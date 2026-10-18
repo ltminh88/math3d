@@ -1,2 +1,4 @@
-// Shim for the "quiz" group: re-point this export to the recovered TS module when it lands.
-export * from '../legacy-quiz.js';
+// Shim for the "quiz" group: legacy names re-exported from the recovered TS modules.
+export { applyAnswerStats as eg, isCorrect as Qm } from '../../quiz/answer-stats';
+export { hintText as tg } from '../../quiz/hint-text';
+export { pickNextFact as Jm } from '../../quiz/question-generator';
