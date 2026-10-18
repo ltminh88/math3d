@@ -1,0 +1,11 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" role="img" aria-label="Hành Trình Đá Số">
+  <title>Hành Trình Đá Số</title>
+  <rect width="512" height="512" rx="96" fill="#3a7d44"/>
+  <polygon points="256,72 404,170 372,372 140,372 108,170" fill="#f2c14e"/>
+  <polygon points="256,72 404,170 256,220" fill="#f7d77f"/>
+  <polygon points="256,72 108,170 256,220" fill="#e0a83a"/>
+  <polygon points="108,170 256,220 140,372" fill="#c98f2a"/>
+  <polygon points="404,170 256,220 372,372" fill="#e9b544"/>
+  <polygon points="140,372 256,220 372,372" fill="#d89c33"/>
+  <text x="256" y="330" text-anchor="middle" font-family="Arial, sans-serif" font-weight="700" font-size="120" fill="#2b2a28">×</text>
+</svg>
