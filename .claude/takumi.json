@@ -1,0 +1,26 @@
+{
+  "kits": {
+    "core": {
+      "version": "26.10.3-r.1",
+      "installedAt": "2026-10-18T10:42:44.597Z",
+      "installState": "complete"
+    },
+    "extras": {
+      "version": "26.10.3",
+      "installedAt": "2026-10-18T10:42:44.598Z",
+      "installState": "complete"
+    }
+  },
+  "scope": "local",
+  "name": "Core",
+  "version": "26.10.3-r.1",
+  "installedAt": "2026-10-18T10:42:44.597Z",
+  "userConfigFiles": [
+    ".gitignore",
+    ".repomixignore",
+    ".mcp.json",
+    ".tkmignore",
+    "takumi.json",
+    ".takumi.json"
+  ]
+}

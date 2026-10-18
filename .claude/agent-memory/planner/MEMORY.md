@@ -1,0 +1,1 @@
+- [VLM auth + ownership decisions](project-vlm-auth-and-ownership-decisions.md) — no OTP; Google+password parent, picture password guard; glob/namespace ownership trick

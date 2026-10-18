@@ -1,0 +1,8 @@
+{
+	"name": "tkm-hooks",
+	"version": "26.10.3-r.1",
+	"author": {
+		"name": "Takumi"
+	},
+	"description": "Takumi guards and tool-call metrics, run in-process instead of one tkm process per hook."
+}

@@ -1,0 +1,19 @@
+# >>> tkm managed
+.claude/skills/tkm
+.claude/rules/tkm
+# <<< tkm managed
+
+# env (never commit)
+.env
+.env.*
+!.env.example
+
+# build / deps
+node_modules
+dist
+dev-dist
+playwright-report
+test-results
+supabase/.temp
+supabase/.branches
+.DS_Store
