@@ -1,7 +1,7 @@
 ---
 title: "Hành Trình Đá Số (Number Stone Quest) math game MVP"
 description: "3D low-poly web/PWA math game for kids 7-9: hub village with VLM guide, Bridge, Field and Forest levels, cosmetics shop, parent accounts with offline-first Supabase sync."
-status: pending
+status: in-progress
 priority: P2
 effort: 128h
 branch: main
@@ -19,7 +19,7 @@ Inputs: [brainstorm](../reports/brainstorm-261018-math-game-continuation.md) · 
 ## Phases
 | Phase | Name | Status |
 |-------|------|--------|
-| 1 | [Scaffold, tooling, PWA, fonts, i18n](./phase-01-scaffold-tooling-pwa-i18n.md) | Pending |
+| 1 | [Scaffold, tooling, PWA, fonts, i18n](./phase-01-scaffold-tooling-pwa-i18n.md) | Done (569c3fe) |
 | 2 | [Engine core, input, audio, read-aloud, UI kit, perf spike gate](./phase-02-engine-core-input-audio-ui-kit.md) | Pending |
 | 3 | [Learning core and local store](./phase-03-learning-core-and-local-store.md) | Pending |
 | 4 | [Hub, world map, VLM guide, story intro, cosmetics shop](./phase-04-hub-map-vlm-guide-story.md) | Pending |

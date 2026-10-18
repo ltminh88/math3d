@@ -8,7 +8,7 @@
 - Date: 2026-10-18
 - Description: git init, Vite 8 + TS 7 project, Biome lint/format, Vitest, Playwright, vite-plugin-pwa manifest, self-hosted fonts, tiny namespaced i18n, base CI. Installs every dependency the MVP needs so later parallel phases never edit `package.json`.
 - Priority: P1 (blocks all)
-- Implementation status: pending
+- Implementation status: done (569c3fe)
 - Review status: not reviewed
 
 ## Key Insights
@@ -61,14 +61,14 @@ Delete: none.
 10. CI workflow; verify locally: `npm run lint && npm run typecheck && npm test && npm run build`.
 
 ## Todo list
-- [ ] git init on main, first commit
-- [ ] verify + pin versions, install all deps
-- [ ] tsconfig, biome, vite, vitest, playwright configs
-- [ ] i18n module + tests
-- [ ] fonts + base CSS + index.html
-- [ ] PWA manifest + icons
-- [ ] boot smoke e2e
-- [ ] CI workflow, README, docs/code-standards.md, .env.example
+- [x] git init on main, first commit
+- [x] verify + pin versions, install all deps
+- [x] tsconfig, biome, vite, vitest, playwright configs
+- [x] i18n module + tests
+- [x] fonts + base CSS + index.html
+- [x] PWA manifest + icons
+- [x] boot smoke e2e
+- [x] CI workflow, README, docs/code-standards.md, .env.example
 
 ## Success Criteria
 - `npm run lint`, `typecheck`, `test`, `build`, `test:e2e` all exit 0.
