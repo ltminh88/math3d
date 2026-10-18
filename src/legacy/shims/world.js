@@ -1,2 +1,2 @@
-// Shim for the "world" group: re-point this export to the recovered TS module when it lands.
-export * from '../legacy-world.js';
+// Shim for the "world" group: the legacy export name `$m` now points at the recovered TS world.
+export { World as $m } from '../../world/world';
