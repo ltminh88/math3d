@@ -8,7 +8,7 @@
 - Date: 2026-10-18
 - Description: Pure-TS learning engine (fact keys, question generator, distractor classes, Leitner 5-box with latency, session planner, hint ladder, scoring, progression) and the versioned IndexedDB store (profiles, fact stats, level progress, wallet, meta, outbox) whose shapes match the server schema of phase 08.
 - Priority: P1
-- Implementation status: pending
+- Implementation status: done (95f966f)
 - Review status: not reviewed
 
 ## Key Insights

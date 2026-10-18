@@ -8,7 +8,7 @@
 - Date: 2026-10-18
 - Description: Renderer, loop, scene manager + disposer, shared asset cache, camera fit, tween, unified pointer/drag/tap-select input, WebAudio synth, Web Speech read-aloud (vi-VN), adaptive quality, DOM UI kit. Ends with a **perf spike on the real target devices (iPad 9th gen Safari + Windows Core i5 Chrome/Edge, Intel iGPU)** that gates phase 04.
 - Priority: P1
-- Implementation status: pending
+- Implementation status: code done (abfbdba), device perf gate pending
 - Review status: not reviewed
 
 ## Key Insights

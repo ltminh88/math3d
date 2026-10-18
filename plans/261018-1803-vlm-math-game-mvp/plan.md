@@ -20,8 +20,8 @@ Inputs: [brainstorm](../reports/brainstorm-261018-math-game-continuation.md) · 
 | Phase | Name | Status |
 |-------|------|--------|
 | 1 | [Scaffold, tooling, PWA, fonts, i18n](./phase-01-scaffold-tooling-pwa-i18n.md) | Done (569c3fe) |
-| 2 | [Engine core, input, audio, read-aloud, UI kit, perf spike gate](./phase-02-engine-core-input-audio-ui-kit.md) | Pending |
-| 3 | [Learning core and local store](./phase-03-learning-core-and-local-store.md) | Pending |
+| 2 | [Engine core, input, audio, read-aloud, UI kit, perf spike gate](./phase-02-engine-core-input-audio-ui-kit.md) | Code done (abfbdba); device perf gate pending |
+| 3 | [Learning core and local store](./phase-03-learning-core-and-local-store.md) | Done (95f966f) |
 | 4 | [Hub, world map, VLM guide, story intro, cosmetics shop](./phase-04-hub-map-vlm-guide-story.md) | Pending |
 | 5 | [Bridge level: equal groups, tables 2 and 5](./phase-05-bridge-level.md) | Pending |
 | 6 | [Field level: arrays, commutativity, tables 3 and 4](./phase-06-field-level.md) | Pending |
@@ -75,3 +75,10 @@ City of Numbers (2-3 digit x 1 digit, remainders) · Math Tower (mixed review) �
 4. VLM visual design; domain name.
 5. Picture password: 3 ordered taps of 9 pictures, lockout 30 s doubling to 5 min; parent gate hold 3 s + adult arithmetic (assumed).
 6. Supabase Free has no backups: accept, or add a scheduled `db dump` workflow later?
+
+## Handoff notes (2026-10-18, after 02/03 review)
+- Perf gate (02) still to run on iPad 9th gen + Windows i5: `npm run dev -- --host`, open `/bench.html`, "Run 60s", record the "RUN DONE" line in `reports/perf-spike-report.md`.
+- 04 boot must: catch `DbBlockedError` (close-other-tabs message); toast when `store.persistent === false`; wire `onVersionChange`/`onTerminated` to a reload prompt; pick ONE source for language (i18n `nsq.language` vs `Settings.lang`) and audio settings (`nsq.audio` vs `nsq.settings`).
+- 04/09: `commitSession(delta, local)` is idempotent by `batchId`; `session-committed` may fire twice. 09 must keep synced `batchId`s (mark, not delete) or retries re-apply.
+- Keyboard: arrows move between 3D items, Enter/Space pick/drop; Tab is never trapped. Number pad takes keys only when focused or `activeInput: true`.
+- Review: `plans/reports/reviewer-261018-phase-02-03.md` (C1-C3, W1-W4, W6-W8, S1-S3 fixed; W5 settings duplication deferred to 04).
