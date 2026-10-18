@@ -10,9 +10,9 @@ import { createSpeechBubble } from '../ui/kit/speech-bubble';
 import { buildBenchWorld, FIELD, STONE_RADIUS } from './perf-bench-world';
 
 const tb = defineStrings('bench', {
-  vi: { prompt: 'Kéo các viên đá vào ô tròn, hoặc chạm đá rồi chạm ô. Bàn phím: Tab, Enter.' },
+  vi: { prompt: 'Kéo các viên đá vào ô tròn, hoặc chạm đá rồi chạm ô. Bàn phím: mũi tên để chọn, Enter để đặt.' },
   en: {
-    prompt: 'Drag stones into the circles, or tap a stone then a circle. Keyboard: Tab, Enter.',
+    prompt: 'Drag stones into the circles, or tap a stone then a circle. Keyboard: arrows to choose, Enter to place.',
   },
 });
 
