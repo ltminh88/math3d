@@ -1,0 +1,37 @@
+// Talking to Milo (E key, interact button, label or clicking him): quest intro or practice offer.
+import { BRIDGE_SEGMENTS } from '../config/world-constants';
+import { openDialog } from './dialog';
+import { gameState, getWorld } from './game-state';
+import { refreshHud } from './hud';
+import { byId, icon } from './icons';
+import { openQuiz } from './quiz-dialog';
+import { persistSave, showToast } from './toast-and-persist';
+
+function miloBodyHtml(bridgeDone: boolean): string {
+  const questComplete = gameState.save.questComplete;
+  return `<div class="dialog-eyebrow">NGƯỜI DẪN ĐƯỜNG CỦA BẠN</div><p class="dialog-copy">${bridgeDone ? `Cây cầu của chúng mình thật đẹp! ${questComplete ? 'Bạn muốn cùng mình luyện thêm phép nhân không?' : 'Bạn hãy đi qua cầu đến khu vườn bên kia nhé. Mình cũng luôn sẵn sàng luyện tập cùng bạn!'}` : 'Khu vườn bên kia sông đang chờ chúng mình. Hãy giúp mình xây <strong>6 đoạn cầu</strong> bằng những viên đá phép thuật nhé!'}</p><div class="milo-tip"><span>✦</span><p>${bridgeDone ? 'Cứ thong thả, không cần vội. Mỗi lần thử là một lần bạn tiến bộ!' : 'Chọn phép nhân cho đúng số viên đá. Mỗi câu đúng: <b>+10 XP, +5 xu</b>. Nếu chưa đúng, chúng mình cùng đếm lại!'}</p></div><button id="accept-quest" class="primary wide">${bridgeDone ? 'Cùng luyện tập' : 'Cùng xây cầu nào!'} ${icon('arrow')}</button>`;
+}
+
+/** Opens Milo's dialog when playing and near him; otherwise nudges the player toward him. */
+export function talkToMilo(): void {
+  const world = getWorld();
+  if (!world.active || world.paused) return;
+  if (!gameState.nearMilo) {
+    showToast('Hãy đến gần Milo — người bạn có chiếc mũ xanh bên bờ sông.');
+    return;
+  }
+  gameState.audio.unlock();
+  const bridgeDone = gameState.save.bridge === BRIDGE_SEGMENTS;
+  openDialog('Chào bạn, mình là Milo!', miloBodyHtml(bridgeDone), 'milo');
+  byId('accept-quest').onclick = () => {
+    gameState.save.questAccepted = true;
+    persistSave();
+    refreshHud();
+    openQuiz(bridgeDone ? 'practice' : 'bridge');
+  };
+}
+
+export function wireMiloTriggers(): void {
+  byId('interact').onclick = talkToMilo;
+  byId('milo-label').onclick = talkToMilo;
+}
