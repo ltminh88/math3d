@@ -21,10 +21,10 @@ Supersedes [261018-1803-vlm-math-game-mvp](../261018-1803-vlm-math-game-mvp/plan
 | 02 | [Legacy bundle runs in Vite (strangler base)](phase-02-legacy-bundle-runs-in-vite.md) | Done (bd357af, gate 5c4f9dd) |
 | 03 | [Recover config, save, xp, quiz](phase-03-recover-config-save-quiz-modules.md) | Done (recovery-p03) |
 | 04 | [Recover audio + i18n](phase-04-recover-audio-and-i18n-modules.md) | Done (recovery-p04) |
-| 05 | [Recover world static builders](phase-05-recover-world-static-builders.md) | Pending |
-| 06 | [Recover scatter, characters, controls, world orchestrator](phase-06-recover-world-scatter-characters-controls.md) | Pending |
-| 07 | [Recover minimap + world map renderer](phase-07-recover-minimap-and-world-map.md) | Pending |
-| 08 | [Recover UI, dialogs, HUD, main](phase-08-recover-ui-dialogs-hud-and-main.md) | Pending |
+| 05 | [Recover world static builders](phase-05-recover-world-static-builders.md) | Done (recovery-p05) |
+| 06 | [Recover scatter, characters, controls, world orchestrator](phase-06-recover-world-scatter-characters-controls.md) | Done (recovery-p06; movement scenarios moved to 09) |
+| 07 | [Recover minimap + world map renderer](phase-07-recover-minimap-and-world-map.md) | Done (recovery-p07) |
+| 08 | [Recover UI, dialogs, HUD, main](phase-08-recover-ui-dialogs-hud-and-main.md) | Done (recovery-p08) |
 | 09 | [Parity sign-off + legacy removal + rename math3d/VLM](phase-09-parity-signoff-and-legacy-removal.md) | Pending |
 | 10 | [three r186 bump + retune to r180 look](phase-10-three-r186-bump-and-rebaseline.md) | Pending |
 | 11 | [Retire old engine code](phase-11-retire-old-engine-code.md) | Pending |
