@@ -1,0 +1,334 @@
+@media (max-width: 700px) {
+  :root {
+    --gutter: 14px;
+  }
+  .topbar {
+    padding: 14px var(--gutter);
+  }
+  .brand {
+    font-size: 10px;
+    letter-spacing: 1.5px;
+    gap: 8px;
+  }
+  .brand small {
+    font-size: 14px;
+  }
+  .brand-mark {
+    width: 40px;
+    height: 40px;
+    border-radius: 12px;
+  }
+  .brand-mark svg {
+    width: 24px;
+    height: 24px;
+  }
+  .top-right {
+    gap: 6px;
+  }
+  .village-status {
+    display: none;
+  }
+  .icon-button {
+    width: 38px;
+    height: 38px;
+    border-radius: 12px;
+  }
+  .area-label {
+    top: 15px;
+    left: 64px;
+    transform: none;
+    max-width: calc(100vw - 214px);
+    padding: 5px 12px 5px 5px;
+    gap: 6px;
+  }
+  .area-label.arrive {
+    animation: none;
+  }
+  .area-icon {
+    width: 28px;
+    height: 28px;
+    font-size: 16px;
+  }
+  .area-label strong {
+    font-size: 13.5px;
+  }
+  .welcome {
+    top: auto;
+    bottom: 16px;
+    left: var(--gutter);
+    transform: none;
+    width: calc(100vw - 2 * var(--gutter));
+    padding: 22px 20px 16px;
+    border-radius: 24px;
+    animation: none;
+  }
+  .chapter {
+    font-size: 10px;
+    letter-spacing: 1.4px;
+  }
+  .welcome h1 {
+    font-size: 40px;
+    margin: 8px 0;
+  }
+  .welcome h1 br {
+    display: none;
+  }
+  .welcome > p {
+    font-size: 14px;
+    line-height: 1.55;
+    margin-bottom: 14px;
+  }
+  .welcome > p strong {
+    font-size: 16px;
+  }
+  .avatar-options {
+    gap: 8px;
+    margin-bottom: 14px;
+  }
+  .avatar-option {
+    font-size: 12px;
+    gap: 6px;
+    padding: 6px 8px 6px 6px;
+  }
+  .avatar-option span {
+    width: 32px;
+    height: 32px;
+    font-size: 22px;
+  }
+  .play-button {
+    padding: 15px 18px;
+    font-size: 17px;
+  }
+  .welcome > .text-button {
+    padding: 8px 0 0;
+  }
+  .welcome-notes,
+  .world-caption,
+  .menu-footer {
+    display: none;
+  }
+  .hud-left {
+    top: 66px;
+    width: min(250px, calc(100vw - 2 * var(--gutter) - 112px));
+    gap: 8px;
+  }
+  .player-card {
+    padding: 7px 8px 7px 7px;
+    gap: 8px;
+    border-radius: 14px;
+  }
+  .avatar-face {
+    width: 38px;
+    height: 40px;
+    font-size: 24px;
+    border-radius: 11px;
+  }
+  .player-info strong {
+    font-size: 12px;
+    gap: 5px;
+  }
+  .player-info small {
+    font-size: 10px;
+  }
+  .wallet {
+    padding: 5px 8px 5px 6px;
+  }
+  .wallet strong {
+    font-size: 16px;
+  }
+  .wallet svg {
+    width: 18px;
+    height: 18px;
+  }
+  .quest-card {
+    padding: 10px 12px;
+    border-radius: 14px;
+  }
+  .quest-card h2 {
+    font-size: 15px;
+  }
+  .quest-head .eyebrow {
+    min-width: 0;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    font-size: 9px;
+  }
+  .quest-card p {
+    font-size: 12px;
+  }
+  .quest-steps > span {
+    height: 24px;
+    font-size: 10px;
+  }
+  .quest-bottom {
+    font-size: 10px;
+  }
+  .quest-bottom .reward {
+    display: none;
+  }
+  .minimap {
+    top: 66px;
+    width: 100px;
+    height: 100px;
+    border-width: 3px;
+  }
+  .minimap-key {
+    display: none;
+  }
+  .bottom-bar {
+    left: var(--gutter);
+    right: var(--gutter);
+    bottom: 14px;
+  }
+  .toolbar {
+    padding: 4px;
+    gap: 4px;
+    border-radius: 16px;
+  }
+  .tool-button {
+    padding: 9px 11px;
+    font-size: 12px;
+    gap: 6px;
+  }
+  .tool-button svg {
+    width: 19px;
+    height: 19px;
+  }
+  .touch-controls {
+    left: 16px;
+    right: 16px;
+    bottom: 82px;
+  }
+  .joystick {
+    width: 94px;
+    height: 94px;
+  }
+  .joystick > div {
+    top: 25px;
+    left: 25px;
+  }
+  .jump-button {
+    width: 55px;
+    height: 55px;
+  }
+  .interact {
+    bottom: 88px;
+    padding: 11px 14px;
+    gap: 6px;
+    font-size: 13px;
+  }
+  .interact svg {
+    display: none;
+  }
+  .toast {
+    bottom: 196px;
+    width: max-content;
+    padding: 11px 16px;
+    font-size: 13px;
+  }
+  .world-label {
+    min-width: 86px;
+    padding: 5px 9px;
+  }
+  .world-label strong {
+    font-size: 12px;
+  }
+  .world-label small {
+    font-size: 9px;
+  }
+  .region-label small {
+    display: none;
+  }
+  .region-icon {
+    width: 24px;
+    height: 24px;
+    font-size: 14px;
+    grid-row: auto;
+  }
+  .map-head {
+    top: 14px;
+    padding: 10px 14px;
+    max-width: calc(100vw - 90px);
+  }
+  .map-head h2 {
+    font-size: 19px;
+  }
+  .map-head p {
+    display: none;
+  }
+  .map-close {
+    top: 14px;
+  }
+  .map-panel {
+    bottom: 14px;
+    padding: 10px;
+    max-height: 40vh;
+  }
+  .map-regions {
+    grid-template-columns: 1fr 1fr;
+  }
+  .map-region {
+    padding: 6px;
+    gap: 8px;
+  }
+  .map-region-icon {
+    width: 32px;
+    height: 32px;
+    font-size: 17px;
+  }
+  .map-region strong {
+    font-size: 12px;
+  }
+  .map-region small,
+  .map-region em {
+    display: none;
+  }
+  dialog {
+    padding: 26px 20px;
+    border-radius: 22px;
+  }
+  dialog h2 {
+    font-size: 24px;
+  }
+  .dialog-eyebrow {
+    font-size: 10px;
+    margin-bottom: 16px;
+  }
+  .dialog-copy,
+  .question-intro {
+    font-size: 15px;
+  }
+  .equation {
+    font-size: 46px;
+    margin: 12px 0 20px;
+  }
+  .answers {
+    gap: 8px;
+  }
+  .answer {
+    min-height: 84px;
+  }
+  .answer > span {
+    font-size: 23px;
+  }
+  .table-tabs {
+    grid-template-columns: repeat(5, 1fr);
+  }
+  .multiplication-grid {
+    gap: 6px 8px;
+  }
+  .multiplication-grid > div {
+    font-size: 15px;
+    padding: 8px;
+  }
+  .dialog-close {
+    top: 12px;
+    right: 12px;
+  }
+  .primary,
+  .secondary {
+    font-size: 15px;
+    padding: 15px 18px;
+  }
+}

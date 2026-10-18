@@ -1,0 +1,131 @@
+.touch-controls {
+  display: none;
+}
+.joystick {
+  position: relative;
+  width: 104px;
+  height: 104px;
+  border: 2px solid #fffaf0a0;
+  border-radius: 50%;
+  background: #fffcf040;
+  -webkit-backdrop-filter: blur(4px);
+  backdrop-filter: blur(4px);
+  touch-action: none;
+  pointer-events: auto;
+}
+.joystick > div {
+  position: absolute;
+  top: 30px;
+  left: 30px;
+  width: 40px;
+  height: 40px;
+  border: 2px solid #fffbed;
+  border-radius: 50%;
+  background: #fffaeacc;
+  box-shadow: 0 3px 7px #24493422;
+}
+.jump-button {
+  width: 62px;
+  height: 62px;
+  display: grid;
+  place-items: center;
+  border: 2px solid #fffbed;
+  border-radius: 50%;
+  background: #fff9eac9;
+}
+.jump-button svg {
+  width: 27px;
+  height: 27px;
+}
+@media (max-height: 780px) and (min-width: 701px) {
+  .welcome {
+    padding: 26px 30px 22px;
+  }
+  h1 {
+    font-size: 50px;
+    margin: 10px 0 8px;
+  }
+  .welcome > p {
+    font-size: 15px;
+    margin-bottom: 14px;
+  }
+  .avatar-options {
+    margin-bottom: 14px;
+  }
+  .play-button {
+    padding: 15px 22px;
+  }
+  .welcome-notes {
+    display: none;
+  }
+  .hud-left,
+  .minimap {
+    top: 80px;
+  }
+  .minimap {
+    width: 150px;
+    height: 150px;
+  }
+}
+@media (max-width: 1100px) {
+  .controls-hint > span:nth-last-child(-n + 2) {
+    display: none;
+  }
+  .hud-left {
+    width: 270px;
+  }
+  .minimap {
+    width: 150px;
+    height: 150px;
+  }
+}
+@media (max-width: 900px) {
+  .controls-hint {
+    display: none;
+  }
+  .bottom-bar {
+    justify-content: flex-end;
+  }
+  .area-label {
+    max-width: calc(100vw - 260px);
+  }
+  .area-label small {
+    display: none;
+  }
+  .map-panel {
+    top: auto;
+    left: var(--gutter);
+    right: var(--gutter);
+    width: auto;
+    max-height: 36vh;
+  }
+  .map-regions {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+  }
+}
+@media (pointer: coarse) {
+  .touch-controls {
+    position: absolute;
+    left: 22px;
+    right: 22px;
+    bottom: 96px;
+    display: flex;
+    align-items: flex-end;
+    justify-content: space-between;
+    pointer-events: none;
+  }
+  .controls-hint,
+  .zoom-group {
+    display: none;
+  }
+  .bottom-bar {
+    justify-content: flex-end;
+  }
+  .interact {
+    bottom: 132px;
+  }
+  .toast {
+    bottom: 210px;
+  }
+}

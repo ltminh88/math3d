@@ -1,0 +1,124 @@
+.controls-hint {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 16px;
+  border-radius: 14px;
+  background: var(--glass);
+  border: 1px solid var(--glass-border);
+  backdrop-filter: var(--blur);
+  -webkit-backdrop-filter: var(--blur);
+  font-size: 12px;
+  font-weight: 700;
+  color: var(--muted);
+}
+.key-group {
+  display: flex;
+  gap: 3px;
+}
+.divider {
+  width: 1px;
+  height: 16px;
+  margin: 0 4px;
+  background: #c4ceb8;
+}
+.toolbar {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 6px;
+  border-radius: 20px;
+  background: var(--glass);
+  border: 1px solid var(--glass-border);
+  backdrop-filter: var(--blur);
+  -webkit-backdrop-filter: var(--blur);
+  box-shadow: var(--shadow);
+}
+.toolbar .icon-button {
+  box-shadow: none;
+}
+.zoom-group {
+  display: flex;
+  gap: 4px;
+  padding-right: 6px;
+  margin-right: 2px;
+  border-right: 1px solid #d9dfcd;
+}
+.zoom-group .icon-button {
+  width: 38px;
+  height: 38px;
+  border-radius: 12px;
+}
+.zoom-group svg {
+  width: 18px;
+  height: 18px;
+}
+.tool-button {
+  display: flex;
+  align-items: center;
+  gap: 9px;
+  padding: 11px 16px;
+  border: 1px solid var(--glass-border);
+  border-radius: 14px;
+  background: #ffffff59;
+  font-size: 14px;
+  font-weight: 800;
+}
+.interact {
+  position: absolute;
+  left: 50%;
+  bottom: 100px;
+  transform: translate(-50%);
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 13px 20px;
+  border: 2px solid #f7cf76;
+  border-radius: 16px;
+  background: var(--ink);
+  color: #fffbea;
+  font-size: 15px;
+  font-weight: 800;
+  white-space: nowrap;
+  box-shadow: var(--shadow-lift);
+  animation: rise-in 0.25s ease;
+}
+@keyframes rise-in {
+  0% {
+    opacity: 0;
+    margin-bottom: -10px;
+  }
+}
+.interact:not(:disabled):active {
+  transform: translate(-50%) translateY(2px);
+}
+.interact kbd {
+  height: 25px;
+  font-size: 14px;
+}
+.toast {
+  position: absolute;
+  left: 50%;
+  bottom: 100px;
+  z-index: 30;
+  transform: translate(-50%);
+  max-width: min(560px, 90vw);
+  padding: 13px 22px;
+  border: 1px solid #d1ddbd;
+  border-radius: 16px;
+  background: var(--paper);
+  color: var(--ink);
+  font-size: 14px;
+  font-weight: 700;
+  text-align: center;
+  box-shadow: var(--shadow-lift);
+  pointer-events: none;
+  animation: rise-in 0.25s ease;
+}
+.map-overlay {
+  position: absolute;
+  inset: 0;
+  z-index: 40;
+  background: #6fa855;
+  animation: map-in 0.35s cubic-bezier(0.2, 0.9, 0.3, 1);
+}

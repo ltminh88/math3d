@@ -1,0 +1,97 @@
+:root {
+  --ink: #194f42;
+  --ink-soft: #387351;
+  --muted: #5f7867;
+  --muted-2: #7e8b76;
+  --paper: #fffcf0;
+  --paper-2: #f2f3e6;
+  --line: #e2e6d4;
+  --glass: rgb(255 252 240 / 50%);
+  --glass-strong: rgb(255 252 240 / 62%);
+  --glass-border: rgb(255 255 255 / 60%);
+  --blur: blur(18px) saturate(1.5);
+  --gold: #f1c35f;
+  --gold-soft: #f7dd9b;
+  --gold-deep: #a97d25;
+  --leaf: #6aa95c;
+  --leaf-soft: #d8ebcc;
+  --coral: #e8562f;
+  --sky: #d4eeec;
+  --radius-lg: 24px;
+  --radius: 18px;
+  --radius-sm: 12px;
+  --shadow: 0 1px 2px rgb(20 60 50 / 8%), 0 10px 30px rgb(20 60 50 / 14%);
+  --shadow-lift: 0 2px 4px rgb(20 60 50 / 10%), 0 18px 48px rgb(20 60 50 / 20%);
+  --font: Nunito, "Trebuchet MS", Arial, sans-serif;
+  --font-display: "Baloo 2", Nunito, "Trebuchet MS", sans-serif;
+  --gutter: 24px;
+  font-family: var(--font);
+  color: var(--ink);
+  background: var(--sky);
+  font-synthesis: none;
+  font-size: 16px;
+  -webkit-font-smoothing: antialiased;
+}
+* {
+  box-sizing: border-box;
+}
+body {
+  margin: 0;
+  background: var(--sky);
+}
+[hidden] {
+  display: none !important;
+}
+button,
+a {
+  -webkit-tap-highlight-color: transparent;
+}
+button {
+  font: inherit;
+  color: inherit;
+  cursor: pointer;
+  transition:
+    background 0.15s,
+    transform 0.15s,
+    box-shadow 0.15s,
+    filter 0.15s;
+}
+button:disabled {
+  cursor: default;
+}
+button:not(:disabled):active {
+  transform: translateY(2px);
+}
+button:hover:not(:disabled) {
+  filter: brightness(1.04);
+}
+button svg {
+  flex-shrink: 0;
+}
+button:focus-visible,
+a:focus-visible {
+  outline: 3px solid #e99231;
+  outline-offset: 3px;
+}
+kbd {
+  font-family: inherit;
+  font-size: 11px;
+  font-weight: 800;
+  display: inline-grid;
+  place-items: center;
+  min-width: 22px;
+  height: 22px;
+  padding: 0 6px;
+  border: 1px solid #c3cbb4;
+  border-bottom-width: 2px;
+  border-radius: 6px;
+  background: var(--paper);
+  color: var(--ink);
+}
+.glass {
+  background: var(--glass);
+  border: 1px solid var(--glass-border);
+  backdrop-filter: var(--blur);
+  -webkit-backdrop-filter: var(--blur);
+  box-shadow: var(--shadow);
+}

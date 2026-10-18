@@ -1,0 +1,15 @@
+/* Recovered game styles, split mechanically; order matters. */
+@import "./01-base-tokens-and-reset.css";
+@import "./02-game-shell-loading-topbar.css";
+@import "./03-area-label-and-welcome-intro.css";
+@import "./04-welcome-actions-caption-footer.css";
+@import "./05-hud-player-card-and-quest.css";
+@import "./06-quest-collapse-minimap-world-labels.css";
+@import "./07-controls-toolbar-interact.css";
+@import "./08-world-map-overlay.css";
+@import "./09-dialog-book-and-answers.css";
+@import "./10-reward-feedback-hints-grid.css";
+@import "./11-settings-help-completion.css";
+@import "./12-touch-controls-and-height-queries.css";
+@import "./13-responsive-max-width-700.css";
+@import "./14-short-landscape-and-reduced-motion.css";

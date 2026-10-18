@@ -1,0 +1,103 @@
+.play-button {
+  width: 100%;
+  justify-content: space-between;
+  padding: 19px 22px;
+  font-size: 18px;
+}
+.play-button svg {
+  box-sizing: content-box;
+  padding: 5px;
+  border-radius: 50%;
+  background: #ffffff1f;
+}
+.text-button {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 12px 0;
+  border: 0;
+  background: none;
+  font-size: 14px;
+  font-weight: 800;
+}
+.welcome > .text-button {
+  margin: 10px auto 0;
+}
+.welcome-notes {
+  display: flex;
+  justify-content: center;
+  gap: 16px;
+  margin-top: 12px;
+  font-size: 12px;
+  color: var(--muted-2);
+}
+.world-caption {
+  position: absolute;
+  right: 5vw;
+  bottom: 13vh;
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  color: #fffdf0;
+  text-shadow: 0 2px 8px #1a523a90;
+  font-family: var(--font-display);
+}
+.world-caption > span {
+  padding-right: 15px;
+  border-right: 1px solid #ffffff80;
+  font-size: 46px;
+  font-weight: 800;
+  opacity: 0.85;
+}
+.world-caption > div {
+  font-size: 26px;
+  font-weight: 800;
+  line-height: 1.1;
+}
+.world-caption small {
+  display: block;
+  margin-top: 6px;
+  font-family: var(--font);
+  font-size: 13px;
+  letter-spacing: 1px;
+}
+.menu-footer {
+  position: absolute;
+  left: 0;
+  bottom: 0;
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 20px;
+  padding: 20px var(--gutter);
+  color: #3f6655;
+  font-size: 12px;
+  font-weight: 700;
+  background: linear-gradient(transparent, #d4eeecb3);
+}
+.menu-footer > span:first-child {
+  font-size: 13px;
+  font-weight: 900;
+  letter-spacing: 1px;
+}
+.menu-footer b {
+  margin-right: 3px;
+  padding: 3px 5px;
+  border-radius: 5px;
+  background: var(--ink);
+  color: #e9f4df;
+}
+.dotcom {
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0;
+}
+.menu-footer > span:last-child {
+  display: flex;
+  align-items: center;
+  gap: 9px;
+}
+.menu-footer svg {
+  width: 16px;
+}

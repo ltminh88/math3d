@@ -1,0 +1,60 @@
+@media (max-height: 620px) and (orientation: landscape) {
+  .topbar {
+    padding: 10px 18px;
+  }
+  .welcome {
+    top: 50%;
+    bottom: auto;
+    transform: translateY(-50%);
+    width: 380px;
+    padding: 18px 22px 14px;
+  }
+  .welcome h1 {
+    font-size: 34px;
+  }
+  .welcome > p {
+    font-size: 13px;
+    margin-bottom: 10px;
+  }
+  .chapter,
+  .choose-label,
+  .welcome-notes,
+  .world-caption,
+  .welcome > .text-button {
+    display: none;
+  }
+  .hud-left,
+  .minimap {
+    top: 62px;
+  }
+  .quest-card p {
+    display: none;
+  }
+  .minimap {
+    width: 96px;
+    height: 96px;
+  }
+  .bottom-bar {
+    bottom: 10px;
+  }
+  .touch-controls {
+    bottom: 70px;
+  }
+  .menu-footer {
+    padding: 10px 18px;
+  }
+  .interact {
+    bottom: 78px;
+  }
+  .toast {
+    bottom: 140px;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *:before,
+  *:after {
+    animation: none !important;
+    transition: none !important;
+  }
+}

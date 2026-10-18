@@ -1,0 +1,93 @@
+.switch i {
+  display: block;
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  background: #fff;
+  transition: transform 0.15s;
+}
+.switch[aria-checked="true"] {
+  background: #43816b;
+}
+.switch[aria-checked="true"] i {
+  transform: translate(20px);
+}
+.progress-summary {
+  display: flex;
+  justify-content: space-around;
+  margin-top: 22px;
+  padding: 20px 9px;
+  border-radius: 16px;
+  background: #eff1e3;
+}
+.progress-summary > span {
+  font-size: 12px;
+  font-weight: 700;
+  text-align: center;
+  color: #7d8b73;
+}
+.progress-summary strong {
+  display: block;
+  margin-bottom: 4px;
+  font-family: var(--font-display);
+  font-size: 28px;
+  color: var(--ink);
+}
+.danger {
+  color: #af624b;
+}
+.danger-bg {
+  background: #a75040;
+  box-shadow: 0 5px #783b30;
+}
+.help-list > div {
+  display: flex;
+  gap: 14px;
+  margin: 20px 0;
+}
+.help-list > div > b {
+  width: 30px;
+  height: 30px;
+  flex-shrink: 0;
+  display: grid;
+  place-items: center;
+  border-radius: 50%;
+  background: #ead499;
+  color: #776338;
+}
+.help-list p {
+  margin: 0;
+  font-size: 14px;
+  line-height: 1.6;
+  color: #76816b;
+}
+.help-list strong {
+  display: block;
+  margin-bottom: 3px;
+  font-size: 16px;
+  color: var(--ink);
+}
+.completion-medal {
+  width: 96px;
+  height: 96px;
+  display: grid;
+  place-items: center;
+  margin: 22px auto;
+  border: 7px solid #f9e9b8;
+  border-radius: 50%;
+  background: #f5d78b;
+  color: #9b7b25;
+  animation: pop 0.6s cubic-bezier(0.2, 1.6, 0.4, 1);
+}
+.completion-medal svg {
+  width: 46px;
+  height: 46px;
+}
+.completion-rewards {
+  display: flex;
+  justify-content: center;
+  gap: 20px;
+  font-size: 20px;
+  font-weight: 900;
+  color: #927423;
+}
