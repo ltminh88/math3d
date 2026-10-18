@@ -54,7 +54,8 @@ h3 {
     env(safe-area-inset-left);
 }
 
-#ui > * {
+/* :where() keeps specificity at zero so full-screen kit layers can opt back out of hit-testing. */
+:where(#ui) > * {
   pointer-events: auto;
 }
 
