@@ -1,7 +1,9 @@
 // Comparison of a capture directory against committed baselines.
-// Canvas PNG + JSON: exact (byte-equal). DOM-overlay PNG: may differ by at most
-// DOM_PNG_TOLERANCE of its pixels — Chrome rasterizes world labels that hang partly off the
-// viewport edge non-deterministically (observed max 0.16 %); html/css/canvas stay exact.
+// Canvas PNG + JSON: exact (byte-equal). DOM-overlay PNG: per-shot pixel tolerance from
+// tests/parity/parity-shot-tolerances.json (unlisted shots: 0). Shots listed there as
+// nonDeterministic (off-edge world labels, keyframe layers) are gated structurally instead:
+// they pass up to the policy ceiling only when their shot JSON (html, cssHash, gl) is exact.
+// DOM_PNG_TOLERANCE caps pixel-gated shots; a structural shot may carry its own measured ceiling.
 export const DOM_PNG_TOLERANCE = 0.002;
 
 import { existsSync, readdirSync, readFileSync } from 'node:fs';
@@ -31,6 +33,25 @@ export function pngPixelDiff(a, b) {
   return { diffPixels, ratio: diffPixels / (pa.width * pa.height) };
 }
 
+/** Per-shot DOM-PNG policy for one project: name -> { tolerance, structuralCeiling|null }. */
+export function loadDomPngPolicy(root, projectName) {
+  const file = join(root, 'tests/parity/parity-shot-tolerances.json');
+  const t = JSON.parse(readFileSync(file, 'utf8'));
+  const shots = t.shots?.[projectName] ?? {};
+  const prefix = `${projectName}/`;
+  const noisy = new Set(
+    Object.keys(t.nonDeterministic ?? {})
+      .filter((k) => k.startsWith(prefix))
+      .map((k) => k.slice(prefix.length)),
+  );
+  const ceiling = Math.min(t.policy.domPngCeiling, DOM_PNG_TOLERANCE);
+  return (name) => ({
+    tolerance: Math.min(shots[name]?.tolerance ?? t.policy.domPngDefault, ceiling),
+    // A noisy shot may name its own structural ceiling (measured); its JSON must still be exact.
+    structuralCeiling: noisy.has(name) ? (shots[name]?.structuralCeiling ?? ceiling) : null,
+  });
+}
+
 function jsonDiffKeys(a, b) {
   const ja = JSON.parse(a);
   const jb = JSON.parse(b);
@@ -38,12 +59,21 @@ function jsonDiffKeys(a, b) {
   return [...keys].filter((k) => JSON.stringify(ja[k]) !== JSON.stringify(jb[k]));
 }
 
+const sameFile = (a, b) =>
+  existsSync(a) && existsSync(b) && readFileSync(a).equals(readFileSync(b));
+
 /**
  * @param {string} baselineDir committed baselines
  * @param {string} actualDir fresh capture
  * @param {(name: string) => boolean} include which baseline files take part
+ * @param {(name: string) => {tolerance: number, structuralCeiling: number|null}} [domPolicy]
  */
-export function compareCaptureDirs(baselineDir, actualDir, include) {
+export function compareCaptureDirs(
+  baselineDir,
+  actualDir,
+  include,
+  domPolicy = () => ({ tolerance: DOM_PNG_TOLERANCE, structuralCeiling: null }),
+) {
   const problems = [];
   const tolerated = [];
   let compared = 0;
@@ -62,13 +92,51 @@ export function compareCaptureDirs(baselineDir, actualDir, include) {
     if (a.equals(b)) continue;
     if (name.endsWith('.png')) {
       const diff = { name, issue: 'pixels', ...pngPixelDiff(a, b) };
-      const ok =
-        name.endsWith('.dom.png') && diff.diffPixels >= 0 && diff.ratio <= DOM_PNG_TOLERANCE;
-      (ok ? tolerated : problems).push(diff);
+      if (!name.endsWith('.dom.png') || diff.diffPixels < 0) {
+        problems.push(diff);
+        continue;
+      }
+      const { tolerance, structuralCeiling } = domPolicy(name);
+      const shotJson = name.replace(/\.dom\.png$/, '.json');
+      if (diff.ratio <= tolerance) tolerated.push({ ...diff, gate: 'pixel', tolerance });
+      else if (
+        structuralCeiling !== null &&
+        diff.ratio <= structuralCeiling &&
+        sameFile(join(baselineDir, shotJson), join(actualDir, shotJson))
+      ) {
+        tolerated.push({ ...diff, gate: 'structural', tolerance: structuralCeiling });
+      } else problems.push({ ...diff, tolerance });
     } else if (name.endsWith('.json')) {
       problems.push({ name, issue: 'json', keys: jsonDiffKeys(a.toString(), b.toString()) });
     } else problems.push({ name, issue: 'bytes' });
   }
   for (const name of actual) problems.push({ name, issue: 'not in baseline' });
   return { compared, problems, tolerated };
+}
+
+/**
+ * Compare a fresh capture of `ids` with the committed baselines of one project: every live
+ * artifact (PNG/JSON/trace) and, with `scenes`, the scene dumps vs the oracle-scene baselines.
+ */
+export function compareWithBaselines(root, projectName, ids, outDir, { scenes = false } = {}) {
+  const ofScenario = (f) => ids.some((id) => f.startsWith(`${id}--`) || f === `${id}.trace.json`);
+  const policy = loadDomPngPolicy(root, projectName);
+  const base = join(root, 'tests/parity/baselines');
+  const live = compareCaptureDirs(
+    join(base, 'live', projectName),
+    outDir,
+    (f) => ofScenario(f) && !f.endsWith('.scene.json'),
+    policy,
+  );
+  if (!scenes) return live;
+  const scene = compareCaptureDirs(
+    join(base, 'oracle-scene', projectName),
+    outDir,
+    (f) => ofScenario(f) && f.endsWith('.scene.json'),
+  );
+  return {
+    compared: live.compared + scene.compared,
+    problems: [...live.problems, ...scene.problems],
+    tolerated: live.tolerated,
+  };
 }

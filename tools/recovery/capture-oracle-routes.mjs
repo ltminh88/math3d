@@ -26,12 +26,12 @@ export function loadOracleFiles(root) {
   };
 }
 
-/** Route every request to `origin` from the archived files; unknown paths 404 (no live fallback). */
+/** Route every request to `origin` from a file map (oracle or local); unknown paths 404. */
 export async function routeOracle(context, origin, files) {
   await context.route(`${origin}/**`, (route) => {
     const path = new URL(route.request().url()).pathname;
     const file = files[path === '/index.html' ? '/' : path];
-    if (!file) return route.fulfill({ status: 404, body: 'not in oracle archive' });
+    if (!file) return route.fulfill({ status: 404, body: 'not in routed files' });
     return route.fulfill({ status: 200, contentType: file.type, body: file.body });
   });
 }

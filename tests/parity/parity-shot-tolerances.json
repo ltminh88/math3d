@@ -3,21 +3,28 @@
   "measuredAt": "2026-10-19",
   "runs": {
     "liveVsLive": "capture-live-baselines.mjs --verify (fresh capture vs committed live baselines)",
-    "liveVsOracle": "capture-live-baselines.mjs --origin oracle (recovered/original served locally + window.__parity)"
+    "liveVsOracle": "capture-live-baselines.mjs --origin oracle (recovered/original served locally + window.__parity)",
+    "localVsLive": "capture-live-baselines.mjs --origin local / npm run test:parity (dist/ served under the live origin + window.__parity), 2026-10-19: canvas, shot JSON, traces and oracle scene dumps exact in every run"
   },
   "policy": {
     "canvasPng": 0,
     "json": 0,
     "domPngDefault": 0,
     "domPngCeiling": 0.002,
-    "rule": "shot tolerance = max observed ratio x2, rounded up to 1e-4; shots not listed use 0"
+    "rule": "shot tolerance = max observed ratio x2, rounded up to 1e-4; shots not listed use 0",
+    "structuralCeiling": "nonDeterministic shots pass on pixels up to shot.structuralCeiling (default domPngCeiling) only when their shot JSON is byte-exact"
   },
   "nonDeterministic": {
     "desktop-chromium/playthrough--after-quest.dom.png": "tower-label world label hangs off the right viewport edge (x~1313/1280); Chrome rasterizes the clipped layer differently run to run (~0.13%).",
     "desktop-chromium/playthrough--quest-complete.dom.png": "same off-edge tower-label, under the dialog backdrop blur (~0.05%).",
     "desktop-chromium/bridge-6--play.dom.png": "20 px on an off-edge world label (0.002%).",
     "desktop-chromium/menus--map-open.dom.png": "3 px, map overlay map-in keyframe animation on a composited layer (oracle run only).",
-    "mobile-pixel/playthrough--quiz-correct-3.dom.png": "3 px, dialog pop/reward-pop keyframe animation on a composited layer."
+    "mobile-pixel/playthrough--quiz-correct-3.dom.png": "3 px, dialog pop/reward-pop keyframe animation on a composited layer.",
+    "desktop-chromium/playthrough--quiz-correct.dom.png": "6 px around the answer feedback (x 614-717, y 354-407); seen live-vs-live and local-vs-live (dialog pop keyframe layer).",
+    "mobile-pixel/playthrough--quiz-correct-6.dom.png": "18 px (x 142-154, y 96-113) in the dialog; local run 1 of 3, 0 in local run 2 (keyframe layer raster).",
+    "mobile-pixel/playthrough--near-milo.dom.png": "905 px on the #interact prompt fading in over the bottom bar (backdrop-filter glass, x 126-336, y 719-822). Two-state raster: identical 905 px in 2 local runs, 0 px in another local run and in live --verify; shot JSON exact in all. Gated structurally with its own ceiling (above domPngCeiling).",
+    "mobile-pixel/playthrough--after-quest.dom.png": "8 px (x 68-75, y 102-109) on the HUD avatar/level badge after the quest reward (keyframe pop layer); local run 3 of 3, shot JSON exact.",
+    "mobile-pixel/playthrough--quest-complete.dom.png": "26 px (x 23-83, y 97-282) in the HUD card under the dialog backdrop blur; local run 3 of 3, shot JSON exact."
   },
   "recommendation": "Keep pixel gating for canvas shots (exact) and for DOM shots at tolerance 0. For the listed shots, do not raise global tolerance: either mask the off-screen world labels (#tower-label, #city-label when their translate x exceeds the viewport) in DOM shots, or gate them structurally via the shot JSON (html + cssHash + gl calls/triangles are exact) and the oracle scene JSON. Structural gating is preferred because it is exact and catches label text/position regressions that a mask would hide.",
   "shots": {
@@ -25,7 +32,7 @@
       "bridge-6--play.dom.png": {
         "liveVsLive": {
           "diffPixels": 20,
-          "ratio": 0.000022
+          "ratio": 2.2e-5
         },
         "tolerance": 0.0001
       },
@@ -37,7 +44,7 @@
         "tolerance": 0.002,
         "liveVsOracle": {
           "diffPixels": 11,
-          "ratio": 0.000012
+          "ratio": 1.2e-5
         }
       },
       "playthrough--quest-complete.dom.png": {
@@ -48,13 +55,24 @@
         "tolerance": 0.0011,
         "liveVsOracle": {
           "diffPixels": 11,
-          "ratio": 0.000012
+          "ratio": 1.2e-5
         }
       },
       "menus--map-open.dom.png": {
         "liveVsOracle": {
           "diffPixels": 3,
-          "ratio": 0.000003
+          "ratio": 3e-6
+        },
+        "tolerance": 0.0001
+      },
+      "playthrough--quiz-correct.dom.png": {
+        "liveVsLive": {
+          "diffPixels": 6,
+          "ratio": 7e-6
+        },
+        "localVsLive": {
+          "diffPixels": 6,
+          "ratio": 7e-6
         },
         "tolerance": 0.0001
       }
@@ -63,9 +81,38 @@
       "playthrough--quiz-correct-3.dom.png": {
         "liveVsLive": {
           "diffPixels": 3,
-          "ratio": 0.000009
+          "ratio": 9e-6
         },
         "tolerance": 0.0001
+      },
+      "playthrough--quiz-correct-6.dom.png": {
+        "localVsLive": {
+          "diffPixels": 18,
+          "ratio": 5.2e-5
+        },
+        "tolerance": 0.0002
+      },
+      "playthrough--near-milo.dom.png": {
+        "localVsLive": {
+          "diffPixels": 905,
+          "ratio": 0.002618
+        },
+        "tolerance": 0,
+        "structuralCeiling": 0.0053
+      },
+      "playthrough--after-quest.dom.png": {
+        "localVsLive": {
+          "diffPixels": 8,
+          "ratio": 2.3e-5
+        },
+        "tolerance": 0.0001
+      },
+      "playthrough--quest-complete.dom.png": {
+        "localVsLive": {
+          "diffPixels": 26,
+          "ratio": 7.5e-5
+        },
+        "tolerance": 0.0002
       }
     }
   }

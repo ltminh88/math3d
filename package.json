@@ -16,7 +16,7 @@
     "format": "biome format --write .",
     "test": "vitest run",
     "test:e2e": "playwright test",
-    "test:parity": "playwright test -c tests/parity/parity.config.ts",
+    "test:parity": "playwright test -c tests/parity/playwright.parity.config.ts",
     "recover:legacy": "bash tools/recovery/unminify-app.sh",
     "recover:styles": "tsx tools/recovery/split-legacy-styles.ts",
     "recover:styles:check": "tsx tools/recovery/split-legacy-styles.ts --check",

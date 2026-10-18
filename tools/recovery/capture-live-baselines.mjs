@@ -2,9 +2,12 @@
 import { createHash } from 'node:crypto';
 // Capture (or verify) seeded, clock-controlled parity baselines of the live game.
 //   node tools/recovery/capture-live-baselines.mjs                 capture -> tests/parity/baselines/live/<project>/
-//   node tools/recovery/capture-live-baselines.mjs --verify        recapture to a temp dir; canvas/json exact, DOM png <=0.2%
+//   node tools/recovery/capture-live-baselines.mjs --verify        recapture to a temp dir; canvas/json exact,
+//        DOM png per-shot tolerance (tests/parity/parity-shot-tolerances.json)
 //   node tools/recovery/capture-live-baselines.mjs --origin oracle serve recovered/original locally (+window.__parity),
 //        require 0 diff vs live baselines, write scene dumps -> tests/parity/baselines/oracle-scene/<project>/
+//   node tools/recovery/capture-live-baselines.mjs --origin local  serve dist/ (npm run build:test first) under the
+//        live origin (+window.__parity), compare vs live baselines + oracle scene dumps (never writes baselines)
 // Options: --project desktop-chromium|mobile-pixel (default both)  --scenario id[,id]  --out <dir>
 import { mkdirSync, mkdtempSync, readdirSync, readFileSync, rmSync, writeFileSync } from 'node:fs';
 import os from 'node:os';
@@ -21,13 +24,12 @@ import {
   PARITY_SEED,
 } from '../../tests/parity/scenarios/parity-projects.ts';
 import { PARITY_SCENARIOS } from '../../tests/parity/scenarios/parity-scenarios.ts';
-import { compareCaptureDirs, DOM_PNG_TOLERANCE } from './capture-baseline-compare.mjs';
-import { loadOracleFiles, routeOracle } from './capture-oracle-routes.mjs';
-import { createParityDriver } from './capture-parity-driver.mjs';
+import { compareWithBaselines, DOM_PNG_TOLERANCE } from './capture-baseline-compare.mjs';
+import { loadLocalFiles } from './capture-local-routes.mjs';
+import { loadOracleFiles } from './capture-oracle-routes.mjs';
+import { runScenario } from './capture-parity-run-scenario.mjs';
 
 const root = join(dirname(fileURLToPath(import.meta.url)), '../..');
-const hooksPath = join(root, 'tools/recovery/capture-parity-hooks.js');
-const clockPath = join(root, 'tools/recovery/capture-parity-virtual-clock.js');
 const { values: args } = parseArgs({
   options: {
     project: { type: 'string' },
@@ -37,9 +39,12 @@ const { values: args } = parseArgs({
     out: { type: 'string' },
   },
 });
-if (!['live', 'oracle'].includes(args.origin)) throw new Error('--origin must be live|oracle');
+if (!['live', 'oracle', 'local'].includes(args.origin)) {
+  throw new Error('--origin must be live|oracle|local');
+}
 const oracle = args.origin === 'oracle';
-const comparing = args.verify || oracle;
+const local = args.origin === 'local';
+const comparing = args.verify || oracle || local;
 const projects = PARITY_PROJECTS.filter((p) => !args.project || p.name === args.project);
 const wanted = args.scenario?.split(',');
 const scenarios = PARITY_SCENARIOS.filter((s) => !wanted || wanted.includes(s.id));
@@ -47,56 +52,6 @@ if (!projects.length || !scenarios.length) throw new Error('no matching project/
 
 const liveDir = (p) => join(root, 'tests/parity/baselines/live', p.name);
 const sha256 = (buf) => createHash('sha256').update(buf).digest('hex');
-
-async function runScenario(browser, project, scenario, outDir, written, oracleFiles) {
-  const context = await browser.newContext({
-    viewport: project.viewport,
-    deviceScaleFactor: project.deviceScaleFactor,
-    isMobile: project.isMobile,
-    hasTouch: project.hasTouch,
-    locale: 'vi-VN',
-    timezoneId: 'Asia/Ho_Chi_Minh',
-    colorScheme: 'light',
-    reducedMotion: 'no-preference',
-  });
-  if (oracleFiles) await routeOracle(context, PARITY_LIVE_ORIGIN, oracleFiles);
-  const page = await context.newPage();
-  const pageErrors = [];
-  page.on('crash', () => console.error(`${project.name} ${scenario.id}: renderer crashed`));
-  page.on('pageerror', (e) => pageErrors.push(String(e.message)));
-  page.on('console', (m) => m.type() === 'error' && pageErrors.push(`console: ${m.text()}`));
-  await page.addInitScript(
-    ({ seed, clockStart, storage }) => {
-      window.__PARITY_SEED__ = seed;
-      window.__PARITY_CLOCK_START__ = clockStart;
-      for (const [k, v] of Object.entries(storage)) localStorage.setItem(k, v);
-    },
-    { seed: PARITY_SEED, clockStart: PARITY_CLOCK_START, storage: scenario.storage ?? {} },
-  );
-  await page.addInitScript({ path: clockPath });
-  await page.addInitScript({ path: hooksPath });
-  await page.goto(`${PARITY_LIVE_ORIGIN}/`, { waitUntil: 'load' });
-  await page.evaluate(() => document.fonts.ready.then(() => undefined));
-  const lowPower = await page.evaluate(
-    () => matchMedia('(max-width: 900px), (pointer: coarse)').matches,
-  );
-  if (lowPower !== project.lowPower) throw new Error(`${project.name}: lowPower=${lowPower}`);
-  const driver = createParityDriver({
-    page,
-    scenarioId: scenario.id,
-    outDir,
-    written,
-  });
-  await scenario.run(driver);
-  const trace = await page.evaluate(() => ({
-    storageWrites: window.__parityStorage,
-    audio: window.__parityAudio,
-  }));
-  const name = `${scenario.id}.trace.json`;
-  writeFileSync(join(outDir, name), `${JSON.stringify({ ...trace, pageErrors }, null, 1)}\n`);
-  written.push(name);
-  await context.close();
-}
 
 async function liveAssetHashes(browser) {
   const ctx = await browser.newContext();
@@ -116,7 +71,11 @@ function clearScenarioFiles(dir, ids) {
 }
 
 const browser = await chromium.launch({ args: PARITY_LAUNCH_ARGS });
-const oracleFiles = oracle ? loadOracleFiles(root) : null;
+const routedFiles = oracle
+  ? loadOracleFiles(root)
+  : local
+    ? loadLocalFiles(join(root, 'dist'))
+    : null;
 let failed = false;
 try {
   for (const project of projects) {
@@ -135,7 +94,7 @@ try {
     const started = Date.now();
     for (const scenario of scenarios) {
       const t = Date.now();
-      await runScenario(browser, project, scenario, outDir, written, oracleFiles);
+      await runScenario(browser, project, scenario, outDir, written, routedFiles);
       console.log(`${project.name} ${scenario.id} ok (${((Date.now() - t) / 1000).toFixed(1)}s)`);
     }
     if (!comparing) {
@@ -154,7 +113,12 @@ try {
         seed: PARITY_SEED,
         clockStart: new Date(PARITY_CLOCK_START).toISOString(),
         frameMs: PARITY_FRAME_MS,
-        verifyTolerance: { canvasPng: 0, json: 0, domPngPixelRatio: DOM_PNG_TOLERANCE },
+        verifyTolerance: {
+          canvasPng: 0,
+          json: 0,
+          domPngPerShot: 'tests/parity/parity-shot-tolerances.json',
+          domPngCeiling: DOM_PNG_TOLERANCE,
+        },
         scenarios: scenarios.map((s) => s.id),
         files: written.length,
         durationSec: Math.round((Date.now() - started) / 1000),
@@ -164,13 +128,18 @@ try {
       continue;
     }
     const ids = scenarios.map((s) => s.id);
-    const inScope = (f) =>
-      !f.endsWith('.scene.json') &&
-      ids.some((id) => f.startsWith(`${id}--`) || f === `${id}.trace.json`);
-    const { compared, problems, tolerated } = compareCaptureDirs(liveDir(project), outDir, inScope);
+    const { compared, problems, tolerated } = compareWithBaselines(
+      root,
+      project.name,
+      ids,
+      outDir,
+      {
+        scenes: local,
+      },
+    );
     console.log(
-      `${project.name}: compared ${compared} files vs live baselines, ${problems.length} differ, ` +
-        `${tolerated.length} DOM shots within ${DOM_PNG_TOLERANCE * 100}% tolerance`,
+      `${project.name} [${args.origin}]: compared ${compared} files vs baselines, ` +
+        `${problems.length} differ, ${tolerated.length} DOM shots within per-shot tolerance`,
     );
     for (const p of tolerated) console.log('  TOLERATED', JSON.stringify(p));
     for (const p of problems) console.log('  DIFF', JSON.stringify(p));
