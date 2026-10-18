@@ -7,6 +7,7 @@ import { dirname, join, relative } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import vm from 'node:vm';
 import { buildI18nCorpus, ORIGINAL_SOURCE } from './golden-i18n-corpus.mjs';
+import { buildMapHitTest } from './golden-map-hit-test.mjs';
 import { buildSaveFixtures } from './golden-save-fixtures.mjs';
 import { mulberry32 } from './seeded-random.mjs';
 
@@ -163,6 +164,7 @@ const files = {
   'lcg-first-1000.json': lcg(m),
   'map-decor.json': plain({ minimapDecor23: m.ag(), worldMapDecor7: m.og() }),
   'i18n-corpus.json': buildI18nCorpus(m, join(root, ORIGINAL_SOURCE)),
+  'map-hit-test.json': buildMapHitTest(m, join(root, ORIGINAL_SOURCE)),
 };
 
 mkdirSync(outDir, { recursive: true });
