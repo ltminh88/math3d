@@ -1,7 +1,7 @@
 ---
 title: "Recover Math AI Game 3D (Vương Quốc Cửu Chương), rename to math3d and continue development"
 description: "Recover the lost source of math.aigame3d.com from the prod bundle into modular TS with pixel/behavior parity, then rename to math3d, add save migration/codes, learning core, Field + Forest levels, cosmetics shop, parent accounts, Supabase sync, Vercel deploy."
-status: pending
+status: in-progress
 priority: P2
 effort: 174h
 branch: main
@@ -17,8 +17,8 @@ Supersedes [261018-1803-vlm-math-game-mvp](../261018-1803-vlm-math-game-mvp/plan
 ## Phases
 | Phase | Name | Status |
 |-------|------|--------|
-| 01 | [Capture live baselines + golden traces](phase-01-capture-live-baselines-and-golden-traces.md) | Pending |
-| 02 | [Legacy bundle runs in Vite (strangler base)](phase-02-legacy-bundle-runs-in-vite.md) | Pending |
+| 01 | [Capture live baselines + golden traces](phase-01-capture-live-baselines-and-golden-traces.md) | Done (5255e31) |
+| 02 | [Legacy bundle runs in Vite (strangler base)](phase-02-legacy-bundle-runs-in-vite.md) | Done (bd357af, gate 5c4f9dd) |
 | 03 | [Recover config, save, xp, quiz](phase-03-recover-config-save-quiz-modules.md) | Pending |
 | 04 | [Recover audio + i18n](phase-04-recover-audio-and-i18n-modules.md) | Pending |
 | 05 | [Recover world static builders](phase-05-recover-world-static-builders.md) | Pending |
