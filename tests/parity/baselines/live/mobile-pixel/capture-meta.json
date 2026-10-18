@@ -1,0 +1,59 @@
+{
+ "capturedAt": "2026-10-18T18:18:41.529Z",
+ "origin": "https://math.aigame3d.com",
+ "liveAssets": {
+  "/": {
+   "status": 200,
+   "sha256": "f1eaeeddc99e22eaafa22ace783a21c942209b4bb1ce9bd190e3ac3c284003d9"
+  },
+  "/assets/index-CO4MPNqj.js": {
+   "status": 200,
+   "sha256": "c10a1e773182d0dd815bf484f0de76be963485c9f88a46f29fa0198567d9c84f"
+  },
+  "/assets/index-D1ngBGok.css": {
+   "status": 200,
+   "sha256": "760bd1ca70ba0b95602383e956c0f1df427b5326ebd2c715578059b4a073d024"
+  }
+ },
+ "chromium": "156.0.8078.4",
+ "playwright": "1.64.1",
+ "node": "v24.15.0",
+ "os": "darwin 25.6.0 arm64",
+ "project": {
+  "name": "mobile-pixel",
+  "lowPower": true,
+  "viewport": {
+   "width": 412,
+   "height": 839
+  },
+  "deviceScaleFactor": 1,
+  "isMobile": true,
+  "hasTouch": true
+ },
+ "launchArgs": [
+  "--use-gl=angle",
+  "--use-angle=swiftshader",
+  "--enable-unsafe-swiftshader",
+  "--ignore-gpu-blocklist"
+ ],
+ "seed": 20261018,
+ "clockStart": "2026-10-18T12:00:00.000Z",
+ "frameMs": 16,
+ "verifyTolerance": {
+  "canvasPng": 0,
+  "json": 0,
+  "domPngPixelRatio": 0.002
+ },
+ "scenarios": [
+  "welcome",
+  "avatar",
+  "menus",
+  "playthrough",
+  "bridge-0",
+  "bridge-3",
+  "bridge-6",
+  "language-en"
+ ],
+ "files": 122,
+ "durationSec": 680
+}

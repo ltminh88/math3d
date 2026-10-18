@@ -1,0 +1,11 @@
+{
+ "storageWrites": [
+  [
+   "set",
+   "aigame3d_quest_collapsed",
+   "1"
+  ]
+ ],
+ "audio": [],
+ "pageErrors": []
+}

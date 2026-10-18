@@ -1,0 +1,72 @@
+{
+  "description": "Per-shot pixel tolerances for parity specs, measured as run-to-run noise of the live oracle (same Mac, Chromium build in capture-meta.json). Canvas PNGs and shot JSON (gl draw calls/triangles, html, cssHash, storage) were exact in every run: tolerance 0. Only DOM-overlay PNGs show noise.",
+  "measuredAt": "2026-10-19",
+  "runs": {
+    "liveVsLive": "capture-live-baselines.mjs --verify (fresh capture vs committed live baselines)",
+    "liveVsOracle": "capture-live-baselines.mjs --origin oracle (recovered/original served locally + window.__parity)"
+  },
+  "policy": {
+    "canvasPng": 0,
+    "json": 0,
+    "domPngDefault": 0,
+    "domPngCeiling": 0.002,
+    "rule": "shot tolerance = max observed ratio x2, rounded up to 1e-4; shots not listed use 0"
+  },
+  "nonDeterministic": {
+    "desktop-chromium/playthrough--after-quest.dom.png": "tower-label world label hangs off the right viewport edge (x~1313/1280); Chrome rasterizes the clipped layer differently run to run (~0.13%).",
+    "desktop-chromium/playthrough--quest-complete.dom.png": "same off-edge tower-label, under the dialog backdrop blur (~0.05%).",
+    "desktop-chromium/bridge-6--play.dom.png": "20 px on an off-edge world label (0.002%).",
+    "desktop-chromium/menus--map-open.dom.png": "3 px, map overlay map-in keyframe animation on a composited layer (oracle run only).",
+    "mobile-pixel/playthrough--quiz-correct-3.dom.png": "3 px, dialog pop/reward-pop keyframe animation on a composited layer."
+  },
+  "recommendation": "Keep pixel gating for canvas shots (exact) and for DOM shots at tolerance 0. For the listed shots, do not raise global tolerance: either mask the off-screen world labels (#tower-label, #city-label when their translate x exceeds the viewport) in DOM shots, or gate them structurally via the shot JSON (html + cssHash + gl calls/triangles are exact) and the oracle scene JSON. Structural gating is preferred because it is exact and catches label text/position regressions that a mask would hide.",
+  "shots": {
+    "desktop-chromium": {
+      "bridge-6--play.dom.png": {
+        "liveVsLive": {
+          "diffPixels": 20,
+          "ratio": 0.000022
+        },
+        "tolerance": 0.0001
+      },
+      "playthrough--after-quest.dom.png": {
+        "liveVsLive": {
+          "diffPixels": 1208,
+          "ratio": 0.001311
+        },
+        "tolerance": 0.002,
+        "liveVsOracle": {
+          "diffPixels": 11,
+          "ratio": 0.000012
+        }
+      },
+      "playthrough--quest-complete.dom.png": {
+        "liveVsLive": {
+          "diffPixels": 496,
+          "ratio": 0.000538
+        },
+        "tolerance": 0.0011,
+        "liveVsOracle": {
+          "diffPixels": 11,
+          "ratio": 0.000012
+        }
+      },
+      "menus--map-open.dom.png": {
+        "liveVsOracle": {
+          "diffPixels": 3,
+          "ratio": 0.000003
+        },
+        "tolerance": 0.0001
+      }
+    },
+    "mobile-pixel": {
+      "playthrough--quiz-correct-3.dom.png": {
+        "liveVsLive": {
+          "diffPixels": 3,
+          "ratio": 0.000009
+        },
+        "tolerance": 0.0001
+      }
+    }
+  }
+}

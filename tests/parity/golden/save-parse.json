@@ -1,0 +1,1490 @@
+[
+ {
+  "name": "null",
+  "input": null,
+  "output": {
+   "version": 1,
+   "xp": 0,
+   "coins": 0,
+   "bridge": 0,
+   "questAccepted": false,
+   "questComplete": false,
+   "avatar": "boy",
+   "table": 0,
+   "sound": true,
+   "music": false,
+   "combo": 0,
+   "questionStats": {},
+   "review": [],
+   "started": false
+  }
+ },
+ {
+  "name": "empty-string",
+  "input": "",
+  "output": {
+   "version": 1,
+   "xp": 0,
+   "coins": 0,
+   "bridge": 0,
+   "questAccepted": false,
+   "questComplete": false,
+   "avatar": "boy",
+   "table": 0,
+   "sound": true,
+   "music": false,
+   "combo": 0,
+   "questionStats": {},
+   "review": [],
+   "started": false
+  }
+ },
+ {
+  "name": "valid-base",
+  "input": "{\"version\":1,\"xp\":120,\"coins\":35,\"bridge\":3,\"questAccepted\":true,\"questComplete\":false,\"avatar\":\"girl\",\"table\":4,\"sound\":true,\"music\":false,\"combo\":2,\"questionStats\":{\"m4_3\":{\"attempts\":999,\"correct\":2,\"wrong\":1,\"responseTime\":1500,\"lastAnsweredAt\":\"2026-10-01T10:00:00.000Z\"},\"m7_8\":{\"attempts\":999,\"correct\":0,\"wrong\":2,\"responseTime\":1500,\"lastAnsweredAt\":\"2026-10-01T10:00:00.000Z\"}},\"review\":[\"m7_8\"],\"started\":true}",
+  "output": {
+   "version": 1,
+   "xp": 120,
+   "coins": 35,
+   "bridge": 3,
+   "questAccepted": true,
+   "questComplete": false,
+   "avatar": "girl",
+   "table": 4,
+   "sound": true,
+   "music": false,
+   "combo": 2,
+   "questionStats": {
+    "m4_3": {
+     "attempts": 3,
+     "correct": 2,
+     "wrong": 1,
+     "responseTime": 1500,
+     "lastAnsweredAt": "2026-10-01T10:00:00.000Z"
+    },
+    "m7_8": {
+     "attempts": 2,
+     "correct": 0,
+     "wrong": 2,
+     "responseTime": 1500,
+     "lastAnsweredAt": "2026-10-01T10:00:00.000Z"
+    }
+   },
+   "review": [
+    "m7_8"
+   ],
+   "started": true
+  }
+ },
+ {
+  "name": "valid-defaults-only",
+  "input": "{\"version\":1}",
+  "output": {
+   "version": 1,
+   "xp": 0,
+   "coins": 0,
+   "bridge": 0,
+   "questAccepted": false,
+   "questComplete": false,
+   "avatar": "boy",
+   "table": 0,
+   "sound": true,
+   "music": false,
+   "combo": 0,
+   "questionStats": {},
+   "review": [],
+   "started": false
+  }
+ },
+ {
+  "name": "version-2",
+  "input": "{\"version\":2,\"xp\":120,\"coins\":35,\"bridge\":3,\"questAccepted\":true,\"questComplete\":false,\"avatar\":\"girl\",\"table\":4,\"sound\":true,\"music\":false,\"combo\":2,\"questionStats\":{\"m4_3\":{\"attempts\":999,\"correct\":2,\"wrong\":1,\"responseTime\":1500,\"lastAnsweredAt\":\"2026-10-01T10:00:00.000Z\"},\"m7_8\":{\"attempts\":999,\"correct\":0,\"wrong\":2,\"responseTime\":1500,\"lastAnsweredAt\":\"2026-10-01T10:00:00.000Z\"}},\"review\":[\"m7_8\"],\"started\":true}",
+  "output": {
+   "version": 1,
+   "xp": 0,
+   "coins": 0,
+   "bridge": 0,
+   "questAccepted": false,
+   "questComplete": false,
+   "avatar": "boy",
+   "table": 0,
+   "sound": true,
+   "music": false,
+   "combo": 0,
+   "questionStats": {},
+   "review": [],
+   "started": false
+  }
+ },
+ {
+  "name": "version-string-1",
+  "input": "{\"version\":\"1\",\"xp\":120,\"coins\":35,\"bridge\":3,\"questAccepted\":true,\"questComplete\":false,\"avatar\":\"girl\",\"table\":4,\"sound\":true,\"music\":false,\"combo\":2,\"questionStats\":{\"m4_3\":{\"attempts\":999,\"correct\":2,\"wrong\":1,\"responseTime\":1500,\"lastAnsweredAt\":\"2026-10-01T10:00:00.000Z\"},\"m7_8\":{\"attempts\":999,\"correct\":0,\"wrong\":2,\"responseTime\":1500,\"lastAnsweredAt\":\"2026-10-01T10:00:00.000Z\"}},\"review\":[\"m7_8\"],\"started\":true}",
+  "output": {
+   "version": 1,
+   "xp": 0,
+   "coins": 0,
+   "bridge": 0,
+   "questAccepted": false,
+   "questComplete": false,
+   "avatar": "boy",
+   "table": 0,
+   "sound": true,
+   "music": false,
+   "combo": 0,
+   "questionStats": {},
+   "review": [],
+   "started": false
+  }
+ },
+ {
+  "name": "version-missing",
+  "input": "{\"xp\":50}",
+  "output": {
+   "version": 1,
+   "xp": 0,
+   "coins": 0,
+   "bridge": 0,
+   "questAccepted": false,
+   "questComplete": false,
+   "avatar": "boy",
+   "table": 0,
+   "sound": true,
+   "music": false,
+   "combo": 0,
+   "questionStats": {},
+   "review": [],
+   "started": false
+  }
+ },
+ {
+  "name": "garbage-text",
+  "input": "not json at all {",
+  "output": {
+   "version": 1,
+   "xp": 0,
+   "coins": 0,
+   "bridge": 0,
+   "questAccepted": false,
+   "questComplete": false,
+   "avatar": "boy",
+   "table": 0,
+   "sound": true,
+   "music": false,
+   "combo": 0,
+   "questionStats": {},
+   "review": [],
+   "started": false
+  }
+ },
+ {
+  "name": "json-number",
+  "input": "42",
+  "output": {
+   "version": 1,
+   "xp": 0,
+   "coins": 0,
+   "bridge": 0,
+   "questAccepted": false,
+   "questComplete": false,
+   "avatar": "boy",
+   "table": 0,
+   "sound": true,
+   "music": false,
+   "combo": 0,
+   "questionStats": {},
+   "review": [],
+   "started": false
+  }
+ },
+ {
+  "name": "json-array",
+  "input": "[1,2,3]",
+  "output": {
+   "version": 1,
+   "xp": 0,
+   "coins": 0,
+   "bridge": 0,
+   "questAccepted": false,
+   "questComplete": false,
+   "avatar": "boy",
+   "table": 0,
+   "sound": true,
+   "music": false,
+   "combo": 0,
+   "questionStats": {},
+   "review": [],
+   "started": false
+  }
+ },
+ {
+  "name": "json-null",
+  "input": "null",
+  "output": {
+   "version": 1,
+   "xp": 0,
+   "coins": 0,
+   "bridge": 0,
+   "questAccepted": false,
+   "questComplete": false,
+   "avatar": "boy",
+   "table": 0,
+   "sound": true,
+   "music": false,
+   "combo": 0,
+   "questionStats": {},
+   "review": [],
+   "started": false
+  }
+ },
+ {
+  "name": "json-string",
+  "input": "\"hello\"",
+  "output": {
+   "version": 1,
+   "xp": 0,
+   "coins": 0,
+   "bridge": 0,
+   "questAccepted": false,
+   "questComplete": false,
+   "avatar": "boy",
+   "table": 0,
+   "sound": true,
+   "music": false,
+   "combo": 0,
+   "questionStats": {},
+   "review": [],
+   "started": false
+  }
+ },
+ {
+  "name": "xp-negative",
+  "input": "{\"version\":1,\"xp\":-50,\"coins\":35,\"bridge\":3,\"questAccepted\":true,\"questComplete\":false,\"avatar\":\"girl\",\"table\":4,\"sound\":true,\"music\":false,\"combo\":2,\"questionStats\":{\"m4_3\":{\"attempts\":999,\"correct\":2,\"wrong\":1,\"responseTime\":1500,\"lastAnsweredAt\":\"2026-10-01T10:00:00.000Z\"},\"m7_8\":{\"attempts\":999,\"correct\":0,\"wrong\":2,\"responseTime\":1500,\"lastAnsweredAt\":\"2026-10-01T10:00:00.000Z\"}},\"review\":[\"m7_8\"],\"started\":true}",
+  "output": {
+   "version": 1,
+   "xp": 0,
+   "coins": 35,
+   "bridge": 3,
+   "questAccepted": true,
+   "questComplete": false,
+   "avatar": "girl",
+   "table": 4,
+   "sound": true,
+   "music": false,
+   "combo": 2,
+   "questionStats": {
+    "m4_3": {
+     "attempts": 3,
+     "correct": 2,
+     "wrong": 1,
+     "responseTime": 1500,
+     "lastAnsweredAt": "2026-10-01T10:00:00.000Z"
+    },
+    "m7_8": {
+     "attempts": 2,
+     "correct": 0,
+     "wrong": 2,
+     "responseTime": 1500,
+     "lastAnsweredAt": "2026-10-01T10:00:00.000Z"
+    }
+   },
+   "review": [
+    "m7_8"
+   ],
+   "started": true
+  }
+ },
+ {
+  "name": "xp-float",
+  "input": "{\"version\":1,\"xp\":99.9,\"coins\":35,\"bridge\":3,\"questAccepted\":true,\"questComplete\":false,\"avatar\":\"girl\",\"table\":4,\"sound\":true,\"music\":false,\"combo\":2,\"questionStats\":{\"m4_3\":{\"attempts\":999,\"correct\":2,\"wrong\":1,\"responseTime\":1500,\"lastAnsweredAt\":\"2026-10-01T10:00:00.000Z\"},\"m7_8\":{\"attempts\":999,\"correct\":0,\"wrong\":2,\"responseTime\":1500,\"lastAnsweredAt\":\"2026-10-01T10:00:00.000Z\"}},\"review\":[\"m7_8\"],\"started\":true}",
+  "output": {
+   "version": 1,
+   "xp": 99,
+   "coins": 35,
+   "bridge": 3,
+   "questAccepted": true,
+   "questComplete": false,
+   "avatar": "girl",
+   "table": 4,
+   "sound": true,
+   "music": false,
+   "combo": 2,
+   "questionStats": {
+    "m4_3": {
+     "attempts": 3,
+     "correct": 2,
+     "wrong": 1,
+     "responseTime": 1500,
+     "lastAnsweredAt": "2026-10-01T10:00:00.000Z"
+    },
+    "m7_8": {
+     "attempts": 2,
+     "correct": 0,
+     "wrong": 2,
+     "responseTime": 1500,
+     "lastAnsweredAt": "2026-10-01T10:00:00.000Z"
+    }
+   },
+   "review": [
+    "m7_8"
+   ],
+   "started": true
+  }
+ },
+ {
+  "name": "xp-huge",
+  "input": "{\"version\":1,\"xp\":1000000000000,\"coins\":35,\"bridge\":3,\"questAccepted\":true,\"questComplete\":false,\"avatar\":\"girl\",\"table\":4,\"sound\":true,\"music\":false,\"combo\":2,\"questionStats\":{\"m4_3\":{\"attempts\":999,\"correct\":2,\"wrong\":1,\"responseTime\":1500,\"lastAnsweredAt\":\"2026-10-01T10:00:00.000Z\"},\"m7_8\":{\"attempts\":999,\"correct\":0,\"wrong\":2,\"responseTime\":1500,\"lastAnsweredAt\":\"2026-10-01T10:00:00.000Z\"}},\"review\":[\"m7_8\"],\"started\":true}",
+  "output": {
+   "version": 1,
+   "xp": 10000000,
+   "coins": 35,
+   "bridge": 3,
+   "questAccepted": true,
+   "questComplete": false,
+   "avatar": "girl",
+   "table": 4,
+   "sound": true,
+   "music": false,
+   "combo": 2,
+   "questionStats": {
+    "m4_3": {
+     "attempts": 3,
+     "correct": 2,
+     "wrong": 1,
+     "responseTime": 1500,
+     "lastAnsweredAt": "2026-10-01T10:00:00.000Z"
+    },
+    "m7_8": {
+     "attempts": 2,
+     "correct": 0,
+     "wrong": 2,
+     "responseTime": 1500,
+     "lastAnsweredAt": "2026-10-01T10:00:00.000Z"
+    }
+   },
+   "review": [
+    "m7_8"
+   ],
+   "started": true
+  }
+ },
+ {
+  "name": "xp-string",
+  "input": "{\"version\":1,\"xp\":\"100\",\"coins\":35,\"bridge\":3,\"questAccepted\":true,\"questComplete\":false,\"avatar\":\"girl\",\"table\":4,\"sound\":true,\"music\":false,\"combo\":2,\"questionStats\":{\"m4_3\":{\"attempts\":999,\"correct\":2,\"wrong\":1,\"responseTime\":1500,\"lastAnsweredAt\":\"2026-10-01T10:00:00.000Z\"},\"m7_8\":{\"attempts\":999,\"correct\":0,\"wrong\":2,\"responseTime\":1500,\"lastAnsweredAt\":\"2026-10-01T10:00:00.000Z\"}},\"review\":[\"m7_8\"],\"started\":true}",
+  "output": {
+   "version": 1,
+   "xp": 0,
+   "coins": 35,
+   "bridge": 3,
+   "questAccepted": true,
+   "questComplete": false,
+   "avatar": "girl",
+   "table": 4,
+   "sound": true,
+   "music": false,
+   "combo": 2,
+   "questionStats": {
+    "m4_3": {
+     "attempts": 3,
+     "correct": 2,
+     "wrong": 1,
+     "responseTime": 1500,
+     "lastAnsweredAt": "2026-10-01T10:00:00.000Z"
+    },
+    "m7_8": {
+     "attempts": 2,
+     "correct": 0,
+     "wrong": 2,
+     "responseTime": 1500,
+     "lastAnsweredAt": "2026-10-01T10:00:00.000Z"
+    }
+   },
+   "review": [
+    "m7_8"
+   ],
+   "started": true
+  }
+ },
+ {
+  "name": "xp-nan-as-null",
+  "input": "{\"version\":1,\"xp\":null,\"coins\":35,\"bridge\":3,\"questAccepted\":true,\"questComplete\":false,\"avatar\":\"girl\",\"table\":4,\"sound\":true,\"music\":false,\"combo\":2,\"questionStats\":{\"m4_3\":{\"attempts\":999,\"correct\":2,\"wrong\":1,\"responseTime\":1500,\"lastAnsweredAt\":\"2026-10-01T10:00:00.000Z\"},\"m7_8\":{\"attempts\":999,\"correct\":0,\"wrong\":2,\"responseTime\":1500,\"lastAnsweredAt\":\"2026-10-01T10:00:00.000Z\"}},\"review\":[\"m7_8\"],\"started\":true}",
+  "output": {
+   "version": 1,
+   "xp": 0,
+   "coins": 35,
+   "bridge": 3,
+   "questAccepted": true,
+   "questComplete": false,
+   "avatar": "girl",
+   "table": 4,
+   "sound": true,
+   "music": false,
+   "combo": 2,
+   "questionStats": {
+    "m4_3": {
+     "attempts": 3,
+     "correct": 2,
+     "wrong": 1,
+     "responseTime": 1500,
+     "lastAnsweredAt": "2026-10-01T10:00:00.000Z"
+    },
+    "m7_8": {
+     "attempts": 2,
+     "correct": 0,
+     "wrong": 2,
+     "responseTime": 1500,
+     "lastAnsweredAt": "2026-10-01T10:00:00.000Z"
+    }
+   },
+   "review": [
+    "m7_8"
+   ],
+   "started": true
+  }
+ },
+ {
+  "name": "coins-infinity-as-string",
+  "input": "{\"version\":1,\"xp\":120,\"coins\":\"Infinity\",\"bridge\":3,\"questAccepted\":true,\"questComplete\":false,\"avatar\":\"girl\",\"table\":4,\"sound\":true,\"music\":false,\"combo\":2,\"questionStats\":{\"m4_3\":{\"attempts\":999,\"correct\":2,\"wrong\":1,\"responseTime\":1500,\"lastAnsweredAt\":\"2026-10-01T10:00:00.000Z\"},\"m7_8\":{\"attempts\":999,\"correct\":0,\"wrong\":2,\"responseTime\":1500,\"lastAnsweredAt\":\"2026-10-01T10:00:00.000Z\"}},\"review\":[\"m7_8\"],\"started\":true}",
+  "output": {
+   "version": 1,
+   "xp": 120,
+   "coins": 0,
+   "bridge": 3,
+   "questAccepted": true,
+   "questComplete": false,
+   "avatar": "girl",
+   "table": 4,
+   "sound": true,
+   "music": false,
+   "combo": 2,
+   "questionStats": {
+    "m4_3": {
+     "attempts": 3,
+     "correct": 2,
+     "wrong": 1,
+     "responseTime": 1500,
+     "lastAnsweredAt": "2026-10-01T10:00:00.000Z"
+    },
+    "m7_8": {
+     "attempts": 2,
+     "correct": 0,
+     "wrong": 2,
+     "responseTime": 1500,
+     "lastAnsweredAt": "2026-10-01T10:00:00.000Z"
+    }
+   },
+   "review": [
+    "m7_8"
+   ],
+   "started": true
+  }
+ },
+ {
+  "name": "bridge-7",
+  "input": "{\"version\":1,\"xp\":120,\"coins\":35,\"bridge\":7,\"questAccepted\":true,\"questComplete\":false,\"avatar\":\"girl\",\"table\":4,\"sound\":true,\"music\":false,\"combo\":2,\"questionStats\":{\"m4_3\":{\"attempts\":999,\"correct\":2,\"wrong\":1,\"responseTime\":1500,\"lastAnsweredAt\":\"2026-10-01T10:00:00.000Z\"},\"m7_8\":{\"attempts\":999,\"correct\":0,\"wrong\":2,\"responseTime\":1500,\"lastAnsweredAt\":\"2026-10-01T10:00:00.000Z\"}},\"review\":[\"m7_8\"],\"started\":true}",
+  "output": {
+   "version": 1,
+   "xp": 120,
+   "coins": 35,
+   "bridge": 6,
+   "questAccepted": true,
+   "questComplete": false,
+   "avatar": "girl",
+   "table": 4,
+   "sound": true,
+   "music": false,
+   "combo": 2,
+   "questionStats": {
+    "m4_3": {
+     "attempts": 3,
+     "correct": 2,
+     "wrong": 1,
+     "responseTime": 1500,
+     "lastAnsweredAt": "2026-10-01T10:00:00.000Z"
+    },
+    "m7_8": {
+     "attempts": 2,
+     "correct": 0,
+     "wrong": 2,
+     "responseTime": 1500,
+     "lastAnsweredAt": "2026-10-01T10:00:00.000Z"
+    }
+   },
+   "review": [
+    "m7_8"
+   ],
+   "started": true
+  }
+ },
+ {
+  "name": "bridge-6-complete",
+  "input": "{\"version\":1,\"xp\":120,\"coins\":35,\"bridge\":6,\"questAccepted\":true,\"questComplete\":true,\"avatar\":\"girl\",\"table\":4,\"sound\":true,\"music\":false,\"combo\":2,\"questionStats\":{\"m4_3\":{\"attempts\":999,\"correct\":2,\"wrong\":1,\"responseTime\":1500,\"lastAnsweredAt\":\"2026-10-01T10:00:00.000Z\"},\"m7_8\":{\"attempts\":999,\"correct\":0,\"wrong\":2,\"responseTime\":1500,\"lastAnsweredAt\":\"2026-10-01T10:00:00.000Z\"}},\"review\":[\"m7_8\"],\"started\":true}",
+  "output": {
+   "version": 1,
+   "xp": 120,
+   "coins": 35,
+   "bridge": 6,
+   "questAccepted": true,
+   "questComplete": true,
+   "avatar": "girl",
+   "table": 4,
+   "sound": true,
+   "music": false,
+   "combo": 2,
+   "questionStats": {
+    "m4_3": {
+     "attempts": 3,
+     "correct": 2,
+     "wrong": 1,
+     "responseTime": 1500,
+     "lastAnsweredAt": "2026-10-01T10:00:00.000Z"
+    },
+    "m7_8": {
+     "attempts": 2,
+     "correct": 0,
+     "wrong": 2,
+     "responseTime": 1500,
+     "lastAnsweredAt": "2026-10-01T10:00:00.000Z"
+    }
+   },
+   "review": [
+    "m7_8"
+   ],
+   "started": true
+  }
+ },
+ {
+  "name": "bridge-5-complete-flag",
+  "input": "{\"version\":1,\"xp\":120,\"coins\":35,\"bridge\":5,\"questAccepted\":true,\"questComplete\":true,\"avatar\":\"girl\",\"table\":4,\"sound\":true,\"music\":false,\"combo\":2,\"questionStats\":{\"m4_3\":{\"attempts\":999,\"correct\":2,\"wrong\":1,\"responseTime\":1500,\"lastAnsweredAt\":\"2026-10-01T10:00:00.000Z\"},\"m7_8\":{\"attempts\":999,\"correct\":0,\"wrong\":2,\"responseTime\":1500,\"lastAnsweredAt\":\"2026-10-01T10:00:00.000Z\"}},\"review\":[\"m7_8\"],\"started\":true}",
+  "output": {
+   "version": 1,
+   "xp": 120,
+   "coins": 35,
+   "bridge": 5,
+   "questAccepted": true,
+   "questComplete": false,
+   "avatar": "girl",
+   "table": 4,
+   "sound": true,
+   "music": false,
+   "combo": 2,
+   "questionStats": {
+    "m4_3": {
+     "attempts": 3,
+     "correct": 2,
+     "wrong": 1,
+     "responseTime": 1500,
+     "lastAnsweredAt": "2026-10-01T10:00:00.000Z"
+    },
+    "m7_8": {
+     "attempts": 2,
+     "correct": 0,
+     "wrong": 2,
+     "responseTime": 1500,
+     "lastAnsweredAt": "2026-10-01T10:00:00.000Z"
+    }
+   },
+   "review": [
+    "m7_8"
+   ],
+   "started": true
+  }
+ },
+ {
+  "name": "bridge-0-accepted-false",
+  "input": "{\"version\":1,\"xp\":120,\"coins\":35,\"bridge\":0,\"questAccepted\":false,\"questComplete\":false,\"avatar\":\"girl\",\"table\":4,\"sound\":true,\"music\":false,\"combo\":2,\"questionStats\":{\"m4_3\":{\"attempts\":999,\"correct\":2,\"wrong\":1,\"responseTime\":1500,\"lastAnsweredAt\":\"2026-10-01T10:00:00.000Z\"},\"m7_8\":{\"attempts\":999,\"correct\":0,\"wrong\":2,\"responseTime\":1500,\"lastAnsweredAt\":\"2026-10-01T10:00:00.000Z\"}},\"review\":[\"m7_8\"],\"started\":true}",
+  "output": {
+   "version": 1,
+   "xp": 120,
+   "coins": 35,
+   "bridge": 0,
+   "questAccepted": false,
+   "questComplete": false,
+   "avatar": "girl",
+   "table": 4,
+   "sound": true,
+   "music": false,
+   "combo": 2,
+   "questionStats": {
+    "m4_3": {
+     "attempts": 3,
+     "correct": 2,
+     "wrong": 1,
+     "responseTime": 1500,
+     "lastAnsweredAt": "2026-10-01T10:00:00.000Z"
+    },
+    "m7_8": {
+     "attempts": 2,
+     "correct": 0,
+     "wrong": 2,
+     "responseTime": 1500,
+     "lastAnsweredAt": "2026-10-01T10:00:00.000Z"
+    }
+   },
+   "review": [
+    "m7_8"
+   ],
+   "started": true
+  }
+ },
+ {
+  "name": "bridge-2-accepted-false",
+  "input": "{\"version\":1,\"xp\":120,\"coins\":35,\"bridge\":2,\"questAccepted\":false,\"questComplete\":false,\"avatar\":\"girl\",\"table\":4,\"sound\":true,\"music\":false,\"combo\":2,\"questionStats\":{\"m4_3\":{\"attempts\":999,\"correct\":2,\"wrong\":1,\"responseTime\":1500,\"lastAnsweredAt\":\"2026-10-01T10:00:00.000Z\"},\"m7_8\":{\"attempts\":999,\"correct\":0,\"wrong\":2,\"responseTime\":1500,\"lastAnsweredAt\":\"2026-10-01T10:00:00.000Z\"}},\"review\":[\"m7_8\"],\"started\":true}",
+  "output": {
+   "version": 1,
+   "xp": 120,
+   "coins": 35,
+   "bridge": 2,
+   "questAccepted": true,
+   "questComplete": false,
+   "avatar": "girl",
+   "table": 4,
+   "sound": true,
+   "music": false,
+   "combo": 2,
+   "questionStats": {
+    "m4_3": {
+     "attempts": 3,
+     "correct": 2,
+     "wrong": 1,
+     "responseTime": 1500,
+     "lastAnsweredAt": "2026-10-01T10:00:00.000Z"
+    },
+    "m7_8": {
+     "attempts": 2,
+     "correct": 0,
+     "wrong": 2,
+     "responseTime": 1500,
+     "lastAnsweredAt": "2026-10-01T10:00:00.000Z"
+    }
+   },
+   "review": [
+    "m7_8"
+   ],
+   "started": true
+  }
+ },
+ {
+  "name": "avatar-unknown",
+  "input": "{\"version\":1,\"xp\":120,\"coins\":35,\"bridge\":3,\"questAccepted\":true,\"questComplete\":false,\"avatar\":\"robot\",\"table\":4,\"sound\":true,\"music\":false,\"combo\":2,\"questionStats\":{\"m4_3\":{\"attempts\":999,\"correct\":2,\"wrong\":1,\"responseTime\":1500,\"lastAnsweredAt\":\"2026-10-01T10:00:00.000Z\"},\"m7_8\":{\"attempts\":999,\"correct\":0,\"wrong\":2,\"responseTime\":1500,\"lastAnsweredAt\":\"2026-10-01T10:00:00.000Z\"}},\"review\":[\"m7_8\"],\"started\":true}",
+  "output": {
+   "version": 1,
+   "xp": 120,
+   "coins": 35,
+   "bridge": 3,
+   "questAccepted": true,
+   "questComplete": false,
+   "avatar": "boy",
+   "table": 4,
+   "sound": true,
+   "music": false,
+   "combo": 2,
+   "questionStats": {
+    "m4_3": {
+     "attempts": 3,
+     "correct": 2,
+     "wrong": 1,
+     "responseTime": 1500,
+     "lastAnsweredAt": "2026-10-01T10:00:00.000Z"
+    },
+    "m7_8": {
+     "attempts": 2,
+     "correct": 0,
+     "wrong": 2,
+     "responseTime": 1500,
+     "lastAnsweredAt": "2026-10-01T10:00:00.000Z"
+    }
+   },
+   "review": [
+    "m7_8"
+   ],
+   "started": true
+  }
+ },
+ {
+  "name": "table-1",
+  "input": "{\"version\":1,\"xp\":120,\"coins\":35,\"bridge\":3,\"questAccepted\":true,\"questComplete\":false,\"avatar\":\"girl\",\"table\":1,\"sound\":true,\"music\":false,\"combo\":2,\"questionStats\":{\"m4_3\":{\"attempts\":999,\"correct\":2,\"wrong\":1,\"responseTime\":1500,\"lastAnsweredAt\":\"2026-10-01T10:00:00.000Z\"},\"m7_8\":{\"attempts\":999,\"correct\":0,\"wrong\":2,\"responseTime\":1500,\"lastAnsweredAt\":\"2026-10-01T10:00:00.000Z\"}},\"review\":[\"m7_8\"],\"started\":true}",
+  "output": {
+   "version": 1,
+   "xp": 120,
+   "coins": 35,
+   "bridge": 3,
+   "questAccepted": true,
+   "questComplete": false,
+   "avatar": "girl",
+   "table": 0,
+   "sound": true,
+   "music": false,
+   "combo": 2,
+   "questionStats": {
+    "m4_3": {
+     "attempts": 3,
+     "correct": 2,
+     "wrong": 1,
+     "responseTime": 1500,
+     "lastAnsweredAt": "2026-10-01T10:00:00.000Z"
+    },
+    "m7_8": {
+     "attempts": 2,
+     "correct": 0,
+     "wrong": 2,
+     "responseTime": 1500,
+     "lastAnsweredAt": "2026-10-01T10:00:00.000Z"
+    }
+   },
+   "review": [
+    "m7_8"
+   ],
+   "started": true
+  }
+ },
+ {
+  "name": "table-10",
+  "input": "{\"version\":1,\"xp\":120,\"coins\":35,\"bridge\":3,\"questAccepted\":true,\"questComplete\":false,\"avatar\":\"girl\",\"table\":10,\"sound\":true,\"music\":false,\"combo\":2,\"questionStats\":{\"m4_3\":{\"attempts\":999,\"correct\":2,\"wrong\":1,\"responseTime\":1500,\"lastAnsweredAt\":\"2026-10-01T10:00:00.000Z\"},\"m7_8\":{\"attempts\":999,\"correct\":0,\"wrong\":2,\"responseTime\":1500,\"lastAnsweredAt\":\"2026-10-01T10:00:00.000Z\"}},\"review\":[\"m7_8\"],\"started\":true}",
+  "output": {
+   "version": 1,
+   "xp": 120,
+   "coins": 35,
+   "bridge": 3,
+   "questAccepted": true,
+   "questComplete": false,
+   "avatar": "girl",
+   "table": 10,
+   "sound": true,
+   "music": false,
+   "combo": 2,
+   "questionStats": {
+    "m4_3": {
+     "attempts": 3,
+     "correct": 2,
+     "wrong": 1,
+     "responseTime": 1500,
+     "lastAnsweredAt": "2026-10-01T10:00:00.000Z"
+    },
+    "m7_8": {
+     "attempts": 2,
+     "correct": 0,
+     "wrong": 2,
+     "responseTime": 1500,
+     "lastAnsweredAt": "2026-10-01T10:00:00.000Z"
+    }
+   },
+   "review": [
+    "m7_8"
+   ],
+   "started": true
+  }
+ },
+ {
+  "name": "table-string",
+  "input": "{\"version\":1,\"xp\":120,\"coins\":35,\"bridge\":3,\"questAccepted\":true,\"questComplete\":false,\"avatar\":\"girl\",\"table\":\"5\",\"sound\":true,\"music\":false,\"combo\":2,\"questionStats\":{\"m4_3\":{\"attempts\":999,\"correct\":2,\"wrong\":1,\"responseTime\":1500,\"lastAnsweredAt\":\"2026-10-01T10:00:00.000Z\"},\"m7_8\":{\"attempts\":999,\"correct\":0,\"wrong\":2,\"responseTime\":1500,\"lastAnsweredAt\":\"2026-10-01T10:00:00.000Z\"}},\"review\":[\"m7_8\"],\"started\":true}",
+  "output": {
+   "version": 1,
+   "xp": 120,
+   "coins": 35,
+   "bridge": 3,
+   "questAccepted": true,
+   "questComplete": false,
+   "avatar": "girl",
+   "table": 0,
+   "sound": true,
+   "music": false,
+   "combo": 2,
+   "questionStats": {
+    "m4_3": {
+     "attempts": 3,
+     "correct": 2,
+     "wrong": 1,
+     "responseTime": 1500,
+     "lastAnsweredAt": "2026-10-01T10:00:00.000Z"
+    },
+    "m7_8": {
+     "attempts": 2,
+     "correct": 0,
+     "wrong": 2,
+     "responseTime": 1500,
+     "lastAnsweredAt": "2026-10-01T10:00:00.000Z"
+    }
+   },
+   "review": [
+    "m7_8"
+   ],
+   "started": true
+  }
+ },
+ {
+  "name": "sound-false-music-true",
+  "input": "{\"version\":1,\"xp\":120,\"coins\":35,\"bridge\":3,\"questAccepted\":true,\"questComplete\":false,\"avatar\":\"girl\",\"table\":4,\"sound\":false,\"music\":true,\"combo\":2,\"questionStats\":{\"m4_3\":{\"attempts\":999,\"correct\":2,\"wrong\":1,\"responseTime\":1500,\"lastAnsweredAt\":\"2026-10-01T10:00:00.000Z\"},\"m7_8\":{\"attempts\":999,\"correct\":0,\"wrong\":2,\"responseTime\":1500,\"lastAnsweredAt\":\"2026-10-01T10:00:00.000Z\"}},\"review\":[\"m7_8\"],\"started\":true}",
+  "output": {
+   "version": 1,
+   "xp": 120,
+   "coins": 35,
+   "bridge": 3,
+   "questAccepted": true,
+   "questComplete": false,
+   "avatar": "girl",
+   "table": 4,
+   "sound": false,
+   "music": true,
+   "combo": 2,
+   "questionStats": {
+    "m4_3": {
+     "attempts": 3,
+     "correct": 2,
+     "wrong": 1,
+     "responseTime": 1500,
+     "lastAnsweredAt": "2026-10-01T10:00:00.000Z"
+    },
+    "m7_8": {
+     "attempts": 2,
+     "correct": 0,
+     "wrong": 2,
+     "responseTime": 1500,
+     "lastAnsweredAt": "2026-10-01T10:00:00.000Z"
+    }
+   },
+   "review": [
+    "m7_8"
+   ],
+   "started": true
+  }
+ },
+ {
+  "name": "sound-0-music-1",
+  "input": "{\"version\":1,\"xp\":120,\"coins\":35,\"bridge\":3,\"questAccepted\":true,\"questComplete\":false,\"avatar\":\"girl\",\"table\":4,\"sound\":0,\"music\":1,\"combo\":2,\"questionStats\":{\"m4_3\":{\"attempts\":999,\"correct\":2,\"wrong\":1,\"responseTime\":1500,\"lastAnsweredAt\":\"2026-10-01T10:00:00.000Z\"},\"m7_8\":{\"attempts\":999,\"correct\":0,\"wrong\":2,\"responseTime\":1500,\"lastAnsweredAt\":\"2026-10-01T10:00:00.000Z\"}},\"review\":[\"m7_8\"],\"started\":true}",
+  "output": {
+   "version": 1,
+   "xp": 120,
+   "coins": 35,
+   "bridge": 3,
+   "questAccepted": true,
+   "questComplete": false,
+   "avatar": "girl",
+   "table": 4,
+   "sound": true,
+   "music": false,
+   "combo": 2,
+   "questionStats": {
+    "m4_3": {
+     "attempts": 3,
+     "correct": 2,
+     "wrong": 1,
+     "responseTime": 1500,
+     "lastAnsweredAt": "2026-10-01T10:00:00.000Z"
+    },
+    "m7_8": {
+     "attempts": 2,
+     "correct": 0,
+     "wrong": 2,
+     "responseTime": 1500,
+     "lastAnsweredAt": "2026-10-01T10:00:00.000Z"
+    }
+   },
+   "review": [
+    "m7_8"
+   ],
+   "started": true
+  }
+ },
+ {
+  "name": "combo-over-cap",
+  "input": "{\"version\":1,\"xp\":120,\"coins\":35,\"bridge\":3,\"questAccepted\":true,\"questComplete\":false,\"avatar\":\"girl\",\"table\":4,\"sound\":true,\"music\":false,\"combo\":50000,\"questionStats\":{\"m4_3\":{\"attempts\":999,\"correct\":2,\"wrong\":1,\"responseTime\":1500,\"lastAnsweredAt\":\"2026-10-01T10:00:00.000Z\"},\"m7_8\":{\"attempts\":999,\"correct\":0,\"wrong\":2,\"responseTime\":1500,\"lastAnsweredAt\":\"2026-10-01T10:00:00.000Z\"}},\"review\":[\"m7_8\"],\"started\":true}",
+  "output": {
+   "version": 1,
+   "xp": 120,
+   "coins": 35,
+   "bridge": 3,
+   "questAccepted": true,
+   "questComplete": false,
+   "avatar": "girl",
+   "table": 4,
+   "sound": true,
+   "music": false,
+   "combo": 10000,
+   "questionStats": {
+    "m4_3": {
+     "attempts": 3,
+     "correct": 2,
+     "wrong": 1,
+     "responseTime": 1500,
+     "lastAnsweredAt": "2026-10-01T10:00:00.000Z"
+    },
+    "m7_8": {
+     "attempts": 2,
+     "correct": 0,
+     "wrong": 2,
+     "responseTime": 1500,
+     "lastAnsweredAt": "2026-10-01T10:00:00.000Z"
+    }
+   },
+   "review": [
+    "m7_8"
+   ],
+   "started": true
+  }
+ },
+ {
+  "name": "stats-45-entries",
+  "input": "{\"version\":1,\"xp\":120,\"coins\":35,\"bridge\":3,\"questAccepted\":true,\"questComplete\":false,\"avatar\":\"girl\",\"table\":4,\"sound\":true,\"music\":false,\"combo\":2,\"questionStats\":{\"m2_1\":{\"attempts\":999,\"correct\":0,\"wrong\":0,\"responseTime\":1500,\"lastAnsweredAt\":\"2026-10-01T10:00:00.000Z\"},\"m2_2\":{\"attempts\":999,\"correct\":1,\"wrong\":1,\"responseTime\":1500,\"lastAnsweredAt\":\"2026-10-01T10:00:00.000Z\"},\"m2_3\":{\"attempts\":999,\"correct\":2,\"wrong\":2,\"responseTime\":1500,\"lastAnsweredAt\":\"2026-10-01T10:00:00.000Z\"},\"m2_4\":{\"attempts\":999,\"correct\":3,\"wrong\":0,\"responseTime\":1500,\"lastAnsweredAt\":\"2026-10-01T10:00:00.000Z\"},\"m2_5\":{\"attempts\":999,\"correct\":0,\"wrong\":1,\"responseTime\":1500,\"lastAnsweredAt\":\"2026-10-01T10:00:00.000Z\"},\"m2_6\":{\"attempts\":999,\"correct\":1,\"wrong\":2,\"responseTime\":1500,\"lastAnsweredAt\":\"2026-10-01T10:00:00.000Z\"},\"m2_7\":{\"attempts\":999,\"correct\":2,\"wrong\":0,\"responseTime\":1500,\"lastAnsweredAt\":\"2026-10-01T10:00:00.000Z\"},\"m2_8\":{\"attempts\":999,\"correct\":3,\"wrong\":1,\"responseTime\":1500,\"lastAnsweredAt\":\"2026-10-01T10:00:00.000Z\"},\"m2_9\":{\"attempts\":999,\"correct\":0,\"wrong\":2,\"responseTime\":1500,\"lastAnsweredAt\":\"2026-10-01T10:00:00.000Z\"},\"m2_10\":{\"attempts\":999,\"correct\":1,\"wrong\":0,\"responseTime\":1500,\"lastAnsweredAt\":\"2026-10-01T10:00:00.000Z\"},\"m3_1\":{\"attempts\":999,\"correct\":2,\"wrong\":1,\"responseTime\":1500,\"lastAnsweredAt\":\"2026-10-01T10:00:00.000Z\"},\"m3_2\":{\"attempts\":999,\"correct\":3,\"wrong\":2,\"responseTime\":1500,\"lastAnsweredAt\":\"2026-10-01T10:00:00.000Z\"},\"m3_3\":{\"attempts\":999,\"correct\":0,\"wrong\":0,\"responseTime\":1500,\"lastAnsweredAt\":\"2026-10-01T10:00:00.000Z\"},\"m3_4\":{\"attempts\":999,\"correct\":1,\"wrong\":1,\"responseTime\":1500,\"lastAnsweredAt\":\"2026-10-01T10:00:00.000Z\"},\"m3_5\":{\"attempts\":999,\"correct\":2,\"wrong\":2,\"responseTime\":1500,\"lastAnsweredAt\":\"2026-10-01T10:00:00.000Z\"},\"m3_6\":{\"attempts\":999,\"correct\":3,\"wrong\":0,\"responseTime\":1500,\"lastAnsweredAt\":\"2026-10-01T10:00:00.000Z\"},\"m3_7\":{\"attempts\":999,\"correct\":0,\"wrong\":1,\"responseTime\":1500,\"lastAnsweredAt\":\"2026-10-01T10:00:00.000Z\"},\"m3_8\":{\"attempts\":999,\"correct\":1,\"wrong\":2,\"responseTime\":1500,\"lastAnsweredAt\":\"2026-10-01T10:00:00.000Z\"},\"m3_9\":{\"attempts\":999,\"correct\":2,\"wrong\":0,\"responseTime\":1500,\"lastAnsweredAt\":\"2026-10-01T10:00:00.000Z\"},\"m3_10\":{\"attempts\":999,\"correct\":3,\"wrong\":1,\"responseTime\":1500,\"lastAnsweredAt\":\"2026-10-01T10:00:00.000Z\"},\"m4_1\":{\"attempts\":999,\"correct\":0,\"wrong\":2,\"responseTime\":1500,\"lastAnsweredAt\":\"2026-10-01T10:00:00.000Z\"},\"m4_2\":{\"attempts\":999,\"correct\":1,\"wrong\":0,\"responseTime\":1500,\"lastAnsweredAt\":\"2026-10-01T10:00:00.000Z\"},\"m4_3\":{\"attempts\":999,\"correct\":2,\"wrong\":1,\"responseTime\":1500,\"lastAnsweredAt\":\"2026-10-01T10:00:00.000Z\"},\"m4_4\":{\"attempts\":999,\"correct\":3,\"wrong\":2,\"responseTime\":1500,\"lastAnsweredAt\":\"2026-10-01T10:00:00.000Z\"},\"m4_5\":{\"attempts\":999,\"correct\":0,\"wrong\":0,\"responseTime\":1500,\"lastAnsweredAt\":\"2026-10-01T10:00:00.000Z\"},\"m4_6\":{\"attempts\":999,\"correct\":1,\"wrong\":1,\"responseTime\":1500,\"lastAnsweredAt\":\"2026-10-01T10:00:00.000Z\"},\"m4_7\":{\"attempts\":999,\"correct\":2,\"wrong\":2,\"responseTime\":1500,\"lastAnsweredAt\":\"2026-10-01T10:00:00.000Z\"},\"m4_8\":{\"attempts\":999,\"correct\":3,\"wrong\":0,\"responseTime\":1500,\"lastAnsweredAt\":\"2026-10-01T10:00:00.000Z\"},\"m4_9\":{\"attempts\":999,\"correct\":0,\"wrong\":1,\"responseTime\":1500,\"lastAnsweredAt\":\"2026-10-01T10:00:00.000Z\"},\"m4_10\":{\"attempts\":999,\"correct\":1,\"wrong\":2,\"responseTime\":1500,\"lastAnsweredAt\":\"2026-10-01T10:00:00.000Z\"},\"m5_1\":{\"attempts\":999,\"correct\":2,\"wrong\":0,\"responseTime\":1500,\"lastAnsweredAt\":\"2026-10-01T10:00:00.000Z\"},\"m5_2\":{\"attempts\":999,\"correct\":3,\"wrong\":1,\"responseTime\":1500,\"lastAnsweredAt\":\"2026-10-01T10:00:00.000Z\"},\"m5_3\":{\"attempts\":999,\"correct\":0,\"wrong\":2,\"responseTime\":1500,\"lastAnsweredAt\":\"2026-10-01T10:00:00.000Z\"},\"m5_4\":{\"attempts\":999,\"correct\":1,\"wrong\":0,\"responseTime\":1500,\"lastAnsweredAt\":\"2026-10-01T10:00:00.000Z\"},\"m5_5\":{\"attempts\":999,\"correct\":2,\"wrong\":1,\"responseTime\":1500,\"lastAnsweredAt\":\"2026-10-01T10:00:00.000Z\"},\"m5_6\":{\"attempts\":999,\"correct\":3,\"wrong\":2,\"responseTime\":1500,\"lastAnsweredAt\":\"2026-10-01T10:00:00.000Z\"},\"m5_7\":{\"attempts\":999,\"correct\":0,\"wrong\":0,\"responseTime\":1500,\"lastAnsweredAt\":\"2026-10-01T10:00:00.000Z\"},\"m5_8\":{\"attempts\":999,\"correct\":1,\"wrong\":1,\"responseTime\":1500,\"lastAnsweredAt\":\"2026-10-01T10:00:00.000Z\"},\"m5_9\":{\"attempts\":999,\"correct\":2,\"wrong\":2,\"responseTime\":1500,\"lastAnsweredAt\":\"2026-10-01T10:00:00.000Z\"},\"m5_10\":{\"attempts\":999,\"correct\":3,\"wrong\":0,\"responseTime\":1500,\"lastAnsweredAt\":\"2026-10-01T10:00:00.000Z\"},\"m6_1\":{\"attempts\":999,\"correct\":0,\"wrong\":1,\"responseTime\":1500,\"lastAnsweredAt\":\"2026-10-01T10:00:00.000Z\"},\"m6_2\":{\"attempts\":999,\"correct\":1,\"wrong\":2,\"responseTime\":1500,\"lastAnsweredAt\":\"2026-10-01T10:00:00.000Z\"},\"m6_3\":{\"attempts\":999,\"correct\":2,\"wrong\":0,\"responseTime\":1500,\"lastAnsweredAt\":\"2026-10-01T10:00:00.000Z\"},\"m6_4\":{\"attempts\":999,\"correct\":3,\"wrong\":1,\"responseTime\":1500,\"lastAnsweredAt\":\"2026-10-01T10:00:00.000Z\"},\"m6_5\":{\"attempts\":999,\"correct\":0,\"wrong\":2,\"responseTime\":1500,\"lastAnsweredAt\":\"2026-10-01T10:00:00.000Z\"}},\"review\":[\"m7_8\"],\"started\":true}",
+  "output": {
+   "version": 1,
+   "xp": 120,
+   "coins": 35,
+   "bridge": 3,
+   "questAccepted": true,
+   "questComplete": false,
+   "avatar": "girl",
+   "table": 4,
+   "sound": true,
+   "music": false,
+   "combo": 2,
+   "questionStats": {
+    "m2_1": {
+     "attempts": 0,
+     "correct": 0,
+     "wrong": 0,
+     "responseTime": 1500,
+     "lastAnsweredAt": "2026-10-01T10:00:00.000Z"
+    },
+    "m2_2": {
+     "attempts": 2,
+     "correct": 1,
+     "wrong": 1,
+     "responseTime": 1500,
+     "lastAnsweredAt": "2026-10-01T10:00:00.000Z"
+    },
+    "m2_3": {
+     "attempts": 4,
+     "correct": 2,
+     "wrong": 2,
+     "responseTime": 1500,
+     "lastAnsweredAt": "2026-10-01T10:00:00.000Z"
+    },
+    "m2_4": {
+     "attempts": 3,
+     "correct": 3,
+     "wrong": 0,
+     "responseTime": 1500,
+     "lastAnsweredAt": "2026-10-01T10:00:00.000Z"
+    },
+    "m2_5": {
+     "attempts": 1,
+     "correct": 0,
+     "wrong": 1,
+     "responseTime": 1500,
+     "lastAnsweredAt": "2026-10-01T10:00:00.000Z"
+    },
+    "m2_6": {
+     "attempts": 3,
+     "correct": 1,
+     "wrong": 2,
+     "responseTime": 1500,
+     "lastAnsweredAt": "2026-10-01T10:00:00.000Z"
+    },
+    "m2_7": {
+     "attempts": 2,
+     "correct": 2,
+     "wrong": 0,
+     "responseTime": 1500,
+     "lastAnsweredAt": "2026-10-01T10:00:00.000Z"
+    },
+    "m2_8": {
+     "attempts": 4,
+     "correct": 3,
+     "wrong": 1,
+     "responseTime": 1500,
+     "lastAnsweredAt": "2026-10-01T10:00:00.000Z"
+    },
+    "m2_9": {
+     "attempts": 2,
+     "correct": 0,
+     "wrong": 2,
+     "responseTime": 1500,
+     "lastAnsweredAt": "2026-10-01T10:00:00.000Z"
+    },
+    "m2_10": {
+     "attempts": 1,
+     "correct": 1,
+     "wrong": 0,
+     "responseTime": 1500,
+     "lastAnsweredAt": "2026-10-01T10:00:00.000Z"
+    },
+    "m3_1": {
+     "attempts": 3,
+     "correct": 2,
+     "wrong": 1,
+     "responseTime": 1500,
+     "lastAnsweredAt": "2026-10-01T10:00:00.000Z"
+    },
+    "m3_2": {
+     "attempts": 5,
+     "correct": 3,
+     "wrong": 2,
+     "responseTime": 1500,
+     "lastAnsweredAt": "2026-10-01T10:00:00.000Z"
+    },
+    "m3_3": {
+     "attempts": 0,
+     "correct": 0,
+     "wrong": 0,
+     "responseTime": 1500,
+     "lastAnsweredAt": "2026-10-01T10:00:00.000Z"
+    },
+    "m3_4": {
+     "attempts": 2,
+     "correct": 1,
+     "wrong": 1,
+     "responseTime": 1500,
+     "lastAnsweredAt": "2026-10-01T10:00:00.000Z"
+    },
+    "m3_5": {
+     "attempts": 4,
+     "correct": 2,
+     "wrong": 2,
+     "responseTime": 1500,
+     "lastAnsweredAt": "2026-10-01T10:00:00.000Z"
+    },
+    "m3_6": {
+     "attempts": 3,
+     "correct": 3,
+     "wrong": 0,
+     "responseTime": 1500,
+     "lastAnsweredAt": "2026-10-01T10:00:00.000Z"
+    },
+    "m3_7": {
+     "attempts": 1,
+     "correct": 0,
+     "wrong": 1,
+     "responseTime": 1500,
+     "lastAnsweredAt": "2026-10-01T10:00:00.000Z"
+    },
+    "m3_8": {
+     "attempts": 3,
+     "correct": 1,
+     "wrong": 2,
+     "responseTime": 1500,
+     "lastAnsweredAt": "2026-10-01T10:00:00.000Z"
+    },
+    "m3_9": {
+     "attempts": 2,
+     "correct": 2,
+     "wrong": 0,
+     "responseTime": 1500,
+     "lastAnsweredAt": "2026-10-01T10:00:00.000Z"
+    },
+    "m3_10": {
+     "attempts": 4,
+     "correct": 3,
+     "wrong": 1,
+     "responseTime": 1500,
+     "lastAnsweredAt": "2026-10-01T10:00:00.000Z"
+    },
+    "m4_1": {
+     "attempts": 2,
+     "correct": 0,
+     "wrong": 2,
+     "responseTime": 1500,
+     "lastAnsweredAt": "2026-10-01T10:00:00.000Z"
+    },
+    "m4_2": {
+     "attempts": 1,
+     "correct": 1,
+     "wrong": 0,
+     "responseTime": 1500,
+     "lastAnsweredAt": "2026-10-01T10:00:00.000Z"
+    },
+    "m4_3": {
+     "attempts": 3,
+     "correct": 2,
+     "wrong": 1,
+     "responseTime": 1500,
+     "lastAnsweredAt": "2026-10-01T10:00:00.000Z"
+    },
+    "m4_4": {
+     "attempts": 5,
+     "correct": 3,
+     "wrong": 2,
+     "responseTime": 1500,
+     "lastAnsweredAt": "2026-10-01T10:00:00.000Z"
+    },
+    "m4_5": {
+     "attempts": 0,
+     "correct": 0,
+     "wrong": 0,
+     "responseTime": 1500,
+     "lastAnsweredAt": "2026-10-01T10:00:00.000Z"
+    },
+    "m4_6": {
+     "attempts": 2,
+     "correct": 1,
+     "wrong": 1,
+     "responseTime": 1500,
+     "lastAnsweredAt": "2026-10-01T10:00:00.000Z"
+    },
+    "m4_7": {
+     "attempts": 4,
+     "correct": 2,
+     "wrong": 2,
+     "responseTime": 1500,
+     "lastAnsweredAt": "2026-10-01T10:00:00.000Z"
+    },
+    "m4_8": {
+     "attempts": 3,
+     "correct": 3,
+     "wrong": 0,
+     "responseTime": 1500,
+     "lastAnsweredAt": "2026-10-01T10:00:00.000Z"
+    },
+    "m4_9": {
+     "attempts": 1,
+     "correct": 0,
+     "wrong": 1,
+     "responseTime": 1500,
+     "lastAnsweredAt": "2026-10-01T10:00:00.000Z"
+    },
+    "m4_10": {
+     "attempts": 3,
+     "correct": 1,
+     "wrong": 2,
+     "responseTime": 1500,
+     "lastAnsweredAt": "2026-10-01T10:00:00.000Z"
+    }
+   },
+   "review": [
+    "m7_8"
+   ],
+   "started": true
+  }
+ },
+ {
+  "name": "stats-bad-keys",
+  "input": "{\"version\":1,\"xp\":120,\"coins\":35,\"bridge\":3,\"questAccepted\":true,\"questComplete\":false,\"avatar\":\"girl\",\"table\":4,\"sound\":true,\"music\":false,\"combo\":2,\"questionStats\":{\"m1_3\":{\"attempts\":999,\"correct\":1,\"wrong\":0,\"responseTime\":1500,\"lastAnsweredAt\":\"2026-10-01T10:00:00.000Z\"},\"m11_2\":{\"attempts\":999,\"correct\":1,\"wrong\":0,\"responseTime\":1500,\"lastAnsweredAt\":\"2026-10-01T10:00:00.000Z\"},\"x\":{\"attempts\":999,\"correct\":1,\"wrong\":0,\"responseTime\":1500,\"lastAnsweredAt\":\"2026-10-01T10:00:00.000Z\"},\"m2_0\":{\"attempts\":999,\"correct\":1,\"wrong\":0,\"responseTime\":1500,\"lastAnsweredAt\":\"2026-10-01T10:00:00.000Z\"},\"m10_10\":{\"attempts\":999,\"correct\":3,\"wrong\":1,\"responseTime\":1500,\"lastAnsweredAt\":\"2026-10-01T10:00:00.000Z\"}},\"review\":[\"m7_8\"],\"started\":true}",
+  "output": {
+   "version": 1,
+   "xp": 120,
+   "coins": 35,
+   "bridge": 3,
+   "questAccepted": true,
+   "questComplete": false,
+   "avatar": "girl",
+   "table": 4,
+   "sound": true,
+   "music": false,
+   "combo": 2,
+   "questionStats": {
+    "m10_10": {
+     "attempts": 4,
+     "correct": 3,
+     "wrong": 1,
+     "responseTime": 1500,
+     "lastAnsweredAt": "2026-10-01T10:00:00.000Z"
+    }
+   },
+   "review": [
+    "m7_8"
+   ],
+   "started": true
+  }
+ },
+ {
+  "name": "stats-bad-values",
+  "input": "{\"version\":1,\"xp\":120,\"coins\":35,\"bridge\":3,\"questAccepted\":true,\"questComplete\":false,\"avatar\":\"girl\",\"table\":4,\"sound\":true,\"music\":false,\"combo\":2,\"questionStats\":{\"m3_3\":null,\"m3_4\":\"x\",\"m3_5\":{\"attempts\":999,\"correct\":-2,\"wrong\":2.7,\"responseTime\":1500,\"lastAnsweredAt\":\"2026-10-01T10:00:00.000Z\"},\"m3_6\":{\"attempts\":999,\"correct\":1,\"wrong\":1,\"responseTime\":1500,\"lastAnsweredAt\":7}},\"review\":[\"m7_8\"],\"started\":true}",
+  "output": {
+   "version": 1,
+   "xp": 120,
+   "coins": 35,
+   "bridge": 3,
+   "questAccepted": true,
+   "questComplete": false,
+   "avatar": "girl",
+   "table": 4,
+   "sound": true,
+   "music": false,
+   "combo": 2,
+   "questionStats": {
+    "m3_5": {
+     "attempts": 2,
+     "correct": 0,
+     "wrong": 2,
+     "responseTime": 1500,
+     "lastAnsweredAt": "2026-10-01T10:00:00.000Z"
+    },
+    "m3_6": {
+     "attempts": 2,
+     "correct": 1,
+     "wrong": 1,
+     "responseTime": 1500,
+     "lastAnsweredAt": ""
+    }
+   },
+   "review": [
+    "m7_8"
+   ],
+   "started": true
+  }
+ },
+ {
+  "name": "stats-long-date",
+  "input": "{\"version\":1,\"xp\":120,\"coins\":35,\"bridge\":3,\"questAccepted\":true,\"questComplete\":false,\"avatar\":\"girl\",\"table\":4,\"sound\":true,\"music\":false,\"combo\":2,\"questionStats\":{\"m5_5\":{\"attempts\":999,\"correct\":1,\"wrong\":0,\"responseTime\":1500,\"lastAnsweredAt\":\"xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx\"}},\"review\":[\"m7_8\"],\"started\":true}",
+  "output": {
+   "version": 1,
+   "xp": 120,
+   "coins": 35,
+   "bridge": 3,
+   "questAccepted": true,
+   "questComplete": false,
+   "avatar": "girl",
+   "table": 4,
+   "sound": true,
+   "music": false,
+   "combo": 2,
+   "questionStats": {
+    "m5_5": {
+     "attempts": 1,
+     "correct": 1,
+     "wrong": 0,
+     "responseTime": 1500,
+     "lastAnsweredAt": "xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx"
+    }
+   },
+   "review": [
+    "m7_8"
+   ],
+   "started": true
+  }
+ },
+ {
+  "name": "stats-not-object",
+  "input": "{\"version\":1,\"xp\":120,\"coins\":35,\"bridge\":3,\"questAccepted\":true,\"questComplete\":false,\"avatar\":\"girl\",\"table\":4,\"sound\":true,\"music\":false,\"combo\":2,\"questionStats\":\"nope\",\"review\":[\"m7_8\"],\"started\":true}",
+  "output": {
+   "version": 1,
+   "xp": 120,
+   "coins": 35,
+   "bridge": 3,
+   "questAccepted": true,
+   "questComplete": false,
+   "avatar": "girl",
+   "table": 4,
+   "sound": true,
+   "music": false,
+   "combo": 2,
+   "questionStats": {},
+   "review": [
+    "m7_8"
+   ],
+   "started": true
+  }
+ },
+ {
+  "name": "review-dupes-and-bad",
+  "input": "{\"version\":1,\"xp\":120,\"coins\":35,\"bridge\":3,\"questAccepted\":true,\"questComplete\":false,\"avatar\":\"girl\",\"table\":4,\"sound\":true,\"music\":false,\"combo\":2,\"questionStats\":{\"m4_3\":{\"attempts\":999,\"correct\":2,\"wrong\":1,\"responseTime\":1500,\"lastAnsweredAt\":\"2026-10-01T10:00:00.000Z\"},\"m7_8\":{\"attempts\":999,\"correct\":0,\"wrong\":2,\"responseTime\":1500,\"lastAnsweredAt\":\"2026-10-01T10:00:00.000Z\"}},\"review\":[\"m2_2\",\"m2_2\",\"m1_1\",5,\"m10_10\",\"bad\"],\"started\":true}",
+  "output": {
+   "version": 1,
+   "xp": 120,
+   "coins": 35,
+   "bridge": 3,
+   "questAccepted": true,
+   "questComplete": false,
+   "avatar": "girl",
+   "table": 4,
+   "sound": true,
+   "music": false,
+   "combo": 2,
+   "questionStats": {
+    "m4_3": {
+     "attempts": 3,
+     "correct": 2,
+     "wrong": 1,
+     "responseTime": 1500,
+     "lastAnsweredAt": "2026-10-01T10:00:00.000Z"
+    },
+    "m7_8": {
+     "attempts": 2,
+     "correct": 0,
+     "wrong": 2,
+     "responseTime": 1500,
+     "lastAnsweredAt": "2026-10-01T10:00:00.000Z"
+    }
+   },
+   "review": [
+    "m2_2",
+    "m10_10"
+   ],
+   "started": true
+  }
+ },
+ {
+  "name": "review-45-ids",
+  "input": "{\"version\":1,\"xp\":120,\"coins\":35,\"bridge\":3,\"questAccepted\":true,\"questComplete\":false,\"avatar\":\"girl\",\"table\":4,\"sound\":true,\"music\":false,\"combo\":2,\"questionStats\":{\"m4_3\":{\"attempts\":999,\"correct\":2,\"wrong\":1,\"responseTime\":1500,\"lastAnsweredAt\":\"2026-10-01T10:00:00.000Z\"},\"m7_8\":{\"attempts\":999,\"correct\":0,\"wrong\":2,\"responseTime\":1500,\"lastAnsweredAt\":\"2026-10-01T10:00:00.000Z\"}},\"review\":[\"m3_1\",\"m3_2\",\"m3_3\",\"m3_4\",\"m3_5\",\"m3_6\",\"m3_7\",\"m3_8\",\"m3_9\",\"m3_10\",\"m4_1\",\"m4_2\",\"m4_3\",\"m4_4\",\"m4_5\",\"m4_6\",\"m4_7\",\"m4_8\",\"m4_9\",\"m4_10\",\"m5_1\",\"m5_2\",\"m5_3\",\"m5_4\",\"m5_5\",\"m5_6\",\"m5_7\",\"m5_8\",\"m5_9\",\"m5_10\",\"m6_1\",\"m6_2\",\"m6_3\",\"m6_4\",\"m6_5\",\"m6_6\",\"m6_7\",\"m6_8\",\"m6_9\",\"m6_10\",\"m7_1\",\"m7_2\",\"m7_3\",\"m7_4\",\"m7_5\"],\"started\":true}",
+  "output": {
+   "version": 1,
+   "xp": 120,
+   "coins": 35,
+   "bridge": 3,
+   "questAccepted": true,
+   "questComplete": false,
+   "avatar": "girl",
+   "table": 4,
+   "sound": true,
+   "music": false,
+   "combo": 2,
+   "questionStats": {
+    "m4_3": {
+     "attempts": 3,
+     "correct": 2,
+     "wrong": 1,
+     "responseTime": 1500,
+     "lastAnsweredAt": "2026-10-01T10:00:00.000Z"
+    },
+    "m7_8": {
+     "attempts": 2,
+     "correct": 0,
+     "wrong": 2,
+     "responseTime": 1500,
+     "lastAnsweredAt": "2026-10-01T10:00:00.000Z"
+    }
+   },
+   "review": [
+    "m3_1",
+    "m3_2",
+    "m3_3",
+    "m3_4",
+    "m3_5",
+    "m3_6",
+    "m3_7",
+    "m3_8",
+    "m3_9",
+    "m3_10",
+    "m4_1",
+    "m4_2",
+    "m4_3",
+    "m4_4",
+    "m4_5",
+    "m4_6",
+    "m4_7",
+    "m4_8",
+    "m4_9",
+    "m4_10",
+    "m5_1",
+    "m5_2",
+    "m5_3",
+    "m5_4",
+    "m5_5",
+    "m5_6",
+    "m5_7",
+    "m5_8",
+    "m5_9",
+    "m5_10"
+   ],
+   "started": true
+  }
+ },
+ {
+  "name": "review-not-array",
+  "input": "{\"version\":1,\"xp\":120,\"coins\":35,\"bridge\":3,\"questAccepted\":true,\"questComplete\":false,\"avatar\":\"girl\",\"table\":4,\"sound\":true,\"music\":false,\"combo\":2,\"questionStats\":{\"m4_3\":{\"attempts\":999,\"correct\":2,\"wrong\":1,\"responseTime\":1500,\"lastAnsweredAt\":\"2026-10-01T10:00:00.000Z\"},\"m7_8\":{\"attempts\":999,\"correct\":0,\"wrong\":2,\"responseTime\":1500,\"lastAnsweredAt\":\"2026-10-01T10:00:00.000Z\"}},\"review\":\"m2_2\",\"started\":true}",
+  "output": {
+   "version": 1,
+   "xp": 120,
+   "coins": 35,
+   "bridge": 3,
+   "questAccepted": true,
+   "questComplete": false,
+   "avatar": "girl",
+   "table": 4,
+   "sound": true,
+   "music": false,
+   "combo": 2,
+   "questionStats": {
+    "m4_3": {
+     "attempts": 3,
+     "correct": 2,
+     "wrong": 1,
+     "responseTime": 1500,
+     "lastAnsweredAt": "2026-10-01T10:00:00.000Z"
+    },
+    "m7_8": {
+     "attempts": 2,
+     "correct": 0,
+     "wrong": 2,
+     "responseTime": 1500,
+     "lastAnsweredAt": "2026-10-01T10:00:00.000Z"
+    }
+   },
+   "review": [],
+   "started": true
+  }
+ },
+ {
+  "name": "started-string",
+  "input": "{\"version\":1,\"xp\":120,\"coins\":35,\"bridge\":3,\"questAccepted\":true,\"questComplete\":false,\"avatar\":\"girl\",\"table\":4,\"sound\":true,\"music\":false,\"combo\":2,\"questionStats\":{\"m4_3\":{\"attempts\":999,\"correct\":2,\"wrong\":1,\"responseTime\":1500,\"lastAnsweredAt\":\"2026-10-01T10:00:00.000Z\"},\"m7_8\":{\"attempts\":999,\"correct\":0,\"wrong\":2,\"responseTime\":1500,\"lastAnsweredAt\":\"2026-10-01T10:00:00.000Z\"}},\"review\":[\"m7_8\"],\"started\":\"true\"}",
+  "output": {
+   "version": 1,
+   "xp": 120,
+   "coins": 35,
+   "bridge": 3,
+   "questAccepted": true,
+   "questComplete": false,
+   "avatar": "girl",
+   "table": 4,
+   "sound": true,
+   "music": false,
+   "combo": 2,
+   "questionStats": {
+    "m4_3": {
+     "attempts": 3,
+     "correct": 2,
+     "wrong": 1,
+     "responseTime": 1500,
+     "lastAnsweredAt": "2026-10-01T10:00:00.000Z"
+    },
+    "m7_8": {
+     "attempts": 2,
+     "correct": 0,
+     "wrong": 2,
+     "responseTime": 1500,
+     "lastAnsweredAt": "2026-10-01T10:00:00.000Z"
+    }
+   },
+   "review": [
+    "m7_8"
+   ],
+   "started": false
+  }
+ },
+ {
+  "name": "extra-unknown-keys",
+  "input": "{\"version\":1,\"xp\":120,\"coins\":35,\"bridge\":3,\"questAccepted\":true,\"questComplete\":false,\"avatar\":\"girl\",\"table\":4,\"sound\":true,\"music\":false,\"combo\":2,\"questionStats\":{\"m4_3\":{\"attempts\":999,\"correct\":2,\"wrong\":1,\"responseTime\":1500,\"lastAnsweredAt\":\"2026-10-01T10:00:00.000Z\"},\"m7_8\":{\"attempts\":999,\"correct\":0,\"wrong\":2,\"responseTime\":1500,\"lastAnsweredAt\":\"2026-10-01T10:00:00.000Z\"}},\"review\":[\"m7_8\"],\"started\":true,\"cloud\":{\"token\":\"x\"},\"owned_cosmetics\":[\"hat\"]}",
+  "output": {
+   "version": 1,
+   "xp": 120,
+   "coins": 35,
+   "bridge": 3,
+   "questAccepted": true,
+   "questComplete": false,
+   "avatar": "girl",
+   "table": 4,
+   "sound": true,
+   "music": false,
+   "combo": 2,
+   "questionStats": {
+    "m4_3": {
+     "attempts": 3,
+     "correct": 2,
+     "wrong": 1,
+     "responseTime": 1500,
+     "lastAnsweredAt": "2026-10-01T10:00:00.000Z"
+    },
+    "m7_8": {
+     "attempts": 2,
+     "correct": 0,
+     "wrong": 2,
+     "responseTime": 1500,
+     "lastAnsweredAt": "2026-10-01T10:00:00.000Z"
+    }
+   },
+   "review": [
+    "m7_8"
+   ],
+   "started": true
+  }
+ }
+]

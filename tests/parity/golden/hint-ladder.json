@@ -1,0 +1,722 @@
+[
+ {
+  "id": "m2_1",
+  "hints": [
+   "Có 2 nhóm, mỗi nhóm 1 viên đá. Hãy đếm từng nhóm nhé!",
+   "Cộng các nhóm lại: 1 + 1 = ?",
+   "2 nhóm, mỗi nhóm 1 viên đá: 2 × 1 = 2. Mình cùng thử lại nhé!"
+  ]
+ },
+ {
+  "id": "m2_2",
+  "hints": [
+   "Có 2 nhóm, mỗi nhóm 2 viên đá. Hãy đếm từng nhóm nhé!",
+   "Cộng các nhóm lại: 2 + 2 = ?",
+   "2 nhóm, mỗi nhóm 2 viên đá: 2 × 2 = 4. Mình cùng thử lại nhé!"
+  ]
+ },
+ {
+  "id": "m2_3",
+  "hints": [
+   "Có 2 nhóm, mỗi nhóm 3 viên đá. Hãy đếm từng nhóm nhé!",
+   "Cộng các nhóm lại: 3 + 3 = ?",
+   "2 nhóm, mỗi nhóm 3 viên đá: 2 × 3 = 6. Mình cùng thử lại nhé!"
+  ]
+ },
+ {
+  "id": "m2_4",
+  "hints": [
+   "Có 2 nhóm, mỗi nhóm 4 viên đá. Hãy đếm từng nhóm nhé!",
+   "Cộng các nhóm lại: 4 + 4 = ?",
+   "2 nhóm, mỗi nhóm 4 viên đá: 2 × 4 = 8. Mình cùng thử lại nhé!"
+  ]
+ },
+ {
+  "id": "m2_5",
+  "hints": [
+   "Có 2 nhóm, mỗi nhóm 5 viên đá. Hãy đếm từng nhóm nhé!",
+   "Cộng các nhóm lại: 5 + 5 = ?",
+   "2 nhóm, mỗi nhóm 5 viên đá: 2 × 5 = 10. Mình cùng thử lại nhé!"
+  ]
+ },
+ {
+  "id": "m2_6",
+  "hints": [
+   "Có 2 nhóm, mỗi nhóm 6 viên đá. Hãy đếm từng nhóm nhé!",
+   "Cộng các nhóm lại: 6 + 6 = ?",
+   "2 nhóm, mỗi nhóm 6 viên đá: 2 × 6 = 12. Mình cùng thử lại nhé!"
+  ]
+ },
+ {
+  "id": "m2_7",
+  "hints": [
+   "Có 2 nhóm, mỗi nhóm 7 viên đá. Hãy đếm từng nhóm nhé!",
+   "Cộng các nhóm lại: 7 + 7 = ?",
+   "2 nhóm, mỗi nhóm 7 viên đá: 2 × 7 = 14. Mình cùng thử lại nhé!"
+  ]
+ },
+ {
+  "id": "m2_8",
+  "hints": [
+   "Có 2 nhóm, mỗi nhóm 8 viên đá. Hãy đếm từng nhóm nhé!",
+   "Cộng các nhóm lại: 8 + 8 = ?",
+   "2 nhóm, mỗi nhóm 8 viên đá: 2 × 8 = 16. Mình cùng thử lại nhé!"
+  ]
+ },
+ {
+  "id": "m2_9",
+  "hints": [
+   "Có 2 nhóm, mỗi nhóm 9 viên đá. Hãy đếm từng nhóm nhé!",
+   "Cộng các nhóm lại: 9 + 9 = ?",
+   "2 nhóm, mỗi nhóm 9 viên đá: 2 × 9 = 18. Mình cùng thử lại nhé!"
+  ]
+ },
+ {
+  "id": "m2_10",
+  "hints": [
+   "Có 2 nhóm, mỗi nhóm 10 viên đá. Hãy đếm từng nhóm nhé!",
+   "Cộng các nhóm lại: 10 + 10 = ?",
+   "2 nhóm, mỗi nhóm 10 viên đá: 2 × 10 = 20. Mình cùng thử lại nhé!"
+  ]
+ },
+ {
+  "id": "m3_1",
+  "hints": [
+   "Có 3 nhóm, mỗi nhóm 1 viên đá. Hãy đếm từng nhóm nhé!",
+   "Cộng các nhóm lại: 1 + 1 + 1 = ?",
+   "3 nhóm, mỗi nhóm 1 viên đá: 3 × 1 = 3. Mình cùng thử lại nhé!"
+  ]
+ },
+ {
+  "id": "m3_2",
+  "hints": [
+   "Có 3 nhóm, mỗi nhóm 2 viên đá. Hãy đếm từng nhóm nhé!",
+   "Cộng các nhóm lại: 2 + 2 + 2 = ?",
+   "3 nhóm, mỗi nhóm 2 viên đá: 3 × 2 = 6. Mình cùng thử lại nhé!"
+  ]
+ },
+ {
+  "id": "m3_3",
+  "hints": [
+   "Có 3 nhóm, mỗi nhóm 3 viên đá. Hãy đếm từng nhóm nhé!",
+   "Cộng các nhóm lại: 3 + 3 + 3 = ?",
+   "3 nhóm, mỗi nhóm 3 viên đá: 3 × 3 = 9. Mình cùng thử lại nhé!"
+  ]
+ },
+ {
+  "id": "m3_4",
+  "hints": [
+   "Có 3 nhóm, mỗi nhóm 4 viên đá. Hãy đếm từng nhóm nhé!",
+   "Cộng các nhóm lại: 4 + 4 + 4 = ?",
+   "3 nhóm, mỗi nhóm 4 viên đá: 3 × 4 = 12. Mình cùng thử lại nhé!"
+  ]
+ },
+ {
+  "id": "m3_5",
+  "hints": [
+   "Có 3 nhóm, mỗi nhóm 5 viên đá. Hãy đếm từng nhóm nhé!",
+   "Cộng các nhóm lại: 5 + 5 + 5 = ?",
+   "3 nhóm, mỗi nhóm 5 viên đá: 3 × 5 = 15. Mình cùng thử lại nhé!"
+  ]
+ },
+ {
+  "id": "m3_6",
+  "hints": [
+   "Có 3 nhóm, mỗi nhóm 6 viên đá. Hãy đếm từng nhóm nhé!",
+   "Cộng các nhóm lại: 6 + 6 + 6 = ?",
+   "3 nhóm, mỗi nhóm 6 viên đá: 3 × 6 = 18. Mình cùng thử lại nhé!"
+  ]
+ },
+ {
+  "id": "m3_7",
+  "hints": [
+   "Có 3 nhóm, mỗi nhóm 7 viên đá. Hãy đếm từng nhóm nhé!",
+   "Cộng các nhóm lại: 7 + 7 + 7 = ?",
+   "3 nhóm, mỗi nhóm 7 viên đá: 3 × 7 = 21. Mình cùng thử lại nhé!"
+  ]
+ },
+ {
+  "id": "m3_8",
+  "hints": [
+   "Có 3 nhóm, mỗi nhóm 8 viên đá. Hãy đếm từng nhóm nhé!",
+   "Cộng các nhóm lại: 8 + 8 + 8 = ?",
+   "3 nhóm, mỗi nhóm 8 viên đá: 3 × 8 = 24. Mình cùng thử lại nhé!"
+  ]
+ },
+ {
+  "id": "m3_9",
+  "hints": [
+   "Có 3 nhóm, mỗi nhóm 9 viên đá. Hãy đếm từng nhóm nhé!",
+   "Cộng các nhóm lại: 9 + 9 + 9 = ?",
+   "3 nhóm, mỗi nhóm 9 viên đá: 3 × 9 = 27. Mình cùng thử lại nhé!"
+  ]
+ },
+ {
+  "id": "m3_10",
+  "hints": [
+   "Có 3 nhóm, mỗi nhóm 10 viên đá. Hãy đếm từng nhóm nhé!",
+   "Cộng các nhóm lại: 10 + 10 + 10 = ?",
+   "3 nhóm, mỗi nhóm 10 viên đá: 3 × 10 = 30. Mình cùng thử lại nhé!"
+  ]
+ },
+ {
+  "id": "m4_1",
+  "hints": [
+   "Có 4 nhóm, mỗi nhóm 1 viên đá. Hãy đếm từng nhóm nhé!",
+   "Cộng các nhóm lại: 1 + 1 + 1 + 1 = ?",
+   "4 nhóm, mỗi nhóm 1 viên đá: 4 × 1 = 4. Mình cùng thử lại nhé!"
+  ]
+ },
+ {
+  "id": "m4_2",
+  "hints": [
+   "Có 4 nhóm, mỗi nhóm 2 viên đá. Hãy đếm từng nhóm nhé!",
+   "Cộng các nhóm lại: 2 + 2 + 2 + 2 = ?",
+   "4 nhóm, mỗi nhóm 2 viên đá: 4 × 2 = 8. Mình cùng thử lại nhé!"
+  ]
+ },
+ {
+  "id": "m4_3",
+  "hints": [
+   "Có 4 nhóm, mỗi nhóm 3 viên đá. Hãy đếm từng nhóm nhé!",
+   "Cộng các nhóm lại: 3 + 3 + 3 + 3 = ?",
+   "4 nhóm, mỗi nhóm 3 viên đá: 4 × 3 = 12. Mình cùng thử lại nhé!"
+  ]
+ },
+ {
+  "id": "m4_4",
+  "hints": [
+   "Có 4 nhóm, mỗi nhóm 4 viên đá. Hãy đếm từng nhóm nhé!",
+   "Cộng các nhóm lại: 4 + 4 + 4 + 4 = ?",
+   "4 nhóm, mỗi nhóm 4 viên đá: 4 × 4 = 16. Mình cùng thử lại nhé!"
+  ]
+ },
+ {
+  "id": "m4_5",
+  "hints": [
+   "Có 4 nhóm, mỗi nhóm 5 viên đá. Hãy đếm từng nhóm nhé!",
+   "Cộng các nhóm lại: 5 + 5 + 5 + 5 = ?",
+   "4 nhóm, mỗi nhóm 5 viên đá: 4 × 5 = 20. Mình cùng thử lại nhé!"
+  ]
+ },
+ {
+  "id": "m4_6",
+  "hints": [
+   "Có 4 nhóm, mỗi nhóm 6 viên đá. Hãy đếm từng nhóm nhé!",
+   "Cộng các nhóm lại: 6 + 6 + 6 + 6 = ?",
+   "4 nhóm, mỗi nhóm 6 viên đá: 4 × 6 = 24. Mình cùng thử lại nhé!"
+  ]
+ },
+ {
+  "id": "m4_7",
+  "hints": [
+   "Có 4 nhóm, mỗi nhóm 7 viên đá. Hãy đếm từng nhóm nhé!",
+   "Cộng các nhóm lại: 7 + 7 + 7 + 7 = ?",
+   "4 nhóm, mỗi nhóm 7 viên đá: 4 × 7 = 28. Mình cùng thử lại nhé!"
+  ]
+ },
+ {
+  "id": "m4_8",
+  "hints": [
+   "Có 4 nhóm, mỗi nhóm 8 viên đá. Hãy đếm từng nhóm nhé!",
+   "Cộng các nhóm lại: 8 + 8 + 8 + 8 = ?",
+   "4 nhóm, mỗi nhóm 8 viên đá: 4 × 8 = 32. Mình cùng thử lại nhé!"
+  ]
+ },
+ {
+  "id": "m4_9",
+  "hints": [
+   "Có 4 nhóm, mỗi nhóm 9 viên đá. Hãy đếm từng nhóm nhé!",
+   "Cộng các nhóm lại: 9 + 9 + 9 + 9 = ?",
+   "4 nhóm, mỗi nhóm 9 viên đá: 4 × 9 = 36. Mình cùng thử lại nhé!"
+  ]
+ },
+ {
+  "id": "m4_10",
+  "hints": [
+   "Có 4 nhóm, mỗi nhóm 10 viên đá. Hãy đếm từng nhóm nhé!",
+   "Cộng các nhóm lại: 10 + 10 + 10 + 10 = ?",
+   "4 nhóm, mỗi nhóm 10 viên đá: 4 × 10 = 40. Mình cùng thử lại nhé!"
+  ]
+ },
+ {
+  "id": "m5_1",
+  "hints": [
+   "Có 5 nhóm, mỗi nhóm 1 viên đá. Hãy đếm từng nhóm nhé!",
+   "Cộng các nhóm lại: 1 + 1 + 1 + 1 + 1 = ?",
+   "5 nhóm, mỗi nhóm 1 viên đá: 5 × 1 = 5. Mình cùng thử lại nhé!"
+  ]
+ },
+ {
+  "id": "m5_2",
+  "hints": [
+   "Có 5 nhóm, mỗi nhóm 2 viên đá. Hãy đếm từng nhóm nhé!",
+   "Cộng các nhóm lại: 2 + 2 + 2 + 2 + 2 = ?",
+   "5 nhóm, mỗi nhóm 2 viên đá: 5 × 2 = 10. Mình cùng thử lại nhé!"
+  ]
+ },
+ {
+  "id": "m5_3",
+  "hints": [
+   "Có 5 nhóm, mỗi nhóm 3 viên đá. Hãy đếm từng nhóm nhé!",
+   "Cộng các nhóm lại: 3 + 3 + 3 + 3 + 3 = ?",
+   "5 nhóm, mỗi nhóm 3 viên đá: 5 × 3 = 15. Mình cùng thử lại nhé!"
+  ]
+ },
+ {
+  "id": "m5_4",
+  "hints": [
+   "Có 5 nhóm, mỗi nhóm 4 viên đá. Hãy đếm từng nhóm nhé!",
+   "Cộng các nhóm lại: 4 + 4 + 4 + 4 + 4 = ?",
+   "5 nhóm, mỗi nhóm 4 viên đá: 5 × 4 = 20. Mình cùng thử lại nhé!"
+  ]
+ },
+ {
+  "id": "m5_5",
+  "hints": [
+   "Có 5 nhóm, mỗi nhóm 5 viên đá. Hãy đếm từng nhóm nhé!",
+   "Cộng các nhóm lại: 5 + 5 + 5 + 5 + 5 = ?",
+   "5 nhóm, mỗi nhóm 5 viên đá: 5 × 5 = 25. Mình cùng thử lại nhé!"
+  ]
+ },
+ {
+  "id": "m5_6",
+  "hints": [
+   "Có 5 nhóm, mỗi nhóm 6 viên đá. Hãy đếm từng nhóm nhé!",
+   "Cộng các nhóm lại: 6 + 6 + 6 + 6 + 6 = ?",
+   "5 nhóm, mỗi nhóm 6 viên đá: 5 × 6 = 30. Mình cùng thử lại nhé!"
+  ]
+ },
+ {
+  "id": "m5_7",
+  "hints": [
+   "Có 5 nhóm, mỗi nhóm 7 viên đá. Hãy đếm từng nhóm nhé!",
+   "Cộng các nhóm lại: 7 + 7 + 7 + 7 + 7 = ?",
+   "5 nhóm, mỗi nhóm 7 viên đá: 5 × 7 = 35. Mình cùng thử lại nhé!"
+  ]
+ },
+ {
+  "id": "m5_8",
+  "hints": [
+   "Có 5 nhóm, mỗi nhóm 8 viên đá. Hãy đếm từng nhóm nhé!",
+   "Cộng các nhóm lại: 8 + 8 + 8 + 8 + 8 = ?",
+   "5 nhóm, mỗi nhóm 8 viên đá: 5 × 8 = 40. Mình cùng thử lại nhé!"
+  ]
+ },
+ {
+  "id": "m5_9",
+  "hints": [
+   "Có 5 nhóm, mỗi nhóm 9 viên đá. Hãy đếm từng nhóm nhé!",
+   "Cộng các nhóm lại: 9 + 9 + 9 + 9 + 9 = ?",
+   "5 nhóm, mỗi nhóm 9 viên đá: 5 × 9 = 45. Mình cùng thử lại nhé!"
+  ]
+ },
+ {
+  "id": "m5_10",
+  "hints": [
+   "Có 5 nhóm, mỗi nhóm 10 viên đá. Hãy đếm từng nhóm nhé!",
+   "Cộng các nhóm lại: 10 + 10 + 10 + 10 + 10 = ?",
+   "5 nhóm, mỗi nhóm 10 viên đá: 5 × 10 = 50. Mình cùng thử lại nhé!"
+  ]
+ },
+ {
+  "id": "m6_1",
+  "hints": [
+   "Có 6 nhóm, mỗi nhóm 1 viên đá. Hãy đếm từng nhóm nhé!",
+   "Cộng các nhóm lại: 1 + 1 + 1 + 1 + 1 + 1 = ?",
+   "6 nhóm, mỗi nhóm 1 viên đá: 6 × 1 = 6. Mình cùng thử lại nhé!"
+  ]
+ },
+ {
+  "id": "m6_2",
+  "hints": [
+   "Có 6 nhóm, mỗi nhóm 2 viên đá. Hãy đếm từng nhóm nhé!",
+   "Cộng các nhóm lại: 2 + 2 + 2 + 2 + 2 + 2 = ?",
+   "6 nhóm, mỗi nhóm 2 viên đá: 6 × 2 = 12. Mình cùng thử lại nhé!"
+  ]
+ },
+ {
+  "id": "m6_3",
+  "hints": [
+   "Có 6 nhóm, mỗi nhóm 3 viên đá. Hãy đếm từng nhóm nhé!",
+   "Cộng các nhóm lại: 3 + 3 + 3 + 3 + 3 + 3 = ?",
+   "6 nhóm, mỗi nhóm 3 viên đá: 6 × 3 = 18. Mình cùng thử lại nhé!"
+  ]
+ },
+ {
+  "id": "m6_4",
+  "hints": [
+   "Có 6 nhóm, mỗi nhóm 4 viên đá. Hãy đếm từng nhóm nhé!",
+   "Cộng các nhóm lại: 4 + 4 + 4 + 4 + 4 + 4 = ?",
+   "6 nhóm, mỗi nhóm 4 viên đá: 6 × 4 = 24. Mình cùng thử lại nhé!"
+  ]
+ },
+ {
+  "id": "m6_5",
+  "hints": [
+   "Có 6 nhóm, mỗi nhóm 5 viên đá. Hãy đếm từng nhóm nhé!",
+   "Cộng các nhóm lại: 5 + 5 + 5 + 5 + 5 + 5 = ?",
+   "6 nhóm, mỗi nhóm 5 viên đá: 6 × 5 = 30. Mình cùng thử lại nhé!"
+  ]
+ },
+ {
+  "id": "m6_6",
+  "hints": [
+   "Có 6 nhóm, mỗi nhóm 6 viên đá. Hãy đếm từng nhóm nhé!",
+   "Cộng các nhóm lại: 6 + 6 + 6 + 6 + 6 + 6 = ?",
+   "6 nhóm, mỗi nhóm 6 viên đá: 6 × 6 = 36. Mình cùng thử lại nhé!"
+  ]
+ },
+ {
+  "id": "m6_7",
+  "hints": [
+   "Có 6 nhóm, mỗi nhóm 7 viên đá. Hãy đếm từng nhóm nhé!",
+   "Cộng các nhóm lại: 7 + 7 + 7 + 7 + 7 + 7 = ?",
+   "6 nhóm, mỗi nhóm 7 viên đá: 6 × 7 = 42. Mình cùng thử lại nhé!"
+  ]
+ },
+ {
+  "id": "m6_8",
+  "hints": [
+   "Có 6 nhóm, mỗi nhóm 8 viên đá. Hãy đếm từng nhóm nhé!",
+   "Cộng các nhóm lại: 8 + 8 + 8 + 8 + 8 + 8 = ?",
+   "6 nhóm, mỗi nhóm 8 viên đá: 6 × 8 = 48. Mình cùng thử lại nhé!"
+  ]
+ },
+ {
+  "id": "m6_9",
+  "hints": [
+   "Có 6 nhóm, mỗi nhóm 9 viên đá. Hãy đếm từng nhóm nhé!",
+   "Cộng các nhóm lại: 9 + 9 + 9 + 9 + 9 + 9 = ?",
+   "6 nhóm, mỗi nhóm 9 viên đá: 6 × 9 = 54. Mình cùng thử lại nhé!"
+  ]
+ },
+ {
+  "id": "m6_10",
+  "hints": [
+   "Có 6 nhóm, mỗi nhóm 10 viên đá. Hãy đếm từng nhóm nhé!",
+   "Cộng các nhóm lại: 10 + 10 + 10 + 10 + 10 + 10 = ?",
+   "6 nhóm, mỗi nhóm 10 viên đá: 6 × 10 = 60. Mình cùng thử lại nhé!"
+  ]
+ },
+ {
+  "id": "m7_1",
+  "hints": [
+   "Có 7 nhóm, mỗi nhóm 1 viên đá. Hãy đếm từng nhóm nhé!",
+   "Cộng các nhóm lại: 1 + 1 + 1 + 1 + 1 + 1 + 1 = ?",
+   "7 nhóm, mỗi nhóm 1 viên đá: 7 × 1 = 7. Mình cùng thử lại nhé!"
+  ]
+ },
+ {
+  "id": "m7_2",
+  "hints": [
+   "Có 7 nhóm, mỗi nhóm 2 viên đá. Hãy đếm từng nhóm nhé!",
+   "Cộng các nhóm lại: 2 + 2 + 2 + 2 + 2 + 2 + 2 = ?",
+   "7 nhóm, mỗi nhóm 2 viên đá: 7 × 2 = 14. Mình cùng thử lại nhé!"
+  ]
+ },
+ {
+  "id": "m7_3",
+  "hints": [
+   "Có 7 nhóm, mỗi nhóm 3 viên đá. Hãy đếm từng nhóm nhé!",
+   "Cộng các nhóm lại: 3 + 3 + 3 + 3 + 3 + 3 + 3 = ?",
+   "7 nhóm, mỗi nhóm 3 viên đá: 7 × 3 = 21. Mình cùng thử lại nhé!"
+  ]
+ },
+ {
+  "id": "m7_4",
+  "hints": [
+   "Có 7 nhóm, mỗi nhóm 4 viên đá. Hãy đếm từng nhóm nhé!",
+   "Cộng các nhóm lại: 4 + 4 + 4 + 4 + 4 + 4 + 4 = ?",
+   "7 nhóm, mỗi nhóm 4 viên đá: 7 × 4 = 28. Mình cùng thử lại nhé!"
+  ]
+ },
+ {
+  "id": "m7_5",
+  "hints": [
+   "Có 7 nhóm, mỗi nhóm 5 viên đá. Hãy đếm từng nhóm nhé!",
+   "Cộng các nhóm lại: 5 + 5 + 5 + 5 + 5 + 5 + 5 = ?",
+   "7 nhóm, mỗi nhóm 5 viên đá: 7 × 5 = 35. Mình cùng thử lại nhé!"
+  ]
+ },
+ {
+  "id": "m7_6",
+  "hints": [
+   "Có 7 nhóm, mỗi nhóm 6 viên đá. Hãy đếm từng nhóm nhé!",
+   "Cộng các nhóm lại: 6 + 6 + 6 + 6 + 6 + 6 + 6 = ?",
+   "7 nhóm, mỗi nhóm 6 viên đá: 7 × 6 = 42. Mình cùng thử lại nhé!"
+  ]
+ },
+ {
+  "id": "m7_7",
+  "hints": [
+   "Có 7 nhóm, mỗi nhóm 7 viên đá. Hãy đếm từng nhóm nhé!",
+   "Cộng các nhóm lại: 7 + 7 + 7 + 7 + 7 + 7 + 7 = ?",
+   "7 nhóm, mỗi nhóm 7 viên đá: 7 × 7 = 49. Mình cùng thử lại nhé!"
+  ]
+ },
+ {
+  "id": "m7_8",
+  "hints": [
+   "Có 7 nhóm, mỗi nhóm 8 viên đá. Hãy đếm từng nhóm nhé!",
+   "Cộng các nhóm lại: 8 + 8 + 8 + 8 + 8 + 8 + 8 = ?",
+   "7 nhóm, mỗi nhóm 8 viên đá: 7 × 8 = 56. Mình cùng thử lại nhé!"
+  ]
+ },
+ {
+  "id": "m7_9",
+  "hints": [
+   "Có 7 nhóm, mỗi nhóm 9 viên đá. Hãy đếm từng nhóm nhé!",
+   "Cộng các nhóm lại: 9 + 9 + 9 + 9 + 9 + 9 + 9 = ?",
+   "7 nhóm, mỗi nhóm 9 viên đá: 7 × 9 = 63. Mình cùng thử lại nhé!"
+  ]
+ },
+ {
+  "id": "m7_10",
+  "hints": [
+   "Có 7 nhóm, mỗi nhóm 10 viên đá. Hãy đếm từng nhóm nhé!",
+   "Cộng các nhóm lại: 10 + 10 + 10 + 10 + 10 + 10 + 10 = ?",
+   "7 nhóm, mỗi nhóm 10 viên đá: 7 × 10 = 70. Mình cùng thử lại nhé!"
+  ]
+ },
+ {
+  "id": "m8_1",
+  "hints": [
+   "Có 8 nhóm, mỗi nhóm 1 viên đá. Hãy đếm từng nhóm nhé!",
+   "Cộng các nhóm lại: 1 + 1 + 1 + 1 + 1 + 1 + 1 + 1 = ?",
+   "8 nhóm, mỗi nhóm 1 viên đá: 8 × 1 = 8. Mình cùng thử lại nhé!"
+  ]
+ },
+ {
+  "id": "m8_2",
+  "hints": [
+   "Có 8 nhóm, mỗi nhóm 2 viên đá. Hãy đếm từng nhóm nhé!",
+   "Cộng các nhóm lại: 2 + 2 + 2 + 2 + 2 + 2 + 2 + 2 = ?",
+   "8 nhóm, mỗi nhóm 2 viên đá: 8 × 2 = 16. Mình cùng thử lại nhé!"
+  ]
+ },
+ {
+  "id": "m8_3",
+  "hints": [
+   "Có 8 nhóm, mỗi nhóm 3 viên đá. Hãy đếm từng nhóm nhé!",
+   "Cộng các nhóm lại: 3 + 3 + 3 + 3 + 3 + 3 + 3 + 3 = ?",
+   "8 nhóm, mỗi nhóm 3 viên đá: 8 × 3 = 24. Mình cùng thử lại nhé!"
+  ]
+ },
+ {
+  "id": "m8_4",
+  "hints": [
+   "Có 8 nhóm, mỗi nhóm 4 viên đá. Hãy đếm từng nhóm nhé!",
+   "Cộng các nhóm lại: 4 + 4 + 4 + 4 + 4 + 4 + 4 + 4 = ?",
+   "8 nhóm, mỗi nhóm 4 viên đá: 8 × 4 = 32. Mình cùng thử lại nhé!"
+  ]
+ },
+ {
+  "id": "m8_5",
+  "hints": [
+   "Có 8 nhóm, mỗi nhóm 5 viên đá. Hãy đếm từng nhóm nhé!",
+   "Cộng các nhóm lại: 5 + 5 + 5 + 5 + 5 + 5 + 5 + 5 = ?",
+   "8 nhóm, mỗi nhóm 5 viên đá: 8 × 5 = 40. Mình cùng thử lại nhé!"
+  ]
+ },
+ {
+  "id": "m8_6",
+  "hints": [
+   "Có 8 nhóm, mỗi nhóm 6 viên đá. Hãy đếm từng nhóm nhé!",
+   "Cộng các nhóm lại: 6 + 6 + 6 + 6 + 6 + 6 + 6 + 6 = ?",
+   "8 nhóm, mỗi nhóm 6 viên đá: 8 × 6 = 48. Mình cùng thử lại nhé!"
+  ]
+ },
+ {
+  "id": "m8_7",
+  "hints": [
+   "Có 8 nhóm, mỗi nhóm 7 viên đá. Hãy đếm từng nhóm nhé!",
+   "Cộng các nhóm lại: 7 + 7 + 7 + 7 + 7 + 7 + 7 + 7 = ?",
+   "8 nhóm, mỗi nhóm 7 viên đá: 8 × 7 = 56. Mình cùng thử lại nhé!"
+  ]
+ },
+ {
+  "id": "m8_8",
+  "hints": [
+   "Có 8 nhóm, mỗi nhóm 8 viên đá. Hãy đếm từng nhóm nhé!",
+   "Cộng các nhóm lại: 8 + 8 + 8 + 8 + 8 + 8 + 8 + 8 = ?",
+   "8 nhóm, mỗi nhóm 8 viên đá: 8 × 8 = 64. Mình cùng thử lại nhé!"
+  ]
+ },
+ {
+  "id": "m8_9",
+  "hints": [
+   "Có 8 nhóm, mỗi nhóm 9 viên đá. Hãy đếm từng nhóm nhé!",
+   "Cộng các nhóm lại: 9 + 9 + 9 + 9 + 9 + 9 + 9 + 9 = ?",
+   "8 nhóm, mỗi nhóm 9 viên đá: 8 × 9 = 72. Mình cùng thử lại nhé!"
+  ]
+ },
+ {
+  "id": "m8_10",
+  "hints": [
+   "Có 8 nhóm, mỗi nhóm 10 viên đá. Hãy đếm từng nhóm nhé!",
+   "Cộng các nhóm lại: 10 + 10 + 10 + 10 + 10 + 10 + 10 + 10 = ?",
+   "8 nhóm, mỗi nhóm 10 viên đá: 8 × 10 = 80. Mình cùng thử lại nhé!"
+  ]
+ },
+ {
+  "id": "m9_1",
+  "hints": [
+   "Có 9 nhóm, mỗi nhóm 1 viên đá. Hãy đếm từng nhóm nhé!",
+   "Cộng các nhóm lại: 1 + 1 + 1 + 1 + 1 + 1 + 1 + 1 + 1 = ?",
+   "9 nhóm, mỗi nhóm 1 viên đá: 9 × 1 = 9. Mình cùng thử lại nhé!"
+  ]
+ },
+ {
+  "id": "m9_2",
+  "hints": [
+   "Có 9 nhóm, mỗi nhóm 2 viên đá. Hãy đếm từng nhóm nhé!",
+   "Cộng các nhóm lại: 2 + 2 + 2 + 2 + 2 + 2 + 2 + 2 + 2 = ?",
+   "9 nhóm, mỗi nhóm 2 viên đá: 9 × 2 = 18. Mình cùng thử lại nhé!"
+  ]
+ },
+ {
+  "id": "m9_3",
+  "hints": [
+   "Có 9 nhóm, mỗi nhóm 3 viên đá. Hãy đếm từng nhóm nhé!",
+   "Cộng các nhóm lại: 3 + 3 + 3 + 3 + 3 + 3 + 3 + 3 + 3 = ?",
+   "9 nhóm, mỗi nhóm 3 viên đá: 9 × 3 = 27. Mình cùng thử lại nhé!"
+  ]
+ },
+ {
+  "id": "m9_4",
+  "hints": [
+   "Có 9 nhóm, mỗi nhóm 4 viên đá. Hãy đếm từng nhóm nhé!",
+   "Cộng các nhóm lại: 4 + 4 + 4 + 4 + 4 + 4 + 4 + 4 + 4 = ?",
+   "9 nhóm, mỗi nhóm 4 viên đá: 9 × 4 = 36. Mình cùng thử lại nhé!"
+  ]
+ },
+ {
+  "id": "m9_5",
+  "hints": [
+   "Có 9 nhóm, mỗi nhóm 5 viên đá. Hãy đếm từng nhóm nhé!",
+   "Cộng các nhóm lại: 5 + 5 + 5 + 5 + 5 + 5 + 5 + 5 + 5 = ?",
+   "9 nhóm, mỗi nhóm 5 viên đá: 9 × 5 = 45. Mình cùng thử lại nhé!"
+  ]
+ },
+ {
+  "id": "m9_6",
+  "hints": [
+   "Có 9 nhóm, mỗi nhóm 6 viên đá. Hãy đếm từng nhóm nhé!",
+   "Cộng các nhóm lại: 6 + 6 + 6 + 6 + 6 + 6 + 6 + 6 + 6 = ?",
+   "9 nhóm, mỗi nhóm 6 viên đá: 9 × 6 = 54. Mình cùng thử lại nhé!"
+  ]
+ },
+ {
+  "id": "m9_7",
+  "hints": [
+   "Có 9 nhóm, mỗi nhóm 7 viên đá. Hãy đếm từng nhóm nhé!",
+   "Cộng các nhóm lại: 7 + 7 + 7 + 7 + 7 + 7 + 7 + 7 + 7 = ?",
+   "9 nhóm, mỗi nhóm 7 viên đá: 9 × 7 = 63. Mình cùng thử lại nhé!"
+  ]
+ },
+ {
+  "id": "m9_8",
+  "hints": [
+   "Có 9 nhóm, mỗi nhóm 8 viên đá. Hãy đếm từng nhóm nhé!",
+   "Cộng các nhóm lại: 8 + 8 + 8 + 8 + 8 + 8 + 8 + 8 + 8 = ?",
+   "9 nhóm, mỗi nhóm 8 viên đá: 9 × 8 = 72. Mình cùng thử lại nhé!"
+  ]
+ },
+ {
+  "id": "m9_9",
+  "hints": [
+   "Có 9 nhóm, mỗi nhóm 9 viên đá. Hãy đếm từng nhóm nhé!",
+   "Cộng các nhóm lại: 9 + 9 + 9 + 9 + 9 + 9 + 9 + 9 + 9 = ?",
+   "9 nhóm, mỗi nhóm 9 viên đá: 9 × 9 = 81. Mình cùng thử lại nhé!"
+  ]
+ },
+ {
+  "id": "m9_10",
+  "hints": [
+   "Có 9 nhóm, mỗi nhóm 10 viên đá. Hãy đếm từng nhóm nhé!",
+   "Cộng các nhóm lại: 10 + 10 + 10 + 10 + 10 + 10 + 10 + 10 + 10 = ?",
+   "9 nhóm, mỗi nhóm 10 viên đá: 9 × 10 = 90. Mình cùng thử lại nhé!"
+  ]
+ },
+ {
+  "id": "m10_1",
+  "hints": [
+   "Có 10 nhóm, mỗi nhóm 1 viên đá. Hãy đếm từng nhóm nhé!",
+   "Cộng các nhóm lại: 1 + 1 + 1 + 1 + 1 + 1 + 1 + 1 + 1 + 1 = ?",
+   "10 nhóm, mỗi nhóm 1 viên đá: 10 × 1 = 10. Mình cùng thử lại nhé!"
+  ]
+ },
+ {
+  "id": "m10_2",
+  "hints": [
+   "Có 10 nhóm, mỗi nhóm 2 viên đá. Hãy đếm từng nhóm nhé!",
+   "Cộng các nhóm lại: 2 + 2 + 2 + 2 + 2 + 2 + 2 + 2 + 2 + 2 = ?",
+   "10 nhóm, mỗi nhóm 2 viên đá: 10 × 2 = 20. Mình cùng thử lại nhé!"
+  ]
+ },
+ {
+  "id": "m10_3",
+  "hints": [
+   "Có 10 nhóm, mỗi nhóm 3 viên đá. Hãy đếm từng nhóm nhé!",
+   "Cộng các nhóm lại: 3 + 3 + 3 + 3 + 3 + 3 + 3 + 3 + 3 + 3 = ?",
+   "10 nhóm, mỗi nhóm 3 viên đá: 10 × 3 = 30. Mình cùng thử lại nhé!"
+  ]
+ },
+ {
+  "id": "m10_4",
+  "hints": [
+   "Có 10 nhóm, mỗi nhóm 4 viên đá. Hãy đếm từng nhóm nhé!",
+   "Cộng các nhóm lại: 4 + 4 + 4 + 4 + 4 + 4 + 4 + 4 + 4 + 4 = ?",
+   "10 nhóm, mỗi nhóm 4 viên đá: 10 × 4 = 40. Mình cùng thử lại nhé!"
+  ]
+ },
+ {
+  "id": "m10_5",
+  "hints": [
+   "Có 10 nhóm, mỗi nhóm 5 viên đá. Hãy đếm từng nhóm nhé!",
+   "Cộng các nhóm lại: 5 + 5 + 5 + 5 + 5 + 5 + 5 + 5 + 5 + 5 = ?",
+   "10 nhóm, mỗi nhóm 5 viên đá: 10 × 5 = 50. Mình cùng thử lại nhé!"
+  ]
+ },
+ {
+  "id": "m10_6",
+  "hints": [
+   "Có 10 nhóm, mỗi nhóm 6 viên đá. Hãy đếm từng nhóm nhé!",
+   "Cộng các nhóm lại: 6 + 6 + 6 + 6 + 6 + 6 + 6 + 6 + 6 + 6 = ?",
+   "10 nhóm, mỗi nhóm 6 viên đá: 10 × 6 = 60. Mình cùng thử lại nhé!"
+  ]
+ },
+ {
+  "id": "m10_7",
+  "hints": [
+   "Có 10 nhóm, mỗi nhóm 7 viên đá. Hãy đếm từng nhóm nhé!",
+   "Cộng các nhóm lại: 7 + 7 + 7 + 7 + 7 + 7 + 7 + 7 + 7 + 7 = ?",
+   "10 nhóm, mỗi nhóm 7 viên đá: 10 × 7 = 70. Mình cùng thử lại nhé!"
+  ]
+ },
+ {
+  "id": "m10_8",
+  "hints": [
+   "Có 10 nhóm, mỗi nhóm 8 viên đá. Hãy đếm từng nhóm nhé!",
+   "Cộng các nhóm lại: 8 + 8 + 8 + 8 + 8 + 8 + 8 + 8 + 8 + 8 = ?",
+   "10 nhóm, mỗi nhóm 8 viên đá: 10 × 8 = 80. Mình cùng thử lại nhé!"
+  ]
+ },
+ {
+  "id": "m10_9",
+  "hints": [
+   "Có 10 nhóm, mỗi nhóm 9 viên đá. Hãy đếm từng nhóm nhé!",
+   "Cộng các nhóm lại: 9 + 9 + 9 + 9 + 9 + 9 + 9 + 9 + 9 + 9 = ?",
+   "10 nhóm, mỗi nhóm 9 viên đá: 10 × 9 = 90. Mình cùng thử lại nhé!"
+  ]
+ },
+ {
+  "id": "m10_10",
+  "hints": [
+   "Có 10 nhóm, mỗi nhóm 10 viên đá. Hãy đếm từng nhóm nhé!",
+   "Cộng các nhóm lại: 10 + 10 + 10 + 10 + 10 + 10 + 10 + 10 + 10 + 10 = ?",
+   "10 nhóm, mỗi nhóm 10 viên đá: 10 × 10 = 100. Mình cùng thử lại nhé!"
+  ]
+ }
+]

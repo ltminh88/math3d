@@ -1,0 +1,21 @@
+{
+ "storageWrites": [
+  [
+   "set",
+   "aigame3d_quest_collapsed",
+   "1"
+  ],
+  [
+   "set",
+   "aigame3d_multiplication_save",
+   "{\"version\":1,\"xp\":30,\"coins\":15,\"bridge\":3,\"questAccepted\":true,\"questComplete\":false,\"avatar\":\"boy\",\"table\":0,\"sound\":true,\"music\":false,\"combo\":0,\"questionStats\":{},\"review\":[],\"started\":true}"
+  ]
+ ],
+ "audio": [
+  [
+   "ctx",
+   "resume"
+  ]
+ ],
+ "pageErrors": []
+}
