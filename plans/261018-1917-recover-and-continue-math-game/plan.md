@@ -19,8 +19,8 @@ Supersedes [261018-1803-vlm-math-game-mvp](../261018-1803-vlm-math-game-mvp/plan
 |-------|------|--------|
 | 01 | [Capture live baselines + golden traces](phase-01-capture-live-baselines-and-golden-traces.md) | Done (5255e31) |
 | 02 | [Legacy bundle runs in Vite (strangler base)](phase-02-legacy-bundle-runs-in-vite.md) | Done (bd357af, gate 5c4f9dd) |
-| 03 | [Recover config, save, xp, quiz](phase-03-recover-config-save-quiz-modules.md) | Pending |
-| 04 | [Recover audio + i18n](phase-04-recover-audio-and-i18n-modules.md) | Pending |
+| 03 | [Recover config, save, xp, quiz](phase-03-recover-config-save-quiz-modules.md) | Done (recovery-p03) |
+| 04 | [Recover audio + i18n](phase-04-recover-audio-and-i18n-modules.md) | Done (recovery-p04) |
 | 05 | [Recover world static builders](phase-05-recover-world-static-builders.md) | Pending |
 | 06 | [Recover scatter, characters, controls, world orchestrator](phase-06-recover-world-scatter-characters-controls.md) | Pending |
 | 07 | [Recover minimap + world map renderer](phase-07-recover-minimap-and-world-map.md) | Pending |
