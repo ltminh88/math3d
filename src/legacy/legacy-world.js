@@ -1,7 +1,17 @@
-// Legacy chunk "world" (recovered, mechanically split). Do not hand-edit; swap via shims/world.js.
-import { ACESFilmicToneMapping, BackSide, BoxGeometry, BufferAttribute, CanvasTexture, Clock, Color, ConeGeometry, CylinderGeometry, DirectionalLight, DodecahedronGeometry, DoubleSide, Fog, Group, HemisphereLight, IcosahedronGeometry, InstancedMesh, MathUtils, Mesh, MeshStandardMaterial, Object3D, OctahedronGeometry, PCFSoftShadowMap, PerspectiveCamera, Plane, PlaneGeometry, Raycaster, SRGBColorSpace, Scene, ShaderMaterial, SphereGeometry, Vector2, Vector3, WebGLRenderer } from 'three';
+// Legacy chunk "world" (recovered, mechanically split). Static builders delegate to src/world/** (phase 05);
+// the rest moves in phase 06. Swap via shims/world.js.
+import { ACESFilmicToneMapping, Clock, Color, ConeGeometry, CylinderGeometry, DirectionalLight, DodecahedronGeometry, Fog, Group, HemisphereLight, IcosahedronGeometry, InstancedMesh, MathUtils, Mesh, Object3D, PCFSoftShadowMap, PerspectiveCamera, Plane, Raycaster, SRGBColorSpace, Scene, Vector2, Vector3, WebGLRenderer } from 'three';
 import { mergeGeometries } from 'three/addons/utils/BufferGeometryUtils.js';
-import { Cs, Dt, Ps, Qe, Wr, fe, qm, yt } from './shims/config.js';
+import { Cs, Dt, Ps, Qe, Wr, fe, yt } from './shims/config.js';
+import { buildCity, buildTower } from '../world/regions/city-tower-builder';
+import { buildForest, buildMathMeadow } from '../world/regions/meadow-forest-builder';
+import { buildGarden, buildVillage } from '../world/regions/village-garden-builder';
+import { buildHouse, buildTree } from '../world/props-house-tree';
+import { createSkyDome, groundHeight as terrainGroundHeight } from '../world/sky-dome';
+import { buildRoadSegment, buildTerrain } from '../world/terrain-river-roads';
+import { buildWestBank } from '../world/west-bank-builder';
+import { addBox, addCylinder, addMesh, addRegionGroup, addSphere, blockAt, getCachedMaterial } from '../world/world-primitives';
+import { addSign } from '../world/world-text-sign';
 
 class $m {
   constructor(e) {
@@ -160,579 +170,69 @@ class $m {
   onFrame;
   onJump;
   onSceneClick;
+  // Static builders recovered in phase 05 (src/world/**); `this` is the WorldBuildContext.
   material(e) {
-    let t = this.materials.get(e);
-    if (!t) {
-      t = new MeshStandardMaterial({
-        color: e,
-        roughness: 0.9,
-        metalness: 0,
-      });
-      this.materials.set(e, t);
-    }
-    return t;
+    return getCachedMaterial(this, e);
   }
   mesh(e, t, n, r, s, a) {
-    const o = new Mesh(t, this.material(n));
-    o.position.set(r, s, a);
-    o.castShadow = true;
-    o.receiveShadow = true;
-    e.add(o);
-    return o;
+    return addMesh(this, e, t, n, r, s, a);
   }
   box(e, t, n, r, s, a, o, l) {
-    return this.mesh(e, new BoxGeometry(s, a, o), l, t, n, r);
+    return addBox(this, e, t, n, r, s, a, o, l);
   }
   sphere(e, t, n, r, s, a) {
-    return this.mesh(e, new IcosahedronGeometry(s, 1), a, t, n, r);
+    return addSphere(this, e, t, n, r, s, a);
   }
   cylinder(e, t, n, r, s, a, o, l, c = 8) {
-    return this.mesh(e, new CylinderGeometry(s, a, o, c), l, t, n, r);
+    return addCylinder(this, e, t, n, r, s, a, o, l, c);
   }
   block(e, t, n, r) {
-    this.obstacles.push({
-      x: e.position.x + t,
-      z: e.position.z + n,
-      radius: r,
-    });
+    blockAt(this, e, t, n, r);
   }
   regionGroup(e) {
-    const t = Ps(e);
-    const n = new Group();
-    n.position.set(t.center[0], 0, t.center[1]);
-    this.scene.add(n);
-    return n;
+    return addRegionGroup(this, e);
   }
   sign(e, t, n, r, s, a, o = '#fffbea', l = '#194f42', c = 0) {
-    const u = document.createElement('canvas');
-    u.width = 256;
-    u.height = 128;
-    const h = u.getContext('2d');
-    h.fillStyle = o;
-    h.beginPath();
-    h.roundRect(4, 4, 248, 120, 26);
-    h.fill();
-    h.fillStyle = l;
-    h.font = '900 76px "Baloo 2", "Trebuchet MS", sans-serif';
-    h.textAlign = 'center';
-    h.textBaseline = 'middle';
-    h.fillText(t, 128, 70);
-    const f = new CanvasTexture(u);
-    f.colorSpace = SRGBColorSpace;
-    f.anisotropy = 4;
-    const m = new Mesh(
-      new PlaneGeometry(a, a / 2),
-      new MeshStandardMaterial({
-        map: f,
-        transparent: true,
-        roughness: 0.8,
-        side: DoubleSide,
-      }),
-    );
-    m.position.set(n, r, s);
-    m.rotation.y = c;
-    e.add(m);
-    return m;
+    return addSign(e, t, n, r, s, a, o, l, c);
   }
   createSky() {
-    const e = new ShaderMaterial({
-      side: BackSide,
-      depthWrite: false,
-      fog: false,
-      uniforms: {
-        top: {
-          value: new Color(qm),
-        },
-        horizon: {
-          value: new Color(Cs),
-        },
-      },
-      vertexShader:
-        'varying vec3 vDir; void main(){ vDir = normalize(position); gl_Position = projectionMatrix * modelViewMatrix * vec4(position, 1.0); }',
-      fragmentShader: `uniform vec3 top; uniform vec3 horizon; varying vec3 vDir; void main(){ float h = smoothstep(0.0, 0.55, vDir.y); gl_FragColor = vec4(mix(horizon, top, h), 1.0);
-#include <tonemapping_fragment>
-#include <colorspace_fragment>
-}`,
-    });
-    const t = new Mesh(new SphereGeometry(1200, 32, 16), e);
-    t.renderOrder = -1;
-    t.frustumCulled = false;
-    return t;
+    return createSkyDome();
   }
   groundHeight(e, t) {
-    const n = Math.max(fe.west.minX - e, e - fe.east.maxX, 0);
-    const r = Math.max(fe.minZ - t, t - fe.maxZ, 0);
-    const s = Math.hypot(n, r);
-    if (s < 8) {
-      return 0;
-    }
-    const a = MathUtils.clamp((Math.abs(e - 7) - 7) / 24, 0, 1);
-    const o =
-      (Math.sin(e * 0.045) + Math.sin(t * 0.06 + 1.3) + Math.sin((e + t) * 0.025 + 2) + 3) / 6;
-    return Math.min(1, (s - 8) / 70) * a * (3 + o * 20);
+    return terrainGroundHeight(e, t);
   }
   terrain() {
-    const e = new PlaneGeometry(2400, 2400, 200, 200);
-    e.rotateX(-Math.PI / 2);
-    const t = e.attributes.position;
-    const n = new Float32Array(t.count * 3);
-    const r = new Color();
-    const s = new Color(9357667);
-    const a = new Color(11128682);
-    const o = new Color(7319125);
-    for (let h = 0; h < t.count; h++) {
-      const f = t.getX(h);
-      const m = t.getZ(h);
-      const g = this.groundHeight(f, m);
-      t.setY(h, g);
-      const S = (Math.sin(f * 0.13 + m * 0.07) + Math.sin(m * 0.11 - f * 0.05)) * 0.25 + 0.5;
-      r.copy(s)
-        .lerp(S > 0.5 ? a : o, Math.abs(S - 0.5) * 1.4)
-        .lerp(o, Math.min(0.5, g / 30));
-      n.set([r.r, r.g, r.b], h * 3);
-    }
-    e.setAttribute('color', new BufferAttribute(n, 3));
-    e.computeVertexNormals();
-    const l = new Mesh(
-      e,
-      new MeshStandardMaterial({
-        vertexColors: true,
-        roughness: 0.95,
-        flatShading: true,
-      }),
-    );
-    l.receiveShadow = true;
-    this.scene.add(l);
-    const c = 900;
-    const u = this.box(
-      this.scene,
-      (Qe.riverMin + Qe.riverMax) / 2,
-      -0.33,
-      0,
-      Qe.riverMax - Qe.riverMin,
-      0.74,
-      c,
-      4765903,
-    );
-    u.castShadow = false;
-    for (const h of [Qe.riverMin - 0.45, Qe.riverMax + 0.45]) {
-      const f = this.box(this.scene, h, 0.012, 0, 0.9, 0.03, c, 14469528);
-      f.castShadow = false;
-    }
-    for (let h = 0; h < 60; h++) {
-      const f = this.box(
-        this.scene,
-        4.7 + (h % 4) * 1.35,
-        0.05,
-        -42 + ((h * 2.17) % 84),
-        0.35 + (h % 3) * 0.2,
-        0.025,
-        0.07,
-        11924717,
-      );
-      f.castShadow = false;
-      this.ripples.push(f);
-    }
-    this.box(this.scene, -7, 0.055, 1, 21, 0.08, 3.2, 15390115);
-    this.box(this.scene, -10, 0.055, -4, 3.1, 0.08, 20, 15390115);
-    this.cylinder(this.scene, -6, 0.07, 5, 4.5, 4.5, 0.1, 15390115, 24);
-    for (const h of Wr.slice(2)) {
-      for (let f = 1; f < h.length; f++) {
-        this.road(h[f - 1], h[f]);
-      }
-    }
-    for (let h = 0; h < 15; h++) {
-      const f = this.box(
-        this.scene,
-        -16 + h * 1.3,
-        0.12,
-        1 + Math.sin(h) * 0.8,
-        0.65,
-        0.08,
-        0.4,
-        16116170,
-      );
-      f.rotation.y = h;
-    }
+    buildTerrain(this);
   }
-  road([e, t], [n, r]) {
-    const s = n - e;
-    const a = r - t;
-    const o = Math.hypot(s, a);
-    const l = this.box(this.scene, (e + n) / 2, 0.05, (t + r) / 2, 3, 0.07, o, 15390115);
-    l.rotation.y = Math.atan2(s, a);
-    l.castShadow = false;
-    for (const [c, u] of [
-      [e, t],
-      [n, r],
-    ]) {
-      const h = this.cylinder(this.scene, c, 0.052, u, 1.5, 1.5, 0.07, 15390115, 16);
-      h.castShadow = false;
-    }
+  road(e, t) {
+    buildRoadSegment(this, e, t);
   }
   house(e, t, n, r = 1, s = 0) {
-    const a = new Group();
-    a.position.set(e, 0, t);
-    a.scale.setScalar(r);
-    a.rotation.y = s;
-    this.box(a, 0, 1.5, 0, 3.6, 3, 3, 16773326);
-    const o = this.cylinder(a, 0, 3.5, 0, 0, 3.1, 2, n, 4);
-    o.rotation.y = Math.PI / 4;
-    o.scale.z = 0.95;
-    this.box(a, -0.85, 4.15, -0.65, 0.5, 1.5, 0.6, 15320736);
-    this.box(a, -0.35, 0.95, 1.53, 0.9, 1.9, 0.15, 8608577);
-    this.box(a, 1, 1.55, 1.53, 0.8, 0.8, 0.12, 5084579);
-    this.box(a, 1, 1.55, 1.61, 0.08, 0.84, 0.07, 16777215);
-    this.box(a, 1, 1.55, 1.61, 0.84, 0.08, 0.07, 16777215);
-    this.box(a, 1, 1.02, 1.7, 1.1, 0.22, 0.4, 10381892);
-    for (let l = 0; l < 4; l++) {
-      this.sphere(a, 0.63 + l * 0.25, 1.23, 1.7, 0.18, l % 2 ? 16764504 : 15830657);
-    }
-    this.box(a, 0, 0.12, 1.85, 2.3, 0.25, 0.8, 14075041);
-    this.scene.add(a);
-    this.obstacles.push({
-      x: e,
-      z: t,
-      radius: 2.35 * r,
-    });
+    buildHouse(this, e, t, n, r, s);
   }
   tree(e, t, n, r = 0) {
-    const s = new Group();
-    s.position.set(e, 0, t);
-    s.scale.setScalar(n);
-    this.cylinder(s, 0, 1.1, 0, 0.18, 0.26, 2.2, 9726787);
-    const a = [3969888, 5678173, 7779153];
-    if (r % 3 === 0) {
-      this.cylinder(s, 0, 2.35, 0, 0, 1.35, 2.3, a[r % 3]);
-      this.cylinder(s, 0, 3.35, 0, 0, 1, 1.9, 6401385);
-    } else {
-      this.sphere(s, 0, 2.7, 0, 1.35, a[r % 3]);
-      this.sphere(s, -0.7, 2.25, 0.25, 0.9, a[(r + 1) % 3]);
-      this.sphere(s, 0.6, 2.7, 0.3, 0.8, 8503138);
-      if (r % 4 === 0) {
-        for (let o = 0; o < 4; o++) {
-          this.sphere(s, Math.cos(o * 2) * 0.8, 2.4 + Math.sin(o) * 0.4, 0.85, 0.17, 15967300);
-        }
-      }
-    }
-    this.scene.add(s);
-    this.obstacles.push({
-      x: e,
-      z: t,
-      radius: 0.45 * n,
-    });
+    buildTree(this, e, t, n, r);
   }
   village() {
-    this.house(-12, -6, 14191701, 1.25);
-    this.house(-17, 6, 5410705, 0.9, 0.25);
-    this.house(-4, -11, 12415075, 1);
-    const e = new Group();
-    e.position.set(-15, 0, -14);
-    this.cylinder(e, 0, 2, 0, 1.2, 1.6, 4, 15851443);
-    this.cylinder(e, 0, 4.7, 0, 0, 1.8, 1.9, 5476749);
-    this.windmill.position.set(0, 3.2, 1.65);
-    for (let n = 0; n < 4; n++) {
-      const r = new Group();
-      r.rotation.z = (n * Math.PI) / 2;
-      this.box(r, 0, 1.6, 0, 0.18, 3, 0.18, 9203785);
-      this.box(r, 0.4, 1.85, 0, 0.75, 1.7, 0.12, 16773579);
-      this.windmill.add(r);
-    }
-    this.sphere(this.windmill, 0, 0, 0.1, 0.25, 15382107);
-    e.add(this.windmill);
-    this.scene.add(e);
-    this.obstacles.push({
-      x: -15,
-      z: -14,
-      radius: 1.8,
-    });
-    [
-      [-20, -14, 1.3],
-      [-20, -8, 1],
-      [-20, 0, 1.1],
-      [-20, 13, 1.3],
-      [-14, 14, 1.1],
-      [-7, 16, 1.4],
-      [-2, 13, 1.1],
-      [1, 17, 1.2],
-      [0, -16, 1.5],
-      [1, -8, 1],
-      [-8, -17, 1.2],
-      [13, -14, 1.3],
-      [18, -17, 1.5],
-      [21, -10, 1.2],
-      [21, 7, 1.3],
-      [17, 14, 1.5],
-      [12, 11, 1.2],
-      [12, -7, 0.85],
-    ].forEach(([n, r, s], a) => this.tree(n, r, s, a));
-    const t = new Group();
-    t.position.set(0.4, 0, 3.4);
-    this.box(t, 0, 0.7, 0, 0.17, 1.4, 0.17, 9201991);
-    this.box(t, 0, 1.45, 0, 1.5, 0.65, 0.2, 12028500);
-    this.scene.add(t);
+    buildVillage(this);
   }
   garden() {
-    for (let e = 0; e < 6; e++) {
-      this.box(this.scene, 12 + e * 1.8, 0.65, 5, 0.15, 1.3, 0.15, 15918525);
-    }
-    this.box(this.scene, 16.5, 0.8, 5, 9.2, 0.15, 0.15, 15918525);
-    for (let e = 0; e < 3; e++) {
-      this.box(this.scene, 16 + e * 1.6, 0.09, -7, 1, 0.12, 5.5, 11703138);
-      for (let t = 0; t < 6; t++) {
-        this.sphere(this.scene, 16 + e * 1.6, 0.35, -9 + t * 0.8, 0.32, 5942105);
-        this.sphere(this.scene, 16 + e * 1.6, 0.54, -9 + t * 0.8, 0.15, 15579480);
-      }
-    }
-    this.cylinder(this.scene, 17.5, 2.1, 0, 0.08, 0.08, 4.2, 9138249);
-    this.box(this.scene, 18.1, 3.6, 0, 1.2, 0.8, 0.06, 16763222);
-    this.cylinder(this.scene, 16, 0.12, 0, 1.5, 1.5, 0.2, 15255931, 12);
+    buildGarden(this);
   }
   mathMeadow() {
-    const e = this.regionGroup('meadow');
-    this.box(e, 0, 0.04, 0, 18, 0.08, 14, 10144363);
-    for (let r = 0; r < 3; r++) {
-      const s = -4 + r * 4;
-      this.box(e, 0, 0.1, s, 11, 0.14, 2.2, r % 2 ? 11900514 : 13085041);
-      for (let a = 0; a < 7; a++) {
-        const o = -4.4 + a * 1.45;
-        this.sphere(e, o, 0.42, s, 0.28, [15908181, 15304039, 7649703][(r + a) % 3]);
-        this.cylinder(e, o, 0.25, s, 0.08, 0.11, 0.35, 6265681, 6);
-      }
-    }
-    for (const r of [-2.4, 2.4]) {
-      this.cylinder(e, r, 1.6, 7, 0.16, 0.2, 3.2, 9201991);
-      this.sphere(e, r, 3.35, 7, 0.35, 16765028);
-    }
-    this.box(e, 0, 3.1, 7, 5.6, 0.22, 0.22, 9201991);
-    this.sign(e, '× ÷', 0, 3.9, 7.05, 2.6, '#ffd064', '#6b4a1c');
-    this.block(e, -2.4, 7, 0.3);
-    this.block(e, 2.4, 7, 0.3);
-    for (let r = 0; r < 7; r++) {
-      const s = this.sphere(e, -7.4 + r * 2.4, 0.22, -6.2, 0.45, 15059349);
-      s.rotation.y = r * 0.8;
-    }
-    const t = new Group();
-    t.position.set(6.5, 0, -1);
-    this.box(t, 0, 1.4, 0, 3, 2.8, 3.6, 13197903);
-    const n = this.cylinder(t, 0, 3.2, 0, 0, 2.5, 1.4, 9062974, 4);
-    n.rotation.y = Math.PI / 4;
-    n.scale.z = 1.3;
-    this.box(t, -1.52, 1, 0, 0.1, 1.8, 1.6, 16181188);
-    e.add(t);
-    this.block(e, 6.5, -1, 2.3);
-    this.sign(t, '2 × 3', -1.6, 2.4, 0, 1.8, '#fffbea', '#8a4a3e', -Math.PI / 2);
+    buildMathMeadow(this);
   }
   forest() {
-    const e = this.regionGroup('forest');
-    const [t, n] = Ps('forest').center;
-    this.box(e, 0, 0.04, 0, 20, 0.08, 16, 7316827);
-    this.box(e, 0, 0.08, -2, 1.8, 0.12, 12, 13809533);
-    [
-      [-8, -6],
-      [-5.5, -4],
-      [-8, -1],
-      [-6, 2],
-      [-8, 5],
-      [-4.5, 6],
-      [-2.5, 2.5],
-      [3, -5],
-      [5.5, -6.5],
-      [8, -4],
-      [5, -1],
-      [8, 1.5],
-      [5.5, 4],
-      [8, 6.5],
-      [3, 6.5],
-      [-2.5, -6.5],
-    ].forEach(([o, l], c) => this.tree(t + o, n + l, 0.85 + (c % 3) * 0.2, c + 2));
-    for (let o = 0; o < 5; o++) {
-      const l = -6 + o * 2.6;
-      const c = o % 2 ? 2 : -2;
-      this.box(e, c, 0.08, l, 0.9, 0.12, 0.9, 9333580);
-      this.sphere(e, c, 0.38, l, 0.3, 15252826);
-    }
-    for (let o = 0; o < 6; o++) {
-      const l = -1 + (o % 3) * 1.1;
-      const c = 3 + Math.floor(o / 3) * 1.2;
-      this.cylinder(e, l, 0.2, c, 0.08, 0.1, 0.4, 16182484, 6);
-      this.sphere(e, l, 0.45, c, 0.24, 14242634).scale.y = 0.6;
-    }
-    const s = new Group();
-    s.position.set(0, 0, 5.5);
-    this.box(s, 0, 1.1, 0, 3.2, 2.2, 2.4, 10120005);
-    const a = this.cylinder(s, 0, 2.8, 0, 0, 2.5, 1.4, 4160088, 4);
-    a.rotation.y = Math.PI / 4;
-    this.box(s, 0, 0.8, -1.22, 0.8, 1.5, 0.08, 5979176);
-    e.add(s);
-    this.block(e, 0, 5.5, 2);
-    this.sign(e, '÷ 3', 0, 2.2, -1.25, 1.5, '#fff4d8', '#3f7a58');
+    buildForest(this);
   }
   city() {
-    const e = this.regionGroup('city');
-    this.box(e, 0, 0.04, 0, 18, 0.08, 18, 12241078);
-    this.box(e, 0, 0.07, 0, 18, 0.06, 2.6, 9278607);
-    this.box(e, 0, 0.071, 0, 2.6, 0.06, 18, 9278607);
-    const t = [15320702, 8566192, 15047544, 10197968];
-    [
-      [-5, -5, 4],
-      [5, -5, 6],
-      [-5, 5, 5],
-      [5, 5, 3.4],
-    ].forEach(([s, a, o], l) => {
-      const c = new Group();
-      c.position.set(s, 0, a);
-      e.add(c);
-      this.box(c, 0, o / 2, 0, 4.2, o, 3.8, t[l]);
-      this.box(c, 0, o + 0.3, 0, 4.5, 0.6, 4.1, 15786688);
-      for (let u = 1; u < o - 0.6; u += 1.3) {
-        for (const h of [-1.2, 0, 1.2]) {
-          this.box(c, h, u + 0.3, a < 0 ? 1.92 : -1.92, 0.6, 0.7, 0.06, 16643804);
-        }
-      }
-      this.box(c, 0, 0.7, a < 0 ? 1.93 : -1.93, 0.9, 1.4, 0.08, 6508377);
-      this.sign(
-        c,
-        String((l + 2) * 12),
-        0,
-        o + 1.4,
-        0,
-        2.2,
-        '#fffbea',
-        '#3c4f6b',
-        a < 0 ? 0 : Math.PI,
-      );
-      this.block(e, s, a, 2.7);
-    });
-    const n = this.cylinder(e, 0, 0.12, 0, 2.4, 2.4, 0.18, 15192219, 20);
-    n.castShadow = false;
-    this.cylinder(e, 0, 0.6, 0, 0.5, 0.7, 0.9, 14206880, 12);
-    const r = this.sphere(e, 0, 1.3, 0, 0.35, 8376544);
-    this.floaters.push({
-      object: r,
-      baseY: 1.3,
-      speed: 2,
-      spin: 0,
-    });
-    this.block(e, 0, 0, 1);
-    for (let s = 0; s < 8; s++) {
-      const a = (s * Math.PI) / 4 + Math.PI / 8;
-      this.cylinder(e, Math.cos(a) * 8, 1.2, Math.sin(a) * 8, 0.07, 0.09, 2.4, 4872794);
-      this.sphere(e, Math.cos(a) * 8, 2.5, Math.sin(a) * 8, 0.22, 16770976);
-    }
+    buildCity(this);
   }
   tower() {
-    const e = this.regionGroup('tower');
-    const t = this.cylinder(e, 0, 0.06, 0, 6.6, 7, 0.12, 10996090, 20);
-    t.castShadow = false;
-    this.cylinder(e, 0, 0.14, 0, 4.4, 4.6, 0.16, 14206100, 14).castShadow = false;
-    this.cylinder(e, 0, 4.9, 0, 2.3, 2.9, 8, 7828392, 10);
-    for (let r = 0; r < 3; r++) {
-      this.cylinder(e, 0, 2.4 + r * 2.4, 0, 2.95 - r * 0.2, 2.95 - r * 0.2, 0.25, 15786688, 10);
-    }
-    this.cylinder(e, 0, 9.6, 0, 3.4, 0, 2, 15778909, 10);
-    const n = this.sphere(e, 0, 11.6, 0, 0.6, 16768115);
-    this.floaters.push({
-      object: n,
-      baseY: 11.6,
-      speed: 1.4,
-      spin: 1,
-    });
-    this.box(e, 0, 1.6, 2.72, 1.3, 2, 0.2, 4931435);
-    this.sign(e, '× ÷ + −', 0, 7.4, 2.62, 3.2, '#fffbea', '#4b3f6b');
-    this.block(e, 0, 0, 3.4);
-    ['2', '×', '5', '=', '10'].forEach((r, s) => {
-      const a = (s / 5) * Math.PI * 2;
-      const o = new Group();
-      o.position.set(Math.cos(a) * 5.4, 2.2, Math.sin(a) * 5.4);
-      const l = this.mesh(
-        o,
-        new OctahedronGeometry(0.45),
-        [10148336, 16167888, 16766836][s % 3],
-        0,
-        0,
-        0,
-      );
-      l.scale.y = 1.5;
-      this.sign(o, r, 0, 1.2, 0, 1.1, '#ffffffdd', '#4b3f6b');
-      e.add(o);
-      this.floaters.push({
-        object: o,
-        baseY: 2.2,
-        speed: 1.2 + s * 0.15,
-        spin: 0.6,
-      });
-    });
+    buildTower(this);
   }
   westBank() {
-    const e = this.cylinder(this.scene, -38, 0.03, -11, 4.6, 4.6, 0.08, 6080214, 28);
-    e.castShadow = false;
-    for (let r = 0; r < 16; r++) {
-      const s = (r / 16) * Math.PI * 2;
-      const a = this.sphere(
-        this.scene,
-        -38 + Math.cos(s) * 4.9,
-        0.15,
-        -11 + Math.sin(s) * 4.9,
-        0.35 + (r % 3) * 0.1,
-        13221280,
-      );
-      a.scale.y = 0.6;
-    }
-    this.box(this.scene, -36.5, 0.25, -7.6, 1.4, 0.12, 2.6, 10779730);
-    for (let r = 0; r < 4; r++) {
-      const s = this.cylinder(
-        this.scene,
-        -39.5 + (r % 2) * 2.4,
-        0.1,
-        -12 + r,
-        0.45,
-        0.45,
-        0.04,
-        5940826,
-        10,
-      );
-      s.castShadow = false;
-    }
-    this.obstacles.push({
-      x: -38,
-      z: -11,
-      radius: 4.8,
-    });
-    const t = this.sphere(this.scene, -40, -1.8, 18, 5.5, 8831582);
-    t.scale.y = 0.45;
-    t.castShadow = false;
-    const n = new Group();
-    n.position.set(-40, 0.6, 18);
-    for (let r = 0; r < 6; r++) {
-      const s = (r / 6) * Math.PI * 2;
-      this.cylinder(n, Math.cos(s) * 1.6, 1.2, Math.sin(s) * 1.6, 0.1, 0.1, 2.4, 15918525);
-    }
-    this.cylinder(n, 0, 2.8, 0, 0, 2.3, 1.2, 14191701, 6);
-    this.cylinder(n, 0, 0.1, 0, 2, 2, 0.2, 15390115, 12);
-    this.scene.add(n);
-    this.obstacles.push({
-      x: -40,
-      z: 18,
-      radius: 2.2,
-    });
-    for (const [r, s, a] of [
-      [-46, -34, 8],
-      [-46, 34, 7],
-      [66, -38, 7],
-      [66, 38, 8],
-      [-24, -40, 6],
-      [30, 40, 6],
-    ]) {
-      const o = this.sphere(this.scene, r, -a * 0.55, s, a, 8371548);
-      o.scale.y = 0.55;
-      o.castShadow = false;
-      this.obstacles.push({
-        x: r,
-        z: s,
-        radius: a * 0.82,
-      });
-    }
+    buildWestBank(this);
   }
   scatter() {
     let e = 1337;
