@@ -18,9 +18,9 @@
 - Entry points: no `src/app/boot.ts` / `hub-menu.ts` (never built). Instead modify `src/main.ts` / `src/ui/bootstrap-game.ts` (cloud init + profile picker before world start) and `src/ui/settings-dialog.ts` (new "Phụ huynh" row -> parent gate). Must not touch `src/levels/**` (G7 collision).
 - UI look: recovered dialog shell (`#dialog`, `dialog-content`, existing button/feedback classes) and fonts; account CSS in `src/ui/account/account-ui.css` using recovered color tokens. Avatars on profile picker = original boy/girl renders (canvas snapshot or SVG).
 - Guest = the migrated legacy player from 12: guest migration batch includes bridge `progress`, wallet, all facts; legacy localStorage stays untouched.
-- No cosmetics anywhere (decision 9); outbox items with `cosmetics` never produced.
+- Cosmetics synced (decision 9 reversed): outbox items from `purchaseCosmetic` carry `cosmetics` + negative coins as in old 09; snapshot merge unions owned ids; equipped slots travel in child `settings`.
 - Language for emails/consent from settings-store (12).
-- Remove "VLM" mentions in strings; guide = Milo.
+- Names: app "math3d", guide "VLM" (renamed in 09); account UI strings follow.
 
 ## Key Insights
 - See old 09 (PKCE, never sign out offline, picture password local guard + lockout, parent gate, outbox single-flight, crash-safe guest migration, Safari ITP mitigation `navigator.storage.persist()`).
@@ -29,7 +29,7 @@
 - As old 09 + deltas.
 
 ## Architecture
-- `src/sync/**` and `src/ui/account/**` file lists exactly as old 09 (minus cosmetics handling); tests as old 09 under `tests/integration/**`, `tests/e2e/account-*.spec.ts`.
+- `src/sync/**` and `src/ui/account/**` file lists exactly as old 09 (incl. cosmetics handling); tests as old 09 under `tests/integration/**`, `tests/e2e/account-*.spec.ts`.
 - Modify: `src/main.ts`, `src/ui/bootstrap-game.ts`, `src/ui/settings-dialog.ts`. Read-only: `src/store/**`, `src/sync/supabase-database-types.ts`.
 
 ## Related code files

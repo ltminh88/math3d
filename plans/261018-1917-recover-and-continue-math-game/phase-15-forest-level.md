@@ -13,7 +13,7 @@
 
 ## Deltas vs old phase 07
 - Host: `LevelDefinition {id:'forest', regionId:'forest', tables:[2,3,4,5], rounds:5, requires:'field'}`; runs in 13's host.
-- Same visual/audio/reward/input deltas as [phase 14](phase-14-field-level-in-meadow.md) (recovered palette, Milo framing, recovered synth, scoring + one-time completion bonus, kept input + number pad).
+- Same visual/audio/reward/input deltas as [phase 14](phase-14-field-level-in-meadow.md) (recovered palette, VLM framing, recovered synth, scoring + one-time completion bonus, kept input + number pad).
 - Trees reuse recovered tree/cone builders (`props-house-tree.ts`) so the clearing matches the world's forest region; animals new low-poly (icosahedron/cone style).
 - E2E end state: map shows City/Tower "Sắp ra mắt" (already from 13), division keys `div:12/3` recorded.
 - Must NOT edit 14's files; shared helpers needed by both go to `src/levels/shared/` only via a small follow-up in 18 (avoid G7 collision) — duplicate tiny helpers temporarily if needed.

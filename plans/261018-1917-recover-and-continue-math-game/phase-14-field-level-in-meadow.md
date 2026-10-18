@@ -13,7 +13,7 @@
 
 ## Deltas vs old phase 06
 - Host: `LevelDefinition {id:'field', regionId:'meadow', tables:[3,4], rounds:5, requires:'bridge'}`; scene runs inside 13's host (not old `scene-manager`). `import.meta.glob` path unchanged (`src/levels/field/index.ts`).
-- Story: Milo (not VLM) frames the level in a speech line on the level HUD; "storm-flattened field" story kept but tied to the meadow region's existing visuals (sign "2x3", number props).
+- Story: VLM (guide NPC, ex-Milo) frames the level in a speech line on the level HUD; "storm-flattened field" story kept but tied to the meadow region's existing visuals (sign "2x3", number props).
 - Visual language: recovered materials/colors (reuse `world-primitives` material cache palette: grass/soil colors from `regions.ts` meadow), icosahedron-style low poly, Baloo 2/Nunito, recovered CSS classes for buttons/feedback (`.answer`, `feedback success|gentle`, `.reward-pop`).
 - Audio: recovered synth (`correct`, `hint`, `celebrate`); no old audio engine.
 - Hints: rung 1-3 rendered with the recovered hint area UI; rungs per old 06 (row highlight, skip count, swapped known fact).

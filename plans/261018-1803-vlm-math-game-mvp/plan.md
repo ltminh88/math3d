@@ -1,7 +1,7 @@
 ---
 title: "Hành Trình Đá Số (Number Stone Quest) math game MVP"
 description: "3D low-poly web/PWA math game for kids 7-9: hub village with VLM guide, Bridge, Field and Forest levels, cosmetics shop, parent accounts with offline-first Supabase sync."
-status: in-progress
+status: superseded
 priority: P2
 effort: 128h
 branch: main

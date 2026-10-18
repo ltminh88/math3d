@@ -16,7 +16,7 @@
 - Event order: HUD refresh `_n()` called ad hoc after mutations; translator runs after every innerHTML -> keep each call site's order.
 - DOM ids, classes (`playing`, `collapsed`, `locked`, `near`, `arrive` reflow trick, `bump`, `correct/incorrect`, `feedback success|gentle`, `reward-pop`, `known`, `done`) and ARIA attributes exactly as inventory §3; template string verbatim (DOM normalized-HTML parity).
 - Quirks kept: window `blur` auto-opens settings; quiz keys 1-3; quest complete +50 XP +10 coins when bridge=6 and x>12, |z|<4.
-- WebMCP `document.modelContext` tool is read-only progress; keep behind feature check (Unresolved Q3 may remove later).
+- WebMCP `document.modelContext` tool is read-only progress; keep behind feature check (kept per validation 2026-10-18; names updated in 12).
 
 ## Requirements
 - Modules < 200 lines; template may be split into partial template strings concatenated in original order.
