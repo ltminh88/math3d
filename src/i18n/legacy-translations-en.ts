@@ -1,8 +1,9 @@
-// Legacy chunk "i18n" (recovered, mechanically split). Do not hand-edit; swap via shims/i18n.js.
+// VI->EN translation table of the recovered UI (original `jl`, bundle lines 1437-1623).
+// Data only. Key ORDER is behavior: translateLongText sorts by key length with a stable sort,
+// so equal-length keys are applied in this order. Keep verbatim until phase 12 migrates it.
+// Plain object on purpose (original quirk): lookups go through the prototype chain.
 
-const Zl = 'aigame3d_language';
-let lr = ig();
-const jl = {
+export const LEGACY_TRANSLATIONS_EN: Record<string, string> = {
   'Vương Quốc Cửu Chương': 'The Multiplication Kingdom',
   'Đang mở cánh cổng…': 'Opening the gate…',
   'Làng Khởi Đầu': 'Starting Village',
@@ -189,67 +190,3 @@ const jl = {
     'You connected both shores! Explore the new lands on the map, or return to Milo to practice.',
   Đóng: 'Close',
 };
-function ig() {
-  try {
-    if (localStorage.getItem(Zl) === 'en') {
-      return 'en';
-    }
-    return 'vi';
-  } catch {
-    return 'vi';
-  }
-}
-function Va() {
-  return lr;
-}
-function rg(i) {
-  lr = i;
-  try {
-    localStorage.setItem(Zl, i);
-  } catch {}
-}
-function Cn(i) {
-  if (lr === 'vi') {
-    return i;
-  }
-  return jl[i] ?? i;
-}
-function Ln(i) {
-  if (lr === 'vi') {
-    return i;
-  }
-  let e = Object.entries(jl)
-    .sort(([t], [n]) => n.length - t.length)
-    .reduce((t, [n, r]) => t.split(n).join(r), i);
-  e = e.replace(
-    /Có (\d+) nhóm, mỗi nhóm (\d+) viên đá\. Hãy đếm từng nhóm nhé!/g,
-    'There are $1 groups with $2 stones each. Count each group!',
-  );
-  e = e.replace(/Cộng các nhóm lại: ([\d +]+) = \?/g, 'Add the groups: $1 = ?');
-  e = e.replace(
-    /(\d+) nhóm, mỗi nhóm (\d+) viên đá: (\d+) × (\d+) = (\d+)\. Mình cùng thử lại nhé!/g,
-    "$1 groups with $2 stones each: $3 × $4 = $5. Let's try again!",
-  );
-  e = e.replace(/(\d+) nhóm, mỗi nhóm có (\d+) viên đá/g, '$1 groups with $2 stones each');
-  return e;
-}
-function Wa(i = document) {
-  if (lr === 'vi') {
-    return;
-  }
-  const e = document.createTreeWalker(i, NodeFilter.SHOW_TEXT);
-  let t;
-  while ((t = e.nextNode())) {
-    t.nodeValue = Cn(t.nodeValue ?? '');
-  }
-  i.querySelectorAll('[aria-label], [title]').forEach((n) => {
-    for (const r of ['aria-label', 'title']) {
-      const s = n.getAttribute(r);
-      if (s) {
-        n.setAttribute(r, Cn(s));
-      }
-    }
-  });
-}
-
-export { Cn, Ln, Va, Wa, rg };

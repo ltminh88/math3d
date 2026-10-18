@@ -1,2 +1,2 @@
-// Shim for the "audio" group: re-point this export to the recovered TS module when it lands.
-export * from '../legacy-audio.js';
+// Shim for the "audio" group: legacy names re-exported from the recovered TS module.
+export { SynthAudio as ng } from '../../audio/synth-audio';
