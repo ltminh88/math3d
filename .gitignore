@@ -17,3 +17,6 @@ test-results
 supabase/.temp
 supabase/.branches
 .DS_Store
+
+# agent worktrees
+.claude/worktrees

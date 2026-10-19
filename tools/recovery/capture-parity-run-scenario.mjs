@@ -9,6 +9,7 @@ import {
   PARITY_LIVE_ORIGIN,
   PARITY_SEED,
 } from '../../tests/parity/scenarios/parity-projects.ts';
+import { routeFontSnapshot, waitForUsedFontFaces } from './capture-fonts-snapshot.mjs';
 import { routeOracle } from './capture-oracle-routes.mjs';
 import { createParityDriver } from './capture-parity-driver.mjs';
 
@@ -28,9 +29,11 @@ export async function runScenario(browser, project, scenario, outDir, written, f
     reducedMotion: 'no-preference',
   });
   try {
+    const pageErrors = [];
+    // Fonts come from tools/recovery/fonts-snapshot/ for every origin (live included).
+    await routeFontSnapshot(context, pageErrors);
     if (files) await routeOracle(context, PARITY_LIVE_ORIGIN, files);
     const page = await context.newPage();
-    const pageErrors = [];
     page.on('crash', () => console.error(`${project.name} ${scenario.id}: renderer crashed`));
     page.on('pageerror', (e) => pageErrors.push(String(e.message)));
     page.on('console', (m) => m.type() === 'error' && pageErrors.push(`console: ${m.text()}`));
@@ -45,7 +48,7 @@ export async function runScenario(browser, project, scenario, outDir, written, f
     await page.addInitScript({ path: clockPath });
     await page.addInitScript({ path: hooksPath });
     await page.goto(`${PARITY_LIVE_ORIGIN}/`, { waitUntil: 'load' });
-    await page.evaluate(() => document.fonts.ready.then(() => undefined));
+    await page.evaluate(waitForUsedFontFaces);
     const lowPower = await page.evaluate(
       () => matchMedia('(max-width: 900px), (pointer: coarse)').matches,
     );

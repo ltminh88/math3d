@@ -1,5 +1,5 @@
 // Local origin: serve the built game (dist/) under the live origin via Playwright routing, so
-// localStorage origin, absolute asset paths and Google Fonts behave exactly as on live.
+// localStorage origin and absolute asset paths behave as on live (Google Fonts: fonts-snapshot/).
 // The window.__parity hook (scene dumps) comes from the test-mode build itself (bootstrap sets it
 // when MODE === 'test'). Fallback for builds without it: inject it into the served entry chunk at
 // route time, like the oracle patch; dist/ on disk and src/ stay untouched either way.

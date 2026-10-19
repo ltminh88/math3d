@@ -1,6 +1,6 @@
 // Structural oracle: serve the archived production files (recovered/original/) under the live
 // origin via Playwright routing, with ONE injected statement exposing the world instance as
-// window.__parity. Originals on disk stay untouched; fonts still load from Google as on live.
+// window.__parity. Originals on disk stay untouched; Google Fonts come from tools/recovery/fonts-snapshot/.
 import { readFileSync } from 'node:fs';
 import { join } from 'node:path';
 

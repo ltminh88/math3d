@@ -6,6 +6,7 @@
 import { createHash } from 'node:crypto';
 import { writeFileSync } from 'node:fs';
 import { join } from 'node:path';
+import { waitForUsedFontFaces } from './capture-fonts-snapshot.mjs';
 import {
   dumpSceneGraph,
   labelAnchorPoint,
@@ -105,7 +106,8 @@ export function createParityDriver({ page, scenarioId, outDir, written }) {
         };
       });
       write(`${base}.canvas.png`, Buffer.from(png.slice(png.indexOf(',') + 1), 'base64'));
-      await page.evaluate(() => document.fonts.ready.then(() => undefined));
+      // Every face the shown text uses is loaded (no fallback glyphs) before the DOM shot.
+      await page.evaluate(waitForUsedFontFaces);
       await screenshotDom(`${base}.dom.png`);
       const dom = await page.evaluate(snapshotDomState);
       const { computedStyles, ...rest } = dom;
