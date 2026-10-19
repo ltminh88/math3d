@@ -9,6 +9,7 @@ import {
   PlaneGeometry,
   SRGBColorSpace,
 } from 'three';
+import { WORLD_LIGHTING } from './world-lighting-tuning';
 
 const SIGN_FONT = '900 76px "Baloo 2", "Trebuchet MS", sans-serif';
 
@@ -43,7 +44,12 @@ export function addSign(
   texture.anisotropy = 4;
   const sign = new Mesh(
     new PlaneGeometry(width, width / 2),
-    new MeshStandardMaterial({ map: texture, transparent: true, roughness: 0.8, side: DoubleSide }),
+    new MeshStandardMaterial({
+      map: texture,
+      transparent: true,
+      roughness: WORLD_LIGHTING.roughness.sign,
+      side: DoubleSide,
+    }),
   );
   sign.position.set(x, y, z);
   sign.rotation.y = rotationY;

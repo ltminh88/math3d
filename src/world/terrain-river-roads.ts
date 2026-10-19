@@ -4,6 +4,7 @@ import { ROADS, type RoadPoint } from '../config/roads';
 import { RIVER } from '../config/world-constants';
 import { groundHeight } from './sky-dome';
 import type { WorldBuildContext } from './world-build-context';
+import { WORLD_LIGHTING } from './world-lighting-tuning';
 import { addBox, addCylinder } from './world-primitives';
 
 const PATH_COLOR = 0xead5a3;
@@ -36,7 +37,11 @@ function buildGroundPlane(ctx: WorldBuildContext): void {
   geometry.computeVertexNormals();
   const ground = new Mesh(
     geometry,
-    new MeshStandardMaterial({ vertexColors: true, roughness: 0.95, flatShading: true }),
+    new MeshStandardMaterial({
+      vertexColors: true,
+      roughness: WORLD_LIGHTING.roughness.ground,
+      flatShading: true,
+    }),
   );
   ground.receiveShadow = true;
   ctx.scene.add(ground);

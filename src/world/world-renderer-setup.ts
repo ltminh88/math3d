@@ -12,6 +12,7 @@ import {
   WebGLRenderer,
 } from 'three';
 import { SKY_HORIZON_COLOR } from '../config/world-constants';
+import { WORLD_LIGHTING } from './world-lighting-tuning';
 
 const LOW_POWER_QUERY = '(max-width: 900px), (pointer: coarse)';
 
@@ -35,7 +36,7 @@ export function createWorldRenderer(canvas: HTMLCanvasElement): WorldRendererSet
   renderer.shadowMap.type = PCFShadowMap;
   renderer.outputColorSpace = SRGBColorSpace;
   renderer.toneMapping = ACESFilmicToneMapping;
-  renderer.toneMappingExposure = 1.12;
+  renderer.toneMappingExposure = WORLD_LIGHTING.toneMappingExposure;
   renderer.setClearColor(SKY_HORIZON_COLOR);
   return { renderer, lowPower };
 }
@@ -43,13 +44,15 @@ export function createWorldRenderer(canvas: HTMLCanvasElement): WorldRendererSet
 /** Adds fog, the hemisphere fill and the shadow-casting sun; returns the sun. */
 export function addWorldLights(scene: Scene, lowPower: boolean): DirectionalLight {
   scene.fog = new Fog(SKY_HORIZON_COLOR, 150, 560);
-  scene.add(new HemisphereLight(0xf2fbff, 0x5c765c, 2.6));
-  const sun = new DirectionalLight(0xfff0c9, 3.2);
+  const { hemisphereSky, hemisphereGround, hemisphereIntensity } = WORLD_LIGHTING;
+  scene.add(new HemisphereLight(hemisphereSky, hemisphereGround, hemisphereIntensity));
+  const sun = new DirectionalLight(WORLD_LIGHTING.sunColor, WORLD_LIGHTING.sunIntensity);
   sun.castShadow = true;
   const mapSize = lowPower ? 1024 : 2048;
   sun.shadow.mapSize.set(mapSize, mapSize);
   sun.shadow.normalBias = 0.045;
   sun.shadow.bias = -0.0003;
+  sun.shadow.radius = WORLD_LIGHTING.shadowRadius;
   scene.add(sun, sun.target);
   return sun;
 }

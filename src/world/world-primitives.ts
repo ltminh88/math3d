@@ -12,12 +12,17 @@ import {
 } from 'three';
 import { regionById } from '../config/regions';
 import type { WorldBuildContext } from './world-build-context';
+import { WORLD_LIGHTING } from './world-lighting-tuning';
 
 /** Returns the shared material for `color`, creating (and caching) it on first use. */
 export function getCachedMaterial(ctx: WorldBuildContext, color: number): MeshStandardMaterial {
   let material = ctx.materials.get(color);
   if (!material) {
-    material = new MeshStandardMaterial({ color, roughness: 0.9, metalness: 0 });
+    material = new MeshStandardMaterial({
+      color,
+      roughness: WORLD_LIGHTING.roughness.primitive,
+      metalness: 0,
+    });
     ctx.materials.set(color, material);
   }
   return material;
