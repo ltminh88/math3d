@@ -21,8 +21,8 @@ export interface ParityDriver {
   holdUntil(keys: string[], predicate: string, maxFrames: number): Promise<number>;
   /** Advance frame by frame until the in-page JS predicate is true; returns frames used. */
   waitFrames(predicate: string, maxFrames: number): Promise<number>;
-  /** Tap the 3D canvas at the screen point where the given label element is anchored. */
-  tapLabelAnchor(labelSelector: string): Promise<void>;
+  /** Tap the 3D canvas where the label element is anchored, offsetY px lower (default 0). */
+  tapLabelAnchor(labelSelector: string, offsetY?: number): Promise<void>;
   /** Click the correct (or first wrong) quiz answer. */
   answer(correct: boolean): Promise<void>;
   capture(name: string, options?: CaptureOptions): Promise<void>;
@@ -176,6 +176,42 @@ export const PARITY_SCENARIOS: readonly ParityScenario[] = [
       await d.click('#keep-playing');
       await d.frames(30);
       await d.capture('after-quest');
+    },
+  },
+  {
+    // Movement (phase 06 step 5, landed in 09), compared at fixed clock steps.
+    // Keyboard walk: hold D for 2 s from the spawn (-6, 6); at the default camera
+    // yaw D runs south-east straight to the river bank by the unbuilt bridge.
+    id: 'walk-to-bridge',
+    async run(d) {
+      await d.frames(30);
+      await d.click('#play');
+      await d.frames(30);
+      await d.capture('start', { scene: true });
+      await d.hold(['d'], 63);
+      await d.capture('walk-1s', { scene: true });
+      await d.hold(['d'], 62);
+      await d.capture('walk-2s', { scene: true });
+      await d.frames(30);
+      await d.capture('settled');
+    },
+  },
+  {
+    // Tap-to-move: tap the ground 60 px below Milo's label anchor (the label covers the anchor
+    // itself); the player walks there (destination cleared on arrival or when blocked).
+    id: 'tap-to-milo',
+    async run(d) {
+      await d.frames(30);
+      await d.click('#play');
+      await d.frames(30);
+      await d.tapLabelAnchor('#milo-label', 60);
+      await d.capture('tap', { scene: true });
+      await d.frames(30);
+      await d.capture('walk-0_5s', { scene: true });
+      await d.frames(30);
+      await d.capture('walk-1s', { scene: true });
+      await d.frames(60);
+      await d.capture('arrived', { scene: true });
     },
   },
   bridgeScenario(0),

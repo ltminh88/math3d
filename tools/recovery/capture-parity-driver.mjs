@@ -77,8 +77,8 @@ export function createParityDriver({ page, scenarioId, outDir, written }) {
         for (const k of keys) await page.keyboard.up(k);
       }
     },
-    async tapLabelAnchor(selector) {
-      const p = await page.evaluate(labelAnchorPoint, selector);
+    async tapLabelAnchor(selector, offsetY = 0) {
+      const p = await page.evaluate(labelAnchorPoint, [selector, offsetY]);
       if (p?.hit !== 'world') {
         throw new Error(
           `[${scenarioId}] anchor of ${selector} not on canvas: ${JSON.stringify(p)}`,

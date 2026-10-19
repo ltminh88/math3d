@@ -84,13 +84,13 @@ export function dumpSceneGraph() {
 }
 
 /** Client coordinates of a world-label's projected anchor (its translate(x,y) origin). */
-export function labelAnchorPoint(selector) {
+export function labelAnchorPoint([selector, offsetY = 0]) {
   const el = document.querySelector(selector);
   const m = /translate\(([-\d.e]+)px,\s*([-\d.e]+)px\)/.exec(el?.style.transform ?? '');
   if (!el || el.hidden || !m) return null;
   const parent = (el.offsetParent ?? document.body).getBoundingClientRect();
   const x = parent.left + Number(m[1]);
-  const y = parent.top + Number(m[2]);
+  const y = parent.top + Number(m[2]) + offsetY;
   return { x, y, hit: document.elementFromPoint(x, y)?.id ?? null };
 }
 
