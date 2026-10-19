@@ -41,3 +41,75 @@ jobs:
           name: playwright-report
           path: playwright-report
           retention-days: 7
+
+  # Visual/behavior parity. Baselines are machine-specific (SwiftShader raster depends on the CPU
+  # and the Chromium build), so CI never compares against the committed Mac baselines in
+  # tests/parity/baselines/. Instead each shard renders the BASE commit and the HEAD commit on the
+  # same runner, with HEAD's capture tooling and scenarios, and requires HEAD == BASE (same gates
+  # as npm run test:parity: canvas/JSON/traces/scene dumps exact, DOM PNGs per-shot tolerance).
+  # Intentional visual changes: label the PR `parity-change` and regenerate the local baselines on
+  # the Mac (npm run parity:baselines). Bases from before the local-baseline gate are skipped.
+  parity:
+    runs-on: ubuntu-latest
+    needs: build
+    if: ${{ github.event_name == 'push' || !contains(github.event.pull_request.labels.*.name, 'parity-change') }}
+    timeout-minutes: 45
+    strategy:
+      fail-fast: false
+      matrix:
+        scenarios:
+          - welcome,avatar,menus,language-en
+          - playthrough
+          - walk-to-bridge,tap-to-milo,bridge-0,bridge-3,bridge-6
+    env:
+      BASE_SHA: ${{ github.event.pull_request.base.sha || github.event.before }}
+      PARITY_ARGS: --project mobile-pixel --scenario ${{ matrix.scenarios }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - name: Check base commit
+        id: base
+        run: |
+          if git cat-file -e "$BASE_SHA^{commit}" 2>/dev/null \
+            && git cat-file -e "$BASE_SHA:tests/parity/baselines/local" 2>/dev/null; then
+            echo "run=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "Base $BASE_SHA missing or predates the local parity gate; skipping."
+            echo "run=false" >> "$GITHUB_OUTPUT"
+          fi
+      - uses: actions/setup-node@v4
+        if: steps.base.outputs.run == 'true'
+        with:
+          node-version-file: .nvmrc
+          cache: npm
+      - if: steps.base.outputs.run == 'true'
+        run: npm ci
+      - if: steps.base.outputs.run == 'true'
+        run: npx playwright install --with-deps chromium
+      - name: Build base commit
+        if: steps.base.outputs.run == 'true'
+        run: |
+          git worktree add "$RUNNER_TEMP/base" "$BASE_SHA"
+          cd "$RUNNER_TEMP/base" && npm ci && npm run build:test
+      - name: Render base
+        if: steps.base.outputs.run == 'true'
+        run: >-
+          node tools/recovery/capture-live-baselines.mjs --origin local --update $PARITY_ARGS
+          --dist "$RUNNER_TEMP/base/dist" --baselines-dir "$RUNNER_TEMP/parity-base"
+      - name: Build head
+        if: steps.base.outputs.run == 'true'
+        run: npm run build:test
+      - name: Compare head vs base
+        if: steps.base.outputs.run == 'true'
+        run: >-
+          node tools/recovery/capture-live-baselines.mjs --origin local $PARITY_ARGS
+          --baselines-dir "$RUNNER_TEMP/parity-base" --out "$RUNNER_TEMP/parity-head"
+      - uses: actions/upload-artifact@v4
+        if: failure()
+        with:
+          name: parity-${{ strategy.job-index }}
+          path: |
+            ${{ runner.temp }}/parity-base
+            ${{ runner.temp }}/parity-head
+          retention-days: 7
