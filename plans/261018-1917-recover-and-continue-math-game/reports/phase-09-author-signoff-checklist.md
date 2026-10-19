@@ -60,4 +60,4 @@ Origins differ, so nothing is shared automatically; this paste is the only carry
 
 ## Sign-off
 
-- [ ] Author: parity accepted, proceed to step 4 (commit + tag `recovered-r180`) — name/date:
+- [x] Author: parity accepted, proceed to step 4 (commit + tag `recovered-r180`) — author (VLM), 2026-10-19 ("ổn, đổi tên luôn đi"). Automated parity gate still being stabilized (network fonts), see Findings.
