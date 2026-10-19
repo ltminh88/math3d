@@ -4,7 +4,7 @@ import { SynthAudio } from '../audio/synth-audio';
 import type { Question, QuizMode } from '../quiz/question-types';
 import { loadSave } from '../save/save-storage';
 import type { SaveV1 } from '../save/save-types';
-import type { GameWorld } from './legacy-world-map-bridge';
+import type { WorldPublicApi } from '../world/world-public-api';
 
 /** Kind of content shown in the shared <dialog>; '' when closed. */
 export type DialogKind = '' | 'milo' | 'quiz' | 'book' | 'help' | 'settings' | 'reset' | 'complete';
@@ -13,7 +13,7 @@ export interface GameState {
   save: SaveV1;
   readonly audio: SynthAudio;
   /** Undefined until bootstrap builds the world (stays undefined when WebGL fails). */
-  world: GameWorld | undefined;
+  world: WorldPublicApi | undefined;
   question: Question | undefined;
   quizMode: QuizMode;
   hintLevel: number;
@@ -55,4 +55,4 @@ export const gameState: GameState = {
  * The world, typed as present. Like the original, UI paths that run after a failed WebGL
  * bootstrap throw on access instead of being silently skipped.
  */
-export const getWorld = (): GameWorld => gameState.world as GameWorld;
+export const getWorld = (): WorldPublicApi => gameState.world as WorldPublicApi;

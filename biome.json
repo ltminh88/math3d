@@ -10,7 +10,6 @@
       "!dist",
       "!dev-dist",
       "!recovered",
-      "!src/legacy",
       "!src/sync/supabase-database-types.ts"
     ]
   },

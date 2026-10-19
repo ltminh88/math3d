@@ -1,17 +1,16 @@
 // Minimap and full-screen world map overlay: drawing, region list/detail panel, open/close.
 import { isRegionUnlocked, REGIONS } from '../config/regions';
 import { translateDomTree, translateLongText, translateText } from '../i18n/legacy-translator';
-import { gameState, getWorld } from './game-state';
-import { byId, icon } from './icons';
+import { drawMap, type MapDrawState } from '../map/map-render';
 import {
-  drawMap,
-  fitWorldView,
-  type MapDrawState,
+  fitWorldMapView,
   type MapView,
-  prepareCanvas,
+  prepareMapCanvas,
   regionAtMapPoint,
   screenToWorld,
-} from './legacy-world-map-bridge';
+} from '../map/map-view-transform';
+import { gameState, getWorld } from './game-state';
+import { byId, icon } from './icons';
 
 function mapDrawState(labels: boolean, withSelection = labels): MapDrawState {
   const world = getWorld();
@@ -30,7 +29,7 @@ function mapDrawState(labels: boolean, withSelection = labels): MapDrawState {
 
 /** Redraws the corner minimap, centred on the player and rotated with the camera. */
 export function drawMinimap(): void {
-  const { ctx, w, h } = prepareCanvas(byId<HTMLCanvasElement>('minimap-canvas'));
+  const { ctx, w, h } = prepareMapCanvas(byId<HTMLCanvasElement>('minimap-canvas'));
   const world = getWorld();
   const position = world.player.position;
   const view = { cx: position.x, cz: position.z, scale: w / 70, rotation: world.heading };
@@ -40,7 +39,7 @@ export function drawMinimap(): void {
 /** World-map view: leaves room for the side panel (wide) or the bottom sheet (narrow). */
 function overlayView(w: number, h: number): MapView {
   const wide = w > 820;
-  const view = fitWorldView(wide ? w - 360 : w, wide ? h : h * 0.62, wide ? 56 : 22);
+  const view = fitWorldMapView(wide ? w - 360 : w, wide ? h : h * 0.62, wide ? 56 : 22);
   if (wide) {
     view.cx += 180 / view.scale;
   } else {
@@ -51,7 +50,7 @@ function overlayView(w: number, h: number): MapView {
 
 function drawOverlayFrame(): void {
   if (!gameState.mapOpen) return;
-  const { ctx, w, h } = prepareCanvas(byId<HTMLCanvasElement>('map-canvas'));
+  const { ctx, w, h } = prepareMapCanvas(byId<HTMLCanvasElement>('map-canvas'));
   drawMap(ctx, w, h, overlayView(w, h), mapDrawState(w > 600, true));
   requestAnimationFrame(drawOverlayFrame);
 }
