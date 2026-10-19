@@ -1,5 +1,5 @@
 // Per-frame ambient animation after the camera is placed: windmill, dropping bridge planks,
-// drifting clouds, bobbing floaters, Milo's beacon, sparks and river ripples (in this order).
+// drifting clouds, bobbing floaters, VLM's beacon, sparks and river ripples (in this order).
 import type { Group, Mesh, Object3D, Scene } from 'three';
 import { type Spark, updateSparks } from './burst-sparks';
 import type { Floater } from './world-build-context';

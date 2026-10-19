@@ -22,7 +22,7 @@ export interface Region {
 
 const VILLAGE: Region = {
   id: 'village',
-  blurb: 'Nơi Milo và bạn bắt đầu hành trình.',
+  blurb: 'Nơi VLM và bạn bắt đầu hành trình.',
   name: 'Làng Khởi Đầu',
   subtitle: 'KHÁM PHÁ · HỌC HỎI · TRƯỞNG THÀNH',
   world: 1,

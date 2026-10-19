@@ -2,7 +2,7 @@ import { expect, test } from '@playwright/test';
 
 test.use({ locale: 'vi-VN' });
 
-const TITLE = 'Math AI Game 3D - Vương Quốc Cửu Chương';
+const TITLE = 'math3d - Vương Quốc Cửu Chương';
 
 test('boots the recovered game: title, html lang, manifest, welcome menu, 3D world', async ({
   page,
@@ -32,8 +32,8 @@ test('serves the manifest with the game name', async ({ request }) => {
   const res = await request.get('/manifest.webmanifest');
   expect(res.ok()).toBe(true);
   const manifest = await res.json();
-  expect(manifest.name).toBe('Math AI Game 3D – Vương Quốc Cửu Chương');
-  expect(manifest.short_name).toBe('Cửu Chương');
+  expect(manifest.name).toBe('math3d – Vương Quốc Cửu Chương');
+  expect(manifest.short_name).toBe('math3d');
   expect(manifest.theme_color).toBe('#194f42');
   expect(manifest.lang).toBe('vi');
 });

@@ -1,12 +1,19 @@
 import { readFileSync } from 'node:fs';
 import { afterEach, describe, expect, it, vi } from 'vitest';
+import { applyProductRename } from '../config/load-golden-trace-for-tests';
 
 type Corpus = { mapEntries: [string, string][]; entries: [string, string, string][] };
 
 // Generated from the ORIGINAL translator by tools/recovery/golden/generate-golden-traces.mjs.
+// The corpus file is never edited: it stays the record of the original build.
 const corpus: Corpus = JSON.parse(
   readFileSync(new URL('../../tests/parity/golden/i18n-corpus.json', import.meta.url), 'utf8'),
 );
+
+// Every expectation below is the original corpus value passed through the phase 09 rename
+// (math3d / VLM), so the table and translator equal the original ones modulo the rename.
+const rename = applyProductRename;
+const renamedEntries = corpus.entries.map((e) => e.map(rename) as [string, string, string]);
 
 function fakeStorage(initial: Record<string, string>) {
   const data = new Map(Object.entries(initial));
@@ -26,17 +33,23 @@ async function loadTranslator(storage: unknown) {
 
 afterEach(() => vi.unstubAllGlobals());
 
-describe('legacy translator vs original golden corpus', () => {
+describe('legacy translator vs original golden corpus (after the math3d/VLM rename)', () => {
   it('keeps the original table entries and key order', async () => {
     const { LEGACY_TRANSLATIONS_EN } = await import('./legacy-translations-en');
-    expect(Object.entries(LEGACY_TRANSLATIONS_EN)).toEqual(corpus.mapEntries);
+    const expected = corpus.mapEntries.map(([vi, en]) => [rename(vi), rename(en)]);
+    expect(Object.entries(LEGACY_TRANSLATIONS_EN)).toEqual(expected);
+    // Guard against a vacuous mapping: the rename really touched the original table.
+    expect(expected.filter(([vi], i) => vi !== corpus.mapEntries[i]?.[0]).length).toBeGreaterThan(
+      10,
+    );
+    expect(JSON.stringify(LEGACY_TRANSLATIONS_EN)).not.toMatch(/Milo|MILO/);
   });
 
   it('matches original Cn and Ln for every corpus string in en', async () => {
     const t = await loadTranslator(fakeStorage({ aigame3d_language: 'en' }));
     expect(t.getLegacyLanguage()).toBe('en');
     expect(corpus.entries.length).toBeGreaterThan(1000);
-    const mismatches = corpus.entries.filter(
+    const mismatches = renamedEntries.filter(
       ([input, cn, ln]) => t.translateText(input) !== cn || t.translateLongText(input) !== ln,
     );
     expect(mismatches).toEqual([]);
@@ -51,7 +64,7 @@ describe('legacy translator vs original golden corpus', () => {
     for (const storage of [fakeStorage({}), fakeStorage({ aigame3d_language: 'fr' }), throwing]) {
       const t = await loadTranslator(storage);
       expect(t.getLegacyLanguage()).toBe('vi');
-      for (const [input] of corpus.entries) {
+      for (const [input] of renamedEntries) {
         expect(t.translateText(input)).toBe(input);
         expect(t.translateLongText(input)).toBe(input);
       }

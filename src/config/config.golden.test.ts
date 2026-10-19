@@ -1,7 +1,7 @@
 import { describe, expect, it } from 'vitest';
 import { levelForXp } from '../game/xp-levels';
 import { defaultSave } from '../save/save-storage';
-import { loadGoldenTrace } from './load-golden-trace-for-tests';
+import { applyProductRename, loadGoldenTrace } from './load-golden-trace-for-tests';
 import { isRegionUnlocked, REGIONS, regionAtPoint, regionById } from './regions';
 import { ROADS } from './roads';
 import { createSeededLcg } from './seeded-lcg';
@@ -24,7 +24,9 @@ interface RegionGrid {
 
 describe('config golden traces', () => {
   it('constants match the original bundle', () => {
-    const golden = loadGoldenTrace<Record<string, unknown>>('constants.json');
+    const original = loadGoldenTrace<Record<string, unknown>>('constants.json');
+    // Only the start region blurb names the guide; the rest must be byte-identical.
+    const golden = JSON.parse(applyProductRename(JSON.stringify(original)));
     expect({
       Ha: TABLES,
       Kl: SAVE_KEY,

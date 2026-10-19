@@ -141,7 +141,7 @@ export class World implements WorldPublicApi {
     this.distance = DEFAULT_DISTANCE;
   }
 
-  /** Tap on the ground: talk to Milo when tapping him from up close, otherwise walk there. */
+  /** Tap on the ground: talk to VLM when tapping him from up close, otherwise walk there. */
   moveToScreen(clientX: number, clientY: number): void {
     const point = groundPointAt(this.canvas, this.camera, clientX, clientY);
     if (!point) return;

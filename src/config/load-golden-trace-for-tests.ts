@@ -17,3 +17,14 @@ export function mulberry32(seed: number): () => number {
     return ((t ^ (t >>> 14)) >>> 0) / 4294967296;
   };
 }
+
+// Phase 09 rename (app "math3d", guide "VLM"). Golden traces stay the untouched ORIGINAL capture;
+// tests pass expected values through the same rename the source got, so nothing else may drift.
+const PRODUCT_RENAMES: ReadonlyArray<readonly [RegExp, string]> = [
+  [/Math AI Game 3D/g, 'math3d'],
+  [/(?<![A-Za-z])(?:Milo|MILO)(?![A-Za-z])/g, 'VLM'],
+];
+
+export function applyProductRename(text: string): string {
+  return PRODUCT_RENAMES.reduce((acc, [from, to]) => acc.replace(from, to), text);
+}

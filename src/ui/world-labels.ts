@@ -1,4 +1,4 @@
-// DOM labels pinned to world points (Milo, bridge, regions) and the current-area badge/toast.
+// DOM labels pinned to world points (VLM, bridge, regions) and the current-area badge/toast.
 import { Vector3 } from 'three';
 import { isRegionUnlocked, regionAtPoint } from '../config/regions';
 import { getLegacyLanguage, translateText } from '../i18n/legacy-translator';
@@ -7,7 +7,7 @@ import { gameState, getWorld } from './game-state';
 import { byId } from './icons';
 import { showToast } from './toast-and-persist';
 
-const MILO_LABEL_AT = new Vector3(-3, 3.5, 1.5);
+const VLM_LABEL_AT = new Vector3(-3, 3.5, 1.5);
 const BRIDGE_LABEL_AT = new Vector3(7, 0.8, 0);
 
 /** Places `label` over world point `at`, fading it out between 70 and 140 units away. */
@@ -24,7 +24,7 @@ function projectLabel(label: HTMLElement, at: Vector3, offset: string, hide: boo
 /** Repositions every floating label (all hidden while the world is paused). */
 export function projectWorldLabels(): void {
   const paused = getWorld().paused;
-  projectLabel(byId('milo-label'), MILO_LABEL_AT, 'translate(-50%,-100%)', paused);
+  projectLabel(byId('milo-label'), VLM_LABEL_AT, 'translate(-50%,-100%)', paused);
   projectLabel(byId('bridge-label'), BRIDGE_LABEL_AT, 'translate(-50%,15px)', paused);
   for (const region of LABELED_REGIONS) {
     projectLabel(

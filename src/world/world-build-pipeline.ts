@@ -23,7 +23,7 @@ export interface WorldBuildTargets extends WorldBuildContext {
   readonly lowPower: boolean;
 }
 
-/** Fills the scene, merges static meshes and places the player and Milo at their start spots. */
+/** Fills the scene, merges static meshes and places the player and VLM at their start spots. */
 export function buildWorldScene(ctx: WorldBuildTargets): PlayerModelParts {
   buildTerrain(ctx);
   buildVillage(ctx);
@@ -51,7 +51,7 @@ export function buildWorldScene(ctx: WorldBuildTargets): PlayerModelParts {
   ]);
   ctx.player.position.set(-6, 0, 6);
   ctx.milo.position.set(-3, 0, 1.5);
-  // Milo is added after the scatter pass on purpose: trees may grow right next to him.
+  // VLM is added after the scatter pass on purpose: trees may grow right next to him.
   ctx.obstacles.push({ x: -3, z: 1.5, radius: 0.85 });
   return playerParts;
 }
