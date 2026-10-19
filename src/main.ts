@@ -6,3 +6,8 @@ import { registerProgressTool } from './webmcp/progress-tool';
 
 bootstrapGame();
 registerProgressTool();
+
+// Dev-only perf probe; Vite drops the whole branch from production builds.
+if (import.meta.env.DEV && new URLSearchParams(location.search).get('debug') === 'fps') {
+  void import('./dev/fps-overlay').then((m) => m.startFpsOverlay());
+}
