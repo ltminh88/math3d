@@ -2,13 +2,13 @@
 // in the composed modules (controller, camera rig, input, ambient animation); this class wires
 // them together and exposes the public API the UI and the parity harness rely on.
 import {
-  Clock,
   type DirectionalLight,
   Group,
   type Mesh,
   type MeshStandardMaterial,
   PerspectiveCamera,
   Scene,
+  Timer,
   Vector3,
   type WebGLRenderer,
 } from 'three';
@@ -51,7 +51,8 @@ export class World implements WorldPublicApi {
   readonly windmill = new Group();
   readonly sun: DirectionalLight;
   readonly sky: Mesh;
-  readonly clock = new Clock();
+  // r183: Clock is deprecated; Timer needs update() each frame (see animate).
+  readonly timer = new Timer();
   readonly target = new Vector3(8, 0, 0);
   readonly wanted = new Vector3();
   destination: Vector3 | undefined;
@@ -91,6 +92,8 @@ export class World implements WorldPublicApi {
     this.observer.observe(container);
     this.resize();
     attachWorldInput(canvas, this);
+    // Clock started on its first getDelta (delta 0); reset() keeps that: first frame dt = 0.
+    this.timer.reset();
     this.animate();
   }
 
@@ -178,12 +181,14 @@ export class World implements WorldPublicApi {
   dispose(): void {
     cancelAnimationFrame(this.frame);
     this.observer.disconnect();
+    this.timer.dispose();
     this.renderer.dispose();
   }
 
   private readonly animate = (): void => {
     this.frame = requestAnimationFrame(this.animate);
-    const dt = Math.min(this.clock.getDelta(), MAX_FRAME_DELTA);
+    this.timer.update();
+    const dt = Math.min(this.timer.getDelta(), MAX_FRAME_DELTA);
     this.time += dt;
     if (this.active && !this.paused) {
       stepPlayer(this, dt);

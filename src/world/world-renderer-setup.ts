@@ -5,7 +5,7 @@ import {
   DirectionalLight,
   Fog,
   HemisphereLight,
-  PCFSoftShadowMap,
+  PCFShadowMap,
   type Scene,
   SRGBColorSpace,
   type Vector3,
@@ -31,7 +31,8 @@ export function createWorldRenderer(canvas: HTMLCanvasElement): WorldRendererSet
   const lowPower = matchMedia(LOW_POWER_QUERY).matches;
   renderer.setPixelRatio(Math.min(devicePixelRatio, lowPower ? 1.25 : 1.75));
   renderer.shadowMap.enabled = true;
-  renderer.shadowMap.type = PCFSoftShadowMap;
+  // r182+: PCFSoftShadowMap is gone; PCFShadowMap is the soft filter now.
+  renderer.shadowMap.type = PCFShadowMap;
   renderer.outputColorSpace = SRGBColorSpace;
   renderer.toneMapping = ACESFilmicToneMapping;
   renderer.toneMappingExposure = 1.12;
