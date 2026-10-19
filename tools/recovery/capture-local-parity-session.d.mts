@@ -16,4 +16,6 @@ export function runLocalParityScenario(options: {
   projectName: string;
   scenarioId: string;
   outDir: string;
+  /** 'local' (default) or 'live' (archived, valid only at tag recovered-r180). */
+  baselines?: 'local' | 'live';
 }): Promise<{ compared: number; problems: ParityFileDiff[]; tolerated: ParityFileDiff[] }>;

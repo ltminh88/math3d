@@ -7,8 +7,12 @@ import { createHash } from 'node:crypto';
 //   node tools/recovery/capture-live-baselines.mjs --origin oracle serve recovered/original locally (+window.__parity),
 //        require 0 diff vs live baselines, write scene dumps -> tests/parity/baselines/oracle-scene/<project>/
 //   node tools/recovery/capture-live-baselines.mjs --origin local  serve dist/ (npm run build:test first) under the
-//        live origin (+window.__parity), compare vs live baselines + oracle scene dumps (never writes baselines)
+//        live origin (+window.__parity), compare vs LOCAL baselines (tests/parity/baselines/local/<project>)
+//   ... --origin local --update      (re)generate the local baselines from dist/ (npm run parity:baselines)
+//   ... --origin local --baselines live   compare vs the archived live baselines + oracle scene dumps
+//        (meaningful only at tag recovered-r180, before the math3d rename)
 // Options: --project desktop-chromium|mobile-pixel (default both)  --scenario id[,id]  --out <dir>
+//   --dist <dir> (default dist/)  --baselines-dir <dir> (local baselines root, e.g. a CI temp dir)
 import { mkdirSync, mkdtempSync, readdirSync, readFileSync, rmSync, writeFileSync } from 'node:fs';
 import os from 'node:os';
 import { dirname, join, relative } from 'node:path';
@@ -37,6 +41,10 @@ const { values: args } = parseArgs({
     origin: { type: 'string', default: 'live' },
     verify: { type: 'boolean', default: false },
     out: { type: 'string' },
+    update: { type: 'boolean', default: false },
+    baselines: { type: 'string', default: 'local' },
+    'baselines-dir': { type: 'string' },
+    dist: { type: 'string' },
   },
 });
 if (!['live', 'oracle', 'local'].includes(args.origin)) {
@@ -44,13 +52,19 @@ if (!['live', 'oracle', 'local'].includes(args.origin)) {
 }
 const oracle = args.origin === 'oracle';
 const local = args.origin === 'local';
-const comparing = args.verify || oracle || local;
+if (args.update && !local) throw new Error('--update only applies to --origin local');
+if (!['live', 'local'].includes(args.baselines)) throw new Error('--baselines must be live|local');
+const comparing = args.verify || oracle || (local && !args.update);
+// Which committed set a comparison uses: live for --verify/oracle, --baselines for local.
+const baselineSet = local ? args.baselines : 'live';
+const localRoot = args['baselines-dir'] ?? join(root, 'tests/parity/baselines/local');
 const projects = PARITY_PROJECTS.filter((p) => !args.project || p.name === args.project);
 const wanted = args.scenario?.split(',');
 const scenarios = PARITY_SCENARIOS.filter((s) => !wanted || wanted.includes(s.id));
 if (!projects.length || !scenarios.length) throw new Error('no matching project/scenario');
 
-const liveDir = (p) => join(root, 'tests/parity/baselines/live', p.name);
+const captureDir = (p) =>
+  local ? join(localRoot, p.name) : join(root, 'tests/parity/baselines/live', p.name);
 const sha256 = (buf) => createHash('sha256').update(buf).digest('hex');
 
 async function liveAssetHashes(browser) {
@@ -74,7 +88,7 @@ const browser = await chromium.launch({ args: PARITY_LAUNCH_ARGS });
 const routedFiles = oracle
   ? loadOracleFiles(root)
   : local
-    ? loadLocalFiles(join(root, 'dist'))
+    ? loadLocalFiles(args.dist ?? join(root, 'dist'))
     : null;
 let failed = false;
 try {
@@ -83,7 +97,7 @@ try {
       ? join(args.out, project.name)
       : comparing
         ? mkdtempSync(join(os.tmpdir(), `parity-${project.name}-`))
-        : liveDir(project);
+        : captureDir(project);
     mkdirSync(outDir, { recursive: true });
     if (!comparing)
       clearScenarioFiles(
@@ -100,8 +114,8 @@ try {
     if (!comparing) {
       const meta = {
         capturedAt: new Date().toISOString(),
-        origin: PARITY_LIVE_ORIGIN,
-        liveAssets: await liveAssetHashes(browser),
+        origin: local ? `local dist/ served under ${PARITY_LIVE_ORIGIN}` : PARITY_LIVE_ORIGIN,
+        ...(local ? {} : { liveAssets: await liveAssetHashes(browser) }),
         chromium: browser.version(),
         playwright: JSON.parse(
           readFileSync(join(root, 'node_modules/@playwright/test/package.json'), 'utf8'),
@@ -133,12 +147,10 @@ try {
       project.name,
       ids,
       outDir,
-      {
-        scenes: local,
-      },
+      { scenes: local, baselines: baselineSet, baselineRoot: localRoot },
     );
     console.log(
-      `${project.name} [${args.origin}]: compared ${compared} files vs baselines, ` +
+      `${project.name} [${args.origin} vs ${baselineSet}]: compared ${compared} files vs baselines, ` +
         `${problems.length} differ, ${tolerated.length} DOM shots within per-shot tolerance`,
     );
     for (const p of tolerated) console.log('  TOLERATED', JSON.stringify(p));

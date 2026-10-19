@@ -1,7 +1,8 @@
 import { defineConfig } from '@playwright/test';
 import { PARITY_LAUNCH_ARGS, PARITY_PROJECTS } from './scenarios/parity-projects';
 
-// Parity runs (phase 02+): local build vs committed live baselines. Same projects, SwiftShader
+// Parity runs: local build vs committed local baselines (PARITY_BASELINES=live: archived live
+// baselines, npm run test:parity:live, valid only at tag recovered-r180). Same projects, SwiftShader
 // args and dpr 1 as tools/recovery/capture-live-baselines.mjs; the scenario list lives in
 // tests/parity/scenarios/parity-scenarios.ts. Run: npm run test:parity
 // dist/ is built by the global setup and served under the live origin via Playwright routing

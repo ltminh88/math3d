@@ -115,13 +115,29 @@ export function compareCaptureDirs(
 }
 
 /**
- * Compare a fresh capture of `ids` with the committed baselines of one project: every live
- * artifact (PNG/JSON/trace) and, with `scenes`, the scene dumps vs the oracle-scene baselines.
+ * Compare a fresh capture of `ids` with the committed baselines of one project.
+ * baselines 'local' (default gate since the math3d rename): tests/parity/baselines/local/<project>
+ *   (or `baselineRoot`/<project>) holds every artifact incl. scene dumps, all compared.
+ * baselines 'live' (archived oracle, valid at tag recovered-r180): every live artifact
+ *   (PNG/JSON/trace) and, with `scenes`, the scene dumps vs the oracle-scene baselines.
  */
-export function compareWithBaselines(root, projectName, ids, outDir, { scenes = false } = {}) {
+export function compareWithBaselines(
+  root,
+  projectName,
+  ids,
+  outDir,
+  { scenes = false, baselines = 'live', baselineRoot } = {},
+) {
   const ofScenario = (f) => ids.some((id) => f.startsWith(`${id}--`) || f === `${id}.trace.json`);
   const policy = loadDomPngPolicy(root, projectName);
   const base = join(root, 'tests/parity/baselines');
+  if (baselines === 'local') {
+    const dir = join(baselineRoot ?? join(base, 'local'), projectName);
+    if (!existsSync(dir))
+      throw new Error(`no local baselines at ${dir} (npm run parity:baselines)`);
+    return compareCaptureDirs(dir, outDir, ofScenario, policy);
+  }
+  if (baselines !== 'live') throw new Error(`baselines must be live|local, got ${baselines}`);
   const live = compareCaptureDirs(
     join(base, 'live', projectName),
     outDir,

@@ -3,7 +3,11 @@ import { expect, test } from '@playwright/test';
 import { runLocalParityScenario } from '../../tools/recovery/capture-local-parity-session.mjs';
 import { PARITY_SCENARIOS } from './scenarios/parity-scenarios';
 
-// Local build (dist/, built by parity-build-global-setup.ts) vs the committed live baselines.
+const baselines = process.env.PARITY_BASELINES === 'live' ? 'live' : 'local';
+
+// Local build (dist/, built by parity-build-global-setup.ts) vs committed baselines:
+// PARITY_BASELINES=local (default, tests/parity/baselines/local, generated from the renamed
+// math3d build) or live (npm run test:parity:live; archived, valid only at tag recovered-r180).
 // Gates per shot: canvas PNG + shot JSON + trace JSON + scene dumps exact; DOM PNG within the
 // per-shot tolerance of parity-shot-tolerances.json (noisy shots gated structurally).
 for (const scenario of PARITY_SCENARIOS) {
@@ -15,6 +19,7 @@ for (const scenario of PARITY_SCENARIOS) {
       projectName: testInfo.project.name,
       scenarioId: scenario.id,
       outDir,
+      baselines,
     });
     await testInfo.attach('parity-result.json', {
       body: JSON.stringify(result, null, 1),

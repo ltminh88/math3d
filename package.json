@@ -17,6 +17,8 @@
     "test": "vitest run",
     "test:e2e": "playwright test",
     "test:parity": "playwright test -c tests/parity/playwright.parity.config.ts",
+    "test:parity:live": "PARITY_BASELINES=live playwright test -c tests/parity/playwright.parity.config.ts",
+    "parity:baselines": "npm run build:test && node tools/recovery/capture-live-baselines.mjs --origin local --update",
     "recover:legacy": "bash tools/recovery/unminify-app.sh",
     "recover:styles": "tsx tools/recovery/split-legacy-styles.ts",
     "recover:styles:check": "tsx tools/recovery/split-legacy-styles.ts --check",
