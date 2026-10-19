@@ -1,10 +1,11 @@
 {
   "description": "Per-shot pixel tolerances for parity specs, measured as run-to-run noise of the live oracle (same Mac, Chromium build in capture-meta.json). Canvas PNGs and shot JSON (gl draw calls/triangles, html, cssHash, storage) were exact in every run: tolerance 0. Only DOM-overlay PNGs show noise.",
-  "measuredAt": "2026-10-19",
+  "measuredAt": "2026-10-19 (r186 re-check, phase 10)",
   "runs": {
     "liveVsLive": "capture-live-baselines.mjs --verify (fresh capture vs committed live baselines)",
     "liveVsOracle": "capture-live-baselines.mjs --origin oracle (recovered/original served locally + window.__parity)",
-    "localVsLive": "capture-live-baselines.mjs --origin local / npm run test:parity (dist/ served under the live origin + window.__parity), 2026-10-19: canvas, shot JSON, traces and oracle scene dumps exact in every run"
+    "localVsLive": "capture-live-baselines.mjs --origin local / npm run test:parity (dist/ served under the live origin + window.__parity), 2026-10-19: canvas, shot JSON, traces and oracle scene dumps exact in every run",
+    "localVsLocalR186": "phase 10 (three 0.186.1, retuned lighting): npm run parity:baselines, then capture-live-baselines.mjs --origin local + npm run test:parity, 2026-10-19: canvas PNGs, shot JSON, traces and scene dumps exact; DOM noise only on shots already listed, all within their existing tolerance/ceiling (none widened)"
   },
   "policy": {
     "canvasPng": 0,
@@ -27,7 +28,7 @@
     "mobile-pixel/playthrough--quest-complete.dom.png": "same region-entry badge keyframe layer under dialog backdrop; local run hit 1.5% once, rerun passes, shot JSON byte-exact.",
     "desktop-chromium/bridge-0--play.dom.png": "20 px on an off-edge world label, same as bridge-6 (local run 2026-10-19).",
     "desktop-chromium/playthrough--near-milo.dom.png": "3 px on the #interact prompt glass (backdrop-filter), as on mobile-pixel; local-vs-local after the math3d rename, shot JSON byte-exact.",
-    "desktop-chromium/playthrough--bridge-built.dom.png": "1 px in 1 of 2 local-vs-local runs after the math3d rename (cause not isolated); shot JSON byte-exact.",
+    "desktop-chromium/playthrough--bridge-built.dom.png": "1 px in 1 of 2 local-vs-local runs after the math3d rename (cause not isolated); shot JSON byte-exact. r186 verify: 1 px again (structural gate).",
     "desktop-chromium/bridge-3--play.dom.png": "off-edge world label, same as bridge-0/bridge-6: 20 px in 2 of 3 local CLI runs, 226 px (0.025%) in a full suite run 2026-10-19; live --verify 0; shot JSON byte-exact."
   },
   "recommendation": "Keep pixel gating for canvas shots (exact) and for DOM shots at tolerance 0. For the listed shots, do not raise global tolerance: either mask the off-screen world labels (#tower-label, #city-label when their translate x exceeds the viewport) in DOM shots, or gate them structurally via the shot JSON (html + cssHash + gl calls/triangles are exact) and the oracle scene JSON. Structural gating is preferred because it is exact and catches label text/position regressions that a mask would hide.",
@@ -49,6 +50,10 @@
         "liveVsOracle": {
           "diffPixels": 11,
           "ratio": 1.2e-5
+        },
+        "localVsLocalR186": {
+          "diffPixels": 1534,
+          "ratio": 0.001664
         }
       },
       "playthrough--quest-complete.dom.png": {
@@ -60,6 +65,10 @@
         "liveVsOracle": {
           "diffPixels": 11,
           "ratio": 1.2e-5
+        },
+        "localVsLocalR186": {
+          "diffPixels": 539,
+          "ratio": 0.000585
         }
       },
       "menus--map-open.dom.png": {
@@ -67,7 +76,11 @@
           "diffPixels": 3,
           "ratio": 3e-6
         },
-        "tolerance": 0.0001
+        "tolerance": 0.0001,
+        "localVsLocalR186": {
+          "diffPixels": 5,
+          "ratio": 5e-6
+        }
       },
       "playthrough--quiz-correct.dom.png": {
         "liveVsLive": {
@@ -141,7 +154,11 @@
           "ratio": 0.002618
         },
         "tolerance": 0,
-        "structuralCeiling": 0.0053
+        "structuralCeiling": 0.0053,
+        "localVsLocalR186": {
+          "diffPixels": 923,
+          "ratio": 0.00267
+        }
       },
       "playthrough--after-quest.dom.png": {
         "localVsLive": {
@@ -168,5 +185,11 @@
         "structuralCeiling": 0.035
       }
     }
+  },
+  "r186Notes": {
+    "renderInfo": "r186 resets renderer.info before the shadow pass (r180 after it), so scene-dump calls/triangles include shadow-pass draws (bridge-0 138 -> 242 calls); textures +2 (DFG LUT, shadow DepthTexture); geometries unchanged.",
+    "html": "three writes data-engine=\"three.js r186\" on the canvas, part of every shot JSON html.",
+    "playthroughRng": "three draws 4 Math.random per object UUID; r186 creates extra textures, so the seeded parity stream shifts and the first playthrough quiz question changed (m2_8 -> m8_1). Baselines regenerated; no tolerance involved.",
+    "canvas": "r186 canvas vs r180: mean abs delta 0.24 levels after retune (plans/261018-1917-recover-and-continue-math-game/reports/r186-retune/README.md); canvas stays exact run to run on r186."
   }
 }
