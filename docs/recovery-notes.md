@@ -1,0 +1,106 @@
+# Recovery notes (math3d, ex "Math AI Game 3D – Vương Quốc Cửu Chương")
+
+The source of the original game (https://math.aigame3d.com) was lost. Only the production
+bundle survived. This repo rebuilt it as typed, modular TypeScript on three r180 with
+pixel/behavior parity to the live site, then renamed it to **math3d** (guide NPC Milo → **VLM**).
+Plan: `plans/261018-1917-recover-and-continue-math-game/` (phases 01-09).
+
+## What was recovered
+
+| Input (committed) | Output |
+|---|---|
+| `recovered/original/` – prod `index.html`, `index-CO4MPNqj.js`, `index-D1ngBGok.css`, favicon | reference oracle, served locally by the parity tools |
+| `recovered/formatted/game-app-section.js` (≈2.5k lines app code) + `three-section.js` (vendored three r180) | `src/config`, `src/save`, `src/game`, `src/quiz`, `src/audio`, `src/i18n/legacy-*`, `src/world`, `src/map`, `src/ui`, `src/webmcp` |
+| `recovered/formatted/game-styles.css` | `src/styles/game/NN-*.css` (byte-identical split, `npm run recover:styles:check`) |
+
+`src/legacy/**` (the intermediate unminified chunks and shims) is gone since f3931c9; the app
+imports the typed modules directly. localStorage keys (`aigame3d_*`) and the save format v1 are
+unchanged, so old saves load as-is.
+
+## Tooling pipeline (`tools/recovery/`)
+
+1. `strip-three.ts` + `strip-three-id-map.ts` – replace the minified vendored three with named
+   imports from npm `three@0.180.0`; every minified id is verified by a marker string.
+2. `unminify-app.sh` (`npm run recover:legacy`) – wakaru `--level minimal` (syntax only, keeps
+   identifiers), Biome format, `split-legacy-chunks.ts` by inventory line ranges.
+3. `apply-rename-map.ts` – reviewed rename maps applied with ts-morph's scope-safe rename
+   (never text/regex renames). Then modules were moved to TS one group at a time (phases 03-08),
+   each swap gated by the parity suite.
+4. `split-legacy-styles.ts` – CSS split with a sha256 concat check.
+5. `golden/` – runs the ORIGINAL pure functions (save parse, quiz picker, hints, xp, i18n corpus,
+   map hit test, …) and writes `tests/parity/golden/*.json`;
+   `node tools/recovery/golden/generate-golden-traces.mjs --check` must stay byte-identical.
+   Vitest asserts the recovered modules equal these traces (rename applied to expected strings).
+
+## Parity method
+
+- `tools/recovery/capture-live-baselines.mjs` drives seeded, clock-controlled scenarios
+  (`tests/parity/scenarios/parity-scenarios.ts`, 10 scenarios × projects `desktop-chromium`
+  1280×720 and `mobile-pixel` 412×839, dpr 1) in Chromium with SwiftShader WebGL.
+- Determinism: `capture-parity-hooks.js` (mulberry32 `Math.random`, silent AudioContext that
+  records synth calls, GL draw-call counters, localStorage write log) and
+  `capture-parity-virtual-clock.js` (virtual `performance.now`/`Date`/timers/rAF, CSS animations
+  seeked to virtual time; frames advance only via `__parityStep`).
+- Per shot: canvas PNG, DOM-overlay PNG, shot JSON (DOM html, computed-style hash, storage, GL
+  calls/triangles), per-scenario trace JSON, scene-graph dumps (`window.__parity`, test-mode build).
+- Gates (`capture-baseline-compare.mjs`): canvas PNG + all JSON exact; DOM PNGs exact except the
+  shots listed in `tests/parity/parity-shot-tolerances.json` (measured raster noise; noisy shots
+  pass only when their shot JSON is byte-exact).
+- Fonts: the harness serves any Google Fonts request from `tools/recovery/fonts-snapshot/`
+  (pinned CSS + woff2), then waits for the used faces. Since the self-hosted switch the app makes
+  no Google request; the route stays for the archived live/oracle runs.
+- Baselines are machine-specific (Mac + Chromium 156 SwiftShader). Never compare across machines.
+
+### Baseline sets
+
+| Set | Source | Use |
+|---|---|---|
+| `tests/parity/baselines/live/**` + `oracle-scene/**` | live site / original bundle, 2026-10-19 | archived proof of the recovered-r180 parity; `npm run test:parity:live` is valid only at tag `recovered-r180` |
+| `tests/parity/baselines/local/**` | renamed, self-hosted-font build (`npm run parity:baselines`) | current gate: `npm run test:parity` |
+
+After the rename, `walk-to-bridge` and `tap-to-milo` wait 40 frames (was 30) after Play so
+their first shot lands after the 600 ms area-badge `arrive` keyframe: its start frame raced by
+one frame run to run (transform scale 1.00113 vs 1 on `#area-label`).
+
+Regenerate local baselines only for an intended visual change, on the same Mac, and say why in
+the commit. Check determinism after regenerating:
+`node tools/recovery/capture-live-baselines.mjs --origin local` (twice, must be 0 diffs).
+
+CI (`.github/workflows/ci.yml`, job `parity`) does not use the committed baselines: on one
+runner it renders the base commit and the head commit (`mobile-pixel`, 3 scenario shards) with
+the head tooling and requires them to be equal. PR label `parity-change` skips it.
+
+## Tags
+
+| Tag | Commit | Meaning |
+|---|---|---|
+| `recovery-p03` … `recovery-p08` | per phase | module groups recovered (rollback points) |
+| `recovered-r180` | 1291325 | full recovery, original names, author-signed parity vs live |
+| `renamed-math3d` | end of phase 09 | rename + self-hosted fonts + local baselines + CI parity |
+
+## Preserved quirks (kept for parity, fix only knowingly in phase 12+)
+
+- Save load keeps only the first 30 `questionStats` entries and 30 review ids
+  (`src/save/save-storage.ts`); version ≠ 1 resets to defaults.
+- Losing window focus while playing opens the settings dialog (`keyboard-joystick.ts`,
+  `settings-dialog.ts`).
+- The forest region never counts in the scatter exclusion test (`world-scatter-exclusion.ts`).
+- Mountains near the river axis are skipped after their random draws, so the RNG order still
+  consumes them (`sky-decor-clouds-mountains.ts`). Never reorder `Math.random` calls in world code.
+- Map screen layer inherits the fill style of the previous draw (`map-render-screen-layer.ts`).
+- VI→EN DOM translator: plain-object table looked up through the prototype chain; the three
+  "viên đá" patterns never match because an earlier rule already rewrote them
+  (`legacy-translator.ts`, `legacy-translations-en.ts`).
+- World text signs need Baloo 2 loaded before the world is built (`world-text-sign.ts`).
+- Reset calls `setBridge(0)` without clearing bridge obstacles; `onFrame` UI work runs every 2nd
+  frame (see `research/researcher-01-recovered-code-inventory.md`).
+
+## Rename and fonts (phase 09, after sign-off)
+
+- Rename: i18n strings (vi + EN translator table), `<title>`/meta, PWA manifest, favicon title,
+  `src/ui/milo-dialog.ts` → `guide-dialog.ts`. Internal ids (`milo` world field, DOM ids, CSS
+  classes, storage keys, scenario names such as `tap-to-milo`) are unchanged on purpose.
+- Fonts: Google Fonts `<link>` replaced by `src/styles/fonts.css` (fontsource 5.3.0 woff2,
+  latin + vietnamese, same weights as the old Google request: Baloo 2 600/700/800, Nunito
+  500-900, so unweighted text still resolves to Nunito 500). Glyph outlines differ slightly from
+  Google's build (DOM text raster shifts by a few pixels); canvas and layout JSON are unaffected.

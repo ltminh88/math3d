@@ -8,7 +8,7 @@
 - Date: 2026-10-18
 - Description: Close Part A on r180: remove `src/legacy/**` and recovery-only scaffolding from the runtime path, enable strict TS on all recovered modules, switch Google Fonts to self-hosted fontsource (offline PWA), run full parity + manual playthrough, then (only after author sign-off) rename the app to "math3d" and the guide NPC Milo to "VLM", and freeze local baselines for CI from the renamed build.
 - Priority: P1
-- Implementation status: pending
+- Implementation status: done (tags `recovered-r180`, `renamed-math3d`)
 - Review status: not reviewed
 
 ## Key Insights
@@ -46,13 +46,13 @@ src/ui/guide-dialog.ts                renamed from milo-dialog.ts
 7. Recovery notes doc. Commit + tag `renamed-math3d`.
 
 ## Todo list
-- [ ] legacy removed, strict TS + lint green
-- [ ] self-hosted fonts (+ DOM parity)
-- [ ] full parity vs live
-- [ ] manual playthrough checklist (desktop + iPad)
-- [ ] rename math3d / VLM (after sign-off) + re-baseline
-- [ ] local baselines + CI parity job
-- [ ] recovery notes
+- [x] legacy removed, strict TS + lint green (f3931c9)
+- [x] self-hosted fonts — done after the rename (874ab93). Glyph drift vs live was 0.7-3.5% per DOM shot (> 0.002 rule), accepted because the live gate is archived at `recovered-r180`; local baselines absorb it. Same weights as the Google request (Nunito 500-900, no 400).
+- [x] full parity vs live (20/20 at `recovered-r180`)
+- [x] manual playthrough checklist (author sign-off 2026-10-19, reports/phase-09-author-signoff-checklist.md)
+- [x] rename math3d / VLM (after sign-off) + re-baseline (25749fb)
+- [x] local baselines + CI parity job (CI: base vs head on one runner, mobile-pixel, 3 shards)
+- [x] recovery notes (docs/recovery-notes.md)
 
 ## Success Criteria
 - `npm run lint && npm run typecheck && npm test && npm run build && npm run test:parity` exit 0.

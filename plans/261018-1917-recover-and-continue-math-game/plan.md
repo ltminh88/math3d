@@ -25,7 +25,7 @@ Supersedes [261018-1803-vlm-math-game-mvp](../261018-1803-vlm-math-game-mvp/plan
 | 06 | [Recover scatter, characters, controls, world orchestrator](phase-06-recover-world-scatter-characters-controls.md) | Done (recovery-p06; movement scenarios moved to 09) |
 | 07 | [Recover minimap + world map renderer](phase-07-recover-minimap-and-world-map.md) | Done (recovery-p07) |
 | 08 | [Recover UI, dialogs, HUD, main](phase-08-recover-ui-dialogs-hud-and-main.md) | Done (recovery-p08) |
-| 09 | [Parity sign-off + legacy removal + rename math3d/VLM](phase-09-parity-signoff-and-legacy-removal.md) | Pending |
+| 09 | [Parity sign-off + legacy removal + rename math3d/VLM](phase-09-parity-signoff-and-legacy-removal.md) | Done (recovered-r180, renamed-math3d) |
 | 10 | [three r186 bump + retune to r180 look](phase-10-three-r186-bump-and-rebaseline.md) | Pending |
 | 11 | [Retire old engine code](phase-11-retire-old-engine-code.md) | Pending |
 | 12 | [Store, save migration + save codes, learning integration](phase-12-store-migration-and-learning-integration.md) | Pending |
