@@ -27,7 +27,7 @@ Supersedes [261018-1803-vlm-math-game-mvp](../261018-1803-vlm-math-game-mvp/plan
 | 08 | [Recover UI, dialogs, HUD, main](phase-08-recover-ui-dialogs-hud-and-main.md) | Done (recovery-p08) |
 | 09 | [Parity sign-off + legacy removal + rename math3d/VLM](phase-09-parity-signoff-and-legacy-removal.md) | Done (recovered-r180, renamed-math3d) |
 | 10 | [three r186 bump + retune to r180 look](phase-10-three-r186-bump-and-rebaseline.md) | Done (recovery-p10) |
-| 11 | [Retire old engine code](phase-11-retire-old-engine-code.md) | Pending |
+| 11 | [Retire old engine code](phase-11-retire-old-engine-code.md) | Done (recovery-p11) |
 | 12 | [Store, save migration + save codes, learning integration](phase-12-store-migration-and-learning-integration.md) | Pending |
 | 13 | [Level host + region progression](phase-13-level-host-and-region-progression.md) | Pending |
 | 14 | [Field level (meadow)](phase-14-field-level-in-meadow.md) | Pending |
