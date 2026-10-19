@@ -186,7 +186,9 @@ export const PARITY_SCENARIOS: readonly ParityScenario[] = [
     async run(d) {
       await d.frames(30);
       await d.click('#play');
-      await d.frames(30);
+      // 40 frames (640 ms): the area badge 'arrive' keyframe (600 ms) has finished. At 30 frames
+      // the shot landed on its last overshoot frames, whose start frame races by one (math3d).
+      await d.frames(40);
       await d.capture('start', { scene: true });
       await d.hold(['d'], 63);
       await d.capture('walk-1s', { scene: true });
@@ -203,7 +205,7 @@ export const PARITY_SCENARIOS: readonly ParityScenario[] = [
     async run(d) {
       await d.frames(30);
       await d.click('#play');
-      await d.frames(30);
+      await d.frames(40); // past the 600 ms area-badge keyframe, see walk-to-bridge
       await d.tapLabelAnchor('#milo-label', 60);
       await d.capture('tap', { scene: true });
       await d.frames(30);
