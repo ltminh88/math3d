@@ -31,6 +31,6 @@ First e2e/parity run needs `npx playwright install chromium`.
 Copy `.env.example` to a local env file (git-ignored). Leave `VITE_ENABLE_CLOUD` empty for a guest-only, fully offline game. Only the Supabase **publishable** key ever goes in client env; the service_role key never enters this repo.
 
 ## Pinned versions
-three 0.180.0 (0.186.1 in phase 10), vite 8.3.4, vite-plugin-pwa 2.0.0, @supabase/supabase-js 2.118.0, vitest 5.0.5, @playwright/test 1.64.1, typescript 7.0.2 — all verified on npm at install (2026-10-18). `@types/three` is 0.186.0 (no 0.186.1 published).
+three 0.186.1 (recovered on 0.180.0, bumped in phase 10), vite 8.3.4, vite-plugin-pwa 2.0.0, @supabase/supabase-js 2.118.0, vitest 5.0.5, @playwright/test 1.64.1, typescript 7.0.2 — all verified on npm at install (2026-10-18). `@types/three` is 0.186.0 (no 0.186.1 published). Lighting is retuned to the r180 look in `src/world/world-lighting-tuning.ts`.
 
 See `docs/code-standards.md` for conventions and `plans/` for the implementation plan.

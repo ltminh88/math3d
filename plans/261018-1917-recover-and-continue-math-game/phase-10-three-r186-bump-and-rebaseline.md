@@ -8,8 +8,8 @@
 - Date: 2026-10-18
 - Description: Upgrade `three` + `@types/three` to 0.186.x in one step (guide allows <=10 releases), fix deprecations, then RETUNE lighting/materials so r186 matches the r180 look (decided 2026-10-18; 2h timebox), re-baseline after author approves screenshots.
 - Priority: P2
-- Implementation status: pending
-- Review status: not reviewed
+- Implementation status: done (2026-10-19, tag `recovery-p10`)
+- Review status: author approved the retuned screenshots 2026-10-19
 
 ## Key Insights
 - r181 PBR energy conservation: rough `MeshStandardMaterial` (roughness > 0.5, i.e. almost everything low-poly here) renders brighter. Main visual risk.
@@ -39,12 +39,18 @@
 5. Author approves screenshots; regenerate baselines; restore strict tolerance (0.002). Commit + tag `three-r186`.
 
 ## Todo list
-- [ ] bump + typecheck
-- [ ] deprecation fixes
-- [ ] diff report
-- [ ] retune to r180 look (2h)
-- [ ] author screenshot approval
-- [ ] re-baseline
+- [x] bump + typecheck
+- [x] deprecation fixes
+- [x] diff report (`reports/r186-retune/README.md`, replaces the planned `three-r186-visual-diff.md`)
+- [x] retune to r180 look (2h)
+- [x] author screenshot approval (2026-10-19)
+- [x] re-baseline
+
+## Outcome (2026-10-19)
+- three 0.186.1, @types/three 0.186.0. `PCFSoftShadowMap` -> `PCFShadowMap`; `Clock` -> `Timer` (`reset()` before the first frame keeps dt 0, movement scene dumps identical to r180). No GLSL, `matrixAutoUpdate` or `onBeforeCompile` sites needed changes. Zero three deprecation warnings.
+- Retune (`src/world/world-lighting-tuning.ts`): r181 made the scene ~1.3 sRGB levels *darker* (Fresnel taken out of diffuse), not brighter. Hemisphere + sun x1.027 (per-pixel least-squares fit), shadow radius 1.5. Mean canvas delta vs r180 over 92 shots 1.54 -> 0.24 levels; pixels off by > 8: 0.52 % -> 0.03 %; exact-byte ratio 0.996 -> 0.384 (exact is unreachable: different BRDF and shadow filter).
+- Structural JSON is not byte-equal to r180, all explained and re-baselined: r186 resets `renderer.info` before the shadow pass (calls/triangles now include shadow-pass draws, bridge-0 138 -> 242 calls; geometries unchanged 222), textures +2 (DFG LUT, shadow DepthTexture), `data-engine="three.js r186"` on the canvas, playthrough RNG shift (three draws 4 `Math.random` per extra texture UUID -> first quiz question m2_8 -> m8_1).
+- Perf smoke (60 s idle fps) not run here: the frame-stats bench lives in phase 11's worktree.
 
 ## Success Criteria
 - Full parity run: 0 deprecation warnings (console listener asserts), structural JSON equal (draw calls, triangles, instance counts unchanged), canvas diffs vs r180 <= 0.05 before re-baseline, DOM shots <= 0.002.

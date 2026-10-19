@@ -56,7 +56,7 @@ unchanged, so old saves load as-is.
 | Set | Source | Use |
 |---|---|---|
 | `tests/parity/baselines/live/**` + `oracle-scene/**` | live site / original bundle, 2026-10-19 | archived proof of the recovered-r180 parity; `npm run test:parity:live` is valid only at tag `recovered-r180` |
-| `tests/parity/baselines/local/**` | renamed, self-hosted-font build (`npm run parity:baselines`) | current gate: `npm run test:parity` |
+| `tests/parity/baselines/local/**` | renamed, self-hosted-font build on three r186 with the retuned lighting (`npm run parity:baselines`, phase 10) | current gate: `npm run test:parity` |
 
 After the rename, `walk-to-bridge` and `tap-to-milo` wait 40 frames (was 30) after Play so
 their first shot lands after the 600 ms area-badge `arrive` keyframe: its start frame raced by
@@ -77,6 +77,7 @@ the head tooling and requires them to be equal. PR label `parity-change` skips i
 | `recovery-p03` … `recovery-p08` | per phase | module groups recovered (rollback points) |
 | `recovered-r180` | 1291325 | full recovery, original names, author-signed parity vs live |
 | `renamed-math3d` | end of phase 09 | rename + self-hosted fonts + local baselines + CI parity |
+| `recovery-p10` | end of phase 10 | three 0.186.1, Clock->Timer, PCFShadowMap, lighting retuned to the r180 look (author-approved), local baselines regenerated |
 
 ## Preserved quirks (kept for parity, fix only knowingly in phase 12+)
 
@@ -87,6 +88,8 @@ the head tooling and requires them to be equal. PR label `parity-change` skips i
 - The forest region never counts in the scatter exclusion test (`world-scatter-exclusion.ts`).
 - Mountains near the river axis are skipped after their random draws, so the RNG order still
   consumes them (`sky-decor-clouds-mountains.ts`). Never reorder `Math.random` calls in world code.
+  three itself draws 4 `Math.random` per object UUID, so a three bump that creates extra objects
+  shifts the seeded parity stream (r186: the first playthrough quiz question changed).
 - Map screen layer inherits the fill style of the previous draw (`map-render-screen-layer.ts`).
 - VI→EN DOM translator: plain-object table looked up through the prototype chain; the three
   "viên đá" patterns never match because an earlier rule already rewrote them

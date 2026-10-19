@@ -26,7 +26,7 @@ Supersedes [261018-1803-vlm-math-game-mvp](../261018-1803-vlm-math-game-mvp/plan
 | 07 | [Recover minimap + world map renderer](phase-07-recover-minimap-and-world-map.md) | Done (recovery-p07) |
 | 08 | [Recover UI, dialogs, HUD, main](phase-08-recover-ui-dialogs-hud-and-main.md) | Done (recovery-p08) |
 | 09 | [Parity sign-off + legacy removal + rename math3d/VLM](phase-09-parity-signoff-and-legacy-removal.md) | Done (recovered-r180, renamed-math3d) |
-| 10 | [three r186 bump + retune to r180 look](phase-10-three-r186-bump-and-rebaseline.md) | Pending |
+| 10 | [three r186 bump + retune to r180 look](phase-10-three-r186-bump-and-rebaseline.md) | Done (recovery-p10) |
 | 11 | [Retire old engine code](phase-11-retire-old-engine-code.md) | Pending |
 | 12 | [Store, save migration + save codes, learning integration](phase-12-store-migration-and-learning-integration.md) | Pending |
 | 13 | [Level host + region progression](phase-13-level-host-and-region-progression.md) | Pending |
@@ -70,6 +70,7 @@ Commit + tag per phase (`recovery-pNN`); any swap reverts by restoring its shim 
 - Q naming? -> A: app "math3d", Milo -> "VLM"; rename after 09 parity sign-off, re-baseline.
 - Q hosting? -> A: Vercel, new domain `mathgame.vercel.app`; save codes for carry-over.
 - Q r186 look? -> A: retune to r180 (2h timebox, author approves screenshots).
+- r186 retune approved by author 2026-10-19 (reports/r186-retune/README.md).
 - Q bridge rewards? -> A: keep original; `scoring.ts` must not override.
 - Q WebMCP tool? -> A: keep, update exposed names.
 - Q cosmetics shop? -> A: yes (~+6h) -> phase 19; keep `owned_cosmetics` in 16/17.
