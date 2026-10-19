@@ -1,4 +1,4 @@
-// The shared modal <dialog>: every dialog (Milo, quiz, book, help, settings, reset, complete)
+// The shared modal <dialog>: every dialog (VLM, quiz, book, help, settings, reset, complete)
 // swaps its content. Opening pauses the world; closing restores the map-pause state.
 import { translateLongText } from '../i18n/legacy-translator';
 import { type DialogKind, gameState, getWorld } from './game-state';

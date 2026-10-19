@@ -16,10 +16,10 @@ export default defineConfig({
       ],
       manifest: {
         // Keep in sync with src/i18n/common-strings.ts (the only duplicated copy of the name).
-        name: 'Math AI Game 3D – Vương Quốc Cửu Chương',
-        short_name: 'Cửu Chương',
+        name: 'math3d – Vương Quốc Cửu Chương',
+        short_name: 'math3d',
         description:
-          'Math AI Game 3D - Vương Quốc Cửu Chương, game 3D giúp trẻ học phép nhân qua phiêu lưu và nhiệm vụ xây cầu.',
+          'math3d - Vương Quốc Cửu Chương, game 3D giúp trẻ học phép nhân qua phiêu lưu và nhiệm vụ xây cầu.',
         lang: 'vi',
         display: 'fullscreen',
         orientation: 'landscape',

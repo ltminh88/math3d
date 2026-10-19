@@ -1,5 +1,5 @@
 // Screen-space pass of the map draw (bundle lines 1857-1912): region icons/lock glyphs, name
-// pills, Milo marker and the pulsing player arrow. Runs after the world transform is restored.
+// pills, VLM marker and the pulsing player arrow. Runs after the world transform is restored.
 import { REGIONS } from '../config/regions';
 import type { MapDrawState, RegionUnlockPredicate } from './map-draw-state';
 import type { MapView } from './map-view-transform';

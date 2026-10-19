@@ -30,10 +30,10 @@ export interface WorldPublicApi {
   readonly milo: Object3D;
   /** Camera yaw in radians. */
   readonly heading: number;
-  /** Every frame: near Milo, on the east bank past the bridge, frames per second. */
+  /** Every frame: near VLM, on the east bank past the bridge, frames per second. */
   onFrame: ((nearMilo: boolean, crossedBridge: boolean, fps: number) => void) | undefined;
   onJump: (() => void) | undefined;
-  /** Tap on Milo while standing next to him (always called with `true`). */
+  /** Tap on VLM while standing next to him (always called with `true`). */
   onSceneClick: ((nearMilo: boolean) => void) | undefined;
   setAvatar(avatar: Avatar): void;
   setBridge(segments: number, animate?: boolean): void;

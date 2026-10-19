@@ -1,4 +1,4 @@
-// Low-poly player (boy/girl avatar) and Milo the guide, built from the shared primitives.
+// Low-poly player (boy/girl avatar) and VLM the guide, built from the shared primitives.
 import type { Group, Mesh } from 'three';
 import type { Avatar } from '../save/save-types';
 import type { WorldBuildContext } from './world-build-context';
@@ -39,7 +39,7 @@ export function buildPlayerModel(ctx: WorldBuildContext, player: Group): PlayerM
   return { shirt, hair, ponytail, legs };
 }
 
-/** Milo in robe and pointed hat with a staff; the floating orb is tagged `userData.beacon`. */
+/** VLM in robe and pointed hat with a staff; the floating orb is tagged `userData.beacon`. */
 export function buildMiloModel(ctx: WorldBuildContext, milo: Group): void {
   addCylinder(ctx, milo, 0, 0.65, 0, 0.45, 0.7, 1.25, 0x537e7e);
   addSphere(ctx, milo, 0, 1.58, 0, 0.48, 0xffd4ab);

@@ -13,7 +13,7 @@ export const LEGACY_TRANSLATIONS_EN: Record<string, string> = {
   'Cài đặt': 'Settings',
   'MỘT CUỘC PHIÊU LƯU NHỎ': 'A SMALL ADVENTURE',
   'Mỗi phép nhân, một điều kỳ diệu.': 'Every multiplication is a little wonder.',
-  'Cùng Milo xây cầu và khám phá ngôi làng!': 'Build a bridge with Milo and explore the village!',
+  'Cùng VLM xây cầu và khám phá ngôi làng!': 'Build a bridge with VLM and explore the village!',
   'Chọn người bạn đồng hành': 'Choose your companion',
   'Nhà thám hiểm': 'Explorer',
   'Nhà khám phá': 'Pathfinder',
@@ -25,8 +25,8 @@ export const LEGACY_TRANSLATIONS_EN: Record<string, string> = {
   xu: 'coins',
   'CHUYẾN PHIÊU LƯU ĐẦU TIÊN': 'FIRST ADVENTURE',
   'Một cây cầu, ngàn niềm vui': 'One bridge, a thousand joys',
-  'Milo đang chờ bạn bên dòng sông. Đến gần và chào bạn ấy nhé!':
-    'Milo is waiting by the river. Come closer and say hello!',
+  'VLM đang chờ bạn bên dòng sông. Đến gần và chào bạn ấy nhé!':
+    'VLM is waiting by the river. Come closer and say hello!',
   'Gặp người dẫn đường': 'Meet the guide',
   'Cây cầu tình bạn': 'Friendship Bridge',
   'Cánh Đồng Phép Tính': 'Math Meadow',
@@ -40,12 +40,12 @@ export const LEGACY_TRANSLATIONS_EN: Record<string, string> = {
   'đoạn cầu': 'bridge segments',
   'đã xây': 'built',
   'chưa xây': 'not built',
-  'Bạn đã nối liền hai bờ! Hãy quay lại Milo để luyện tập và khám phá thêm phép nhân.':
-    'You connected both shores! Return to Milo to practice and explore more multiplication.',
+  'Bạn đã nối liền hai bờ! Hãy quay lại VLM để luyện tập và khám phá thêm phép nhân.':
+    'You connected both shores! Return to VLM to practice and explore more multiplication.',
   'Cây cầu đã sẵn sàng! Hãy đi qua cầu sang khu vườn bên kia sông.':
     'The bridge is ready! Cross it to reach the garden on the other side.',
-  'Giúp Milo chọn phép nhân đúng. Mỗi câu trả lời sẽ xây thêm một đoạn cầu.':
-    'Help Milo choose the correct multiplication. Each answer builds another bridge segment.',
+  'Giúp VLM chọn phép nhân đúng. Mỗi câu trả lời sẽ xây thêm một đoạn cầu.':
+    'Help VLM choose the correct multiplication. Each answer builds another bridge segment.',
   'Cây cầu tình bạn đã hoàn thành!': 'The Friendship Bridge is complete!',
   'Đi qua cầu để hoàn thành': 'Cross the bridge to finish',
   '✓ Hoàn thành': '✓ Complete',
@@ -96,15 +96,15 @@ export const LEGACY_TRANSLATIONS_EN: Record<string, string> = {
   'Thử lại': 'Try again',
   'Sổ cửu chương': 'Multiplication book',
   'Hướng dẫn chơi': 'How to play',
-  'Nói chuyện với Milo': 'Talk to Milo',
+  'Nói chuyện với VLM': 'Talk to VLM',
   'Người dẫn đường': 'Your guide',
   'Một thế giới nhỏ. Những khám phá lớn.': 'A small world. Big discoveries.',
   'Lưu trên thiết bị này': 'Saved on this device',
-  'Chào bạn! Di chuyển đến Milo, hoặc chạm xuống đất để đi.':
-    'Hi! Move to Milo, or tap the ground to walk.',
-  'Hãy đến gần Milo — người bạn có chiếc mũ xanh bên bờ sông.':
-    'Come closer to Milo, the friend with the blue hat by the river.',
-  'Chào bạn, mình là Milo!': "Hi, I'm Milo!",
+  'Chào bạn! Di chuyển đến VLM, hoặc chạm xuống đất để đi.':
+    'Hi! Move to VLM, or tap the ground to walk.',
+  'Hãy đến gần VLM — người bạn có chiếc mũ xanh bên bờ sông.':
+    'Come closer to VLM, the friend with the blue hat by the river.',
+  'Chào bạn, mình là VLM!': "Hi, I'm VLM!",
   'NGƯỜI DẪN ĐƯỜNG CỦA BẠN': 'YOUR GUIDE',
   'Cây cầu của chúng mình thật đẹp! ': 'Our bridge looks wonderful! ',
   'Bạn muốn cùng mình luyện thêm phép nhân không?':
@@ -126,7 +126,7 @@ export const LEGACY_TRANSLATIONS_EN: Record<string, string> = {
   'Cùng xây cây cầu!': "Let's build the bridge!",
   'Mỗi ngày, giỏi hơn một chút': 'A little better every day',
   'ÔN LẠI PHÉP NHÂN': 'REVIEW MULTIPLICATION',
-  'LUYỆN TẬP CÙNG MILO': 'PRACTICE WITH MILO',
+  'LUYỆN TẬP CÙNG VLM': 'PRACTICE WITH VLM',
   'Bạn tìm được kết quả không?': 'Can you find the answer?',
   'viên đá': 'stones',
   'Gợi ý cho mình': 'Give me a hint',
@@ -141,7 +141,7 @@ export const LEGACY_TRANSLATIONS_EN: Record<string, string> = {
   'Trộn các bảng ×2 – ×10': 'Mix tables ×2 – ×10',
   'Sẵn sàng phiêu lưu?': 'Ready for an adventure?',
   'Khám phá ngôi làng': 'Explore the village',
-  'Làm quen với Milo': 'Meet Milo',
+  'Làm quen với VLM': 'Meet VLM',
   'Xây cầu bằng phép nhân': 'Build a bridge with multiplication',
   'Mình hiểu rồi!': 'Got it!',
   'Một chút cài đặt': 'A few settings',
@@ -161,7 +161,7 @@ export const LEGACY_TRANSLATIONS_EN: Record<string, string> = {
   '↻ Chưa đúng rồi. Mình cùng đếm lại nhé!': "↻ Not quite. Let's count again!",
   'Khu Vườn Bên Sông': 'Riverside Garden',
   'ĐÍCH ĐẾN CỦA CÂY CẦU': "THE BRIDGE'S DESTINATION",
-  'Nơi Milo và bạn bắt đầu hành trình.': 'Where you and Milo begin the journey.',
+  'Nơi VLM và bạn bắt đầu hành trình.': 'Where you and VLM begin the journey.',
   'Khu vườn bên kia Cây cầu tình bạn.': 'The garden across the Friendship Bridge.',
   'Ruộng phép tính và cổng vào thế giới thứ hai.': 'Math fields and the gate to the second world.',
   'Khu rừng rậm của phép nhân và phép chia.': 'A deep forest of multiplication and division.',
@@ -186,7 +186,7 @@ export const LEGACY_TRANSLATIONS_EN: Record<string, string> = {
     'Press M or tap the minimap in the corner to see every land.',
   '4 vùng đất mới đã mở trên bản đồ. Nhấn M để xem!':
     '4 new lands are open on the map. Press M to look!',
-  'Bạn đã nối liền hai bờ! Hãy khám phá các vùng đất mới trên bản đồ, hoặc quay lại Milo để luyện tập.':
-    'You connected both shores! Explore the new lands on the map, or return to Milo to practice.',
+  'Bạn đã nối liền hai bờ! Hãy khám phá các vùng đất mới trên bản đồ, hoặc quay lại VLM để luyện tập.':
+    'You connected both shores! Explore the new lands on the map, or return to VLM to practice.',
   Đóng: 'Close',
 };

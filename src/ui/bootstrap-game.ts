@@ -7,12 +7,12 @@ import { wireBookAndHelp } from './book-help-dialogs';
 import { wireDialog } from './dialog';
 import { gameShellHtml } from './dom-template';
 import { gameState } from './game-state';
+import { talkToGuide, wireGuideTriggers } from './guide-dialog';
 import { initQuestCard, refreshHud } from './hud';
 import { byId } from './icons';
 import { wireKeyboardAndJoystick } from './keyboard-joystick';
 import { wireMapOverlay } from './map-overlay';
 import { wireMenu } from './menu-language-start';
-import { talkToMilo, wireMiloTriggers } from './milo-dialog';
 import { wireSettingsAndToolbar } from './settings-dialog';
 import { onWorldFrame } from './world-frame-hook';
 
@@ -30,7 +30,7 @@ function wireControls(): void {
   initQuestCard();
   wireDialog();
   wireMenu();
-  wireMiloTriggers();
+  wireGuideTriggers();
   wireBookAndHelp();
   wireSettingsAndToolbar();
   wireMapOverlay();
@@ -48,7 +48,7 @@ function startWorld(): void {
     world.setBridge(gameState.save.bridge);
     world.setAvatar(gameState.save.avatar);
     world.onJump = () => gameState.audio.jump();
-    world.onSceneClick = () => talkToMilo();
+    world.onSceneClick = () => talkToGuide();
     world.onFrame = onWorldFrame;
     byId('loading').hidden = true;
     refreshHud();

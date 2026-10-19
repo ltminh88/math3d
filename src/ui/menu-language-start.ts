@@ -31,7 +31,7 @@ export function startAdventure(): void {
   gameState.currentRegionId = '';
   updateCurrentArea();
   requestAnimationFrame(drawMinimap);
-  showToast('Chào bạn! Di chuyển đến Milo, hoặc chạm xuống đất để đi.');
+  showToast('Chào bạn! Di chuyển đến VLM, hoặc chạm xuống đất để đi.');
 }
 
 /** Back to the welcome menu: closes dialog/map, deactivates the world, stops music. */

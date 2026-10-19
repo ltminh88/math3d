@@ -13,14 +13,14 @@ const QUEST_COLLAPSED_KEY = 'aigame3d_quest_collapsed';
 function questCopy(): string {
   const save = gameState.save;
   if (save.questComplete) {
-    return 'Bạn đã nối liền hai bờ! Hãy khám phá các vùng đất mới trên bản đồ, hoặc quay lại Milo để luyện tập.';
+    return 'Bạn đã nối liền hai bờ! Hãy khám phá các vùng đất mới trên bản đồ, hoặc quay lại VLM để luyện tập.';
   }
   if (save.bridge === BRIDGE_SEGMENTS) {
     return 'Cây cầu đã sẵn sàng! Hãy đi qua cầu sang khu vườn bên kia sông.';
   }
   return save.questAccepted
-    ? 'Giúp Milo chọn phép nhân đúng. Mỗi câu trả lời sẽ xây thêm một đoạn cầu.'
-    : 'Milo đang chờ bạn bên dòng sông. Đến gần và chào bạn ấy nhé!';
+    ? 'Giúp VLM chọn phép nhân đúng. Mỗi câu trả lời sẽ xây thêm một đoạn cầu.'
+    : 'VLM đang chờ bạn bên dòng sông. Đến gần và chào bạn ấy nhé!';
 }
 
 function questProgress(): string {
