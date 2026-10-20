@@ -1,7 +1,7 @@
 // Game bootstrap: renders the shell, wires every control in the original order, builds the 3D
 // world (synchronously, as the original: world text signs and Math.random order depend on it),
-// then opens the store and hydrates progress (store-boot.ts hides the loading card). Without
-// WebGL the loading card turns into a "could not open the 3D world" notice.
+// then opens the store and hydrates progress (store-boot.ts). Without WebGL the loading card
+// turns into a "could not open the 3D world" notice.
 import { translateDomTree } from '../i18n/legacy-translator';
 import { World } from '../world/world';
 import type { WorldPublicApi } from '../world/world-public-api';
@@ -53,6 +53,7 @@ function startWorld(): void {
     world.onJump = () => gameState.audio.jump();
     world.onSceneClick = () => talkToGuide();
     world.onFrame = onWorldFrame;
+    byId('loading').hidden = true;
     refreshHud();
   } catch (error) {
     byId('loading').innerHTML = WORLD_FAILED_HTML;

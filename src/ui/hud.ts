@@ -55,6 +55,19 @@ function refreshXp(): void {
   byId('xp-fill').parentElement?.setAttribute('aria-valuenow', String(Math.round(percent)));
 }
 
+/**
+ * Rewrites markup only when it changed: the HUD is refreshed again after the store hydrates, and
+ * re-inserting identical icons under the glass (backdrop-filter) buttons changes their raster.
+ */
+const writtenMarkup = new WeakMap<Element, string>();
+function setMarkup(id: string, html: string): void {
+  const el = byId(id);
+  if (writtenMarkup.get(el) !== html) {
+    el.innerHTML = html;
+    writtenMarkup.set(el, html);
+  }
+}
+
 /** Re-renders every HUD field from the progress view, then re-runs the DOM translator on the HUD. */
 export function refreshHud(): void {
   const progress = gameState.progress;
@@ -63,15 +76,18 @@ export function refreshHud(): void {
   byId('player-name').textContent = progress.avatar === 'girl' ? 'Nhà khám phá' : 'Nhà thám hiểm';
   byId('boy').setAttribute('aria-pressed', String(progress.avatar === 'boy'));
   byId('girl').setAttribute('aria-pressed', String(progress.avatar === 'girl'));
-  byId('play').innerHTML = translateLongText(
-    `${progress.started ? 'Tiếp tục phiêu lưu' : 'Bắt đầu phiêu lưu'} ${icon('arrow')}`,
+  setMarkup(
+    'play',
+    translateLongText(
+      `${progress.started ? 'Tiếp tục phiêu lưu' : 'Bắt đầu phiêu lưu'} ${icon('arrow')}`,
+    ),
   );
   byId('quest-copy').textContent = questCopy();
   byId('quest-title').textContent = progress.questComplete
     ? 'Cây cầu tình bạn đã hoàn thành!'
     : 'Một cây cầu, ngàn niềm vui';
   byId('quest-progress').textContent = questProgress();
-  byId('quest-steps').innerHTML = questStepsHtml();
+  setMarkup('quest-steps', questStepsHtml());
   byId('bridge-count').textContent = `${progress.bridge} / ${BRIDGE_SEGMENTS} đoạn cầu`;
   for (const region of LABELED_REGIONS) {
     const label = byId(`${region.id}-label`);
@@ -82,7 +98,7 @@ export function refreshHud(): void {
       : '🔒';
   }
   const { sound } = appSettings.get();
-  byId('sound').innerHTML = icon(sound ? 'sound' : 'mute');
+  setMarkup('sound', icon(sound ? 'sound' : 'mute'));
   byId('sound').setAttribute('aria-label', sound ? 'Tắt âm thanh' : 'Bật âm thanh');
   gameState.audio.enabled = sound;
   translateDomTree(byId('hud'));

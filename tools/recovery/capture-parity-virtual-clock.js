@@ -80,10 +80,16 @@
 
   // Let queued real tasks (e.g. dialog 'close' events) and the compositor settle; virtual time
   // does not move. Called after every interaction and before every screenshot.
-  window.__parityFlush = (settleMs = 0) =>
-    new Promise((resolve) =>
+  // Adopts animations started by the interaction first (getAnimations() forces the style update
+  // that creates them), so they are paused at the current virtual time instead of racing to
+  // their end in real time while the compositor settles (phase 12: the book dialog's `pop`
+  // entrance was caught settled in some runs and at its start in others).
+  window.__parityFlush = (settleMs = 0) => {
+    syncAnimations();
+    return new Promise((resolve) =>
       realSetTimeout(() => realRaf(() => realRaf(() => realSetTimeout(resolve, settleMs))), 0),
     );
+  };
   window.__parityNow = () => now;
   window.__paritySyncAnimations = syncAnimations;
   window.__parityStep = (frames, grab = false) => {

@@ -18,17 +18,17 @@ const hooksPath = join(here, 'capture-parity-hooks.js');
 const clockPath = join(here, 'capture-parity-virtual-clock.js');
 
 /**
- * Since phase 12 the game hides its loading card only after the store (IndexedDB) has opened and
- * the progress is hydrated; the live/oracle builds hide it synchronously at load. Polled from Node:
- * page timers and rAF are virtual and never advance on their own.
+ * Since phase 12 the game hydrates progress from the store (IndexedDB) after load; it marks
+ * <html data-boot="store"> until done. Live/oracle builds have no attribute (ready at load).
+ * Polled from Node: page timers and rAF are virtual and never advance on their own.
  */
 async function waitForGameReady(page, label) {
-  const ready = () => document.getElementById('loading')?.hidden === true;
+  const ready = () => document.documentElement.dataset.boot !== 'store';
   for (let i = 0; i < 500; i++) {
     if (await page.evaluate(ready)) return;
     await new Promise((resolve) => setTimeout(resolve, 10));
   }
-  throw new Error(`${label}: the game did not finish booting (loading card still shown)`);
+  throw new Error(`${label}: the game did not finish booting (store hydration)`);
 }
 
 export async function runScenario(browser, project, scenario, outDir, written, files) {

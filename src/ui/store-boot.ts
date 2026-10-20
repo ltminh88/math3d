@@ -1,6 +1,7 @@
 // Boot step after the shell and world are built: open the game store (IndexedDB, or memory when
-// unavailable), import the legacy v1 save once, hydrate the progress view, then reveal the game.
-// The loading card stays up until then, so nothing renders stale defaults.
+// unavailable), import the legacy v1 save once and hydrate the progress view (a few ms after the
+// world, which shows defaults until then). <html data-boot> is "store" while this runs and
+// "ready" afterwards; the parity runner waits for it before driving the virtual clock.
 import { openGameStore } from '../store/game-store';
 import type { GameStore } from '../store/game-store-api';
 import { DbBlockedError } from '../store/idb-database';
@@ -41,6 +42,7 @@ async function openStore(): Promise<{ store: GameStore; blocked: boolean }> {
 }
 
 export async function bootStore(): Promise<void> {
+  document.documentElement.dataset.boot = 'store';
   try {
     const { store, blocked } = await openStore();
     try {
@@ -50,7 +52,6 @@ export async function bootStore(): Promise<void> {
       console.error('Legacy save import failed', err);
     }
     connectStore(store);
-    renderProgress();
     if (blocked) showToast(ts('blocked'));
     else if (!store.persistent) showToast(ts('notPersistent'));
     addEventListener('pagehide', () => void flushProgress());
@@ -60,6 +61,7 @@ export async function bootStore(): Promise<void> {
   } catch (err) {
     console.error('Game store unavailable', err);
   } finally {
-    if (gameState.world) byId('loading').hidden = true;
+    renderProgress();
+    document.documentElement.dataset.boot = 'ready';
   }
 }
