@@ -8,7 +8,7 @@
 - Date: 2026-10-18
 - Description: Add a level gate in the meadow ("Cánh Đồng Phép Tính") and forest ("Rừng Nhân Chia") regions; walking up to it shows the existing interact button; entering pauses the world and runs a level scene on the same renderer; finishing records `LevelProgress` and returns the player to the gate. Levels self-register.
 - Priority: P1
-- Implementation status: pending
+- Implementation status: done (tag phase-13)
 - Review status: not reviewed
 
 ## Key Insights
@@ -50,11 +50,11 @@ src/ui/world-labels.ts  src/ui/guide-dialog.ts  src/map/map-render.ts   gate lab
 5. Test debug hook; e2e `tests/e2e/level-gate.spec.ts`: seeded progress -> teleport to meadow gate -> locked before bridge, open after; enter/exit returns to gate; renderer.info.geometries back to baseline after exit (leak check).
 
 ## Todo list
-- [ ] progression + registry (+ tests)
-- [ ] world pause/resume, interactables
-- [ ] gates + labels + map text
-- [ ] level host + commit
-- [ ] debug hook + e2e
+- [x] progression + registry (+ tests)
+- [x] world pause/resume, interactables
+- [x] gates + labels + map text
+- [x] level host + commit
+- [x] debug hook + e2e (enter/exit + leak e2e deferred to 14, see notes)
 
 ## Success Criteria
 - `npm test` + `npm run test:e2e -- level-gate` green; `npm run test:parity`: all original scenarios identical except shots containing the new gates (re-baselined, listed).
@@ -78,3 +78,45 @@ Rollback: remove gates (config flag) -> world as after 12.
 
 ## Next steps
 - 14/15 implement levels against `LevelContext`; 19 adds the shop stall via the interactables registry.
+
+## Implementation notes (2026-10-21)
+- Host API (`src/levels/shared/level-types.ts`): `LevelDefinition {id, regionId, tables, rounds,
+  requires, load()}`; `load()` resolves a `LevelModule {start(ctx) -> LevelSession}`; the host owns
+  the frame loop (`session.update(dt, time)` then `renderer.render(session.scene, session.camera)`,
+  dt clamped to 0.05) and on exit runs `session.dispose()`, flushes `ctx.disposer` (the scene is
+  tracked automatically), unmounts `ctx.ui`, commits, resumes the world. `LevelContext`: renderer,
+  canvas, ui (overlay root), audio, learning {stats, sessionNo, planSession(pool, length),
+  record(outcome), rng}, input.createInteraction(camera), defineStrings, announce, disposer,
+  reducedMotion, exit({completed}). Errors in load/start/update give the world back.
+- Registry: definitions are EAGER (`import.meta.glob(..., {eager: true, import: 'default'})`), not
+  `eager:false` as sketched: a gate must know whether its level exists before anyone walks up to
+  it. `index.ts` must import only types and use `load: () => import('./<id>-scene')` (verified the
+  scene lands in its own chunk). Registration refuses a definition whose id/folder, region or
+  `requires` disagree with `LEVEL_GATES` (single source for gate placement + requirement).
+- Commit: `levelRunToCommit` (recorder.finish + one-time +50 XP/+10 coins on the first completion,
+  same constant as the frozen bridge quest) -> `progress-sync.commitLevelRun` (same write queue,
+  after pending quiz answers). Round rewards are `scoring.ts` via the recorder; bridge quiz untouched.
+  Leaving before any answer commits nothing; an abandoned run keeps its answers, no level entry.
+- World: `suspend()/resume()` (the plan's pause/resume; `paused` already names the dialog/map
+  freeze), `registerInteractable({id, position, radius, priority?, label(), onInteract})` returns
+  its unregister; `nearestInteractable()` = nearest strictly in reach, ties within 0.25 go to the
+  lower priority (VLM 0). VLM registers with the recovered 3.1 reach, so its prompt and parity are
+  unchanged; the interact button keeps VLM's recovered markup and shows other labels otherwise.
+- Gates: meadow (29, -14.5) and forest (37.2, 13.4), both facing the default camera; built after
+  the scatter pass (obstacle circles appended, no RNG shift), ~9 meshes each, not merged. Statuses:
+  locked (requirement unmet) > coming-soon (level not registered) > open > completed (stars on the
+  label). City/Tower: `COMING_SOON_REGIONS` (kept out of `REGIONS`, which is golden-tested) ->
+  "Sắp ra mắt" badge on their world label and in the map list/detail; gate regions show
+  "Cổng màn chơi: <state>" in the map detail. Map canvas rendering untouched.
+- Keyboard: world keys, M, Esc and the blur->settings quirk are ignored while a level runs.
+- Test hook `window.__game` (test builds only, dynamic import behind `MODE === 'test'`; prod
+  bundle grep-clean): seedProgress, teleport, teleportToGate, gateStatus, levelRunning, snapshot,
+  memory (renderer.info.memory for 14's leak check).
+- Verification without a shipped level: unit tests drive the host with a real three.js scene
+  (disposal counted per geometry, 10 enter/exit cycles, load/start/update failures). A manual
+  browser smoke with an uncommitted scratch level confirmed: code-split chunk, HUD/top bar hidden,
+  M/E ignored, geometries 272 -> 277 in level -> 272 after exit and after 10 more cycles, commit
+  xp 60 / coins 15 / 3 stars / completedAt, gate -> completed, forest -> coming-soon.
+- Deferred to 14: e2e enter/exit + renderer.info leak check on the real field level (no stub level
+  is shipped; `__game.memory()` is ready for it). 14/15 must update `level-gate.spec.ts`, whose
+  "Sắp ra mắt" expectations hold only while the levels are absent.
