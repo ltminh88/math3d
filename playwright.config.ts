@@ -1,6 +1,9 @@
 import { defineConfig, devices } from '@playwright/test';
 
 // SwiftShader keeps WebGL available in headless CI; e2e asserts state, not pixels.
+// E2E_PORT lets parallel worktrees run e2e side by side without reusing each other's server.
+const port = Number(process.env.E2E_PORT ?? 4173);
+const baseURL = `http://localhost:${port}`;
 const webglArgs = ['--use-gl=angle', '--use-angle=swiftshader', '--enable-unsafe-swiftshader'];
 
 export default defineConfig({
@@ -10,7 +13,7 @@ export default defineConfig({
   retries: process.env.CI ? 1 : 0,
   reporter: process.env.CI ? 'github' : 'list',
   use: {
-    baseURL: 'http://localhost:4173',
+    baseURL,
     trace: 'retain-on-failure',
     launchOptions: { args: webglArgs },
   },
@@ -25,8 +28,8 @@ export default defineConfig({
     },
   ],
   webServer: {
-    command: 'npm run build:test && npm run preview -- --port 4173 --strictPort',
-    url: 'http://localhost:4173',
+    command: `npm run build:test && npm run preview -- --port ${port} --strictPort`,
+    url: baseURL,
     reuseExistingServer: !process.env.CI,
     timeout: 120_000,
   },
