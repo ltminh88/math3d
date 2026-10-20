@@ -5,7 +5,8 @@
     "liveVsLive": "capture-live-baselines.mjs --verify (fresh capture vs committed live baselines)",
     "liveVsOracle": "capture-live-baselines.mjs --origin oracle (recovered/original served locally + window.__parity)",
     "localVsLive": "capture-live-baselines.mjs --origin local / npm run test:parity (dist/ served under the live origin + window.__parity), 2026-10-19: canvas, shot JSON, traces and oracle scene dumps exact in every run",
-    "localVsLocalR186": "phase 10 (three 0.186.1, retuned lighting): npm run parity:baselines, then capture-live-baselines.mjs --origin local + npm run test:parity, 2026-10-19: canvas PNGs, shot JSON, traces and scene dumps exact; DOM noise only on shots already listed, all within their existing tolerance/ceiling (none widened)"
+    "localVsLocalR186": "phase 10 (three 0.186.1, retuned lighting): npm run parity:baselines, then capture-live-baselines.mjs --origin local + npm run test:parity, 2026-10-19: canvas PNGs, shot JSON, traces and scene dumps exact; DOM noise only on shots already listed, all within their existing tolerance/ceiling (none widened)",
+    "localVsLocalPhase12": "phase 12 (IndexedDB store, learning quiz, save-code buttons): npm run parity:baselines, then npm run test:parity: canvas PNGs, shot JSON, traces and scene dumps exact; one new DOM-noise shot (mobile milo-dialog, 2 px)"
   },
   "policy": {
     "canvasPng": 0,
@@ -29,7 +30,8 @@
     "desktop-chromium/bridge-0--play.dom.png": "20 px on an off-edge world label, same as bridge-6 (local run 2026-10-19).",
     "desktop-chromium/playthrough--near-milo.dom.png": "3 px on the #interact prompt glass (backdrop-filter), as on mobile-pixel; local-vs-local after the math3d rename, shot JSON byte-exact.",
     "desktop-chromium/playthrough--bridge-built.dom.png": "1 px in 1 of 2 local-vs-local runs after the math3d rename (cause not isolated); shot JSON byte-exact. r186 verify: 1 px again (structural gate).",
-    "desktop-chromium/bridge-3--play.dom.png": "off-edge world label, same as bridge-0/bridge-6: 20 px in 2 of 3 local CLI runs, 226 px (0.025%) in a full suite run 2026-10-19; live --verify 0; shot JSON byte-exact."
+    "desktop-chromium/bridge-3--play.dom.png": "off-edge world label, same as bridge-0/bridge-6: 20 px in 2 of 3 local CLI runs, 226 px (0.025%) in a full suite run 2026-10-19; live --verify 0; shot JSON byte-exact.",
+    "mobile-pixel/playthrough--milo-dialog.dom.png": "2 px, dialog pop keyframe on a composited layer (phase 12 local full run, 1 of 6 runs); shot JSON byte-exact."
   },
   "recommendation": "Keep pixel gating for canvas shots (exact) and for DOM shots at tolerance 0. For the listed shots, do not raise global tolerance: either mask the off-screen world labels (#tower-label, #city-label when their translate x exceeds the viewport) in DOM shots, or gate them structurally via the shot JSON (html + cssHash + gl calls/triangles are exact) and the oracle scene JSON. Structural gating is preferred because it is exact and catches label text/position regressions that a mask would hide.",
   "shots": {
@@ -183,6 +185,13 @@
           "ratio": 0.015003
         },
         "structuralCeiling": 0.035
+      },
+      "playthrough--milo-dialog.dom.png": {
+        "localVsLocalPhase12": {
+          "diffPixels": 2,
+          "ratio": 5.8e-6
+        },
+        "tolerance": 0.0001
       }
     }
   },

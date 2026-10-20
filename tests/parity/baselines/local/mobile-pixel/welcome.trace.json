@@ -2,8 +2,8 @@
  "storageWrites": [
   [
    "set",
-   "aigame3d_quest_collapsed",
-   "1"
+   "math3d.settings",
+   "{\"lang\":\"vi\",\"sound\":true,\"volume\":0.8,\"readAloud\":true,\"reducedMotion\":false,\"qualityTier\":\"auto\",\"music\":false,\"questCollapsed\":true}"
   ]
  ],
  "audio": [],
