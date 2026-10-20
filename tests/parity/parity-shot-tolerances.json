@@ -31,7 +31,8 @@
     "desktop-chromium/playthrough--near-milo.dom.png": "3 px on the #interact prompt glass (backdrop-filter), as on mobile-pixel; local-vs-local after the math3d rename, shot JSON byte-exact.",
     "desktop-chromium/playthrough--bridge-built.dom.png": "1 px in 1 of 2 local-vs-local runs after the math3d rename (cause not isolated); shot JSON byte-exact. r186 verify: 1 px again (structural gate).",
     "desktop-chromium/bridge-3--play.dom.png": "off-edge world label, same as bridge-0/bridge-6: 20 px in 2 of 3 local CLI runs, 226 px (0.025%) in a full suite run 2026-10-19; live --verify 0; shot JSON byte-exact.",
-    "mobile-pixel/playthrough--milo-dialog.dom.png": "2 px, dialog pop keyframe on a composited layer (phase 12 local full run, 1 of 6 runs); shot JSON byte-exact."
+    "mobile-pixel/playthrough--milo-dialog.dom.png": "2 px, dialog pop keyframe on a composited layer (phase 12 local full run, 1 of 6 runs); shot JSON byte-exact.",
+    "mobile-pixel/playthrough--quiz-correct.dom.png": "floating '+10 XP' reward text mid-animation: 39 px sub-pixel shift under machine load (fails 3/3 on fab59f8 and on 58db29b, capture tool reproduces baseline exactly); shot JSON byte-exact. Same class as quiz-correct-3/6."
   },
   "recommendation": "Keep pixel gating for canvas shots (exact) and for DOM shots at tolerance 0. For the listed shots, do not raise global tolerance: either mask the off-screen world labels (#tower-label, #city-label when their translate x exceeds the viewport) in DOM shots, or gate them structurally via the shot JSON (html + cssHash + gl calls/triangles are exact) and the oracle scene JSON. Structural gating is preferred because it is exact and catches label text/position regressions that a mask would hide.",
   "shots": {
@@ -192,6 +193,11 @@
           "ratio": 5.8e-6
         },
         "tolerance": 0.0001
+      },
+      "playthrough--quiz-correct.dom.png": {
+        "localVsLocalPhase12": {
+          "diffPixels": 39
+        }
       }
     }
   },
