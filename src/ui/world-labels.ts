@@ -59,7 +59,7 @@ export function updateCurrentArea(): void {
     world.active &&
     region.id !== 'village' &&
     region.id !== 'garden' &&
-    isRegionUnlocked(region, gameState.save.questComplete)
+    isRegionUnlocked(region, gameState.progress.questComplete)
   ) {
     showToast(
       getLegacyLanguage() === 'vi'

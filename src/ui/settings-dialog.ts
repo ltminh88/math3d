@@ -1,29 +1,34 @@
-// Settings dialog (sound/music switches, progress summary, save, menu, reset) and the reset
-// confirmation. Also wires the top-bar sound button and the jump/zoom buttons.
-import { defaultSave } from '../save/save-storage';
+// Settings dialog (sound/music switches, progress summary, save, save-code export, menu, reset)
+// and the reset confirmation. Also wires the top-bar sound button and the jump/zoom buttons.
+// Sound and music live in the app settings store; progress in the game store.
+import { appSettings } from '../store/app-settings';
+import { emptyProgressRecords } from '../store/profile-replacement';
 import { openDialog } from './dialog';
-import { gameState, getWorld } from './game-state';
+import { defaultProgressView, gameState, getWorld } from './game-state';
 import { refreshHud } from './hud';
 import { byId, icon } from './icons';
 import { returnToMenu } from './menu-language-start';
-import { persistSave, showToast } from './toast-and-persist';
+import { connectedStore, factCountsView, flushProgress, replaceAllProgress } from './progress-sync';
+import { openSaveCodeExport } from './save-code-dialog';
+import { ts } from './save-code-strings';
+import { showToast } from './toast-and-persist';
 
 function settingsBodyHtml(): string {
-  const save = gameState.save;
-  const stats = Object.values(save.questionStats);
+  const { sound, music } = appSettings.get();
+  const stats = Object.values(factCountsView());
   const attempts = stats.reduce((sum, stat) => sum + stat.attempts, 0);
   const correct = stats.reduce((sum, stat) => sum + stat.correct, 0);
-  return `<div class="settings-row"><span>Hiệu ứng âm thanh</span><button id="toggle-sound" class="switch" role="switch" aria-checked="${save.sound}" aria-label="Hiệu ứng âm thanh"><i></i></button></div><div class="settings-row"><span>Nhạc nền nhẹ nhàng</span><button id="toggle-music" class="switch" role="switch" aria-checked="${save.music}" aria-label="Nhạc nền"><i></i></button></div><div class="progress-summary"><span><strong>${save.xp}</strong>XP tích lũy</span><span><strong>${attempts}</strong>Lượt trả lời</span><span><strong>${attempts ? Math.round((correct / attempts) * 100) : 0}%</strong>Trả lời đúng</span></div><p class="book-note">Tiến trình tự lưu trên trình duyệt này, không cần tài khoản. Xóa dữ liệu trình duyệt sẽ xóa tiến trình.</p><button id="save-now" class="secondary wide">${icon('save')} Lưu tiến trình</button><button id="return-menu" class="text-button centered">Về màn hình chính</button><button id="reset-progress" class="text-button danger centered">${icon('reset')} Chơi lại từ đầu</button>`;
+  return `<div class="settings-row"><span>Hiệu ứng âm thanh</span><button id="toggle-sound" class="switch" role="switch" aria-checked="${sound}" aria-label="Hiệu ứng âm thanh"><i></i></button></div><div class="settings-row"><span>Nhạc nền nhẹ nhàng</span><button id="toggle-music" class="switch" role="switch" aria-checked="${music}" aria-label="Nhạc nền"><i></i></button></div><div class="progress-summary"><span><strong>${gameState.progress.xp}</strong>XP tích lũy</span><span><strong>${attempts}</strong>Lượt trả lời</span><span><strong>${attempts ? Math.round((correct / attempts) * 100) : 0}%</strong>Trả lời đúng</span></div><p class="book-note">Tiến trình tự lưu trên trình duyệt này, không cần tài khoản. Xóa dữ liệu trình duyệt sẽ xóa tiến trình.</p><button id="save-now" class="secondary wide">${icon('save')} Lưu tiến trình</button><button id="export-save-code" class="secondary wide">${icon('save')} ${ts('exportButton')}</button><button id="return-menu" class="text-button centered">Về màn hình chính</button><button id="reset-progress" class="text-button danger centered">${icon('reset')} Chơi lại từ đầu</button>`;
 }
 
-/** Wipes progress: fresh save, bridge reset, player back at the start, back to the menu. */
+/** Wipes progress: fresh profile, bridge reset, player back at the start, back to the menu. */
 function confirmReset(): void {
-  gameState.save = defaultSave();
-  persistSave();
+  gameState.progress = defaultProgressView();
+  void replaceAllProgress(emptyProgressRecords());
   const world = getWorld();
   world.setBridge(0);
   world.player.position.set(-6, 0, 6);
-  world.setAvatar(gameState.save.avatar);
+  world.setAvatar(gameState.progress.avatar);
   world.resetCamera();
   returnToMenu();
   showToast('Một hành trình mới đang chờ bạn!');
@@ -45,24 +50,25 @@ export function openSettings(): void {
   const audio = gameState.audio;
   byId('toggle-sound').onclick = () => {
     audio.unlock();
-    gameState.save.sound = !gameState.save.sound;
-    audio.enabled = gameState.save.sound;
-    persistSave();
+    audio.enabled = appSettings.update({ sound: !appSettings.get().sound }).sound;
     refreshHud();
     openSettings();
   };
   byId('toggle-music').onclick = () => {
     audio.unlock();
-    gameState.save.music = !gameState.save.music;
-    audio.music(gameState.save.music);
-    persistSave();
+    audio.music(appSettings.update({ music: !appSettings.get().music }).music);
     openSettings();
   };
   byId('save-now').onclick = () => {
-    if (persistSave()) {
-      showToast('Đã lưu hành trình của bạn trên thiết bị này.');
-    }
+    void flushProgress().then((ok) => {
+      if (ok && connectedStore()?.persistent) {
+        showToast('Đã lưu hành trình của bạn trên thiết bị này.');
+      } else if (ok) {
+        showToast(ts('notPersistent'));
+      }
+    });
   };
+  byId('export-save-code').onclick = () => void openSaveCodeExport();
   byId('return-menu').onclick = returnToMenu;
   byId('reset-progress').onclick = openResetConfirm;
 }
@@ -71,9 +77,8 @@ export function wireSettingsAndToolbar(): void {
   byId('settings').onclick = openSettings;
   byId('sound').onclick = () => {
     gameState.audio.unlock();
-    gameState.save.sound = !gameState.save.sound;
+    appSettings.update({ sound: !appSettings.get().sound });
     refreshHud();
-    persistSave();
   };
   byId('jump').onclick = () => getWorld().jump();
   byId('zoom-in').onclick = () => getWorld().zoom(-8);

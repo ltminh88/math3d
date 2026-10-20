@@ -1,20 +1,23 @@
 // Multiplication book (tables ×2–×10 with ✓ for facts answered right) and the how-to-play dialog.
 import { TABLES } from '../config/world-constants';
+import { mulKey } from '../learning/fact-key';
 import { closeDialog, openDialog } from './dialog';
 import { gameState } from './game-state';
 import { byId, icon } from './icons';
+import { factCountsView, saveGameMeta } from './progress-sync';
 import { openQuiz } from './quiz-dialog';
-import { persistSave } from './toast-and-persist';
 
 function bookGridHtml(table: number): string {
+  const counts = factCountsView();
   return Array.from({ length: 10 }, (_, t) => {
-    const stat = gameState.save.questionStats[`m${table}_${t + 1}`];
+    // Facts are pooled: answering 7 × 3 also checks 3 × 7.
+    const stat = counts[mulKey(table, t + 1)];
     return `<div class="${stat?.correct ? 'known' : ''}"><span>${table} × ${t + 1}</span><b>= ${table * (t + 1)}</b><small>${stat?.correct ? '✓' : ''}</small></div>`;
   }).join('');
 }
 
 /** Opens the book on `table` (default: the saved table, or ×2 when "all tables" is saved). */
-export function openBook(table = gameState.save.table || 2): void {
+export function openBook(table = gameState.progress.table || 2): void {
   openDialog(
     'Sổ cửu chương',
     `<div class="dialog-eyebrow">HỌC TỪNG CHÚT, NHỚ THẬT LÂU</div><div class="table-tabs" role="group" aria-label="Chọn bảng cửu chương">${TABLES.map((t) => `<button data-table="${t}" aria-pressed="${t === table}">×${t}</button>`).join('')}</div><div class="multiplication-grid">${bookGridHtml(table)}</div><p class="book-note">Dấu ✓ là phép nhân bạn đã trả lời đúng. Mình luyện thêm nhé?</p><button id="practice-table" class="primary wide">Luyện bảng ×${table} ${icon('arrow')}</button><button id="practice-all" class="text-button centered">Trộn các bảng ×2 – ×10</button>`,
@@ -24,13 +27,13 @@ export function openBook(table = gameState.save.table || 2): void {
     tab.onclick = () => openBook(Number(tab.dataset.table));
   }
   byId('practice-table').onclick = () => {
-    gameState.save.table = table;
-    persistSave();
+    gameState.progress.table = table;
+    void saveGameMeta({ table });
     openQuiz('practice');
   };
   byId('practice-all').onclick = () => {
-    gameState.save.table = 0;
-    persistSave();
+    gameState.progress.table = 0;
+    void saveGameMeta({ table: 0 });
     openQuiz('practice');
   };
 }

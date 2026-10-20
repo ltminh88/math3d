@@ -3,6 +3,7 @@
 import { REGIONS, type Region } from '../config/regions';
 import { getLegacyLanguage } from '../i18n/legacy-translator';
 import { icon } from './icons';
+import { ts } from './save-code-strings';
 
 /** Regions with a floating world label (all but the starting village). */
 export const LABELED_REGIONS: readonly Region[] = REGIONS.filter((r) => r.id !== 'village');
@@ -25,6 +26,7 @@ export const gameShellHtml = (): string => `
       <div class="avatar-options" role="group" aria-label="Chọn nhân vật"><button id="boy" class="avatar-option" aria-pressed="true"><span>👦</span>Nhà thám hiểm</button><button id="girl" class="avatar-option" aria-pressed="false"><span>👧</span>Nhà khám phá</button></div>
       <button id="play" class="primary play-button">Bắt đầu phiêu lưu ${icon('arrow')}</button>
       <button id="learn-welcome" class="text-button">${icon('book')} Khám phá bảng cửu chương</button>
+      <button id="import-save-code" class="text-button">${icon('save')} ${ts('importButton')}</button>
       <div class="welcome-notes"><span>✦ Học qua những chuyến đi</span><span>Không giới hạn thời gian</span></div>
     </section>
     <div id="world-caption" class="world-caption"><span>0${(REGIONS.at(-1) as Region).world}</span><div>Vương Quốc Cửu Chương<small>${REGIONS.length} vùng đất · Bảng ×2 – ×10</small></div></div>

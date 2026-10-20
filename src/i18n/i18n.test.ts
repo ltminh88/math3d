@@ -1,4 +1,5 @@
 import { afterEach, describe, expect, it, vi } from 'vitest';
+import { createSettingsStore, SETTINGS_STORAGE_KEY } from '../store/settings-store';
 import {
   defineStrings,
   detectLanguage,
@@ -67,24 +68,29 @@ describe('language detection', () => {
   });
 });
 
-describe('setLanguage / initLanguage', () => {
-  it('updates <html lang>, persists, and notifies listeners', () => {
+describe('setLanguage / initLanguage (one settings source)', () => {
+  it('updates <html lang>, persists in the settings store, and notifies listeners', () => {
     const doc = { documentElement: { lang: '' } };
     const storage = memoryStorage();
+    const settings = createSettingsStore(storage);
     const seen: string[] = [];
     const off = onLanguageChange((l) => seen.push(l));
-    setLanguage('en', doc, storage);
+    setLanguage('en', doc, settings);
     off();
-    setLanguage('vi', doc, storage);
+    expect(JSON.parse(storage.data.get(SETTINGS_STORAGE_KEY) ?? '{}').lang).toBe('en');
+    setLanguage('vi', doc, settings);
     expect(doc.documentElement.lang).toBe('vi');
-    expect(storage.data.get('nsq.language')).toBe('vi');
+    expect(settings.get().lang).toBe('vi');
     expect(seen).toEqual(['en']);
   });
 
-  it('initLanguage reads storage first', () => {
+  it('initLanguage applies the stored setting without writing', () => {
     const doc = { documentElement: { lang: '' } };
-    expect(initLanguage(doc, memoryStorage({ 'nsq.language': 'en' }), 'vi-VN')).toBe('en');
+    const storage = memoryStorage({ [SETTINGS_STORAGE_KEY]: JSON.stringify({ lang: 'en' }) });
+    expect(initLanguage(doc, createSettingsStore(storage))).toBe('en');
     expect(doc.documentElement.lang).toBe('en');
+    expect(tt('hello', { name: 'Kid' })).toBe('Hello Kid');
+    expect(storage.data.size).toBe(1);
   });
 
   it('survives a throwing storage', () => {
@@ -96,7 +102,9 @@ describe('setLanguage / initLanguage', () => {
         throw new Error('blocked');
       },
     };
-    expect(initLanguage(undefined, broken, 'en-US')).toBe('en');
-    expect(() => setLanguage('vi', undefined, broken)).not.toThrow();
+    const settings = createSettingsStore(broken);
+    expect(initLanguage(undefined, settings)).toBe('vi');
+    expect(() => setLanguage('en', undefined, settings)).not.toThrow();
+    expect(settings.get().lang).toBe('en');
   });
 });

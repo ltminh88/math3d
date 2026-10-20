@@ -1,5 +1,6 @@
-// v1 save: defaults, defensive parsing and localStorage persistence (recovered verbatim).
-import { BRIDGE_SEGMENTS, SAVE_KEY, TABLES } from '../config/world-constants';
+// v1 save: defaults and defensive parsing (recovered verbatim). Since phase 12 the game never
+// writes this format to localStorage again; it is only read for migration and save codes.
+import { BRIDGE_SEGMENTS, TABLES } from '../config/world-constants';
 import { type SaveV1, STAT_KEY_PATTERN } from './save-types';
 
 /** Upper bound of the parsed questionStats / review lists (original quirk; migration lifts it). */
@@ -105,24 +106,5 @@ export function decodeSaveV1(
     return save;
   } catch {
     return null;
-  }
-}
-
-/** Reads the save from localStorage; storage errors fall back to defaults. */
-export function loadSave(): SaveV1 {
-  try {
-    return parseSave(localStorage.getItem(SAVE_KEY));
-  } catch {
-    return defaultSave();
-  }
-}
-
-/** Writes the save; returns false when storage is unavailable or full. */
-export function writeSave(save: SaveV1): boolean {
-  try {
-    localStorage.setItem(SAVE_KEY, JSON.stringify(save));
-    return true;
-  } catch {
-    return false;
   }
 }

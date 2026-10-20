@@ -1,5 +1,7 @@
-// Game bootstrap: renders the shell, wires every control in the original order, then builds the
-// 3D world. Without WebGL the loading card turns into a "could not open the 3D world" notice.
+// Game bootstrap: renders the shell, wires every control in the original order, builds the 3D
+// world (synchronously, as the original: world text signs and Math.random order depend on it),
+// then opens the store and hydrates progress (store-boot.ts hides the loading card). Without
+// WebGL the loading card turns into a "could not open the 3D world" notice.
 import { translateDomTree } from '../i18n/legacy-translator';
 import { World } from '../world/world';
 import type { WorldPublicApi } from '../world/world-public-api';
@@ -14,6 +16,7 @@ import { wireKeyboardAndJoystick } from './keyboard-joystick';
 import { wireMapOverlay } from './map-overlay';
 import { wireMenu } from './menu-language-start';
 import { wireSettingsAndToolbar } from './settings-dialog';
+import { bootStore } from './store-boot';
 import { onWorldFrame } from './world-frame-hook';
 
 const WORLD_FAILED_HTML =
@@ -45,12 +48,11 @@ function startWorld(): void {
     if (import.meta.env.MODE === 'test') {
       window.__parity = world;
     }
-    world.setBridge(gameState.save.bridge);
-    world.setAvatar(gameState.save.avatar);
+    world.setBridge(gameState.progress.bridge);
+    world.setAvatar(gameState.progress.avatar);
     world.onJump = () => gameState.audio.jump();
     world.onSceneClick = () => talkToGuide();
     world.onFrame = onWorldFrame;
-    byId('loading').hidden = true;
     refreshHud();
   } catch (error) {
     byId('loading').innerHTML = WORLD_FAILED_HTML;
@@ -59,10 +61,11 @@ function startWorld(): void {
 }
 
 /** Builds the whole game into `#app`. Call once, after the stylesheet is imported. */
-export function bootstrapGame(): void {
+export function bootstrapGame(): Promise<void> {
   const app = byId('app');
   app.innerHTML = gameShellHtml();
   translateDomTree(app);
   wireControls();
   startWorld();
+  return bootStore();
 }

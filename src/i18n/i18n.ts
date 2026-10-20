@@ -1,11 +1,13 @@
 // Tiny namespaced i18n. Each module registers its own strings with defineStrings(ns, {vi, en}),
 // so no shared locale file ever becomes a merge hotspot. `vi` is the source of truth; `en` must
-// carry exactly the same keys (enforced by the type of defineStrings).
+// carry exactly the same keys (enforced by the type of defineStrings). The language is the one
+// in the app settings store (shared with the legacy translator).
+import { appSettings } from '../store/app-settings';
+import type { SettingsStore } from '../store/settings-store';
 
 export type Language = 'vi' | 'en';
 export const LANGUAGES: readonly Language[] = ['vi', 'en'];
 export const DEFAULT_LANGUAGE: Language = 'vi';
-const STORAGE_KEY = 'nsq.language';
 
 export type Params = Record<string, string | number>;
 
@@ -18,14 +20,10 @@ export interface StringTable<V extends Record<string, string>> {
 export interface LangTarget {
   documentElement: { lang: string };
 }
-export interface KeyValueStorage {
-  getItem(key: string): string | null;
-  setItem(key: string, value: string): void;
-}
 
 const registry = new Map<string, StringTable<Record<string, string>>>();
 const listeners = new Set<(lang: Language) => void>();
-let current: Language = DEFAULT_LANGUAGE;
+let current: Language = appSettings.get().lang;
 
 function isLanguage(value: unknown): value is Language {
   return value === 'vi' || value === 'en';
@@ -80,14 +78,15 @@ export function getLanguage(): Language {
   return current;
 }
 
-export function setLanguage(lang: Language, target?: LangTarget, storage?: KeyValueStorage): void {
+/** Applies and persists the language in `settings` (default: the app settings store). */
+export function setLanguage(
+  lang: Language,
+  target?: LangTarget,
+  settings: SettingsStore = appSettings,
+): void {
   current = lang;
   if (target) target.documentElement.lang = lang;
-  try {
-    storage?.setItem(STORAGE_KEY, lang);
-  } catch {
-    // Storage can be blocked (private mode); the language still applies for this session.
-  }
+  settings.update({ lang });
   for (const listener of listeners) listener(lang);
 }
 
@@ -96,19 +95,9 @@ export function onLanguageChange(listener: (lang: Language) => void): () => void
   return () => listeners.delete(listener);
 }
 
-/** Resolve and apply the starting language from storage + navigator. */
-export function initLanguage(
-  target?: LangTarget,
-  storage?: KeyValueStorage,
-  navigatorLanguage?: string,
-): Language {
-  let stored: string | null = null;
-  try {
-    stored = storage?.getItem(STORAGE_KEY) ?? null;
-  } catch {
-    stored = null;
-  }
-  const lang = detectLanguage(stored, navigatorLanguage);
-  setLanguage(lang, target);
-  return lang;
+/** Applies the stored language from `settings` to `target` (no write). */
+export function initLanguage(target?: LangTarget, settings: SettingsStore = appSettings): Language {
+  current = settings.get().lang;
+  if (target) target.documentElement.lang = current;
+  return current;
 }

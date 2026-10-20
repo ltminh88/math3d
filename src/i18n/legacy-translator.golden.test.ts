@@ -55,6 +55,14 @@ describe('legacy translator vs original golden corpus (after the math3d/VLM rena
     expect(mismatches).toEqual([]);
   });
 
+  it('a stored math3d.settings language wins over the legacy key', async () => {
+    const storage = fakeStorage({
+      aigame3d_language: 'en',
+      'math3d.settings': JSON.stringify({ lang: 'vi' }),
+    });
+    expect((await loadTranslator(storage)).getLegacyLanguage()).toBe('vi');
+  });
+
   it('is the identity in vi (default, unknown value, or storage failure)', async () => {
     const throwing = {
       getItem: () => {
@@ -71,11 +79,12 @@ describe('legacy translator vs original golden corpus (after the math3d/VLM rena
     }
   });
 
-  it('persists the language without reloading the current state', async () => {
-    const storage = fakeStorage({});
+  it('persists the language in math3d.settings, never in the legacy key', async () => {
+    const storage = fakeStorage({ aigame3d_language: 'vi' });
     const t = await loadTranslator(storage);
     t.setLegacyLanguage('en');
-    expect(storage.data.get('aigame3d_language')).toBe('en');
+    expect(JSON.parse(storage.data.get('math3d.settings') ?? '{}').lang).toBe('en');
+    expect(storage.data.get('aigame3d_language')).toBe('vi');
     expect(t.getLegacyLanguage()).toBe('en');
     expect(t.translateText('Đóng')).toBe('Close');
   });

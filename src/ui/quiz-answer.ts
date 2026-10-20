@@ -1,16 +1,23 @@
-// Quiz answer handling: stats, rewards (+10 XP, +5 coins, bridge segment), feedback, the hint
-// ladder (0..3; a wrong answer also climbs one rung) and the floating reward pop.
+// Quiz answer handling: rewards (+10 XP, +5 coins, bridge segment; frozen, see quiz-rewards.ts),
+// combo, feedback, the hint ladder (0..3; a wrong answer also climbs one rung) and the floating
+// reward pop. Each finished question goes to the Leitner recorder (progress-sync.ts).
 import { Vector3 } from 'three';
 import { BRIDGE_SEGMENTS } from '../config/world-constants';
 import { levelForXp } from '../game/xp-levels';
 import { translateLongText, translateText } from '../i18n/legacy-translator';
-import { applyAnswerStats, isCorrect } from '../quiz/answer-stats';
 import { hintText } from '../quiz/hint-text';
 import type { Question } from '../quiz/question-types';
+import {
+  BRIDGE_SEGMENTS_PER_CORRECT,
+  COMBO_SHOWN_FROM,
+  CORRECT_ANSWER_REWARD,
+  NO_REWARD,
+} from '../quiz/quiz-rewards';
 import { gameState, getWorld } from './game-state';
 import { refreshHud } from './hud';
 import { byId, icon } from './icons';
-import { bump, persistSave, showToast } from './toast-and-persist';
+import { flushProgress, recordQuizQuestion } from './progress-sync';
+import { bump, showToast } from './toast-and-persist';
 
 /** Shows the hint text for the current rung plus the a×b stone groups. */
 export function renderHint(): void {
@@ -37,23 +44,20 @@ function showRewardPop(button: HTMLElement): void {
 
 function nextButtonLabel(): string {
   const bridgeMode = gameState.quizMode === 'bridge';
-  if (bridgeMode && gameState.save.bridge === BRIDGE_SEGMENTS) return 'Khám phá bên kia cầu!';
+  if (bridgeMode && gameState.progress.bridge === BRIDGE_SEGMENTS) return 'Khám phá bên kia cầu!';
   return bridgeMode ? 'Xây đoạn cầu tiếp theo' : 'Thử thêm một câu';
 }
 
 function onCorrect(question: Question, button: HTMLButtonElement): void {
-  const save = gameState.save;
+  const progress = gameState.progress;
   const world = getWorld();
   gameState.answered = true;
-  if (gameState.hintLevel === 0) {
-    save.review = save.review.filter((id) => id !== question.id);
-  }
-  const levelBefore = levelForXp(save.xp);
-  save.xp += 10;
-  save.coins += 5;
+  const levelBefore = levelForXp(progress.xp);
+  progress.xp += CORRECT_ANSWER_REWARD.xp;
+  progress.coins += CORRECT_ANSWER_REWARD.coins;
   if (gameState.quizMode === 'bridge') {
-    save.bridge = Math.min(BRIDGE_SEGMENTS, save.bridge + 1);
-    world.setBridge(save.bridge, true);
+    progress.bridge = Math.min(BRIDGE_SEGMENTS, progress.bridge + BRIDGE_SEGMENTS_PER_CORRECT);
+    world.setBridge(progress.bridge, true);
   }
   for (const answer of document.querySelectorAll<HTMLButtonElement>('.answer')) {
     answer.disabled = true;
@@ -62,7 +66,7 @@ function onCorrect(question: Question, button: HTMLButtonElement): void {
   showRewardPop(button);
   byId('feedback').className = 'feedback success';
   byId('feedback').textContent = translateLongText(
-    `✓ Chính xác! ${question.a} × ${question.b} = ${question.answer}. +10 XP · +5 xu${save.combo >= 3 ? ` · Combo ${save.combo}!` : ''}`,
+    `✓ Chính xác! ${question.a} × ${question.b} = ${question.answer}. +10 XP · +5 xu${progress.combo >= COMBO_SHOWN_FROM ? ` · Combo ${progress.combo}!` : ''}`,
   );
   byId('next-question').hidden = false;
   byId('next-question').innerHTML = translateLongText(`${nextButtonLabel()} ${icon('arrow')}`);
@@ -71,9 +75,9 @@ function onCorrect(question: Question, button: HTMLButtonElement): void {
   world.burst(world.player.position.clone().add(new Vector3(0, 1, 0)));
   bump('wallet');
   bump('xp-fill');
-  if (levelForXp(save.xp) > levelBefore) {
+  if (levelForXp(progress.xp) > levelBefore) {
     gameState.audio.celebrate();
-    showToast(`Bạn đã đạt cấp ${levelForXp(save.xp)}. Thật tuyệt vời!`);
+    showToast(`Bạn đã đạt cấp ${levelForXp(progress.xp)}. Thật tuyệt vời!`);
   }
   byId('next-question').focus();
 }
@@ -93,19 +97,38 @@ export function answerQuestion(value: number, button: HTMLButtonElement): void {
   const question = gameState.question;
   if (!question || gameState.answered || button.disabled) return;
   gameState.audio.unlock();
-  const correct = isCorrect(question, value);
-  applyAnswerStats(
-    gameState.save,
-    question,
-    correct,
-    performance.now() - gameState.questionStartedAt,
-  );
+  const correct = value === question.answer;
+  gameState.progress.combo = correct ? gameState.progress.combo + 1 : 0;
   gameState.questionStartedAt = performance.now();
   if (correct) {
     onCorrect(question, button);
+    recordQuizQuestion(questionOutcome(question, true), CORRECT_ANSWER_REWARD);
   } else {
+    gameState.wrongAnswers.push(value);
     onWrong(button);
   }
   refreshHud();
-  persistSave();
+}
+
+function questionOutcome(question: Question, correct: boolean) {
+  return {
+    factKey: question.factKey,
+    ms: performance.now() - gameState.questionShownAt,
+    correct,
+    firstTry: gameState.wrongAnswers.length === 0,
+    usedHint: gameState.hintLevel > 0,
+    wrongAnswers: [...gameState.wrongAnswers],
+  };
+}
+
+/**
+ * Quiz dialog closed: a question left after wrong answers counts as missed (no reward), then the
+ * pending answer batch is committed.
+ */
+export function finishQuizOnClose(): void {
+  const question = gameState.question;
+  if (question && !gameState.answered && gameState.wrongAnswers.length > 0) {
+    recordQuizQuestion(questionOutcome(question, false), NO_REWARD);
+  }
+  void flushProgress();
 }

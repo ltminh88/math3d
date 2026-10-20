@@ -4,7 +4,7 @@ import './styles/game/game-styles-index.css';
 import { bootstrapGame } from './ui/bootstrap-game';
 import { registerProgressTool } from './webmcp/progress-tool';
 
-bootstrapGame();
+void bootstrapGame();
 registerProgressTool();
 
 // Dev-only perf probe; Vite drops the whole branch from production builds.

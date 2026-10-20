@@ -1,5 +1,6 @@
 // Keyboard (WASD/arrows, Space, E, M, Esc, quiz keys 1-3), focus/visibility handling and the
 // touch joystick. Quirk kept: losing window focus while playing opens the settings dialog.
+import { appSettings } from '../store/app-settings';
 import { gameState, getWorld } from './game-state';
 import { talkToGuide } from './guide-dialog';
 import { byId } from './icons';
@@ -57,7 +58,7 @@ function wireFocusAndVisibility(): void {
     if (document.hidden) {
       gameState.audio.music(false);
     } else if (gameState.world?.active) {
-      gameState.audio.music(gameState.save.music);
+      gameState.audio.music(appSettings.get().music);
     }
   });
 }

@@ -1,0 +1,30 @@
+/* Save-code import/export dialog (phase 12). Scoped to its own classes: the recovered
+   stylesheet under game/ stays byte-identical to the original. */
+.save-code-input {
+  display: block;
+  width: 100%;
+  min-height: 7.5em;
+  margin: 12px 0;
+  padding: 12px 14px;
+  border: 1.5px solid var(--line);
+  border-radius: var(--radius-sm);
+  background: var(--paper-2);
+  color: var(--ink);
+  font:
+    600 13px / 1.45 ui-monospace,
+    "SFMono-Regular",
+    Menlo,
+    Consolas,
+    monospace;
+  overflow-wrap: anywhere;
+  resize: vertical;
+}
+
+.save-code-input:focus-visible {
+  outline: 3px solid var(--gold);
+  outline-offset: 2px;
+}
+
+.save-code-error {
+  margin: 0 0 12px;
+}

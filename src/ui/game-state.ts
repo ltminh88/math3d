@@ -1,16 +1,28 @@
 // The UI's single mutable state (formerly ~14 module-level lets in the recovered chunk).
-// `save` is replaced wholesale on reset, so always read `gameState.save`; never alias it.
+// `progress` is the optimistic view of the game store (progress-sync.ts writes every change
+// through and replaces it wholesale on hydrate/reset/import), so always read
+// `gameState.progress`; never alias it.
 import { SynthAudio } from '../audio/synth-audio';
 import type { Question, QuizMode } from '../quiz/question-types';
-import { loadSave } from '../save/save-storage';
-import type { SaveV1 } from '../save/save-types';
+import { defaultSave } from '../save/save-storage';
+import type { ProgressView } from '../store/store-to-save-v1';
 import type { WorldPublicApi } from '../world/world-public-api';
 
 /** Kind of content shown in the shared <dialog>; '' when closed. */
-export type DialogKind = '' | 'milo' | 'quiz' | 'book' | 'help' | 'settings' | 'reset' | 'complete';
+export type DialogKind =
+  | ''
+  | 'milo'
+  | 'quiz'
+  | 'book'
+  | 'help'
+  | 'settings'
+  | 'reset'
+  | 'complete'
+  | 'save-code'
+  | 'notice';
 
 export interface GameState {
-  save: SaveV1;
+  progress: ProgressView;
   readonly audio: SynthAudio;
   /** Undefined until bootstrap builds the world (stays undefined when WebGL fails). */
   world: WorldPublicApi | undefined;
@@ -20,11 +32,15 @@ export interface GameState {
   /** The current question was answered correctly (answers are locked). */
   answered: boolean;
   questionStartedAt: number;
+  /** When the current question was shown (its total time feeds the Leitner box). */
+  questionShownAt: number;
+  /** Wrong answers given to the current question, in order. */
+  wrongAnswers: number[];
   dialogKind: DialogKind;
   toastTimer: number;
   nearMilo: boolean;
   frameCount: number;
-  /** The one-time "storage blocked" toast has been shown. */
+  /** The one-time "progress not saved" toast has been shown. */
   saveFailWarned: boolean;
   /** Region id the player stands in; '' before the first area check. */
   currentRegionId: string;
@@ -32,8 +48,14 @@ export interface GameState {
   selectedRegionId: string | undefined;
 }
 
+export const defaultProgressView = (): ProgressView => {
+  const { xp, coins, bridge, questAccepted, questComplete, avatar, table, combo, started } =
+    defaultSave();
+  return { xp, coins, bridge, questAccepted, questComplete, avatar, table, combo, started };
+};
+
 export const gameState: GameState = {
-  save: loadSave(),
+  progress: defaultProgressView(),
   audio: new SynthAudio(),
   world: undefined,
   question: undefined,
@@ -41,6 +63,8 @@ export const gameState: GameState = {
   hintLevel: 0,
   answered: false,
   questionStartedAt: 0,
+  questionShownAt: 0,
+  wrongAnswers: [],
   dialogKind: '',
   toastTimer: 0,
   nearMilo: false,

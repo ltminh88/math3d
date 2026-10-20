@@ -4,6 +4,7 @@ import { translateLongText } from '../i18n/legacy-translator';
 import { type DialogKind, gameState, getWorld } from './game-state';
 import { byId } from './icons';
 import { closeMap } from './map-overlay';
+import { finishQuizOnClose } from './quiz-answer';
 
 /** Shows `bodyHtml` under a translated `<h2 id="dialog-title">`, closing the map first. */
 export function openDialog(title: string, bodyHtml: string, kind: DialogKind): void {
@@ -29,6 +30,7 @@ export function closeDialog(): void {
 
 export function wireDialog(): void {
   byId('dialog').addEventListener('close', () => {
+    if (gameState.dialogKind === 'quiz') finishQuizOnClose();
     const world = getWorld();
     world.paused = gameState.mapOpen;
     world.clearInput();

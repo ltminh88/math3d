@@ -2,21 +2,22 @@
 // quest completion (+50 XP, +10 coins) when the player crosses the finished bridge.
 import { Vector3 } from 'three';
 import { BRIDGE_SEGMENTS } from '../config/world-constants';
+import { QUEST_COMPLETE_REWARD } from '../quiz/quiz-rewards';
 import { closeDialog, openDialog } from './dialog';
 import { gameState, getWorld } from './game-state';
 import { refreshHud } from './hud';
 import { byId, icon } from './icons';
 import { drawMinimap } from './map-overlay';
-import { persistSave } from './toast-and-persist';
+import { saveQuestComplete } from './progress-sync';
 import { projectWorldLabels, updateCurrentArea } from './world-labels';
 
 function completeQuest(): void {
-  const save = gameState.save;
+  const progress = gameState.progress;
   const world = getWorld();
-  save.questComplete = true;
-  save.xp += 50;
-  save.coins += 10;
-  persistSave();
+  progress.questComplete = true;
+  progress.xp += QUEST_COMPLETE_REWARD.xp;
+  progress.coins += QUEST_COMPLETE_REWARD.coins;
+  void saveQuestComplete();
   refreshHud();
   gameState.audio.celebrate();
   world.burst(world.player.position.clone().add(new Vector3(0, 1, 0)));
@@ -43,12 +44,12 @@ export function onWorldFrame(nearMilo: boolean, crossedBridge: boolean): void {
   if (gameState.frameCount % 6 === 0) {
     drawMinimap();
   }
-  const save = gameState.save;
+  const progress = gameState.progress;
   if (
     world.active &&
     !world.paused &&
-    save.bridge === BRIDGE_SEGMENTS &&
-    !save.questComplete &&
+    progress.bridge === BRIDGE_SEGMENTS &&
+    !progress.questComplete &&
     crossedBridge
   ) {
     completeQuest();

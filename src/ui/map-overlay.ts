@@ -18,8 +18,8 @@ function mapDrawState(labels: boolean, withSelection = labels): MapDrawState {
   return {
     player: { x: position.x, z: position.z, facing: world.player.rotation.y },
     milo: { x: world.milo.position.x, z: world.milo.position.z },
-    bridge: gameState.save.bridge,
-    questComplete: gameState.save.questComplete,
+    bridge: gameState.progress.bridge,
+    questComplete: gameState.progress.questComplete,
     selected: withSelection ? gameState.selectedRegionId : undefined,
     labels,
     translate: translateText,
@@ -56,7 +56,7 @@ function drawOverlayFrame(): void {
 }
 
 function regionButtonHtml(region: (typeof REGIONS)[number]): string {
-  const unlocked = isRegionUnlocked(region, gameState.save.questComplete);
+  const unlocked = isRegionUnlocked(region, gameState.progress.questComplete);
   return `<button class="map-region${unlocked ? '' : ' locked'}" data-region="${region.id}" aria-pressed="${gameState.selectedRegionId === region.id}"><span class="map-region-icon" style="--tint:${region.color}">${unlocked ? region.icon : '🔒'}</span><span><strong>${region.name}</strong><small>${region.subtitle}</small></span>${gameState.currentRegionId === region.id ? '<em>Bạn ở đây</em>' : ''}</button>`;
 }
 
@@ -65,7 +65,7 @@ function renderMapPanel(): void {
   const selected = REGIONS.find((r) => r.id === gameState.selectedRegionId);
   byId('map-detail').innerHTML = selected
     ? translateLongText(
-        `<strong>${selected.icon} ${selected.name}</strong><p>${selected.blurb}</p>${isRegionUnlocked(selected, gameState.save.questComplete) ? '' : `<p class="map-locked">${icon('lock')} Mở khóa khi hoàn thành Cây cầu tình bạn</p>`}`,
+        `<strong>${selected.icon} ${selected.name}</strong><p>${selected.blurb}</p>${isRegionUnlocked(selected, gameState.progress.questComplete) ? '' : `<p class="map-locked">${icon('lock')} Mở khóa khi hoàn thành Cây cầu tình bạn</p>`}`,
       )
     : '';
   for (const button of document.querySelectorAll<HTMLElement>('[data-region]')) {

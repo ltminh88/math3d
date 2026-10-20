@@ -1,25 +1,18 @@
 // VI->EN translator of the recovered UI (original bundle lines 1435-1436, 1624-1673).
 // Source text is Vietnamese; in 'en' the UI rewrites strings/DOM after rendering. Behavior is
-// frozen for parity (decision 8): language switch writes the key and the caller reloads.
+// frozen for parity (decision 8): language switch writes the setting and the caller reloads.
+// Since phase 12 the language lives in the app settings store (first boot reads the original
+// `aigame3d_language` key once; it is never written again).
 // Original names: Zl=LEGACY_LANGUAGE_KEY, lr=currentLanguage, ig=readStoredLanguage,
 // Va=getLegacyLanguage, rg=setLegacyLanguage, Cn=translateText, Ln=translateLongText,
 // Wa=translateDomTree, jl=LEGACY_TRANSLATIONS_EN.
+import { appSettings } from '../store/app-settings';
 import { LEGACY_TRANSLATIONS_EN } from './legacy-translations-en';
 
 export type LegacyLanguage = 'vi' | 'en';
 
-export const LEGACY_LANGUAGE_KEY = 'aigame3d_language';
-
-function readStoredLanguage(): LegacyLanguage {
-  try {
-    return localStorage.getItem(LEGACY_LANGUAGE_KEY) === 'en' ? 'en' : 'vi';
-  } catch {
-    return 'vi';
-  }
-}
-
 // Read once at module evaluation, like the original top-level `let lr = ig()`.
-let currentLanguage: LegacyLanguage = readStoredLanguage();
+let currentLanguage: LegacyLanguage = appSettings.get().lang;
 
 // Longest key first. Array#sort is stable, so equal lengths keep table order — identical to
 // the original, which re-sorted the same entries on every call.
@@ -49,9 +42,7 @@ export function getLegacyLanguage(): LegacyLanguage {
 /** Sets the language and persists it; the caller reloads the page to re-render. */
 export function setLegacyLanguage(language: LegacyLanguage): void {
   currentLanguage = language;
-  try {
-    localStorage.setItem(LEGACY_LANGUAGE_KEY, language);
-  } catch {}
+  appSettings.update({ lang: language });
 }
 
 /** Whole-string lookup; unknown text is returned unchanged. */

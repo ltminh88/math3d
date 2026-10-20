@@ -3,30 +3,33 @@
 
 import { getLegacyLanguage, setLegacyLanguage } from '../i18n/legacy-translator';
 import type { Avatar } from '../save/save-types';
+import { appSettings } from '../store/app-settings';
 import { closeDialog } from './dialog';
 import { gameState, getWorld } from './game-state';
 import { refreshHud } from './hud';
 import { byId } from './icons';
 import { closeMap, drawMinimap } from './map-overlay';
-import { persistSave, showToast } from './toast-and-persist';
+import { saveAvatar, saveGameMeta } from './progress-sync';
+import { openSaveCodeImport } from './save-code-dialog';
+import { showToast } from './toast-and-persist';
 import { updateCurrentArea } from './world-labels';
 
 /** Leaves the menu: starts music, activates the world and shows the HUD. */
 export function startAdventure(): void {
   gameState.audio.unlock();
-  gameState.audio.music(gameState.save.music);
-  gameState.save.started = true;
+  gameState.audio.music(appSettings.get().music);
+  gameState.progress.started = true;
   const world = getWorld();
   world.active = true;
   world.paused = false;
-  world.setAvatar(gameState.save.avatar);
+  world.setAvatar(gameState.progress.avatar);
   byId('welcome').hidden = true;
   byId('hud').hidden = false;
   byId('area-label').hidden = false;
   byId('world-caption').hidden = true;
   byId('menu-footer').hidden = true;
   document.body.classList.add('playing');
-  persistSave();
+  void saveGameMeta({ started: true });
   refreshHud();
   gameState.currentRegionId = '';
   updateCurrentArea();
@@ -59,10 +62,11 @@ export function wireMenu(): void {
   byId('play').onclick = startAdventure;
   for (const avatar of ['boy', 'girl'] as const satisfies readonly Avatar[]) {
     byId(avatar).onclick = () => {
-      gameState.save.avatar = avatar;
+      gameState.progress.avatar = avatar;
       getWorld().setAvatar(avatar);
       refreshHud();
-      persistSave();
+      void saveAvatar(avatar);
     };
   }
+  byId('import-save-code').onclick = () => openSaveCodeImport();
 }
