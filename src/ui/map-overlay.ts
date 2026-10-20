@@ -1,6 +1,14 @@
 // Minimap and full-screen world map overlay: drawing, region list/detail panel, open/close.
-import { isRegionUnlocked, REGIONS } from '../config/regions';
+import {
+  COMING_SOON_REGIONS,
+  isRegionUnlocked,
+  LEVEL_GATES,
+  REGIONS,
+  type Region,
+} from '../config/regions';
 import { translateDomTree, translateLongText, translateText } from '../i18n/legacy-translator';
+import { currentGateStatus, gateStateText } from '../levels/shared/level-gates';
+import { tl } from '../levels/shared/level-host-strings';
 import { drawMap, type MapDrawState } from '../map/map-render';
 import {
   fitWorldMapView,
@@ -55,9 +63,21 @@ function drawOverlayFrame(): void {
   requestAnimationFrame(drawOverlayFrame);
 }
 
-function regionButtonHtml(region: (typeof REGIONS)[number]): string {
+function regionButtonHtml(region: Region): string {
   const unlocked = isRegionUnlocked(region, gameState.progress.questComplete);
-  return `<button class="map-region${unlocked ? '' : ' locked'}" data-region="${region.id}" aria-pressed="${gameState.selectedRegionId === region.id}"><span class="map-region-icon" style="--tint:${region.color}">${unlocked ? region.icon : '🔒'}</span><span><strong>${region.name}</strong><small>${region.subtitle}</small></span>${gameState.currentRegionId === region.id ? '<em>Bạn ở đây</em>' : ''}</button>`;
+  const soon = COMING_SOON_REGIONS.has(region.id) ? comingSoonHtml() : '';
+  return `<button class="map-region${unlocked ? '' : ' locked'}" data-region="${region.id}" aria-pressed="${gameState.selectedRegionId === region.id}"><span class="map-region-icon" style="--tint:${region.color}">${unlocked ? region.icon : '🔒'}</span><span><strong>${region.name}</strong><small>${region.subtitle}</small>${soon}</span>${gameState.currentRegionId === region.id ? '<em>Bạn ở đây</em>' : ''}</button>`;
+}
+
+const comingSoonHtml = (): string => `<em class="coming-soon">${tl('comingSoon')}</em>`;
+
+/** Region detail line about levels: "Sắp ra mắt" for City/Tower, the gate state for gate regions. */
+function regionLevelHtml(region: Region): string {
+  if (COMING_SOON_REGIONS.has(region.id)) return `<p class="map-soon">${comingSoonHtml()}</p>`;
+  const gate = LEVEL_GATES.find((g) => g.regionId === region.id);
+  if (!gate) return '';
+  const state = gateStateText(gate.levelId, currentGateStatus(gate));
+  return `<p class="map-gate">${tl('mapGate', { state })}</p>`;
 }
 
 function renderMapPanel(): void {
@@ -65,7 +85,7 @@ function renderMapPanel(): void {
   const selected = REGIONS.find((r) => r.id === gameState.selectedRegionId);
   byId('map-detail').innerHTML = selected
     ? translateLongText(
-        `<strong>${selected.icon} ${selected.name}</strong><p>${selected.blurb}</p>${isRegionUnlocked(selected, gameState.progress.questComplete) ? '' : `<p class="map-locked">${icon('lock')} Mở khóa khi hoàn thành Cây cầu tình bạn</p>`}`,
+        `<strong>${selected.icon} ${selected.name}</strong><p>${selected.blurb}</p>${isRegionUnlocked(selected, gameState.progress.questComplete) ? '' : `<p class="map-locked">${icon('lock')} Mở khóa khi hoàn thành Cây cầu tình bạn</p>`}${regionLevelHtml(selected)}`,
       )
     : '';
   for (const button of document.querySelectorAll<HTMLElement>('[data-region]')) {

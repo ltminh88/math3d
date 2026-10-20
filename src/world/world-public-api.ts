@@ -3,6 +3,8 @@
 import type { Object3D, PerspectiveCamera, Scene, Vector3, WebGLRenderer } from 'three';
 import type { Avatar } from '../save/save-types';
 import type { JoystickVector } from './player-controller';
+import type { ObstacleCircle } from './world-build-context';
+import type { Interactable } from './world-interactables';
 
 /** Screen projection of a world point (canvas CSS pixels). */
 export interface ProjectedPoint {
@@ -27,6 +29,8 @@ export interface WorldPublicApi {
   readonly renderer: WebGLRenderer;
   readonly lowPower: boolean;
   readonly player: Object3D;
+  /** Collision circles; content added after the build (level gates) never re-runs the scatter. */
+  readonly obstacles: ObstacleCircle[];
   readonly milo: Object3D;
   /** Camera yaw in radians. */
   readonly heading: number;
@@ -45,5 +49,15 @@ export interface WorldPublicApi {
   nearMilo(): boolean;
   project(point: Vector3): ProjectedPoint;
   burst(at: Vector3): void;
+  /**
+   * Adds something the player can interact with (VLM, level gates, phase 19 shop stall); the
+   * nearest one in reach drives the interact button and the E key. Returns the unregister.
+   */
+  registerInteractable(item: Interactable): () => void;
+  nearestInteractable(): Interactable | undefined;
+  /** Stops rendering and input while a level owns the renderer (no-op when suspended). */
+  suspend(): void;
+  /** Restarts the world loop after `suspend()`. */
+  resume(): void;
   dispose(): void;
 }

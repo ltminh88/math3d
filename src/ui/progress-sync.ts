@@ -164,6 +164,20 @@ export function saveQuestComplete(): Promise<boolean> {
 }
 
 /**
+ * Commits a finished level run (after any pending quiz answers, same queue), then adds its XP and
+ * coins to the progress view. False when the store refused it (view unchanged).
+ */
+export async function commitLevelRun(run: SessionResult): Promise<boolean> {
+  void flushProgress();
+  const ok = await enqueue((s) => s.commitSession(run.delta, run.local));
+  if (ok) {
+    gameState.progress.xp += run.delta.xp;
+    gameState.progress.coins += run.delta.coins;
+  }
+  return ok;
+}
+
+/**
  * Replaces all progress (reset, save-code import) and re-hydrates the view; pending answers
  * belonged to the old progress and are dropped. False when the store refused (view unchanged).
  */

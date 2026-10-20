@@ -1,12 +1,14 @@
-// Per-frame world hook: interact button, floating labels, area badge, minimap refresh and the
-// quest completion (+50 XP, +10 coins) when the player crosses the finished bridge.
+// Per-frame world hook: interact button, level gate states, floating labels, area badge, minimap
+// refresh and the quest completion (+50 XP, +10 coins) when the player crosses the finished bridge.
 import { Vector3 } from 'three';
 import { BRIDGE_SEGMENTS } from '../config/world-constants';
+import { refreshLevelGates } from '../levels/shared/level-gates';
 import { QUEST_COMPLETE_REWARD } from '../quiz/quiz-rewards';
 import { closeDialog, openDialog } from './dialog';
 import { gameState, getWorld } from './game-state';
 import { refreshHud } from './hud';
 import { byId, icon } from './icons';
+import { renderInteractButton } from './interact-target';
 import { drawMinimap } from './map-overlay';
 import { saveQuestComplete } from './progress-sync';
 import { projectWorldLabels, updateCurrentArea } from './world-labels';
@@ -37,7 +39,8 @@ export function onWorldFrame(nearMilo: boolean, crossedBridge: boolean): void {
   const world = getWorld();
   gameState.nearMilo = nearMilo;
   if (++gameState.frameCount % 2 !== 0 || !world.active) return;
-  byId('interact').hidden = !nearMilo || world.paused;
+  renderInteractButton(world.nearestInteractable(), world.paused);
+  refreshLevelGates();
   projectWorldLabels();
   byId('milo-label').classList.toggle('near', nearMilo);
   updateCurrentArea();

@@ -1,7 +1,8 @@
 // Static game shell (recovered verbatim): every element id the UI looks up is defined here.
 // Whitespace and attribute order are part of the DOM parity contract; do not reformat.
-import { REGIONS, type Region } from '../config/regions';
+import { COMING_SOON_REGIONS, LEVEL_GATES, REGIONS, type Region } from '../config/regions';
 import { getLegacyLanguage } from '../i18n/legacy-translator';
+import { tl } from '../levels/shared/level-host-strings';
 import { icon } from './icons';
 import { ts } from './save-code-strings';
 
@@ -38,7 +39,8 @@ export const gameShellHtml = (): string => `
       <button id="minimap" class="minimap" aria-label="Mở bản đồ thế giới" title="Bản đồ (M)"><canvas id="minimap-canvas"></canvas><span class="minimap-ring"></span><span class="minimap-key"><kbd>M</kbd></span></button>
       <button id="milo-label" class="world-label" aria-label="Nói chuyện với VLM"><span class="milo-dot">!</span><strong>VLM</strong><small>Người dẫn đường</small></button>
       <div id="bridge-label" class="world-label landmark"><strong>Cây cầu tình bạn</strong><small id="bridge-count">0 / 6 đoạn cầu</small></div>
-      ${LABELED_REGIONS.map((r) => `<div id="${r.id}-label" class="world-label landmark region-label"><span class="region-icon">${r.icon}</span><strong>${r.name}</strong><small>${r.subtitle}</small></div>`).join('')}
+      ${LABELED_REGIONS.map((r) => `<div id="${r.id}-label" class="world-label landmark region-label"><span class="region-icon">${r.icon}</span><strong>${r.name}</strong><small>${r.subtitle}</small>${COMING_SOON_REGIONS.has(r.id) ? `<em class="coming-soon">${tl('comingSoon')}</em>` : ''}</div>`).join('')}
+      ${LEVEL_GATES.map((g) => `<div id="gate-${g.levelId}-label" class="world-label landmark region-label gate-label"><span class="region-icon">🔒</span><strong></strong><small class="gate-state"></small></div>`).join('')}
       <div class="bottom-bar"><div class="controls-hint"><span class="key-group"><kbd>W</kbd><kbd>A</kbd><kbd>S</kbd><kbd>D</kbd></span><span>Di chuyển</span><span class="divider"></span><kbd>Space</kbd><span>Nhảy</span><span class="divider"></span><kbd>M</kbd><span>Bản đồ</span><span class="divider"></span><span>Kéo chuột để xoay</span></div><div class="toolbar"><div class="zoom-group"><button id="zoom-in" class="icon-button" aria-label="Phóng to" title="Phóng to">${icon('plus')}</button><button id="zoom-out" class="icon-button" aria-label="Thu nhỏ" title="Thu nhỏ">${icon('minus')}</button></div><button id="open-map" class="tool-button">${icon('map')}<span>Bản đồ</span></button><button id="learn" class="tool-button">${icon('book')}<span>Sổ cửu chương</span></button><button id="help" class="icon-button" aria-label="Hướng dẫn chơi" title="Hướng dẫn chơi">${icon('help')}</button></div></div>
       <button id="interact" class="interact" hidden><kbd>E</kbd> Nói chuyện với VLM ${icon('arrow')}</button>
       <div id="touch-controls" class="touch-controls"><div id="joystick" class="joystick" role="group" aria-label="Cần điều khiển di chuyển"><div id="joystick-knob"></div></div><button id="jump" class="jump-button" aria-label="Nhảy">${icon('jump')}</button></div>

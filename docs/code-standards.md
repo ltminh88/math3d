@@ -17,7 +17,9 @@ One engine only: the recovered world. Folders under `src/`:
 - Progress has one source of truth, the game store (IndexedDB); the UI keeps an optimistic view (`gameState.progress`) and writes every change through `src/ui/progress-sync.ts`. Settings (language, sound, music, quest card) have one source too: `src/store/app-settings.ts`. Never write the legacy `aigame3d_*` keys.
 - `core/` holds only reusable pieces kept for later levels (input controllers, speech narrator, audio gesture unlock, quality tiers, context-loss, WebGL check, tweens, asset cache/disposer). It is not a second engine.
 - `dev/` dev-only probes (`?debug=fps` frame-time overlay), never in the production bundle.
-- Planned: `levels/**` game content hosted by the world, `sync/**` Supabase.
+- `levels/shared/` the level host (one renderer: the world loop is suspended while a level runs), level gates, progression and the test-build hook `window.__game`. Each level lives in `levels/<id>/`; its `index.ts` default-exports only a `LevelDefinition` (self-registered via `import.meta.glob`) and loads its scene with a dynamic `import()` so the level stays its own chunk.
+- Interactables (VLM, level gates, the phase 19 shop stall) register with `world.registerInteractable`; the interact button and E key use the nearest one in reach.
+- Planned: `sync/**` Supabase.
 - Cosmetics are visual only and never touch learning logic.
 - Every drag interaction has a tap-select and a keyboard alternative (WCAG 2.5.7).
 

@@ -29,8 +29,10 @@ import type { Floater, ObstacleCircle } from './world-build-context';
 import { buildWorldScene } from './world-build-pipeline';
 import { animateAmbient, MAX_FRAME_DELTA } from './world-frame-loop';
 import { attachWorldInput, groundPointAt } from './world-input';
+import { type Interactable, InteractableRegistry } from './world-interactables';
 import type { ProjectedPoint, WorldPublicApi } from './world-public-api';
 import { addWorldLights, createWorldRenderer, updateSunShadow } from './world-renderer-setup';
+import { projectToCanvas } from './world-screen-projection';
 
 export class World implements WorldPublicApi {
   readonly canvas: HTMLCanvasElement;
@@ -74,6 +76,8 @@ export class World implements WorldPublicApi {
   onJump: (() => void) | undefined;
   onSceneClick: ((nearMilo: boolean) => void) | undefined;
   private readonly playerParts: PlayerModelParts;
+  private readonly interactables = new InteractableRegistry();
+  private suspended = false;
   private readonly observer: ResizeObserver;
   private frame = 0;
 
@@ -165,17 +169,35 @@ export class World implements WorldPublicApi {
   }
 
   project(point: Vector3): ProjectedPoint {
-    const ndc = point.clone().project(this.camera);
-    const width = this.canvas.clientWidth;
-    const height = this.canvas.clientHeight;
-    const x = (ndc.x * 0.5 + 0.5) * width;
-    const y = (-0.5 * ndc.y + 0.5) * height;
-    return {
-      x,
-      y,
-      visible: ndc.z < 1 && x > -80 && x < width + 80 && y > -80 && y < height + 80,
-      distance: this.camera.position.distanceTo(point),
-    };
+    return projectToCanvas(this.camera, this.canvas, point);
+  }
+
+  registerInteractable(item: Interactable): () => void {
+    return this.interactables.register(item);
+  }
+
+  nearestInteractable(): Interactable | undefined {
+    return this.interactables.nearest(this.player.position.x, this.player.position.z);
+  }
+
+  /** Stops the frame loop (no render, input ignored) while a level owns the renderer. */
+  suspend(): void {
+    if (this.suspended) return;
+    this.suspended = true;
+    this.paused = true;
+    this.clearInput();
+    cancelAnimationFrame(this.frame);
+  }
+
+  /** Restarts the frame loop after `suspend()`; the first frame simulates no time (dt 0). */
+  resume(): void {
+    if (!this.suspended) return;
+    this.suspended = false;
+    this.paused = false;
+    this.clearInput();
+    this.resize();
+    this.timer.reset();
+    this.animate();
   }
 
   dispose(): void {

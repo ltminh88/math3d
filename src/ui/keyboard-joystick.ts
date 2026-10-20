@@ -1,9 +1,10 @@
 // Keyboard (WASD/arrows, Space, E, M, Esc, quiz keys 1-3), focus/visibility handling and the
 // touch joystick. Quirk kept: losing window focus while playing opens the settings dialog.
+import { isLevelRunning } from '../levels/shared/level-gates';
 import { appSettings } from '../store/app-settings';
 import { gameState, getWorld } from './game-state';
-import { talkToGuide } from './guide-dialog';
 import { byId } from './icons';
+import { interactWithNearest } from './interact-target';
 import { closeMap, openMap } from './map-overlay';
 import { openSettings } from './settings-dialog';
 
@@ -13,6 +14,8 @@ const JOYSTICK_RADIUS = 34;
 const KNOB_TRAVEL = 30;
 
 function onKeyDown(event: KeyboardEvent): void {
+  // A running level handles its own keys (InteractionController, number pad).
+  if (isLevelRunning()) return;
   if (event.repeat && NO_REPEAT_KEYS.includes(event.key)) return;
   if (byId<HTMLDialogElement>('dialog').open) {
     if (gameState.dialogKind === 'quiz' && /^[123]$/.test(event.key)) {
@@ -38,7 +41,7 @@ function onKeyDown(event: KeyboardEvent): void {
     world.keys.add(key);
   }
   if (key === ' ') world.jump();
-  if (key === 'e') talkToGuide();
+  if (key === 'e') interactWithNearest();
   if (key === 'm') openMap();
   if (key === 'escape') {
     event.preventDefault();
@@ -49,7 +52,12 @@ function onKeyDown(event: KeyboardEvent): void {
 function wireFocusAndVisibility(): void {
   window.addEventListener('blur', () => {
     gameState.world?.clearInput();
-    if (gameState.world?.active && !gameState.mapOpen && !byId<HTMLDialogElement>('dialog').open) {
+    if (
+      gameState.world?.active &&
+      !gameState.mapOpen &&
+      !isLevelRunning() &&
+      !byId<HTMLDialogElement>('dialog').open
+    ) {
       openSettings();
     }
   });

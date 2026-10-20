@@ -139,3 +139,49 @@ export const isRegionUnlocked = (region: Region, bridgeComplete: boolean): boole
 /** Region by id (`undefined` for an unknown id, like the original `Array#find`). */
 export const regionById = (id: string): Region | undefined =>
   REGIONS.find((region) => region.id === id);
+
+/**
+ * Regions without a level yet: their label and the map say "Sắp ra mắt" (coming soon). Kept
+ * apart from REGIONS, which stays byte-equal to the original bundle (golden test).
+ */
+export const COMING_SOON_REGIONS: ReadonlySet<RegionId> = new Set<RegionId>(['city', 'tower']);
+
+/** What a level gate needs before it opens: the bridge quest, or a completed level. */
+export type GateRequirement = 'bridge' | 'field' | null;
+
+/** A level gate standing in a region (placed after the scatter pass, so no RNG shift). */
+export interface LevelGate {
+  /** Level the gate opens (`src/levels/<levelId>/index.ts`). */
+  readonly levelId: 'field' | 'forest';
+  readonly regionId: RegionId;
+  /** Gate centre on the ground plane as [x, z]. */
+  readonly position: readonly [x: number, z: number];
+  /** Rotation around y; 0 faces +z, towards the default camera (signs read from the start view). */
+  readonly facing: number;
+  readonly requires: GateRequirement;
+  /** Text on the gate's sign board. */
+  readonly sign: string;
+}
+
+/**
+ * Level gates: beside the road ends at the meadow and forest edges, on free ground (no flower
+ * row, tree or scatter circle within reach; checked by the gate placement test).
+ */
+export const LEVEL_GATES: readonly LevelGate[] = [
+  {
+    levelId: 'field',
+    regionId: 'meadow',
+    position: [29, -14.5],
+    facing: 0,
+    requires: 'bridge',
+    sign: '3 × 4',
+  },
+  {
+    levelId: 'forest',
+    regionId: 'forest',
+    position: [37.2, 13.4],
+    facing: 0,
+    requires: 'field',
+    sign: '12 : 3',
+  },
+];

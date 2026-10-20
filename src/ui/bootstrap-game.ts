@@ -3,6 +3,7 @@
 // then opens the store and hydrates progress (store-boot.ts). Without WebGL the loading card
 // turns into a "could not open the 3D world" notice.
 import { translateDomTree } from '../i18n/legacy-translator';
+import { initLevelGates } from '../levels/shared/level-gates';
 import { World } from '../world/world';
 import type { WorldPublicApi } from '../world/world-public-api';
 import { wireBookAndHelp } from './book-help-dialogs';
@@ -12,6 +13,7 @@ import { gameState } from './game-state';
 import { talkToGuide, wireGuideTriggers } from './guide-dialog';
 import { initQuestCard, refreshHud } from './hud';
 import { byId } from './icons';
+import { registerGuideInteractable } from './interact-target';
 import { wireKeyboardAndJoystick } from './keyboard-joystick';
 import { wireMapOverlay } from './map-overlay';
 import { wireMenu } from './menu-language-start';
@@ -41,13 +43,15 @@ function wireControls(): void {
 }
 
 function startWorld(): void {
-  let world: WorldPublicApi;
   try {
-    world = new World(byId('world'));
+    const world = new World(byId('world'));
     gameState.world = world;
     if (import.meta.env.MODE === 'test') {
       window.__parity = world;
+      void import('../levels/shared/test-debug-hook').then((m) => m.installTestDebugHook());
     }
+    registerGuideInteractable();
+    initLevelGates(world);
     world.setBridge(gameState.progress.bridge);
     world.setAvatar(gameState.progress.avatar);
     world.onJump = () => gameState.audio.jump();

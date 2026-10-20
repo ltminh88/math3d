@@ -1,9 +1,11 @@
-// Talking to VLM (E key, interact button, label or clicking him): quest intro or practice offer.
+// Talking to VLM (E key or interact button when he is the nearest interactable, his label, or
+// clicking him): quest intro or practice offer.
 import { BRIDGE_SEGMENTS } from '../config/world-constants';
 import { openDialog } from './dialog';
 import { gameState, getWorld } from './game-state';
 import { refreshHud } from './hud';
 import { byId, icon } from './icons';
+import { interactWithNearest } from './interact-target';
 import { saveQuestAccepted } from './progress-sync';
 import { openQuiz } from './quiz-dialog';
 import { showToast } from './toast-and-persist';
@@ -33,6 +35,6 @@ export function talkToGuide(): void {
 }
 
 export function wireGuideTriggers(): void {
-  byId('interact').onclick = talkToGuide;
+  byId('interact').onclick = () => interactWithNearest();
   byId('milo-label').onclick = talkToGuide;
 }

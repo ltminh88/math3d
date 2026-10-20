@@ -1,0 +1,81 @@
+// Low-poly level gate in the recovered style: two wooden posts with lantern caps, a lintel with
+// the level's sign, a portal panel that glows once the gate is open, and a padlock while locked.
+// Built after the world's scatter pass and outside the static merge; its collision circles are
+// appended to the obstacle list, so no RNG draw shifts.
+import { DoubleSide, Group, Mesh, MeshStandardMaterial, PlaneGeometry, TorusGeometry } from 'three';
+import type { LevelGate } from '../../config/regions';
+import type { WorldBuildContext } from '../../world/world-build-context';
+import { addBox, addCylinder, addMesh, addSphere } from '../../world/world-primitives';
+import { addSign } from '../../world/world-text-sign';
+import type { GateStatus } from './level-progression';
+
+const WOOD = 0x8c6947;
+const LANTERN = 0xffd064;
+const POST_X = 1.3;
+
+export interface LevelGateView {
+  readonly group: Group;
+  setStatus(status: GateStatus): void;
+}
+
+const portalMaterial = (color: number, emissive: number, opacity: number) =>
+  new MeshStandardMaterial({
+    color,
+    emissive,
+    emissiveIntensity: 0.55,
+    roughness: 0.6,
+    transparent: true,
+    opacity,
+    side: DoubleSide,
+  });
+
+/** Gate-local offset (dx, dz) -> world ground point, honouring the gate's facing. */
+function toWorld(gate: LevelGate, dx: number, dz: number): { x: number; z: number } {
+  const cos = Math.cos(gate.facing);
+  const sin = Math.sin(gate.facing);
+  return { x: gate.position[0] + dx * cos + dz * sin, z: gate.position[1] - dx * sin + dz * cos };
+}
+
+export function buildLevelGate(ctx: WorldBuildContext, gate: LevelGate): LevelGateView {
+  const group = new Group();
+  group.name = `level-gate-${gate.levelId}`;
+  group.position.set(gate.position[0], 0, gate.position[1]);
+  group.rotation.y = gate.facing;
+  for (const x of [-POST_X, POST_X]) {
+    addCylinder(ctx, group, x, 1.5, 0, 0.17, 0.21, 3, WOOD);
+    addSphere(ctx, group, x, 3.2, 0, 0.3, LANTERN);
+  }
+  addBox(ctx, group, 0, 3, 0, 3.1, 0.24, 0.24, WOOD);
+  addSign(group, gate.sign, 0, 3.75, 0.05, 1.9, '#ffd064', '#6b4a1c');
+  const locked = portalMaterial(0x9fb0bf, 0x1d2a33, 0.78);
+  const open = portalMaterial(0xffe9a3, 0xffc24a, 0.86);
+  const portal = new Mesh(new PlaneGeometry(2.3, 2.75), locked);
+  portal.position.set(0, 1.45, 0);
+  portal.receiveShadow = true;
+  group.add(portal);
+  const padlock = new Group();
+  padlock.position.set(0, 1.55, 0.06);
+  addBox(ctx, padlock, 0, 0, 0, 0.5, 0.42, 0.14, LANTERN);
+  addMesh(ctx, padlock, new TorusGeometry(0.15, 0.05, 6, 10, Math.PI), LANTERN, 0, 0.21, 0);
+  group.add(padlock);
+  ctx.scene.add(group);
+  for (const [dx, radius] of [
+    [-POST_X, 0.3],
+    [0, 0.95],
+    [POST_X, 0.3],
+  ] as const) {
+    ctx.obstacles.push({ ...toWorld(gate, dx, 0), radius });
+  }
+  return {
+    group,
+    setStatus(status) {
+      portal.material = status === 'locked' ? locked : open;
+      padlock.visible = status === 'locked';
+    },
+  };
+}
+
+/** Where the player stands to use the gate: in front of the portal (facing side). */
+export function gateFrontPoint(gate: LevelGate, distance = 1.9): { x: number; z: number } {
+  return toWorld(gate, 0, distance);
+}

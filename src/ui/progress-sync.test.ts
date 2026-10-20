@@ -116,4 +116,29 @@ describe('progress-sync', () => {
     expect(other.getSnapshot().profile.id).toBe(tab.getSnapshot().profile.id);
     tab.close();
   });
+
+  it('a level run commits after pending quiz answers and adds its rewards to the view', async () => {
+    const { sync, gameState, openGameStore, createMemoryGameDb } = await freshSync();
+    const { createSessionRecorder } = await import('../learning/session-recorder');
+    const store = await openGameStore({ db: createMemoryGameDb() });
+    sync.connectStore(store);
+    gameState.quizMode = 'practice';
+    sync.recordQuizQuestion(outcome('mul:2x3'), reward);
+    const recorder = createSessionRecorder({
+      profileId: store.getSnapshot().profile.id,
+      levelId: 'field',
+      sessionNo: store.nextSessionNo(),
+      getStat: () => undefined,
+      now: Date.now,
+      newId: () => 'level-run-1',
+    });
+    recorder.recordQuestion(outcome('mul:3x4'));
+    expect(await sync.commitLevelRun(recorder.finish(true))).toBe(true);
+    const snapshot = store.getSnapshot();
+    expect(Object.keys(snapshot.factStats).sort()).toEqual(['mul:2x3', 'mul:3x4']);
+    expect(snapshot.levelProgress.field?.completedAt).toBeGreaterThan(0);
+    expect(snapshot.wallet).toEqual({ xp: 20, coins: 10 });
+    expect(gameState.progress.xp).toBe(10);
+    store.close();
+  });
 });

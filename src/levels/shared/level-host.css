@@ -1,0 +1,54 @@
+/* Level host overlay and level gate labels (recovered tokens and button classes). */
+.game-shell.in-level .topbar,
+.game-shell.in-level .area-label {
+  display: none;
+}
+
+.level-layer {
+  position: absolute;
+  inset: 0;
+  z-index: 6;
+  pointer-events: none;
+}
+
+.level-layer > * {
+  pointer-events: auto;
+}
+
+.level-leave {
+  position: absolute;
+  top: max(16px, env(safe-area-inset-top));
+  left: max(16px, env(safe-area-inset-left));
+}
+
+.gate-label .gate-state {
+  display: block;
+}
+
+.gate-label.locked .region-icon {
+  filter: grayscale(0.6);
+}
+
+.region-label .coming-soon {
+  grid-column: 2;
+  justify-self: start;
+}
+
+.world-label .coming-soon,
+.map-region .coming-soon,
+.map-detail .coming-soon {
+  display: inline-block;
+  margin: 2px 0 0;
+  padding: 1px 7px;
+  border-radius: 999px;
+  background: #fff1c2;
+  color: #6b4a1c;
+  font-size: 0.68rem;
+  font-weight: 800;
+  font-style: normal;
+  letter-spacing: 0.02em;
+}
+
+.map-gate {
+  font-weight: 700;
+}

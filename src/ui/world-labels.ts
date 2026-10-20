@@ -1,6 +1,7 @@
-// DOM labels pinned to world points (VLM, bridge, regions) and the current-area badge/toast.
+// DOM labels pinned to world points (VLM, bridge, level gates, regions) and the current-area
+// badge/toast.
 import { Vector3 } from 'three';
-import { isRegionUnlocked, regionAtPoint } from '../config/regions';
+import { isRegionUnlocked, LEVEL_GATES, regionAtPoint } from '../config/regions';
 import { getLegacyLanguage, translateText } from '../i18n/legacy-translator';
 import { LABELED_REGIONS } from './dom-template';
 import { gameState, getWorld } from './game-state';
@@ -9,6 +10,8 @@ import { showToast } from './toast-and-persist';
 
 const VLM_LABEL_AT = new Vector3(-3, 3.5, 1.5);
 const BRIDGE_LABEL_AT = new Vector3(7, 0.8, 0);
+/** Gate labels float just above the gate sign. */
+const GATE_LABEL_HEIGHT = 4.6;
 
 /** Places `label` over world point `at`, fading it out between 70 and 140 units away. */
 function projectLabel(label: HTMLElement, at: Vector3, offset: string, hide: boolean): void {
@@ -26,6 +29,14 @@ export function projectWorldLabels(): void {
   const paused = getWorld().paused;
   projectLabel(byId('milo-label'), VLM_LABEL_AT, 'translate(-50%,-100%)', paused);
   projectLabel(byId('bridge-label'), BRIDGE_LABEL_AT, 'translate(-50%,15px)', paused);
+  for (const gate of LEVEL_GATES) {
+    projectLabel(
+      byId(`gate-${gate.levelId}-label`),
+      new Vector3(gate.position[0], GATE_LABEL_HEIGHT, gate.position[1]),
+      'translate(-50%,-100%)',
+      paused,
+    );
+  }
   for (const region of LABELED_REGIONS) {
     projectLabel(
       byId(`${region.id}-label`),
