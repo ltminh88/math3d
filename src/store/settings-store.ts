@@ -8,6 +8,10 @@ export interface Settings {
   readAloud: boolean;
   reducedMotion: boolean;
   qualityTier: QualityTier;
+  /** Soft background music (legacy save `music`). */
+  music: boolean;
+  /** The quest card is collapsed (legacy key `aigame3d_quest_collapsed`). */
+  questCollapsed: boolean;
 }
 
 export const DEFAULT_SETTINGS: Readonly<Settings> = {
@@ -17,9 +21,11 @@ export const DEFAULT_SETTINGS: Readonly<Settings> = {
   readAloud: true,
   reducedMotion: false,
   qualityTier: 'auto',
+  music: false,
+  questCollapsed: false,
 };
 
-export const SETTINGS_STORAGE_KEY = 'nsq.settings';
+export const SETTINGS_STORAGE_KEY = 'math3d.settings';
 
 export interface StorageLike {
   getItem(key: string): string | null;
@@ -48,10 +54,12 @@ export function sanitizeSettings(raw: unknown): Settings {
     readAloud: bool(r.readAloud, d.readAloud),
     reducedMotion: bool(r.reducedMotion, d.reducedMotion),
     qualityTier: QUALITY.find((q) => q === r.qualityTier) ?? d.qualityTier,
+    music: bool(r.music, d.music),
+    questCollapsed: bool(r.questCollapsed, d.questCollapsed),
   };
 }
 
-function defaultStorage(): StorageLike | null {
+export function defaultStorage(): StorageLike | null {
   try {
     return (globalThis as { localStorage?: StorageLike }).localStorage ?? null;
   } catch {
@@ -59,13 +67,22 @@ function defaultStorage(): StorageLike | null {
   }
 }
 
-export function createSettingsStore(storage: StorageLike | null = defaultStorage()): SettingsStore {
+/**
+ * `firstBootDefaults` seeds the settings while nothing is stored under SETTINGS_STORAGE_KEY yet
+ * (e.g. values carried over from the legacy save). Nothing is written until the first update.
+ */
+export function createSettingsStore(
+  storage: StorageLike | null = defaultStorage(),
+  firstBootDefaults?: (storage: StorageLike) => Partial<Settings>,
+): SettingsStore {
   let persistent = storage !== null;
   let current: Settings = { ...DEFAULT_SETTINGS };
   if (storage) {
     try {
       const stored = storage.getItem(SETTINGS_STORAGE_KEY);
       if (stored !== null) current = sanitizeSettings(JSON.parse(stored));
+      else if (firstBootDefaults)
+        current = sanitizeSettings({ ...DEFAULT_SETTINGS, ...firstBootDefaults(storage) });
     } catch {
       persistent = false; // unreadable or corrupt: start from defaults
     }

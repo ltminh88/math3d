@@ -2,6 +2,7 @@ import { isFactKey } from '../learning/fact-key';
 import type { SessionDelta } from '../learning/learning-types';
 
 const MAX_FACTS = 300;
+const MAX_LEVEL_PROGRESS = 1000;
 
 export class InvalidDeltaError extends Error {
   constructor(reason: string) {
@@ -38,7 +39,8 @@ export function validateDelta(delta: SessionDelta, activeProfileId: string): voi
       !Number.isInteger(l.stars) ||
       l.stars < 0 ||
       l.stars > 3 ||
-      !isNonNegInt(l.bestScore)
+      !isNonNegInt(l.bestScore) ||
+      (l.progress !== undefined && (!isNonNegInt(l.progress) || l.progress > MAX_LEVEL_PROGRESS))
     ) {
       fail(`level ${id}`);
     }

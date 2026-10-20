@@ -1,57 +1,25 @@
-import type { FactKey } from '../learning/fact-key';
-import type { FactLocalState, SessionDelta } from '../learning/learning-types';
+import type { SessionDelta } from '../learning/learning-types';
+import { type PurchaseResult, purchaseInTransaction } from './cosmetic-purchase-transaction';
 import { validateDelta } from './delta-validation';
+import type { GameStore, OpenStoreOptions, SessionCommittedEvent } from './game-store-api';
 import { isMemoryGameDb } from './memory-database';
-import { type OpenDbOrMemoryOptions, openDbOrMemory } from './open-game-db-with-memory-fallback';
+import { openDbOrMemory } from './open-game-db-with-memory-fallback';
+import { hasLegacyImportMarker, writeReplacementProfile } from './profile-replacement';
 import { loadOrCreateActiveProfile, saveProfile } from './profile-repository';
 import {
   appendOutbox,
   applyDelta,
   type GameSnapshot,
   loadSnapshot,
+  newLevelProgress,
   readSessionCount,
 } from './progress-repository';
-import { metaSessionCountKey } from './save-schema';
+import { metaGameKey, metaSessionCountKey } from './save-schema';
 import { inTransaction } from './store-transaction';
 
+export type { PurchaseResult } from './cosmetic-purchase-transaction';
+export type { GameStore, OpenStoreOptions, SessionCommittedEvent } from './game-store-api';
 export type { GameSnapshot } from './progress-repository';
-
-export type PurchaseResult =
-  | { ok: true }
-  | { ok: false; reason: 'insufficient-coins' | 'already-owned' };
-
-/** Fired after the outbox gained an item (session finished or cosmetic bought). Phase 09 flushes on it. */
-export interface SessionCommittedEvent {
-  delta: SessionDelta;
-}
-
-export interface GameStore {
-  /** false: IndexedDB was unavailable, progress lives in memory only (phase 04 shows a toast). */
-  readonly persistent: boolean;
-  getSnapshot(): GameSnapshot;
-  subscribe(listener: (snapshot: GameSnapshot) => void): () => void;
-  on(event: 'session-committed', listener: (e: SessionCommittedEvent) => void): () => void;
-  /**
-   * Number to stamp on the next session (for the planner and recorder). A hint from the snapshot:
-   * the committed counter is re-derived inside the commit transaction, so tabs never collide.
-   */
-  nextSessionNo(): number;
-  /**
-   * Atomic: facts + levels + wallet + session counter + one outbox record, or nothing.
-   * Idempotent per batchId: a retry of an already committed delta is a no-op success.
-   */
-  commitSession(delta: SessionDelta, local?: Record<FactKey, FactLocalState>): Promise<void>;
-  /** Atomic debit + ownership + outbox record. Price semantics live in src/shop. */
-  purchaseCosmetic(cosmeticId: string, price: number): Promise<PurchaseResult>;
-  /** Stored in profile settings; ownership is the shop's concern (default items are never "purchased"). */
-  equipCosmetic(slot: string, cosmeticId: string): Promise<void>;
-  close(): void;
-}
-
-export interface OpenStoreOptions extends OpenDbOrMemoryOptions {
-  now?: () => number;
-  newId?: () => string;
-}
 
 export async function openGameStore(options: OpenStoreOptions = {}): Promise<GameStore> {
   const now = options.now ?? Date.now;
@@ -145,15 +113,9 @@ export async function openGameStore(options: OpenStoreOptions = {}): Promise<Gam
           coins: -price,
           cosmetics: [cosmeticId],
         };
-        const result = await inTransaction<PurchaseResult>(db, async (tx) => {
-          if (await tx.objectStore('ownedCosmetics').get([profileId, cosmeticId]))
-            return { ok: false, reason: 'already-owned' };
-          const wallet = await tx.objectStore('wallet').get(profileId);
-          if ((wallet?.coins ?? 0) < price) return { ok: false, reason: 'insufficient-coins' };
-          await applyDelta(tx, delta, { now: at, sessionNo: snapshot.sessionCount });
-          await appendOutbox(tx, delta, at);
-          return { ok: true };
-        });
+        const result = await inTransaction<PurchaseResult>(db, (tx) =>
+          purchaseInTransaction(tx, delta, price, at, snapshot.sessionCount),
+        );
         if (result.ok) await afterCommit(delta);
         return result;
       });
@@ -174,6 +136,53 @@ export async function openGameStore(options: OpenStoreOptions = {}): Promise<Gam
         await saveProfile(db, profile);
         snapshot = { ...snapshot, profile };
         notify(snapshotListeners, snapshot);
+      });
+    },
+
+    setAvatar(avatarId) {
+      return serial(async () => {
+        const profile = { ...snapshot.profile, avatarId };
+        await saveProfile(db, profile);
+        snapshot = { ...snapshot, profile };
+        notify(snapshotListeners, snapshot);
+      });
+    },
+
+    updateGameMeta(patch) {
+      return serial(async () => {
+        const gameMeta = { ...snapshot.gameMeta, ...patch };
+        await db.put('meta', { key: metaGameKey(snapshot.profile.id), value: gameMeta });
+        snapshot = { ...snapshot, gameMeta };
+        notify(snapshotListeners, snapshot);
+      });
+    },
+
+    acceptLevel(levelId) {
+      return serial(async () => {
+        const profileId = snapshot.profile.id;
+        await inTransaction(db, async (tx) => {
+          const levels = tx.objectStore('levelProgress');
+          const prev = {
+            ...newLevelProgress(profileId, levelId),
+            ...(await levels.get([profileId, levelId])),
+          };
+          if (prev.acceptedAt === 0) await levels.put({ ...prev, acceptedAt: now() });
+        });
+        await refresh();
+      });
+    },
+
+    replaceProgress(records, replaceOptions = {}) {
+      return serial(async () => {
+        const profileId = newId();
+        const profile = await inTransaction(db, async (tx) => {
+          if (replaceOptions.legacyImport && (await hasLegacyImportMarker(tx))) return undefined;
+          return writeReplacementProfile(tx, profileId, records, now(), replaceOptions);
+        });
+        if (!profile) return 'already-imported';
+        snapshot = await loadSnapshot(db, profile);
+        notify(snapshotListeners, snapshot);
+        return 'replaced';
       });
     },
 

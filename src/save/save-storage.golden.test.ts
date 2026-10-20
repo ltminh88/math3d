@@ -1,7 +1,7 @@
 import { afterEach, describe, expect, it, vi } from 'vitest';
 import { loadGoldenTrace } from '../config/load-golden-trace-for-tests';
 import { SAVE_KEY } from '../config/world-constants';
-import { defaultSave, loadSave, parseSave, writeSave } from './save-storage';
+import { decodeSaveV1, defaultSave, loadSave, parseSave, writeSave } from './save-storage';
 
 interface SaveFixture {
   name: string;
@@ -52,5 +52,40 @@ describe('loadSave / writeSave', () => {
     });
     expect(loadSave()).toEqual(defaultSave());
     expect(writeSave(defaultSave())).toBe(false);
+  });
+});
+
+// Legacy v1 compatibility: the original reload kept only 30 stats / 30 review ids. That cap is
+// the default of parseSave (golden-exact above); migration reads with { cap: false }.
+describe('legacy v1 compatibility: 30-entry cap', () => {
+  interface StatsTrace {
+    trace: Array<{ id: string; stat: unknown }>;
+    finalStatsCount: number;
+    reparsed: { questionStats: Record<string, unknown>; review: string[] };
+  }
+  const golden = loadGoldenTrace<StatsTrace>('stats-update.json');
+  // Rebuild the original 60-answer save (insertion order = first answer per fact) from the trace.
+  const questionStats: Record<string, unknown> = {};
+  for (const { id, stat } of golden.trace) questionStats[id] = stat;
+  const review = Object.keys(questionStats);
+  const raw = JSON.stringify({ ...defaultSave(), questionStats, review });
+
+  it('default parse reproduces the original capped reload', () => {
+    expect(Object.keys(questionStats)).toHaveLength(golden.finalStatsCount);
+    expect(golden.finalStatsCount).toBeGreaterThan(30);
+    expect(parseSave(raw).questionStats).toEqual(golden.reparsed.questionStats);
+  });
+
+  it('{ cap: false } keeps every valid stat and review id', () => {
+    const save = parseSave(raw, { cap: false });
+    expect(Object.keys(save.questionStats)).toHaveLength(golden.finalStatsCount);
+    expect(save.review).toHaveLength(golden.finalStatsCount);
+  });
+
+  it('decodeSaveV1 tells invalid input apart from a default save', () => {
+    for (const bad of [null, '', '{nope', '[]', '{"version":2}', '"x"', '{}']) {
+      expect(decodeSaveV1(bad)).toBeNull();
+    }
+    expect(decodeSaveV1('{"version":1}')).toEqual(defaultSave());
   });
 });

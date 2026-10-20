@@ -1,0 +1,72 @@
+import type { FactKey } from '../learning/fact-key';
+import type { FactStat } from '../learning/learning-types';
+import { newLevelProgress, type WriteTx } from './progress-repository';
+import {
+  DEFAULT_GAME_META,
+  type GameMeta,
+  type LegacyImportMarker,
+  type LevelProgress,
+  META_ACTIVE_PROFILE,
+  META_LEGACY_IMPORT,
+  metaGameKey,
+  newProfile,
+  type Profile,
+} from './save-schema';
+
+/** Everything a profile's progress consists of; written wholesale by an import or a reset. */
+export interface ProgressRecords {
+  avatarId: string;
+  wallet: { coins: number; xp: number };
+  levels: Record<string, Omit<LevelProgress, 'profileId' | 'levelId'>>;
+  facts: Record<FactKey, FactStat>;
+  gameMeta: GameMeta;
+}
+
+export const emptyProgressRecords = (): ProgressRecords => ({
+  avatarId: 'default',
+  wallet: { coins: 0, xp: 0 },
+  levels: {},
+  facts: {},
+  gameMeta: { ...DEFAULT_GAME_META },
+});
+
+export interface ReplaceOptions {
+  /** Legacy-save import: skip when an import already happened (marker), write the marker otherwise. */
+  legacyImport?: boolean;
+}
+
+export async function hasLegacyImportMarker(tx: WriteTx): Promise<boolean> {
+  return (await tx.objectStore('meta').get(META_LEGACY_IMPORT)) !== undefined;
+}
+
+/**
+ * Writes `records` as a brand-new guest profile and makes it the active one, inside the caller's
+ * transaction. The previous profile's rows stay untouched (no delete needed, nothing to undo).
+ */
+export async function writeReplacementProfile(
+  tx: WriteTx,
+  profileId: string,
+  records: ProgressRecords,
+  now: number,
+  options: ReplaceOptions = {},
+): Promise<Profile> {
+  const profile: Profile = { ...newProfile(profileId, 'guest'), avatarId: records.avatarId };
+  await tx.objectStore('profiles').put(profile);
+  await tx.objectStore('wallet').put({ profileId, ...records.wallet });
+  for (const [levelId, level] of Object.entries(records.levels)) {
+    await tx
+      .objectStore('levelProgress')
+      .put({ ...newLevelProgress(profileId, levelId), ...level, profileId, levelId });
+  }
+  for (const [key, stat] of Object.entries(records.facts)) {
+    await tx.objectStore('factStats').put({ ...stat, profileId, key });
+  }
+  const meta = tx.objectStore('meta');
+  await meta.put({ key: metaGameKey(profileId), value: { ...records.gameMeta } });
+  await meta.put({ key: META_ACTIVE_PROFILE, value: profileId });
+  if (options.legacyImport) {
+    const marker: LegacyImportMarker = { v: 1, at: now, profileId };
+    await meta.put({ key: META_LEGACY_IMPORT, value: marker });
+  }
+  return profile;
+}

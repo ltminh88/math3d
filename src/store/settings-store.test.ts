@@ -1,4 +1,6 @@
 import { describe, expect, it } from 'vitest';
+import { SAVE_KEY } from '../config/world-constants';
+import { readLegacySettings } from './legacy-settings-defaults';
 import {
   createSettingsStore,
   DEFAULT_SETTINGS,
@@ -53,6 +55,40 @@ describe('settings store', () => {
     off();
     s.update({ readAloud: true });
     expect(seen).toBe(1);
+  });
+
+  it('stores under math3d.settings with music and quest-card state', () => {
+    const storage = memory();
+    createSettingsStore(storage).update({ music: true, questCollapsed: true });
+    expect(SETTINGS_STORAGE_KEY).toBe('math3d.settings');
+    expect(JSON.parse(storage.data.get(SETTINGS_STORAGE_KEY) ?? '{}')).toMatchObject({
+      music: true,
+      questCollapsed: true,
+    });
+    expect(DEFAULT_SETTINGS).toMatchObject({ music: false, questCollapsed: false, lang: 'vi' });
+  });
+
+  it('derives first-boot settings from legacy keys without writing anything', () => {
+    const storage = memory();
+    storage.data.set('aigame3d_language', 'en');
+    storage.data.set('aigame3d_quest_collapsed', '1');
+    storage.data.set(SAVE_KEY, JSON.stringify({ version: 1, sound: false, music: true }));
+    const before = new Map(storage.data);
+    const s = createSettingsStore(storage, readLegacySettings);
+    expect(s.get()).toMatchObject({ lang: 'en', questCollapsed: true, sound: false, music: true });
+    expect(storage.data).toEqual(before);
+    // Once the new key exists, legacy keys are ignored (a later language switch sticks).
+    s.update({ lang: 'vi' });
+    expect(createSettingsStore(storage, readLegacySettings).get().lang).toBe('vi');
+    expect(storage.data.get('aigame3d_language')).toBe('en');
+  });
+
+  it('legacy settings fall back to the original defaults for junk or throwing storage', () => {
+    const junk = memory();
+    junk.data.set('aigame3d_language', 'fr');
+    junk.data.set(SAVE_KEY, '{broken');
+    expect(createSettingsStore(junk, readLegacySettings).get()).toEqual(DEFAULT_SETTINGS);
+    expect(readLegacySettings(throwing)).toEqual({});
   });
 
   it('rejects out-of-range patches instead of storing them', () => {

@@ -39,6 +39,8 @@ export interface DeltaFact {
 export interface DeltaLevel {
   stars: number;
   bestScore: number;
+  /** Level progress counter reached (e.g. bridge segments); merged with max. */
+  progress?: number;
 }
 
 /** Session summary; also the outbox payload sent to `sync_batch`. */

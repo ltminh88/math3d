@@ -2,7 +2,7 @@
 import { BRIDGE_SEGMENTS, SAVE_KEY, TABLES } from '../config/world-constants';
 import { type SaveV1, STAT_KEY_PATTERN } from './save-types';
 
-/** Upper bound of the parsed questionStats / review lists (original quirk, fixed in phase 12). */
+/** Upper bound of the parsed questionStats / review lists (original quirk; migration lifts it). */
 const MAX_PARSED_ENTRIES = 30;
 
 /** Fresh save. Literal order defines the JSON key order written to localStorage. */
@@ -33,20 +33,34 @@ export const clampInt = (value: unknown, max = 10000000): number => {
 
 type Loose = Record<string, unknown>;
 
+export interface ParseSaveOptions {
+  /** Keep only 30 stats / 30 review ids like the original reload (default true). */
+  cap?: boolean;
+}
+
 /**
  * Parses a stored save string. Any version other than 1, bad JSON or a non-object resets to
- * defaults. Only the first 30 questionStats entries are inspected and at most 30 review ids
- * are kept (original behaviour).
+ * defaults. By default only the first 30 questionStats entries are inspected and at most 30
+ * review ids are kept (original behaviour); migration passes `{ cap: false }`.
  */
-export function parseSave(raw: string | null | undefined): SaveV1 {
-  const save = defaultSave();
+export function parseSave(raw: string | null | undefined, options: ParseSaveOptions = {}): SaveV1 {
+  return decodeSaveV1(raw, options) ?? defaultSave();
+}
+
+/** Like parseSave, but returns null for anything that is not a v1 save object. */
+export function decodeSaveV1(
+  raw: string | null | undefined,
+  options: ParseSaveOptions = {},
+): SaveV1 | null {
   if (!raw) {
-    return save;
+    return null;
   }
+  const limit = options.cap === false ? Number.POSITIVE_INFINITY : MAX_PARSED_ENTRIES;
+  const save = defaultSave();
   try {
     const parsed: unknown = JSON.parse(raw);
     if (!parsed || typeof parsed !== 'object' || !('version' in parsed) || parsed.version !== 1) {
-      return save;
+      return null;
     }
     const data = parsed as Loose;
     save.xp = clampInt(data.xp);
@@ -61,7 +75,7 @@ export function parseSave(raw: string | null | undefined): SaveV1 {
     save.started = data.started === true;
     save.combo = clampInt(data.combo, 10000);
     if (data.questionStats && typeof data.questionStats === 'object') {
-      const entries = Object.entries(data.questionStats).slice(0, MAX_PARSED_ENTRIES);
+      const entries = Object.entries(data.questionStats).slice(0, limit);
       for (const [key, value] of entries) {
         if (!STAT_KEY_PATTERN.test(key) || !value || typeof value !== 'object') {
           continue;
@@ -86,11 +100,11 @@ export function parseSave(raw: string | null | undefined): SaveV1 {
             (id): id is string => typeof id === 'string' && STAT_KEY_PATTERN.test(id),
           ),
         ),
-      ].slice(0, MAX_PARSED_ENTRIES);
+      ].slice(0, limit);
     }
     return save;
   } catch {
-    return save;
+    return null;
   }
 }
 

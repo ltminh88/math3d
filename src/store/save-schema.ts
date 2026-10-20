@@ -4,7 +4,7 @@ import type { FactStat, SessionDelta } from '../learning/learning-types';
 export type { FactLocalState, FactStat, SessionDelta } from '../learning/learning-types';
 
 export const SCHEMA_VERSION = 1;
-export const DB_NAME = 'number-stone-quest';
+export const DB_NAME = 'math3d';
 
 export interface ProfileSettings {
   /** slot -> equipped cosmetic id */
@@ -34,6 +34,10 @@ export interface LevelProgress {
   stars: number;
   bestScore: number;
   completedAt: number;
+  /** Level-specific progress counter, e.g. bridge segments built (0..6). Only grows. */
+  progress: number;
+  /** When the level's quest was accepted (0 = not yet). */
+  acceptedAt: number;
 }
 
 export interface Wallet {
@@ -48,9 +52,29 @@ export interface OwnedCosmetic {
   acquiredAt: number;
 }
 
+/** Per-profile game state that is neither wallet nor level progress (legacy save: table, combo, started). */
+export interface GameMeta {
+  /** Practice table filter, or 0 for all tables. */
+  table: number;
+  /** Consecutive correct answers (shown as "Combo N" from 3). */
+  combo: number;
+  /** The adventure was started once (menu button says "continue"). */
+  started: boolean;
+}
+
+export const DEFAULT_GAME_META: Readonly<GameMeta> = { table: 0, combo: 0, started: false };
+
+/** Written in the same transaction as an imported legacy save; its presence makes the import idempotent. */
+export interface LegacyImportMarker {
+  v: 1;
+  at: number;
+  /** Profile created by the import. */
+  profileId: string;
+}
+
 export interface MetaRecord {
   key: string;
-  value: string | number;
+  value: string | number | GameMeta | LegacyImportMarker;
 }
 
 /** Pending sync item; `payload` is exactly what `sync_batch` receives. */
@@ -64,7 +88,9 @@ export interface OutboxItem {
 }
 
 export const META_ACTIVE_PROFILE = 'activeProfileId';
+export const META_LEGACY_IMPORT = 'legacyImport';
 export const metaSessionCountKey = (profileId: string): string => `sessionCount:${profileId}`;
+export const metaGameKey = (profileId: string): string => `game:${profileId}`;
 
 export function newProfile(id: string, kind: Profile['kind'] = 'guest'): Profile {
   return {

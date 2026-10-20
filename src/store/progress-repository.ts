@@ -4,7 +4,14 @@ import type { FactLocalState, FactStat, SessionDelta } from '../learning/learnin
 import { newFactStat } from '../learning/leitner-box';
 import type { GameDb } from './idb-database';
 import type { NumberStoneDb } from './save-migrations';
-import { type LevelProgress, metaSessionCountKey, type Profile } from './save-schema';
+import {
+  DEFAULT_GAME_META,
+  type GameMeta,
+  type LevelProgress,
+  metaGameKey,
+  metaSessionCountKey,
+  type Profile,
+} from './save-schema';
 
 export type StoreName = StoreNames<NumberStoneDb>;
 export const ALL_STORES: StoreName[] = [
@@ -26,17 +33,35 @@ export interface GameSnapshot {
   ownedCosmetics: string[];
   /** Committed sessions so far; the next session is `sessionCount + 1`. */
   sessionCount: number;
+  gameMeta: GameMeta;
+}
+
+/** Keeps only correctly typed fields of a stored game meta record. */
+export function sanitizeGameMeta(raw: unknown): GameMeta {
+  const r = (typeof raw === 'object' && raw !== null ? raw : {}) as Record<string, unknown>;
+  const int = (v: unknown, fallback: number): number =>
+    Number.isInteger(v) && (v as number) >= 0 ? (v as number) : fallback;
+  return {
+    table: int(r.table, DEFAULT_GAME_META.table),
+    combo: int(r.combo, DEFAULT_GAME_META.combo),
+    started: typeof r.started === 'boolean' ? r.started : DEFAULT_GAME_META.started,
+  };
+}
+
+export function newLevelProgress(profileId: string, levelId: string): LevelProgress {
+  return { profileId, levelId, stars: 0, bestScore: 0, completedAt: 0, progress: 0, acceptedAt: 0 };
 }
 
 export async function loadSnapshot(db: GameDb, profile: Profile): Promise<GameSnapshot> {
   const id = profile.id;
   const tx = db.transaction(ALL_STORES, 'readonly');
-  const [facts, levels, wallet, owned, count] = await Promise.all([
+  const [facts, levels, wallet, owned, count, game] = await Promise.all([
     tx.objectStore('factStats').index('byProfile').getAll(id),
     tx.objectStore('levelProgress').index('byProfile').getAll(id),
     tx.objectStore('wallet').get(id),
     tx.objectStore('ownedCosmetics').index('byProfile').getAll(id),
     tx.objectStore('meta').get(metaSessionCountKey(id)),
+    tx.objectStore('meta').get(metaGameKey(id)),
     tx.done,
   ]);
   const factStats: Record<FactKey, FactStat> = {};
@@ -44,10 +69,13 @@ export async function loadSnapshot(db: GameDb, profile: Profile): Promise<GameSn
   return {
     profile,
     factStats,
-    levelProgress: Object.fromEntries(levels.map((l) => [l.levelId, l])),
+    levelProgress: Object.fromEntries(
+      levels.map((l) => [l.levelId, { ...newLevelProgress(id, l.levelId), ...l }]),
+    ),
     wallet: { coins: wallet?.coins ?? 0, xp: wallet?.xp ?? 0 },
     ownedCosmetics: owned.map((o) => o.cosmeticId),
     sessionCount: typeof count?.value === 'number' ? count.value : 0,
+    gameMeta: sanitizeGameMeta(game?.value),
   };
 }
 
@@ -94,13 +122,16 @@ export async function applyDelta(
 
   const levels = tx.objectStore('levelProgress');
   for (const [levelId, l] of Object.entries(delta.levels)) {
-    const prev = await levels.get([profileId, levelId]);
+    const prev = {
+      ...newLevelProgress(profileId, levelId),
+      ...(await levels.get([profileId, levelId])),
+    };
     await levels.put({
-      profileId,
-      levelId,
-      stars: Math.max(prev?.stars ?? 0, l.stars),
-      bestScore: Math.max(prev?.bestScore ?? 0, l.bestScore),
-      completedAt: l.stars >= 1 ? prev?.completedAt || ctx.now : (prev?.completedAt ?? 0),
+      ...prev,
+      stars: Math.max(prev.stars, l.stars),
+      bestScore: Math.max(prev.bestScore, l.bestScore),
+      completedAt: l.stars >= 1 ? prev.completedAt || ctx.now : prev.completedAt,
+      progress: Math.max(prev.progress, l.progress ?? 0),
     });
   }
 
