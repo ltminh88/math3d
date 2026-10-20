@@ -9,7 +9,7 @@
 - Description: Make the existing `src/store/**` (idb + outbox) the source of truth, import legacy v1 progress (localStorage blob when present on this origin, or a pasted "save code"), add save-code export, unify settings/language, and replace the original picker/distractors/stats with `src/learning/**` (Leitner, session planner, distractor classes). Deliberate behavior change; parity suite switches from "identical" to "visuals identical except quiz content".
 - Priority: P1
 - Implementation status: done (tag phase-12)
-- Review status: not reviewed
+- Review status: reviewed (reports/reviewer-phase-12.md); W1, W2, S1, S3, S5-S8 fixed (tag phase-12-reviewed)
 
 ## Key Insights
 - Store has no deployed users -> edit schema v1 in place (no extra migration step); rename `DB_NAME` 'number-stone-quest' -> 'math3d', settings key 'nsq.settings' -> 'math3d.settings'. Keep `ownedCosmetics` store + `purchaseCosmetic`/`equipCosmetic` untouched (shop = phase 19). Old-plan handoff W5 resolved here: ONE source for language + audio = `settings-store`; `i18n.ts` and recovered translator read it.
@@ -85,7 +85,7 @@ src/save/save-storage.ts             parseSave option {cap:false}; writeSave rem
 | Risk | L | I | Countermove |
 |---|---|---|---|
 | Player loses progress on migration | L | H | old key untouched; import idempotent; e2e with real live save |
-| Double import (two tabs) | L | M | marker written in same tx as data; second tab sees marker |
+| Double import (two tabs) | L | M | marker written in same tx as data; second tab sees marker and adopts the imported profile; every write re-checks the active profile in its tx |
 | Mistyped / partial save code | M | M | CRC32 + version prefix; copy button on export; error never touches store |
 | idb unavailable (Safari private) | M | M | memory fallback + toast; legacy key still read each boot (re-import into memory) |
 Rollback: revert phase; old key still holds pre-migration progress -> recovered r186 build reads it again.
@@ -111,3 +111,17 @@ Rollback: revert phase; old key still holds pre-migration progress -> recovered 
   seeded RNG). Clock harness: animations adopted at interaction flush (book-welcome race).
 - Deferred: imports/resets append no outbox item (phase 17 must sync a freshly imported profile
   wholesale); old orphaned guest profiles are not garbage-collected.
+
+## Review fixes (2026-10-20, tag phase-12-reviewed)
+- W1: progress clicks during `data-boot=store` are held and replayed after connect
+  (`src/ui/boot-window-action-gate.ts`); unreadable store -> memory store + `notPersistent`
+  toast; a write with no store reports the failure.
+- W2: `assertActiveProfile` in every write tx (`src/store/active-profile-guard.ts`); a refused
+  write makes the store follow the active profile, progress-sync drops pending answers,
+  re-hydrates and the UI shows the reload prompt. `'already-imported'` follows the active profile.
+- S1 drop + report `InvalidDeltaError` batches; S3 commit each correct bridge answer; S5 every
+  replacement writes the legacy marker; S6 fact time beyond the Date range -> `SaveCodeError`;
+  S7 documented (reset keeps sound/music); S8 WebMCP read no longer flushes.
+- Not done: S2 (stale box in a batch after a failed commit), S4 (flush before versionchange close).
+- Tradeoff: a bridge round is now one Leitner session per committed answer (interval counts in
+  sessions advance faster during the bridge quest).

@@ -138,3 +138,30 @@ the head tooling and requires them to be equal. PR label `parity-change` skips i
 - Quiz: facts from the Leitner session planner over the chosen table, options from the
   distractor classes (practice) or expression choice (bridge); rewards stay the original
   (`src/quiz/quiz-rewards.ts`, asserted against the original bundle).
+
+### Behavior changes after the phase 12 review (`phase-12-reviewed`)
+
+- Reset ("Chơi lại từ đầu") no longer resets sound and music. The original `defaultSave()`
+  reset turned sound on and music off; settings now live in `math3d.settings`, separate from
+  progress, and survive a reset. Intentional deviation.
+- Boot window: Play, the avatar buttons, "Nhập mã lưu" and the book's practice buttons clicked
+  while `<html data-boot="store">` are held and replayed in click order right after the store
+  connects (`src/ui/boot-window-action-gate.ts`); before, the hydrate silently reverted them.
+  After boot they run at once, as before (parity scenarios click only after `ready`).
+- A store that opens but cannot be read now falls back to the in-memory store with the
+  "chưa cho phép lưu" toast, instead of a session where every write was silently dropped.
+- Several tabs: every store write checks, in its transaction, that its profile is still the
+  active one. If another tab switched it (reset, save-code import, or won the legacy-import
+  race), the write is refused, the tab follows the new profile and shows the reload prompt
+  ("dữ liệu lưu đã thay đổi ở nơi khác"). A tab that lost the import race adopts the imported
+  profile at boot.
+- Any progress replacement (reset, save-code import) also writes `meta.legacyImport`, so a
+  failed first import retried on a later boot never overwrites newer progress.
+- Quiz batches: each correct bridge answer commits at once (the built segment survives a tab
+  close on iOS); practice still commits every 5 answers, on close and on hide. Each commit is
+  one Leitner session, so a bridge round counts one session per segment. A batch the store
+  refuses for good (`InvalidDeltaError`) is dropped and logged instead of blocking later ones.
+- Save codes: a fact time beyond the JS Date range is a `payload` error (`SaveCodeError`), not a
+  raw `RangeError`.
+- WebMCP `read_adventure_progress` stays read-only: it no longer commits the open quiz batch, so
+  up to 4 practice answers in progress are not counted yet (the description says so).
