@@ -11,12 +11,14 @@ export interface AnswerOption {
 }
 
 export interface Question {
-  /** Stats key `m{a}_{b}`. */
+  /** Directed id `m{a}_{b}` (the original stats key). */
   id: string;
+  /** Pooled learning fact key, e.g. `mul:3x7`. */
+  factKey: string;
   a: number;
   b: number;
   answer: number;
   options: AnswerOption[];
-  /** True when the fact was drawn from the review queue. */
+  /** The fact was answered before and sits in Leitner box 1 (shown as a review). */
   review: boolean;
 }
