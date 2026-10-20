@@ -154,3 +154,16 @@ describe('save code codec', () => {
     expect(boxes).toEqual({});
   });
 });
+
+describe('decodeSaveCode outside the Date range', () => {
+  it('a well-checksummed fact time no Date can hold is a payload error, not a RangeError', () => {
+    for (const seenSec of [8.64e12 + 1, 1e15]) {
+      const payload = b64url(JSON.stringify({ f: [[7, 8, 2, 1, 50, seenSec]] }));
+      expect(errorReason(() => decodeSaveCode(`M3D1-${payload}-${crc32Hex(payload)}`))).toBe(
+        'payload',
+      );
+    }
+    const edge = b64url(JSON.stringify({ f: [[7, 8, 2, 1, 50, 8.64e12]] }));
+    expect(decodeSaveCode(`M3D1-${edge}-${crc32Hex(edge)}`).save.questionStats.m7_8).toBeDefined();
+  });
+});

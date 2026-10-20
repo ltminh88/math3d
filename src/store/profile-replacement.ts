@@ -31,7 +31,10 @@ export const emptyProgressRecords = (): ProgressRecords => ({
 });
 
 export interface ReplaceOptions {
-  /** Legacy-save import: skip when an import already happened (marker), write the marker otherwise. */
+  /**
+   * Legacy-save import: skip when the marker exists. Every replacement writes the marker (if
+   * absent), so a reset or save-code import is never overwritten by a later legacy-import retry.
+   */
   legacyImport?: boolean;
 }
 
@@ -64,7 +67,8 @@ export async function writeReplacementProfile(
   const meta = tx.objectStore('meta');
   await meta.put({ key: metaGameKey(profileId), value: { ...records.gameMeta } });
   await meta.put({ key: META_ACTIVE_PROFILE, value: profileId });
-  if (options.legacyImport) {
+  // Any replacement supersedes the legacy save: a later import retry must never overwrite it.
+  if (options.legacyImport || !(await hasLegacyImportMarker(tx))) {
     const marker: LegacyImportMarker = { v: 1, at: now, profileId };
     await meta.put({ key: META_LEGACY_IMPORT, value: marker });
   }

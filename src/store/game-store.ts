@@ -1,11 +1,16 @@
 import type { SessionDelta } from '../learning/learning-types';
-import { type PurchaseResult, purchaseInTransaction } from './cosmetic-purchase-transaction';
+import { assertActiveProfile, ProfileSwitchedError } from './active-profile-guard';
+import {
+  type PurchaseResult,
+  purchaseDelta,
+  purchaseInTransaction,
+} from './cosmetic-purchase-transaction';
 import { validateDelta } from './delta-validation';
 import type { GameStore, OpenStoreOptions, SessionCommittedEvent } from './game-store-api';
 import { isMemoryGameDb } from './memory-database';
 import { openDbOrMemory } from './open-game-db-with-memory-fallback';
 import { hasLegacyImportMarker, writeReplacementProfile } from './profile-replacement';
-import { loadOrCreateActiveProfile, saveProfile } from './profile-repository';
+import { loadOrCreateActiveProfile } from './profile-repository';
 import {
   appendOutbox,
   applyDelta,
@@ -14,12 +19,23 @@ import {
   newLevelProgress,
   readSessionCount,
 } from './progress-repository';
-import { metaGameKey, metaSessionCountKey } from './save-schema';
+import { metaGameKey, metaSessionCountKey, type Profile } from './save-schema';
 import { inTransaction } from './store-transaction';
 
+export { ProfileSwitchedError } from './active-profile-guard';
 export type { PurchaseResult } from './cosmetic-purchase-transaction';
 export type { GameStore, OpenStoreOptions, SessionCommittedEvent } from './game-store-api';
 export type { GameSnapshot } from './progress-repository';
+
+function notify<A>(listeners: Set<(a: A) => void>, arg: A): void {
+  for (const l of listeners) {
+    try {
+      l(arg);
+    } catch (err) {
+      console.error('Game store listener failed', err);
+    }
+  }
+}
 
 export async function openGameStore(options: OpenStoreOptions = {}): Promise<GameStore> {
   const now = options.now ?? Date.now;
@@ -30,15 +46,6 @@ export async function openGameStore(options: OpenStoreOptions = {}): Promise<Gam
   const snapshotListeners = new Set<(s: GameSnapshot) => void>();
   const commitListeners = new Set<(e: SessionCommittedEvent) => void>();
 
-  const notify = <A>(listeners: Set<(a: A) => void>, arg: A): void => {
-    for (const l of listeners) {
-      try {
-        l(arg);
-      } catch (err) {
-        console.error('Game store listener failed', err);
-      }
-    }
-  };
   const refresh = async (): Promise<void> => {
     snapshot = await loadSnapshot(db, snapshot.profile);
     notify(snapshotListeners, snapshot);
@@ -58,6 +65,31 @@ export async function openGameStore(options: OpenStoreOptions = {}): Promise<Gam
     queue = run.catch(() => undefined);
     return run;
   };
+  /** Re-reads the active profile (another tab replaced it, or lost the legacy-import race). */
+  const followActiveProfile = async (): Promise<void> => {
+    const active = await loadOrCreateActiveProfile(db, newId);
+    if (active.id === snapshot.profile.id) return;
+    snapshot = await loadSnapshot(db, active);
+    notify(snapshotListeners, snapshot);
+  };
+  /** A serialized write to the held profile; a stale profile is refused and then followed. */
+  const write = <T>(job: () => Promise<T>): Promise<T> =>
+    serial(async () => {
+      try {
+        return await job();
+      } catch (err) {
+        if (err instanceof ProfileSwitchedError) await followActiveProfile();
+        throw err;
+      }
+    });
+  const saveHeldProfile = async (profile: Profile): Promise<void> => {
+    await inTransaction(db, async (tx) => {
+      await assertActiveProfile(tx, profile.id);
+      await tx.objectStore('profiles').put(profile);
+    });
+    snapshot = { ...snapshot, profile };
+    notify(snapshotListeners, snapshot);
+  };
 
   return {
     persistent: !isMemoryGameDb(db),
@@ -73,7 +105,7 @@ export async function openGameStore(options: OpenStoreOptions = {}): Promise<Gam
     nextSessionNo: () => snapshot.sessionCount + 1,
 
     commitSession(delta, local) {
-      return serial(async () => {
+      return write(async () => {
         validateDelta(delta, snapshot.profile.id);
         if (delta.coins < 0 || (delta.cosmetics?.length ?? 0) > 0) {
           throw new Error(
@@ -82,6 +114,7 @@ export async function openGameStore(options: OpenStoreOptions = {}): Promise<Gam
         }
         const at = now();
         await inTransaction(db, async (tx) => {
+          await assertActiveProfile(tx, delta.profileId);
           // Retry of a delta that already committed (e.g. the refresh failed afterwards): no-op.
           if (await tx.objectStore('outbox').index('byBatchId').get(delta.batchId)) return;
           const sessionNo = (await readSessionCount(tx, delta.profileId)) + 1;
@@ -96,23 +129,9 @@ export async function openGameStore(options: OpenStoreOptions = {}): Promise<Gam
     },
 
     purchaseCosmetic(cosmeticId, price) {
-      return serial(async () => {
-        if (cosmeticId === '') throw new Error('purchaseCosmetic: empty cosmetic id');
-        if (!Number.isInteger(price) || price <= 0)
-          throw new Error('purchaseCosmetic: price must be a positive integer');
-        const profileId = snapshot.profile.id;
+      return write(async () => {
         const at = now();
-        const delta: SessionDelta = {
-          batchId: newId(),
-          profileId,
-          clientTs: at,
-          v: 1,
-          facts: {},
-          levels: {},
-          xp: 0,
-          coins: -price,
-          cosmetics: [cosmeticId],
-        };
+        const delta = purchaseDelta(snapshot.profile.id, cosmeticId, price, at, newId);
         const result = await inTransaction<PurchaseResult>(db, (tx) =>
           purchaseInTransaction(tx, delta, price, at, snapshot.sessionCount),
         );
@@ -122,45 +141,42 @@ export async function openGameStore(options: OpenStoreOptions = {}): Promise<Gam
     },
 
     equipCosmetic(slot, cosmeticId) {
-      return serial(async () => {
+      return write(async () => {
         if (slot === '' || cosmeticId === '')
           throw new Error('equipCosmetic: slot and id are required');
         const { profile: current } = snapshot;
-        const profile = {
+        await saveHeldProfile({
           ...current,
           settings: {
             ...current.settings,
             equipped: { ...current.settings.equipped, [slot]: cosmeticId },
           },
-        };
-        await saveProfile(db, profile);
-        snapshot = { ...snapshot, profile };
-        notify(snapshotListeners, snapshot);
+        });
       });
     },
 
     setAvatar(avatarId) {
-      return serial(async () => {
-        const profile = { ...snapshot.profile, avatarId };
-        await saveProfile(db, profile);
-        snapshot = { ...snapshot, profile };
-        notify(snapshotListeners, snapshot);
-      });
+      return write(() => saveHeldProfile({ ...snapshot.profile, avatarId }));
     },
 
     updateGameMeta(patch) {
-      return serial(async () => {
+      return write(async () => {
         const gameMeta = { ...snapshot.gameMeta, ...patch };
-        await db.put('meta', { key: metaGameKey(snapshot.profile.id), value: gameMeta });
+        const profileId = snapshot.profile.id;
+        await inTransaction(db, async (tx) => {
+          await assertActiveProfile(tx, profileId);
+          await tx.objectStore('meta').put({ key: metaGameKey(profileId), value: gameMeta });
+        });
         snapshot = { ...snapshot, gameMeta };
         notify(snapshotListeners, snapshot);
       });
     },
 
     acceptLevel(levelId) {
-      return serial(async () => {
+      return write(async () => {
         const profileId = snapshot.profile.id;
         await inTransaction(db, async (tx) => {
+          await assertActiveProfile(tx, profileId);
           const levels = tx.objectStore('levelProgress');
           const prev = {
             ...newLevelProgress(profileId, levelId),
@@ -179,7 +195,11 @@ export async function openGameStore(options: OpenStoreOptions = {}): Promise<Gam
           if (replaceOptions.legacyImport && (await hasLegacyImportMarker(tx))) return undefined;
           return writeReplacementProfile(tx, profileId, records, now(), replaceOptions);
         });
-        if (!profile) return 'already-imported';
+        if (!profile) {
+          // Another tab imported first and switched the active profile: follow it.
+          await followActiveProfile();
+          return 'already-imported';
+        }
         snapshot = await loadSnapshot(db, profile);
         notify(snapshotListeners, snapshot);
         return 'replaced';

@@ -12,6 +12,7 @@ import {
   seedLeitnerBox,
 } from './legacy-save-import';
 import { createMemoryGameDb } from './memory-database';
+import { emptyProgressRecords } from './profile-replacement';
 
 let dbCounter = 0;
 const freshName = () => `legacy-import-db-${++dbCounter}`;
@@ -173,5 +174,17 @@ describe('importLegacySave', () => {
     };
     expect(readLegacySaveRaw(throwing)).toBeNull();
     expect(readLegacySaveRaw(null)).toBeNull();
+  });
+});
+
+describe('legacy import after a replacement', () => {
+  it('a reset or save-code import marks the legacy save as superseded', async () => {
+    const store = await openGameStore({ db: createMemoryGameDb() });
+    await store.replaceProgress(emptyProgressRecords());
+    await store.updateGameMeta({ started: true });
+    expect(await importLegacySave(store, '{"version":1,"xp":500}')).toBe('already-imported');
+    expect(store.getSnapshot().wallet.xp).toBe(0);
+    expect(store.getSnapshot().gameMeta.started).toBe(true);
+    store.close();
   });
 });

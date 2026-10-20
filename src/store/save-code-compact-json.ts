@@ -13,6 +13,8 @@ type FactTuple = number[];
 const NUMBER_KEYS = { x: 'xp', c: 'coins', b: 'bridge', t: 'table', k: 'combo' } as const;
 const FLAG_KEYS = { qa: 'questAccepted', qc: 'questComplete', m: 'music', st: 'started' } as const;
 const MAX_FACTS = 200;
+/** Latest second a JS Date can hold (8.64e15 ms); later times would throw a RangeError. */
+const MAX_SEEN_SEC = 8.64e12;
 
 export function saveV1ToCompact(save: SaveV1, boxes: Readonly<Record<string, number>>): Compact {
   const out: Compact = {};
@@ -52,7 +54,7 @@ function expandFact(tuple: unknown): [string, QuestionStat, number | undefined] 
     return null;
   const [a, b, correct, wrong, responseTime, seenSec, box] = tuple as number[];
   const id = `m${a}_${b}`;
-  if (!STAT_KEY_PATTERN.test(id)) return null;
+  if (!STAT_KEY_PATTERN.test(id) || (seenSec as number) > MAX_SEEN_SEC) return null;
   const lastAnsweredAt =
     (seenSec as number) > 0 ? new Date((seenSec as number) * 1000).toISOString() : '';
   const stat = {

@@ -20,7 +20,3 @@ export async function loadOrCreateActiveProfile(db: GameDb, newId: () => string)
   await tx.done;
   return profile;
 }
-
-export async function saveProfile(db: GameDb, profile: Profile): Promise<void> {
-  await db.put('profiles', profile);
-}
