@@ -4,6 +4,7 @@
 import { getLegacyLanguage, setLegacyLanguage } from '../i18n/legacy-translator';
 import type { Avatar } from '../save/save-types';
 import { appSettings } from '../store/app-settings';
+import { whenStoreReady } from './boot-window-action-gate';
 import { closeDialog } from './dialog';
 import { gameState, getWorld } from './game-state';
 import { refreshHud } from './hud';
@@ -59,14 +60,16 @@ export function wireMenu(): void {
     setLegacyLanguage(getLegacyLanguage() === 'vi' ? 'en' : 'vi');
     location.reload();
   };
-  byId('play').onclick = startAdventure;
+  // Progress-changing clicks wait for the store boot (boot-window-action-gate.ts).
+  byId('play').onclick = () => whenStoreReady('play', startAdventure);
   for (const avatar of ['boy', 'girl'] as const satisfies readonly Avatar[]) {
-    byId(avatar).onclick = () => {
-      gameState.progress.avatar = avatar;
-      getWorld().setAvatar(avatar);
-      refreshHud();
-      void saveAvatar(avatar);
-    };
+    byId(avatar).onclick = () =>
+      whenStoreReady('avatar', () => {
+        gameState.progress.avatar = avatar;
+        getWorld().setAvatar(avatar);
+        refreshHud();
+        void saveAvatar(avatar);
+      });
   }
-  byId('import-save-code').onclick = () => openSaveCodeImport();
+  byId('import-save-code').onclick = () => whenStoreReady('import', () => openSaveCodeImport());
 }

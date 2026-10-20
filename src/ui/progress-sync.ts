@@ -1,6 +1,7 @@
 // Writes the UI's optimistic progress view through to the game store (IndexedDB). Quiz answers
-// are committed in batches (every 5 questions, when the quiz closes, or when the page hides);
-// every other change is written at once. Writes run in order through one queue.
+// are committed in batches (every 5 questions, after each correct bridge answer, when the quiz
+// closes, or when the page hides); every other change is written at once. Writes run in order
+// through one queue.
 import type { FactKey } from '../learning/fact-key';
 import type { QuestionOutcome, SessionResult } from '../learning/session-recorder';
 import { createQuizPlanner } from '../quiz/learning-quiz-adapter';
@@ -10,6 +11,8 @@ import {
   type QuizAnswerBatch,
   questCompleteDelta,
 } from '../quiz/quiz-answer-batch';
+import { ProfileSwitchedError } from '../store/active-profile-guard';
+import { InvalidDeltaError } from '../store/delta-validation';
 import type { GameStore } from '../store/game-store-api';
 import { BRIDGE_LEVEL_ID } from '../store/legacy-save-import';
 import type { ProgressRecords } from '../store/profile-replacement';
@@ -25,6 +28,7 @@ let batch: QuizAnswerBatch | undefined;
 /** Finished batches whose commit has not succeeded yet (retried with the same batchId). */
 const unsent: SessionResult[] = [];
 let queue: Promise<void> = Promise.resolve();
+let onProfileSwitched: () => void = () => {};
 // Math.random is seeded in parity runs, so quiz content stays deterministic there.
 const planner = createQuizPlanner(Math.random);
 
@@ -37,18 +41,33 @@ function reportFailure(err: unknown): void {
 }
 
 /**
+ * Another tab replaced the active profile; the store already follows the new one. Pending answers
+ * belonged to the old profile: drop them and re-hydrate the view from the new snapshot.
+ */
+function followProfileSwitch(s: GameStore): void {
+  batch = undefined;
+  unsent.length = 0;
+  gameState.progress = progressViewFromSnapshot(s.getSnapshot());
+  onProfileSwitched();
+}
+
+/**
  * Runs store writes one after another; resolves false (after reporting) when the write failed or
- * no store is connected yet. A failure never blocks later writes.
+ * no store is connected. A failure never blocks later writes.
  */
 function enqueue(job: (s: GameStore) => Promise<unknown>): Promise<boolean> {
   const s = store;
-  if (!s) return Promise.resolve(false);
+  if (!s) {
+    reportFailure(new Error('Game store is not connected'));
+    return Promise.resolve(false);
+  }
   const run = queue
     .then(() => job(s))
     .then(
       () => true,
       (err: unknown) => {
-        reportFailure(err);
+        if (err instanceof ProfileSwitchedError) followProfileSwitch(s);
+        else reportFailure(err);
         return false;
       },
     );
@@ -56,8 +75,14 @@ function enqueue(job: (s: GameStore) => Promise<unknown>): Promise<boolean> {
   return run;
 }
 
-export function connectStore(connected: GameStore): void {
+export interface ConnectOptions {
+  /** Another tab switched the active profile (view already re-hydrated). */
+  onProfileSwitched?: () => void;
+}
+
+export function connectStore(connected: GameStore, options: ConnectOptions = {}): void {
   store = connected;
+  onProfileSwitched = options.onProfileSwitched ?? (() => {});
   batch = undefined;
   unsent.length = 0;
   gameState.progress = progressViewFromSnapshot(connected.getSnapshot());
@@ -94,7 +119,9 @@ export function recordQuizQuestion(
   batch.recordQuestion(outcome, reward);
   if (gameState.quizMode === 'bridge')
     batch.setLevelProgress(BRIDGE_LEVEL_ID, gameState.progress.bridge);
-  if (batch.size >= QUIZ_BATCH_SIZE) void flushProgress();
+  // A built bridge segment is the progress a child notices missing: commit it right away.
+  const bridgeStep = gameState.quizMode === 'bridge' && outcome.correct;
+  if (bridgeStep || batch.size >= QUIZ_BATCH_SIZE) void flushProgress();
 }
 
 /** Commits pending quiz answers and the combo. */
@@ -102,13 +129,22 @@ export function flushProgress(): Promise<boolean> {
   if (batch && batch.size > 0) unsent.push(batch.finish());
   batch = undefined;
   return enqueue(async (s) => {
+    let refused: unknown;
     while (unsent.length > 0) {
       const next = unsent[0] as SessionResult;
-      await s.commitSession(next.delta, next.local);
+      try {
+        await s.commitSession(next.delta, next.local);
+      } catch (err) {
+        // A transient failure (quota, closed connection) keeps the batch for a retry; one the
+        // store refuses for good would block every later batch, so it is dropped.
+        if (!(err instanceof InvalidDeltaError)) throw err;
+        refused = err;
+      }
       unsent.shift();
     }
     const { combo } = gameState.progress;
     if (s.getSnapshot().gameMeta.combo !== combo) await s.updateGameMeta({ combo });
+    if (refused) throw refused; // reported once the queue moved on
   });
 }
 

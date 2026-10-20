@@ -1,6 +1,7 @@
 // Multiplication book (tables ×2–×10 with ✓ for facts answered right) and the how-to-play dialog.
 import { TABLES } from '../config/world-constants';
 import { mulKey } from '../learning/fact-key';
+import { whenStoreReady } from './boot-window-action-gate';
 import { closeDialog, openDialog } from './dialog';
 import { gameState } from './game-state';
 import { byId, icon } from './icons';
@@ -26,16 +27,14 @@ export function openBook(table = gameState.progress.table || 2): void {
   for (const tab of document.querySelectorAll<HTMLElement>('[data-table]')) {
     tab.onclick = () => openBook(Number(tab.dataset.table));
   }
-  byId('practice-table').onclick = () => {
-    gameState.progress.table = table;
-    void saveGameMeta({ table });
-    openQuiz('practice');
-  };
-  byId('practice-all').onclick = () => {
-    gameState.progress.table = 0;
-    void saveGameMeta({ table: 0 });
-    openQuiz('practice');
-  };
+  const practice = (pick: number) => () =>
+    whenStoreReady('practice', () => {
+      gameState.progress.table = pick;
+      void saveGameMeta({ table: pick });
+      openQuiz('practice');
+    });
+  byId('practice-table').onclick = practice(table);
+  byId('practice-all').onclick = practice(0);
 }
 
 export function openHelp(): void {
