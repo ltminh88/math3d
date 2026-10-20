@@ -1,6 +1,8 @@
 // WebMCP: registers the read-only `read_adventure_progress` tool when the browser exposes
 // `document.modelContext`. Returns progress counters from the game store only (no personal data).
-import { connectedStore, flushProgress } from '../ui/progress-sync';
+// It never writes: answers still in the open quiz batch (at most 4; bridge answers commit at
+// once) show up after the next commit.
+import { connectedStore } from '../ui/progress-sync';
 import { type AdventureProgress, adventureProgressFromSnapshot } from './adventure-progress';
 
 interface ModelContextTool {
@@ -15,12 +17,11 @@ interface ModelContext {
   registerTool?: (tool: ModelContextTool, options: { signal: AbortSignal }) => unknown;
 }
 
-/** Commits pending quiz answers, then reads the store (re-read on every call). */
+/** Reads the committed progress from the store (re-read on every call, no write). */
 export async function readAdventureProgress(input: unknown): Promise<AdventureProgress> {
   if (!input || typeof input !== 'object' || Array.isArray(input) || Object.keys(input).length) {
     throw new Error('Expected an empty object');
   }
-  await flushProgress();
   const store = connectedStore();
   if (!store) throw new Error('Progress is still loading');
   return adventureProgressFromSnapshot(store.getSnapshot());
@@ -29,7 +30,7 @@ export async function readAdventureProgress(input: unknown): Promise<AdventurePr
 const progressTool: ModelContextTool = {
   name: 'read_adventure_progress',
   description:
-    'Read local progress in math3d (Multiplication Kingdom): XP, coins, level, bridge segments built and avatar.',
+    'Read saved local progress in math3d (Multiplication Kingdom): XP, coins, level, bridge segments built and avatar. Read-only; answers in a quiz round still in progress may not be counted yet.',
   inputSchema: { type: 'object', properties: {}, additionalProperties: false },
   annotations: { readOnlyHint: true },
   execute: (input) => readAdventureProgress(input),
