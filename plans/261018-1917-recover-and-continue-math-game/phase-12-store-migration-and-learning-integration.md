@@ -8,7 +8,7 @@
 - Date: 2026-10-18
 - Description: Make the existing `src/store/**` (idb + outbox) the source of truth, import legacy v1 progress (localStorage blob when present on this origin, or a pasted "save code"), add save-code export, unify settings/language, and replace the original picker/distractors/stats with `src/learning/**` (Leitner, session planner, distractor classes). Deliberate behavior change; parity suite switches from "identical" to "visuals identical except quiz content".
 - Priority: P1
-- Implementation status: pending
+- Implementation status: done (tag phase-12)
 - Review status: not reviewed
 
 ## Key Insights
@@ -63,14 +63,14 @@ src/save/save-storage.ts             parseSave option {cap:false}; writeSave rem
 7. E2E `tests/e2e/legacy-save-migration.spec.ts`: inject real captured live save (from 01 trace) into localStorage -> boot -> assert HUD values, bridge segments, language; reload -> same; old key unchanged. E2E `legacy-save-code.spec.ts`: encode the same captured save as a code -> fresh profile -> "Nhập mã lưu" -> identical HUD; export -> clear site data -> import -> identical.
 
 ## Todo list
-- [ ] schema + settings unification
-- [ ] legacy import (+ tests)
-- [ ] boot sequence + handoff items
-- [ ] quiz adapter + UI wiring (+ tests)
-- [ ] save-code codec + export + dialogs (+ tests)
-- [ ] bridge reward freeze test
-- [ ] parity re-baseline (quiz only + new start/settings buttons)
-- [ ] migration e2e
+- [x] schema + settings unification
+- [x] legacy import (+ tests)
+- [x] boot sequence + handoff items
+- [x] quiz adapter + UI wiring (+ tests)
+- [x] save-code codec + export + dialogs (+ tests)
+- [x] bridge reward freeze test
+- [x] parity re-baseline (quiz + new start/settings buttons + storage moved to IndexedDB)
+- [x] migration e2e
 
 ## Success Criteria
 - `npm test` green incl. import tests (every fixture: no throw, totals equal to source sums).
@@ -95,3 +95,19 @@ Rollback: revert phase; old key still holds pre-migration progress -> recovered 
 
 ## Next steps
 - 13 region progression on `LevelProgress`; 16 adds `progress` column; 17 syncs.
+
+## Implementation notes (2026-10-20)
+- Store: `replaceProgress` writes an import/reset as a NEW active guest profile in one transaction
+  (old rows stay, no delete needed); legacy import writes `meta.legacyImport` in the same tx.
+  `questAccepted` -> `LevelProgress.acceptedAt`; game meta key `game:<profileId>`.
+- Settings: `math3d.settings` is not written at boot; until the first write, legacy keys seed it.
+- Quiz: recovered picker/stats retired (golden JSON kept; picker/stats vitest cases removed, 30-cap
+  check moved to save golden as "legacy v1 compatibility"). 3-choice practice options rebalance
+  the answer rank (pickDistractors alone would leave the answer in the middle every time).
+- Boot: world + loading card stay synchronous (original timing); store hydration re-renders
+  afterwards and flags `<html data-boot="ready">` (parity runner + e2e wait on it).
+- Parity: every scenario re-baselined; see the phase-12 baseline commit for per-scenario causes.
+  Canvas PNG + scene JSON changed only in `playthrough` (quiz content; spark positions follow the
+  seeded RNG). Clock harness: animations adopted at interaction flush (book-welcome race).
+- Deferred: imports/resets append no outbox item (phase 17 must sync a freshly imported profile
+  wholesale); old orphaned guest profiles are not garbage-collected.

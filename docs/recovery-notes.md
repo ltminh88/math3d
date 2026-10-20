@@ -14,8 +14,9 @@ Plan: `plans/261018-1917-recover-and-continue-math-game/` (phases 01-09).
 | `recovered/formatted/game-styles.css` | `src/styles/game/NN-*.css` (byte-identical split, `npm run recover:styles:check`) |
 
 `src/legacy/**` (the intermediate unminified chunks and shims) is gone since f3931c9; the app
-imports the typed modules directly. localStorage keys (`aigame3d_*`) and the save format v1 are
-unchanged, so old saves load as-is.
+imports the typed modules directly. Since phase 12 progress lives in IndexedDB (`math3d`) and
+settings in `math3d.settings`; the original keys (`aigame3d_*`, save format v1) are only read
+once to migrate and are never written again (see "Progress storage and save codes" below).
 
 ## Tooling pipeline (`tools/recovery/`)
 
@@ -81,8 +82,9 @@ the head tooling and requires them to be equal. PR label `parity-change` skips i
 
 ## Preserved quirks (kept for parity, fix only knowingly in phase 12+)
 
-- Save load keeps only the first 30 `questionStats` entries and 30 review ids
-  (`src/save/save-storage.ts`); version ≠ 1 resets to defaults.
+- Fixed in phase 12: the original reload kept only the first 30 `questionStats` entries and 30
+  review ids. `parseSave` still does that by default (golden-exact, "legacy v1 compatibility"
+  tests); migration and save codes read with `{ cap: false }`. Version ≠ 1 still means defaults.
 - Losing window focus while playing opens the settings dialog (`keyboard-joystick.ts`,
   `settings-dialog.ts`).
 - The forest region never counts in the scatter exclusion test (`world-scatter-exclusion.ts`).
@@ -107,3 +109,32 @@ the head tooling and requires them to be equal. PR label `parity-change` skips i
   latin + vietnamese, same weights as the old Google request: Baloo 2 600/700/800, Nunito
   500-900, so unweighted text still resolves to Nunito 500). Glyph outlines differ slightly from
   Google's build (DOM text raster shifts by a few pixels); canvas and layout JSON are unaffected.
+
+## Progress storage and save codes (phase 12)
+
+- Store: `src/store/**` (IndexedDB `math3d`, memory fallback when IndexedDB is unavailable, with
+  a toast). Boot builds the shell and world and hides the loading card synchronously as before,
+  then `src/ui/store-boot.ts` opens the store, imports the legacy save once and re-renders
+  world + HUD (a few ms later). `<html data-boot>` is `store` until then and `ready` after; the
+  parity runner and e2e wait for it. The HUD skips rewriting unchanged icon markup: re-inserting
+  icons under the glass (backdrop-filter) buttons changes their raster.
+- Parity clock: `__parityFlush` adopts new CSS animations synchronously, so an entrance
+  animation (dialog `pop`) always starts at the interaction's virtual time instead of sometimes
+  finishing in real time first (phase 12 saw `menus--book-welcome` flip between the two).
+- Legacy import (`legacy-save-import.ts`): `aigame3d_multiplication_save` v1 -> a new guest
+  profile in one transaction with the marker `meta.legacyImport`. Mapping: avatar ->
+  `Profile.avatarId`; xp/coins -> wallet; bridge/questAccepted/questComplete ->
+  `LevelProgress{levelId:'bridge', progress, acceptedAt, completedAt, stars}`; table/combo/started
+  -> `meta game:<profileId>`; `questionStats m{a}_{b}` -> pooled `mul:{min}x{max}` (sums;
+  totalMs = last response time x attempts; lastSeenAt = max); Leitner box: in review -> 1,
+  correct >= 3 and no wrong -> 3, correct >= 1 -> 2, else 1. Invalid/unknown-version blobs import
+  nothing and write no marker (retried next boot).
+- Settings: one source, `math3d.settings` (`src/store/app-settings.ts`); until it is first
+  written, language / quest card / sound / music come from the legacy keys.
+- Save codes (`save-code-codec.ts`): `M3D1-` + base64url(compact JSON: short keys, defaults
+  omitted, facts as `[a, b, correct, wrong, responseMs, lastAnsweredSec, box?]`) + `-` + CRC32
+  (8 hex) of the payload; max 4096 chars; decoded through the same v1 validator. Import: start
+  screen "Nhập mã lưu"; export: settings "Xuất mã lưu".
+- Quiz: facts from the Leitner session planner over the chosen table, options from the
+  distractor classes (practice) or expression choice (bridge); rewards stay the original
+  (`src/quiz/quiz-rewards.ts`, asserted against the original bundle).

@@ -8,12 +8,13 @@
 ## Layering
 One engine only: the recovered world. Folders under `src/`:
 - `config/` world constants, regions, roads, seeded LCG (pure data).
-- `save/` legacy save format and storage; `game/` XP and levels; `quiz/` recovered question generator, hints, answer stats.
+- `save/` legacy v1 save format and parser (read-only: migration and save codes); `game/` XP and levels; `quiz/` the recovered hint text, frozen quiz rewards and the adapter from `learning/` (Leitner planner, distractors, recorder) to the 3-choice quiz dialog.
 - `audio/` recovered Web Audio synth; `i18n/` `defineStrings` namespaces and the legacy translator.
 - `world/` Three.js world (renderer setup, builders, scatter, characters, player, camera, frame loop); `map/` minimap and world-map canvas rendering.
 - `ui/` DOM shell, HUD, dialogs and bootstrap; `ui/kit/` keeps number-pad, choice-buttons, aria-announcer for later levels.
 - `webmcp/` WebMCP tools exposed by the page.
 - `learning/` and `store/` are pure logic: no `three`, no DOM imports. They must run under Vitest's node environment.
+- Progress has one source of truth, the game store (IndexedDB); the UI keeps an optimistic view (`gameState.progress`) and writes every change through `src/ui/progress-sync.ts`. Settings (language, sound, music, quest card) have one source too: `src/store/app-settings.ts`. Never write the legacy `aigame3d_*` keys.
 - `core/` holds only reusable pieces kept for later levels (input controllers, speech narrator, audio gesture unlock, quality tiers, context-loss, WebGL check, tweens, asset cache/disposer). It is not a second engine.
 - `dev/` dev-only probes (`?debug=fps` frame-time overlay), never in the production bundle.
 - Planned: `levels/**` game content hosted by the world, `sync/**` Supabase.
