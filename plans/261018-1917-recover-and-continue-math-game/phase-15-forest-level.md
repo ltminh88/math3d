@@ -74,7 +74,8 @@ tests/e2e/forest-level.spec.ts
   parts baked to one mesh each; fruit and baskets are instanced. World lighting constants,
   sky colour, recovered CSS classes (glass, equation, answer-style pad keys, feedback,
   hint-area, stone-groups, reward-pop, completion-medal, primary/secondary).
-- Measured (SwiftShader, test build): 8 draw calls in a 2-friend round, max seen in e2e <= 17
+- Measured (SwiftShader, test build): 8 draw calls in a 2-friend round; worst case by
+  construction ~17 (5 friends + shadows, fruit, baskets, ring); e2e asserts max <= 60
   (budget 60). Geometries 236 in the world, 276 in the level, back to 236 after exit and after
   10 enter/exit cycles (both projects). Renderer state untouched; the level's sun shadow map is
   disposed in `dispose()`.
