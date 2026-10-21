@@ -2,8 +2,9 @@
 // scene, drive it from the host's own frame loop, and on exit dispose everything, close the run
 // (commit + UI unmount) and resume the world. One renderer, one WebGL context (iPad memory).
 // Browser wiring lives in level-host-ports.ts; this class only depends on the ports below.
-import type { Camera, Scene } from 'three';
+import type { Camera, Scene, Texture } from 'three';
 import { SceneDisposer } from '../../core/scene-disposer';
+import { isShared } from '../../core/shared-asset-cache';
 import type { LevelContext, LevelDefinition, LevelResult, LevelSession } from './level-types';
 
 /** Largest simulated level step, same as the world's (a hitch never jumps the simulation). */
@@ -23,6 +24,8 @@ export interface LevelHostPorts {
     render(scene: Scene, camera: Camera): void;
     setSize(width: number, height: number, updateStyle: boolean): void;
   };
+  /** Snapshots the renderer's global state; the returned function puts it back. */
+  saveRendererState(): () => void;
   requestFrame(callback: (timeMs: number) => void): number;
   cancelFrame(handle: number): void;
   /** Calls `onResize` with the canvas CSS size now and on every change; returns the stop. */
@@ -39,6 +42,7 @@ export type EnterOutcome = 'entered' | 'busy' | 'failed';
 interface ActiveRun {
   session: LevelSession | undefined;
   stopResize: () => void;
+  restoreRenderer: () => void;
   frame: number;
   ended: boolean;
 }
@@ -67,7 +71,13 @@ export class LevelHost {
     const { ports } = this;
     ports.world.suspend();
     const disposer = new SceneDisposer();
-    const active: ActiveRun = { session: undefined, stopResize: () => {}, frame: 0, ended: false };
+    const active: ActiveRun = {
+      session: undefined,
+      stopResize: () => {},
+      restoreRenderer: ports.saveRendererState(),
+      frame: 0,
+      ended: false,
+    };
     let run: LevelRun | undefined;
     const exit = (result: LevelResult): void => {
       if (run) this.finish(active, disposer, run, result);
@@ -76,6 +86,7 @@ export class LevelHost {
       run = ports.openRun(definition, disposer, exit);
     } catch (error) {
       console.error(`Level "${definition.id}" could not open its run`, error);
+      active.restoreRenderer();
       ports.world.resume();
       this.busy = false;
       return 'failed';
@@ -92,6 +103,7 @@ export class LevelHost {
     if (active.ended) {
       // The level exited during start: its run is closed already, only the scene is left.
       session.dispose?.();
+      disposeSceneTextures(session.scene);
       disposer.flush();
       return 'entered';
     }
@@ -113,6 +125,8 @@ export class LevelHost {
       startedAt.last = timeMs;
       try {
         session.update(dt, (timeMs - first) / 1000);
+        // The level may have exited inside update: its scene is disposed, never render it again.
+        if (active.ended) return;
         this.ports.renderer.render(session.scene, session.camera);
       } catch (error) {
         console.error('Level frame failed; leaving the level', error);
@@ -134,12 +148,22 @@ export class LevelHost {
     } catch (error) {
       console.error('Level dispose failed', error);
     }
+    if (active.session) disposeSceneTextures(active.session.scene);
     disposer.flush();
+    active.restoreRenderer();
     try {
       run.close(result);
     } finally {
       this.ports.world.resume();
       this.busy = false;
     }
+  }
+}
+
+/** Background/environment textures are not reached by the disposer's mesh traversal. */
+function disposeSceneTextures(scene: Scene): void {
+  for (const value of [scene.background, scene.environment]) {
+    const texture = value as Texture | null;
+    if (texture?.isTexture && !isShared(texture)) texture.dispose();
   }
 }

@@ -19,6 +19,7 @@ import { tl } from './level-host-strings';
 import { levelRunToCommit } from './level-run-result';
 import { mountLevelRunUi } from './level-run-ui';
 import type { LevelDefinition, LevelResult } from './level-types';
+import { saveRendererState } from './renderer-state-snapshot';
 
 const byFluency = (tables: readonly number[]): number[] =>
   [...tables].sort((a, b) => FLUENCY_ORDER.indexOf(a) - FLUENCY_ORDER.indexOf(b));
@@ -107,6 +108,7 @@ export function createLevelHostPorts(world: WorldPublicApi): LevelHostPorts {
   return {
     world,
     renderer: world.renderer,
+    saveRendererState: () => saveRendererState(world.renderer),
     requestFrame: (callback) => requestAnimationFrame(callback),
     cancelFrame: (handle) => cancelAnimationFrame(handle),
     watchResize(onResize) {

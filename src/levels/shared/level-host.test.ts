@@ -5,6 +5,7 @@ import {
   MeshBasicMaterial,
   PerspectiveCamera,
   Scene,
+  Texture,
 } from 'three';
 import { afterEach, describe, expect, it, vi } from 'vitest';
 import { LevelHost, type LevelHostPorts } from './level-host';
@@ -29,6 +30,10 @@ function fakePorts() {
     },
     cancelFrame: () => {
       pending = undefined;
+    },
+    saveRendererState: () => {
+      events.push('renderer:save');
+      return () => events.push('renderer:restore');
     },
     watchResize: (onResize) => {
       onResize(800, 600);
@@ -102,7 +107,7 @@ describe('level host', () => {
     const host = new LevelHost(f.ports);
     expect(await host.enter(definition(async () => testLevel(log)))).toBe('entered');
     expect(host.running).toBe(true);
-    expect(f.events.slice(0, 2)).toEqual(['suspend', 'size:800x600']);
+    expect(f.events.slice(0, 3)).toEqual(['suspend', 'renderer:save', 'size:800x600']);
     f.tick(1000);
     f.tick(1016);
     f.tick(3000); // long hitch: clamped
@@ -121,7 +126,7 @@ describe('level host', () => {
     expect(f.looping()).toBe(false);
     expect(disposed()).toBe(4);
     expect(f.closed).toEqual([{ completed: true }]);
-    expect(f.events.slice(-3)).toEqual(['unwatch', 'close', 'resume']);
+    expect(f.events.slice(-4)).toEqual(['unwatch', 'renderer:restore', 'close', 'resume']);
     expect(host.running).toBe(false);
   });
 
@@ -177,7 +182,7 @@ describe('level host', () => {
     });
     const log = { geometries: [], updates: [] };
     expect(await host.enter(definition(async () => testLevel(log)))).toBe('failed');
-    expect(f.events).toEqual(['suspend', 'resume']);
+    expect(f.events).toEqual(['suspend', 'renderer:save', 'renderer:restore', 'resume']);
     expect(host.running).toBe(false);
   });
 
@@ -209,5 +214,63 @@ describe('level host', () => {
     expect(f.closed).toEqual([{ completed: false }]);
     expect(f.looping()).toBe(false);
     expect(host.running).toBe(false);
+  });
+
+  it('a level that exits inside update is neither rendered nor scheduled again', async () => {
+    const f = fakePorts();
+    const host = new LevelHost(f.ports);
+    const quitting: LevelModule = {
+      start: (ctx) => {
+        const scene = new Scene();
+        scene.name = 'level';
+        return {
+          scene,
+          camera: new PerspectiveCamera(),
+          update: () => ctx.exit({ completed: false }),
+        };
+      },
+    };
+    await host.enter(definition(async () => quitting));
+    f.tick(0);
+    expect(f.events).not.toContain('render:level');
+    expect(f.looping()).toBe(false);
+    expect(f.closed).toEqual([{ completed: false }]);
+  });
+
+  it('restores the renderer state before the world resumes, also when start fails', async () => {
+    vi.spyOn(console, 'error').mockImplementation(() => {});
+    const f = fakePorts();
+    const host = new LevelHost(f.ports);
+    const broken: LevelModule = {
+      start: () => {
+        throw new Error('scene build failed');
+      },
+    };
+    await host.enter(definition(async () => broken));
+    expect(f.events.filter((e) => e.startsWith('renderer:'))).toEqual([
+      'renderer:save',
+      'renderer:restore',
+    ]);
+    expect(f.events.indexOf('renderer:restore')).toBeLessThan(f.events.indexOf('resume'));
+  });
+
+  it("disposes the scene's background and environment textures on exit", async () => {
+    const f = fakePorts();
+    const host = new LevelHost(f.ports);
+    const background = new Texture();
+    const environment = new Texture();
+    const textured: LevelModule = {
+      start: () => {
+        const scene = new Scene();
+        scene.background = background;
+        scene.environment = environment;
+        return { scene, camera: new PerspectiveCamera(), update: () => {} };
+      },
+    };
+    await host.enter(definition(async () => textured));
+    let disposed = 0;
+    for (const t of [background, environment]) t.addEventListener('dispose', () => disposed++);
+    f.exit({ completed: false });
+    expect(disposed).toBe(2);
   });
 });
