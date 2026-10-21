@@ -8,7 +8,7 @@
 - Date: 2026-10-18
 - Description: Implement old-07 Forest level as a level module behind the forest gate. Only deltas are written here.
 - Priority: P1
-- Implementation status: pending
+- Implementation status: done (2026-10-21, awaiting review)
 - Review status: not reviewed
 
 ## Deltas vs old phase 07
@@ -43,11 +43,47 @@ tests/e2e/forest-level.spec.ts
 5. E2E: `__game` seeds field complete -> enter forest gate -> complete -> `div:` keys in store.
 
 ## Todo list
-- [ ] sharing model (+tests)
-- [ ] diorama, animals, fruit
-- [ ] round flow + fact-family card (+tests)
-- [ ] hints + celebration
-- [ ] e2e
+- [x] sharing model (+tests)
+- [x] diorama, animals, fruit
+- [x] round flow + fact-family card (+tests)
+- [x] hints + celebration
+- [x] e2e
+
+## Implementation notes (2026-10-21)
+- `index.ts` only holds the definition; `load: () => import('./forest-scene')` builds as its own
+  chunk (`forest-scene-*.js` ~34 kB, `forest-scene-*.css` 4 kB). Strings are registered through
+  `ctx.defineStrings('forest', …)` once (cached); VLM's name comes from `tc('guideName')`.
+- Facts: `forestFactPool` = inverse divisions (`div:p/d`, tables 2-5) of box 3+ multiplication
+  facts plus divisions already seen; with fewer than 3, the concrete starter set (tables 2-3,
+  dividend <= 20). `ctx.learning.planSession(pool, 5)` picks the run. Rounds cycle share / pack /
+  family / share / pack; a fact at box 3+ or with more than 20 fruit is a fact family (symbolic).
+  One `learning.record` per round (fact-family blanks share one outcome); no completion bonus
+  in the level (the host adds it).
+- Sharing model: per-fruit spots (pile or group). Share = uncapped (uneven dealing allowed);
+  pack = baskets of k that appear one after another. "Kiểm tra" marks friends with ▲/▼/✓
+  chips (shape + colour) and a tone. Inputs: drag, tap fruit then friend, keyboard (arrows +
+  Enter through the shared InteractionController), "Chia mỗi bạn một quả" / "Xếp đầy một giỏ",
+  and the kit number pad (digits + Enter). The interaction is created before the pad so the 3D
+  layer sees Enter first (it passes Enter on when nothing in 3D has focus).
+- Hints: rung 1 encourage, 2 model (auto deal in 3D every 0.45 s, instant with reduced motion;
+  stone groups for the fact family), 3 skip count, 4 `? × d = p`; 3 misses reveal the answer
+  (recorded as not correct). Revealed facts are not requeued inside the 5-round run (the
+  Leitner box drop reschedules them).
+- Look: recovered `buildTree` ring + recovered primitives in a scratch context, baked into ONE
+  vertex-coloured mesh; animals (rabbit, squirrel, fox, hedgehog, bear) are icosahedron/cone
+  parts baked to one mesh each; fruit and baskets are instanced. World lighting constants,
+  sky colour, recovered CSS classes (glass, equation, answer-style pad keys, feedback,
+  hint-area, stone-groups, reward-pop, completion-medal, primary/secondary).
+- Measured (SwiftShader, test build): 8 draw calls in a 2-friend round, max seen in e2e <= 17
+  (budget 60). Geometries 236 in the world, 276 in the level, back to 236 after exit and after
+  10 enter/exit cycles (both projects). Renderer state untouched; the level's sun shadow map is
+  disposed in `dispose()`.
+- Test-build only: `.level-layer[data-draw-calls|data-max-draw-calls]` (previous frame's
+  `renderer.info.render.calls`), `.forest-panel[data-round|kind|dividend|divisor|pile]`.
+- Merge note: `tests/e2e/level-gate.spec.ts` lines 65 and 71 expect the forest gate to be
+  `coming-soon`; with this level shipped it is `open` (the e2e owner of that file updates it).
+- Screens for author review: `reports/phase-15-screens/` (world gate, start, mid-round, hint,
+  fact family, celebration).
 
 ## Success Criteria
 - Old 07 criteria + `npm run test:e2e -- forest-level` green both projects; <= 60 draw calls in level.

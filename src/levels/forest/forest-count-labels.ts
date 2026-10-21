@@ -19,6 +19,7 @@ export class ForestCountLabels {
   private labels: readonly CountLabel[] = [];
   private width = 1;
   private height = 1;
+  private camera: Camera | undefined;
 
   constructor(parent: HTMLElement) {
     this.root.className = 'forest-labels';
@@ -47,10 +48,12 @@ export class ForestCountLabels {
         return chip;
       }),
     );
+    if (this.camera) this.place(this.camera);
   }
 
   /** Positions the chips for `camera` (call after the camera or the canvas changed). */
   place(camera: Camera): void {
+    this.camera = camera;
     camera.updateMatrixWorld();
     this.labels.forEach((label, i) => {
       const chip = this.root.children[i] as HTMLElement | undefined;
