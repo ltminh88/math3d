@@ -56,10 +56,19 @@ export interface LevelInput {
 
 export interface LevelContext {
   readonly definition: LevelDefinition;
-  /** The world's renderer (one WebGL context); the host renders `session.scene` with it. */
+  /**
+   * The world's renderer (one WebGL context); the host renders `session.scene` with it. Leave its
+   * global state alone (clear colour, tone mapping, exposure, shadowMap, pixel ratio, autoClear,
+   * render target, viewport): set a look through the scene (`scene.background`, lights) instead.
+   * If a level must change it, it restores it in `dispose()`; the host also restores a snapshot.
+   */
   readonly renderer: WebGLRenderer;
   readonly canvas: HTMLCanvasElement;
-  /** Overlay root for the level's DOM (HUD, number pad); removed on exit. */
+  /**
+   * Overlay root for the level's DOM (HUD, number pad, its own dialogs); removed on exit. It has
+   * focus when `start` runs. Do not use `src/ui/dialog.ts` (`openDialog`) inside a level: the
+   * shared dialog stays closed while a level runs and belongs to the world.
+   */
   readonly ui: HTMLElement;
   readonly audio: SynthAudio;
   readonly learning: LevelLearning;
@@ -67,7 +76,13 @@ export interface LevelContext {
   readonly defineStrings: typeof defineStrings;
   /** Polite screen-reader announcement. */
   announce(message: string): void;
-  /** Tracks objects, listeners (`{ signal }`) and cleanups; flushed after `session.dispose()`. */
+  /**
+   * Tracks objects, listeners and cleanups; flushed after `session.dispose()`. Listen for keys on
+   * `document` with `{ signal: ctx.disposer.signal }`: the world's own `document` handler runs
+   * first and ignores keys while the level runs. A handler on an element (`ctx.ui`, a button)
+   * runs before it, so a key that ends the level there reaches the world after resume (E would
+   * re-enter the gate) unless it calls `event.stopPropagation()`.
+   */
   readonly disposer: SceneDisposer;
   readonly reducedMotion: boolean;
   /** Ends the run: stops the loop, disposes the scene, commits the result, resumes the world. */

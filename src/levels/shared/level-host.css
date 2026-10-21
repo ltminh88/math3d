@@ -11,6 +11,11 @@
   pointer-events: none;
 }
 
+.level-layer:focus {
+  /* Focused programmatically on mount (focus target, not a control). */
+  outline: none;
+}
+
 .level-layer > * {
   pointer-events: auto;
 }

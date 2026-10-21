@@ -1,5 +1,7 @@
 // DOM side of a level run: the overlay root levels draw their UI into, the host's "back to the
-// world" button, and hiding the world HUD/top bar while the level owns the screen.
+// world" button, and hiding the world HUD/top bar while the level owns the screen. Focus moves
+// into the layer on mount (keyboard and screen-reader users land in the level) and goes back to
+// where it was on unmount.
 import { byId, icon } from '../../ui/icons';
 import { tl } from './level-host-strings';
 
@@ -14,8 +16,10 @@ export function mountLevelRunUi(title: string, onLeave: () => void): LevelRunUi 
   const canvas = byId('world');
   const hud = byId('hud');
   const canvasLabel = canvas.getAttribute('aria-label') ?? '';
+  const previousFocus = document.activeElement as HTMLElement | null;
   const root = document.createElement('section');
   root.className = 'level-layer';
+  root.tabIndex = -1;
   root.setAttribute('aria-label', title);
   const leave = document.createElement('button');
   leave.type = 'button';
@@ -28,6 +32,7 @@ export function mountLevelRunUi(title: string, onLeave: () => void): LevelRunUi 
   shell.classList.add('in-level');
   hud.hidden = true;
   canvas.setAttribute('aria-label', title);
+  root.focus({ preventScroll: true });
   return {
     root,
     unmount() {
@@ -35,6 +40,7 @@ export function mountLevelRunUi(title: string, onLeave: () => void): LevelRunUi 
       shell.classList.remove('in-level');
       hud.hidden = false;
       canvas.setAttribute('aria-label', canvasLabel);
+      if (previousFocus?.isConnected) previousFocus.focus({ preventScroll: true });
     },
   };
 }
