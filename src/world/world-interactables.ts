@@ -1,7 +1,7 @@
 // Things the player can interact with when standing next to them (VLM, level gates, later the
 // shop stall of phase 19): the `#interact` button and the E key act on the nearest one in reach.
 
-/** Distances closer than this count as a tie; the lower `priority` (VLM: 0) then wins. */
+/** Distances closer than this are a tie: the lower `priority` (VLM: 0) wins, else the closer. */
 export const INTERACT_TIE_DISTANCE = 0.25;
 const DEFAULT_PRIORITY = 1;
 
@@ -38,10 +38,11 @@ export class InteractableRegistry {
     for (const item of this.items.values()) {
       const distance = Math.hypot(x - item.position.x, z - item.position.z);
       if (distance >= item.radius) continue;
+      const priority = item.priority ?? DEFAULT_PRIORITY;
+      const bestPriority = best?.priority ?? DEFAULT_PRIORITY;
       const tie = Math.abs(distance - bestDistance) < INTERACT_TIE_DISTANCE;
-      const wins = tie
-        ? (item.priority ?? DEFAULT_PRIORITY) < (best?.priority ?? DEFAULT_PRIORITY)
-        : distance < bestDistance;
+      const wins =
+        tie && priority !== bestPriority ? priority < bestPriority : distance < bestDistance;
       if (wins) {
         best = item;
         bestDistance = distance;

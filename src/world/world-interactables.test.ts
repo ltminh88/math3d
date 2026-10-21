@@ -34,6 +34,14 @@ describe('interactable registry', () => {
     expect(registry.nearest(1, 0)?.id).toBe('gate');
   });
 
+  it('a near tie between equal priorities goes to the closer one, whatever the order', () => {
+    const registry = new InteractableRegistry();
+    registry.register(item('gate', 1.2, 0, 3));
+    registry.register(item('stall', -1, 0, 3));
+    expect(registry.nearest(0, 0)?.id).toBe('stall');
+    expect(registry.nearest(0.15, 0)?.id).toBe('gate');
+  });
+
   it('unregister removes it; a duplicate id is refused', () => {
     const registry = new InteractableRegistry();
     const unregister = registry.register(item('gate', 0, 0));
