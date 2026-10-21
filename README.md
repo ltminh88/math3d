@@ -26,6 +26,7 @@ Recovered from the production bundle of the original game (ex "Math AI Game 3D",
 | `npm run icons` | Regenerate PWA icons from `public/icons/icon.svg` |
 
 First e2e/parity run needs `npx playwright install chromium`.
+Set `E2E_PORT` to run the e2e preview server on another port (default 4173), e.g. `E2E_PORT=4178 npx playwright test`.
 
 ## Environment
 Copy `.env.example` to a local env file (git-ignored). Leave `VITE_ENABLE_CLOUD` empty for a guest-only, fully offline game. Only the Supabase **publishable** key ever goes in client env; the service_role key never enters this repo.

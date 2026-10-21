@@ -30,12 +30,12 @@ Supersedes [261018-1803-vlm-math-game-mvp](../261018-1803-vlm-math-game-mvp/plan
 | 11 | [Retire old engine code](phase-11-retire-old-engine-code.md) | Done (recovery-p11) |
 | 12 | [Store, save migration + save codes, learning integration](phase-12-store-migration-and-learning-integration.md) | Done (phase-12) |
 | 13 | [Level host + region progression](phase-13-level-host-and-region-progression.md) | Done (phase-13) |
-| 14 | [Field level (meadow)](phase-14-field-level-in-meadow.md) | Pending |
-| 15 | [Forest level](phase-15-forest-level.md) | Pending |
+| 14 | [Field level (meadow)](phase-14-field-level-in-meadow.md) | Done (phase-14) |
+| 15 | [Forest level](phase-15-forest-level.md) | Done (phase-15) |
 | 16 | [Supabase backend](phase-16-supabase-backend.md) | Pending |
 | 17 | [Parent auth, profiles, sync client](phase-17-parent-auth-profiles-sync-client.md) | Pending |
 | 18 | [Polish, a11y, perf, e2e, Vercel deploy](phase-18-polish-a11y-perf-e2e-deploy.md) | Pending |
-| 19 | [Cosmetics shop in village](phase-19-cosmetics-shop-in-village.md) (runs in G7) | Pending |
+| 19 | [Cosmetics shop in village](phase-19-cosmetics-shop-in-village.md) (runs in G7) | Done (phase-19) |
 
 Effort (h) / depends: 01 7/- · 02 9/- (gate needs 01) · 03 7/01,02 · 04 5/01,02 · 05 10/03 · 06 12/05 · 07 5/03 · 08 14/03,04 · 09 6/06,07,08 · 10 6/09 · 11 3/09 · 12 15/10,11 · 13 7/12 · 14 12/13 · 15 12/13 · 16 8/12 · 17 16/13,16 · 19 6/13 · 18 14/14,15,17,19. Critical path 02>03>05>06>09>10>12>16>17>18 = 103h.
 
