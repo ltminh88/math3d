@@ -1,6 +1,6 @@
 // Write-through queue between the UI's progress view and the game store.
 import { beforeEach, describe, expect, it, vi } from 'vitest';
-import type { QuestionOutcome } from '../learning/session-recorder';
+import { createSessionRecorder, type QuestionOutcome } from '../learning/session-recorder';
 import type { GameStore } from '../store/game-store';
 
 const { showToast } = vi.hoisted(() => ({ showToast: vi.fn() }));
@@ -133,7 +133,7 @@ describe('progress-sync', () => {
       newId: () => 'level-run-1',
     });
     recorder.recordQuestion(outcome('mul:3x4'));
-    expect(await sync.commitLevelRun(recorder.finish(true))).toBe(true);
+    expect(await sync.commitLevelRun(recorder.finish(true))).toMatchObject({ xp: 10, coins: 5 });
     const snapshot = store.getSnapshot();
     expect(Object.keys(snapshot.factStats).sort()).toEqual(['mul:2x3', 'mul:3x4']);
     expect(snapshot.levelProgress.field?.completedAt).toBeGreaterThan(0);
@@ -141,4 +141,63 @@ describe('progress-sync', () => {
     expect(gameState.progress.xp).toBe(10);
     store.close();
   });
+
+  it('a level run whose commit fails for now is kept and retried by the next flush', async () => {
+    const { sync, gameState, openGameStore, createMemoryGameDb } = await freshSync();
+    const store = await openGameStore({ db: createMemoryGameDb() });
+    let failures = 1;
+    const flaky: GameStore = {
+      ...store,
+      commitSession(delta, local) {
+        if (failures-- > 0) return Promise.reject(new Error('transient: connection closing'));
+        return store.commitSession(delta, local);
+      },
+    };
+    sync.connectStore(flaky);
+    expect(await sync.commitLevelRun(levelRun(store, 'run-1'))).toBeFalsy();
+    expect(store.getSnapshot().levelProgress.field).toBeUndefined();
+    expect(await sync.flushProgress()).toBe(true);
+    expect(store.getSnapshot().levelProgress.field?.completedAt).toBeGreaterThan(0);
+    expect(store.getSnapshot().wallet).toEqual({ xp: 10, coins: 5 });
+    expect(gameState.progress.xp).toBe(10);
+    store.close();
+  });
+
+  it('two completed runs behind a stalled queue get the first-completion bonus once', async () => {
+    const { sync, openGameStore, createMemoryGameDb } = await freshSync();
+    const { firstCompletionBonus } = await import('../levels/shared/level-run-result');
+    const store = await openGameStore({ db: createMemoryGameDb() });
+    let failures = 1;
+    const stalled: GameStore = {
+      ...store,
+      commitSession(delta, local) {
+        if (failures-- > 0) return Promise.reject(new Error('transient: quota'));
+        return store.commitSession(delta, local);
+      },
+    };
+    sync.connectStore(stalled);
+    const first = levelRun(store, 'run-1');
+    const second = levelRun(store, 'run-2');
+    expect(await sync.commitLevelRun(first, firstCompletionBonus('field', first))).toBeFalsy();
+    const committed = await sync.commitLevelRun(second, firstCompletionBonus('field', second));
+    expect(committed).toMatchObject({ xp: 10, coins: 5 });
+    // 10 XP / 5 coins per run, +50 XP / +10 coins once.
+    expect(store.getSnapshot().wallet).toEqual({ xp: 70, coins: 20 });
+    store.close();
+  });
 });
+
+/** A completed field run with one correct answer (10 XP, 5 coins, 1+ star). */
+function levelRun(store: GameStore, batchId: string) {
+  // Imported statically: the recorder has no module state, so it is safe across resetModules.
+  const recorder = createSessionRecorder({
+    profileId: store.getSnapshot().profile.id,
+    levelId: 'field',
+    sessionNo: store.nextSessionNo(),
+    getStat: () => undefined,
+    now: Date.now,
+    newId: () => batchId,
+  });
+  recorder.recordQuestion(outcome('mul:3x4'));
+  return recorder.finish(true);
+}

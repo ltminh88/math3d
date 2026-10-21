@@ -7,7 +7,7 @@ import type { SceneDisposer } from '../../core/scene-disposer';
 import { defineStrings } from '../../i18n/i18n';
 import { FLUENCY_ORDER } from '../../learning/curriculum-tables';
 import { planSession } from '../../learning/session-planner';
-import { createSessionRecorder } from '../../learning/session-recorder';
+import { createSessionRecorder, type SessionResult } from '../../learning/session-recorder';
 import { gameState } from '../../ui/game-state';
 import { refreshHud } from '../../ui/hud';
 import { announce } from '../../ui/kit/aria-announcer';
@@ -16,7 +16,7 @@ import { showToast } from '../../ui/toast-and-persist';
 import type { WorldPublicApi } from '../../world/world-public-api';
 import type { LevelHostPorts, LevelRun } from './level-host';
 import { tl } from './level-host-strings';
-import { levelRunToCommit } from './level-run-result';
+import { firstCompletionBonus, levelRunToCommit } from './level-run-result';
 import { mountLevelRunUi } from './level-run-ui';
 import type { LevelDefinition, LevelResult } from './level-types';
 import { saveRendererState } from './renderer-state-snapshot';
@@ -25,10 +25,12 @@ const byFluency = (tables: readonly number[]): number[] =>
   [...tables].sort((a, b) => FLUENCY_ORDER.indexOf(a) - FLUENCY_ORDER.indexOf(b));
 
 /** Commits the run in the background; a completed run thanks the child with its rewards. */
-function commitRun(run: Parameters<typeof commitLevelRun>[0], completed: boolean): void {
-  void commitLevelRun(run).then((ok) => {
+function commitRun(run: SessionResult, levelId: string): void {
+  void commitLevelRun(run, firstCompletionBonus(levelId, run)).then((committed) => {
     refreshHud();
-    if (ok && completed) showToast(tl('levelDone', { xp: run.delta.xp, coins: run.delta.coins }));
+    if (committed && levelId in committed.levels) {
+      showToast(tl('levelDone', { xp: committed.xp, coins: committed.coins }));
+    }
   });
 }
 
@@ -94,11 +96,8 @@ function openLevelRun(
       if (closed) return;
       closed = true;
       ui.unmount();
-      const firstCompletion = !(
-        (store.getSnapshot().levelProgress[definition.id]?.completedAt ?? 0) > 0
-      );
-      const run = levelRunToCommit(recorder, result, { firstCompletion });
-      if (run) commitRun(run, result.completed);
+      const run = levelRunToCommit(recorder, result);
+      if (run) commitRun(run, definition.id);
       announce(tl('backAtGate'));
     },
   };

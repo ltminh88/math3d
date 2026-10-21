@@ -1,8 +1,10 @@
 // Writes the UI's optimistic progress view through to the game store (IndexedDB). Quiz answers
 // are committed in batches (every 5 questions, after each correct bridge answer, when the quiz
-// closes, or when the page hides); every other change is written at once. Writes run in order
+// closes, or when the page hides) and, like level runs, retried until they land
+// (pending-session-commits.ts); every other change is written at once. Writes run in order
 // through one queue.
 import type { FactKey } from '../learning/fact-key';
+import type { SessionDelta } from '../learning/learning-types';
 import type { QuestionOutcome, SessionResult } from '../learning/session-recorder';
 import { createQuizPlanner } from '../quiz/learning-quiz-adapter';
 import type { Question, QuizMode } from '../quiz/question-types';
@@ -12,21 +14,21 @@ import {
   questCompleteDelta,
 } from '../quiz/quiz-answer-batch';
 import { ProfileSwitchedError } from '../store/active-profile-guard';
-import { InvalidDeltaError } from '../store/delta-validation';
 import type { GameStore } from '../store/game-store-api';
 import { BRIDGE_LEVEL_ID } from '../store/legacy-save-import';
 import type { ProgressRecords } from '../store/profile-replacement';
 import type { GameMeta } from '../store/save-schema';
 import { progressViewFromSnapshot } from '../store/store-to-save-v1';
 import { gameState } from './game-state';
+import { type CommitBonus, PendingSessionCommits } from './pending-session-commits';
 import { showToast } from './toast-and-persist';
 
 export const QUIZ_BATCH_SIZE = 5;
 
 let store: GameStore | undefined;
 let batch: QuizAnswerBatch | undefined;
-/** Finished batches whose commit has not succeeded yet (retried with the same batchId). */
-const unsent: SessionResult[] = [];
+/** Finished sessions whose commit has not succeeded yet. */
+const unsent = new PendingSessionCommits();
 let queue: Promise<void> = Promise.resolve();
 let onProfileSwitched: () => void = () => {};
 // Math.random is seeded in parity runs, so quiz content stays deterministic there.
@@ -46,7 +48,7 @@ function reportFailure(err: unknown): void {
  */
 function followProfileSwitch(s: GameStore): void {
   batch = undefined;
-  unsent.length = 0;
+  unsent.clear();
   gameState.progress = progressViewFromSnapshot(s.getSnapshot());
   onProfileSwitched();
 }
@@ -84,7 +86,7 @@ export function connectStore(connected: GameStore, options: ConnectOptions = {})
   store = connected;
   onProfileSwitched = options.onProfileSwitched ?? (() => {});
   batch = undefined;
-  unsent.length = 0;
+  unsent.clear();
   gameState.progress = progressViewFromSnapshot(connected.getSnapshot());
 }
 
@@ -124,24 +126,17 @@ export function recordQuizQuestion(
   if (bridgeStep || batch.size >= QUIZ_BATCH_SIZE) void flushProgress();
 }
 
-/** Commits pending quiz answers and the combo. */
-export function flushProgress(): Promise<boolean> {
-  if (batch && batch.size > 0) unsent.push(batch.finish());
+/** Moves the open quiz batch (if it has answers) to the unsent commits. */
+function stageQuizBatch(): void {
+  if (batch && batch.size > 0) unsent.push({ session: batch.finish() });
   batch = undefined;
+}
+
+/** Commits pending quiz answers, pending level runs and the combo. */
+export function flushProgress(): Promise<boolean> {
+  stageQuizBatch();
   return enqueue(async (s) => {
-    let refused: unknown;
-    while (unsent.length > 0) {
-      const next = unsent[0] as SessionResult;
-      try {
-        await s.commitSession(next.delta, next.local);
-      } catch (err) {
-        // A transient failure (quota, closed connection) keeps the batch for a retry; one the
-        // store refuses for good would block every later batch, so it is dropped.
-        if (!(err instanceof InvalidDeltaError)) throw err;
-        refused = err;
-      }
-      unsent.shift();
-    }
+    const refused = await unsent.commitAll(s);
     const { combo } = gameState.progress;
     if (s.getSnapshot().gameMeta.combo !== combo) await s.updateGameMeta({ combo });
     if (refused) throw refused; // reported once the queue moved on
@@ -164,17 +159,28 @@ export function saveQuestComplete(): Promise<boolean> {
 }
 
 /**
- * Commits a finished level run (after any pending quiz answers, same queue), then adds its XP and
- * coins to the progress view. False when the store refused it (view unchanged).
+ * Commits a finished level run after any pending quiz answers (same queue, retried like a quiz
+ * batch), adding `bonus` decided at commit time; once it lands its XP and coins go to the
+ * progress view. Resolves to the committed delta, or undefined when this attempt did not land
+ * (kept for the next flush unless the store refused it for good).
  */
-export async function commitLevelRun(run: SessionResult): Promise<boolean> {
-  void flushProgress();
-  const ok = await enqueue((s) => s.commitSession(run.delta, run.local));
-  if (ok) {
-    gameState.progress.xp += run.delta.xp;
-    gameState.progress.coins += run.delta.coins;
-  }
-  return ok;
+export async function commitLevelRun(
+  run: SessionResult,
+  bonus?: CommitBonus,
+): Promise<SessionDelta | undefined> {
+  stageQuizBatch();
+  let committed: SessionDelta | undefined;
+  unsent.push({
+    session: run,
+    bonus,
+    onCommitted: (delta) => {
+      committed = delta;
+      gameState.progress.xp += delta.xp;
+      gameState.progress.coins += delta.coins;
+    },
+  });
+  await flushProgress();
+  return committed;
 }
 
 /**
@@ -183,7 +189,7 @@ export async function commitLevelRun(run: SessionResult): Promise<boolean> {
  */
 export async function replaceAllProgress(records: ProgressRecords): Promise<boolean> {
   batch = undefined;
-  unsent.length = 0;
+  unsent.clear();
   const ok = await enqueue((s) => s.replaceProgress(records));
   if (ok && store) gameState.progress = progressViewFromSnapshot(store.getSnapshot());
   return ok;
@@ -198,7 +204,7 @@ export function factCountsView(): Record<FactKey, { attempts: number; correct: n
   };
   for (const [key, f] of Object.entries(store?.getSnapshot().factStats ?? {}))
     add(key, f.attempts, f.correct);
-  for (const { delta } of unsent)
+  for (const delta of unsent.deltas())
     for (const [key, f] of Object.entries(delta.facts)) add(key, f.a, f.c);
   for (const [key, f] of Object.entries(batch?.pendingCounts() ?? {}))
     add(key, f.attempts, f.correct);
