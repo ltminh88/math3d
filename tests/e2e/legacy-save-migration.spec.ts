@@ -66,6 +66,7 @@ test('language, quest card and mid-quest bridge carry over; progress made later 
     coins: '15',
     xpText: '30 / 100 XP',
     bridgeBuilt: 3,
+    questStepsDone: 3,
     // Original quirk: the translator matches whole text nodes, so this one stays Vietnamese.
     questProgress: '3 / 6 đoạn cầu',
     play: /Continue adventure/,

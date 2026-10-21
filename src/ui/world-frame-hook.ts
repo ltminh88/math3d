@@ -3,6 +3,7 @@
 import { Vector3 } from 'three';
 import { BRIDGE_SEGMENTS } from '../config/world-constants';
 import { refreshLevelGates } from '../levels/shared/level-gates';
+import { tl } from '../levels/shared/level-host-strings';
 import { QUEST_COMPLETE_REWARD } from '../quiz/quiz-rewards';
 import { closeDialog, openDialog } from './dialog';
 import { gameState, getWorld } from './game-state';
@@ -11,6 +12,7 @@ import { byId, icon } from './icons';
 import { renderInteractButton } from './interact-target';
 import { drawMinimap } from './map-overlay';
 import { saveQuestComplete } from './progress-sync';
+import { tq } from './quest-chain-strings';
 import { projectWorldLabels, updateCurrentArea } from './world-labels';
 
 function completeQuest(): void {
@@ -25,7 +27,7 @@ function completeQuest(): void {
   world.burst(world.player.position.clone().add(new Vector3(0, 1, 0)));
   openDialog(
     'Bạn đã làm được rồi!',
-    `<div class="completion-medal">${icon('crown')}</div><p class="dialog-copy centered">Nhờ bạn, hai bờ đã được nối liền.<br><b>Cây cầu tình bạn</b> đã hoàn thành!</p><div class="completion-rewards"><span>★ +50 XP</span><span>◉ +10 xu</span></div><p class="book-note centered">4 vùng đất mới đã mở trên bản đồ. Nhấn M để xem!</p><button id="keep-playing" class="primary wide">Tiếp tục khám phá ${icon('arrow')}</button>`,
+    `<div class="completion-medal">${icon('crown')}</div><p class="dialog-copy centered">Nhờ bạn, hai bờ đã được nối liền.<br><b>Cây cầu tình bạn</b> đã hoàn thành!</p><div class="completion-rewards"><span>★ +50 XP</span><span>◉ +10 xu</span></div><p class="book-note centered">${tq('completeNote', { gate: tl('gateField') })}</p><button id="keep-playing" class="primary wide">Tiếp tục khám phá ${icon('arrow')}</button>`,
     'complete',
   );
   byId('keep-playing').onclick = closeDialog;

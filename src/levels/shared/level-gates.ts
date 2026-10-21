@@ -3,6 +3,8 @@
 // gate's status changes). Using a gate either explains why it is closed, says "Sắp ra mắt" when
 // its level is not shipped yet, or enters the level through the level host.
 import { LEVEL_GATES, type LevelGate } from '../../config/regions';
+import { BRIDGE_SEGMENTS } from '../../config/world-constants';
+import { tc } from '../../i18n/common-strings';
 import { gameState } from '../../ui/game-state';
 import { byId } from '../../ui/icons';
 import { connectedStore } from '../../ui/progress-sync';
@@ -35,9 +37,13 @@ export const gateName = (gate: LevelGate): string =>
 
 const starsText = (stars: number): string => '★'.repeat(stars) + '☆'.repeat(3 - stars);
 
+/** Why a locked gate is closed (field: the bridge quest, forest: the field level). */
+const lockReason = (levelId: string): string =>
+  levelId === 'field' ? tl('lockReasonBridge') : tl('lockReasonField');
+
 /** Short state line for the gate label and the map detail. */
 export function gateStateText(levelId: string, status: GateStatus): string {
-  if (status === 'locked') return tl('stateLocked');
+  if (status === 'locked') return lockReason(levelId);
   if (status === 'coming-soon') return tl('comingSoon');
   if (status === 'open') return tl('stateOpen');
   const stars = connectedStore()?.getSnapshot().levelProgress[levelId]?.stars ?? 0;
@@ -54,7 +60,7 @@ export function currentGateStatus(gate: LevelGate): GateStatus {
 /** Interact-button text: what pressing E will do at this gate. */
 function interactLabel(gate: LevelGate): string {
   const status = currentGateStatus(gate);
-  if (status === 'locked') return `${gateName(gate)} 🔒`;
+  if (status === 'locked') return `${gateName(gate)} 🔒 · ${lockReason(gate.levelId)}`;
   if (status === 'coming-soon') return `${gateName(gate)} · ${tl('comingSoon')}`;
   return tl('enter', { gate: gateName(gate) });
 }
@@ -72,11 +78,18 @@ async function enterGate(gate: LevelGate): Promise<void> {
   if ((await host.enter(definition)) === 'failed') showToast(tl('loadFailed'));
 }
 
+function lockedToast(gate: LevelGate): string {
+  if (gate.requires === 'field') return tl('lockedField');
+  return gameState.progress.bridge === BRIDGE_SEGMENTS
+    ? tl('lockedBridgeCross')
+    : tl('lockedBridge', { guide: tc('guideName') });
+}
+
 function useGate(gate: LevelGate, world: WorldPublicApi): void {
   if (!world.active || world.paused) return;
   const status = currentGateStatus(gate);
   if (status === 'locked') {
-    showToast(gate.requires === 'field' ? tl('lockedField') : tl('lockedBridge'));
+    showToast(lockedToast(gate));
   } else if (status === 'coming-soon') {
     showToast(tl('comingSoonToast'));
   } else {

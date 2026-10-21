@@ -11,37 +11,8 @@ import { appSettings } from '../store/app-settings';
 import { LABELED_REGIONS } from './dom-template';
 import { gameState } from './game-state';
 import { byId, icon } from './icons';
-
-function questCopy(): string {
-  const progress = gameState.progress;
-  if (progress.questComplete) {
-    return 'Bạn đã nối liền hai bờ! Hãy khám phá các vùng đất mới trên bản đồ, hoặc quay lại VLM để luyện tập.';
-  }
-  if (progress.bridge === BRIDGE_SEGMENTS) {
-    return 'Cây cầu đã sẵn sàng! Hãy đi qua cầu sang khu vườn bên kia sông.';
-  }
-  return progress.questAccepted
-    ? 'Giúp VLM chọn phép nhân đúng. Mỗi câu trả lời sẽ xây thêm một đoạn cầu.'
-    : 'VLM đang chờ bạn bên dòng sông. Đến gần và chào bạn ấy nhé!';
-}
-
-function questProgress(): string {
-  const progress = gameState.progress;
-  if (progress.questComplete) return '✓ Hoàn thành';
-  if (progress.bridge === BRIDGE_SEGMENTS) return 'Đi qua cầu để hoàn thành';
-  return progress.questAccepted
-    ? `${progress.bridge} / ${BRIDGE_SEGMENTS} đoạn cầu`
-    : 'Gặp người dẫn đường';
-}
-
-function questStepsHtml(): string {
-  const built = gameState.progress.bridge;
-  return Array.from(
-    { length: BRIDGE_SEGMENTS },
-    (_, s) =>
-      `<span class="${s < built ? 'done' : ''}" aria-label="Đoạn ${s + 1}: ${s < built ? 'đã xây' : 'chưa xây'}">${s < built ? icon('check') : s + 1}</span>`,
-  ).join('');
-}
+import { renderQuestCard } from './quest-chain';
+import { setMarkup } from './set-markup-if-changed';
 
 function refreshXp(): void {
   const progress = gameState.progress;
@@ -56,19 +27,6 @@ function refreshXp(): void {
   const percent = next ? Math.min(100, ((progress.xp - floor) / (next - floor)) * 100) : 100;
   byId('xp-fill').style.width = `${percent}%`;
   byId('xp-fill').parentElement?.setAttribute('aria-valuenow', String(Math.round(percent)));
-}
-
-/**
- * Rewrites markup only when it changed: the HUD is refreshed again after the store hydrates, and
- * re-inserting identical icons under the glass (backdrop-filter) buttons changes their raster.
- */
-const writtenMarkup = new WeakMap<Element, string>();
-function setMarkup(id: string, html: string): void {
-  const el = byId(id);
-  if (writtenMarkup.get(el) !== html) {
-    el.innerHTML = html;
-    writtenMarkup.set(el, html);
-  }
 }
 
 /** The toolbar's shop button (phase 19), added once next to the map button. */
@@ -97,12 +55,7 @@ export function refreshHud(): void {
       `${progress.started ? 'Tiếp tục phiêu lưu' : 'Bắt đầu phiêu lưu'} ${icon('arrow')}`,
     ),
   );
-  byId('quest-copy').textContent = questCopy();
-  byId('quest-title').textContent = progress.questComplete
-    ? 'Cây cầu tình bạn đã hoàn thành!'
-    : 'Một cây cầu, ngàn niềm vui';
-  byId('quest-progress').textContent = questProgress();
-  setMarkup('quest-steps', questStepsHtml());
+  renderQuestCard();
   byId('bridge-count').textContent = `${progress.bridge} / ${BRIDGE_SEGMENTS} đoạn cầu`;
   for (const region of LABELED_REGIONS) {
     const label = byId(`${region.id}-label`);

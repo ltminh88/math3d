@@ -24,6 +24,8 @@ export interface HudExpectation {
   coins: string;
   xpText: string;
   bridgeBuilt: number;
+  /** Done cells in the quest card's step row (bridge segments, or quests once past the bridge). */
+  questStepsDone: number;
   questProgress: string;
   play: RegExp;
 }
@@ -33,7 +35,9 @@ export const QUEST_COMPLETE_HUD: HudExpectation = {
   coins: '40',
   xpText: '10 / 150 XP',
   bridgeBuilt: 6,
-  questProgress: '✓ Hoàn thành',
+  // Past the bridge the card shows the next quest of the chain: the field gate.
+  questStepsDone: 1,
+  questProgress: 'Đến Cổng Cánh Đồng',
   play: /Tiếp tục phiêu lưu/,
 };
 
@@ -50,7 +54,7 @@ export async function expectHud(page: Page, hud: HudExpectation): Promise<void> 
   await expect(page.locator('#coins')).toHaveText(hud.coins);
   await expect(page.locator('#xp-text')).toHaveText(hud.xpText);
   await expect(page.locator('#quest-progress')).toHaveText(hud.questProgress);
-  await expect(page.locator('#quest-steps .done')).toHaveCount(hud.bridgeBuilt);
+  await expect(page.locator('#quest-steps .done')).toHaveCount(hud.questStepsDone);
   await expect(page.locator('#avatar-face')).toHaveText('👦');
   const bridge = await page.evaluate(
     () => (window as unknown as { __parity?: { bridgeCount: number } }).__parity?.bridgeCount,

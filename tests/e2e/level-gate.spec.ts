@@ -8,7 +8,7 @@ import { expect, SLOW_TEST_MS, waitForStoreBoot } from './legacy-live-save-fixtu
 test.use({ locale: 'vi-VN' });
 test.describe.configure({ timeout: SLOW_TEST_MS });
 
-const LOCKED_BRIDGE = 'Hoàn thành Cây cầu tình bạn để mở cổng này nhé!';
+const LOCKED_BRIDGE = 'Hãy giúp VLM xây xong cây cầu, rồi đi qua cầu để mở cổng này nhé!';
 const LOCKED_FIELD = 'Hoàn thành Cánh Đồng Phép Tính để mở cổng này nhé!';
 
 async function startPlaying(page: Page): Promise<void> {
@@ -38,8 +38,11 @@ test('gates stay locked before the bridge quest; VLM keeps his prompt', async ({
   await expect(page.locator('#interact')).toContainText('Nói chuyện với VLM');
 
   await useGate(page, 'field');
-  await expect(page.locator('#interact')).toContainText('Cổng Cánh Đồng Phép Tính 🔒');
-  await expect(page.locator('#gate-field-label small')).toHaveText('Đang khóa');
+  await expect(page.locator('#interact')).toContainText(
+    'Cổng Cánh Đồng Phép Tính 🔒 · Đi qua cầu để mở',
+  );
+  await expect(page.locator('#gate-field-label small')).toHaveText('Đi qua cầu để mở');
+  await expect(page.locator('#gate-forest-label small')).toHaveText('Hoàn thành Cánh Đồng để mở');
   await expect(page.locator('#toast')).toHaveText(LOCKED_BRIDGE);
 
   await useGate(page, 'forest');
@@ -80,7 +83,7 @@ test('City and Tower say Sắp ra mắt; the map shows each region’s level sta
   await page.locator('[data-region="city"]').click();
   await expect(page.locator('#map-detail .coming-soon')).toHaveText('Sắp ra mắt');
   await page.locator('[data-region="meadow"]').click();
-  await expect(page.locator('#map-detail .map-gate')).toHaveText('Cổng màn chơi: Đang khóa');
+  await expect(page.locator('#map-detail .map-gate')).toHaveText('Cổng màn chơi: Đi qua cầu để mở');
   await page.locator('[data-region="village"]').click();
   await expect(page.locator('#map-detail .map-gate')).toHaveCount(0);
 });
