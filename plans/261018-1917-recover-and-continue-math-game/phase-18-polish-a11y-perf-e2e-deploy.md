@@ -77,5 +77,13 @@ Rollback: Vercel instant rollback to previous deployment; old site untouched thr
 ## Security Considerations
 - As old 10 (secrets in stores only, CSP + headers, no third-party SDKs, export/delete verified on prod).
 
+## Done early
+
+- Quest chain discoverability (tag `quest-chain`): after the bridge the quest card points at the next
+  open gate (Cánh Đồng, then Rừng Nhân Chia) and ends on a closing card (practice, Cửa hàng, City/Tower
+  sắp ra mắt). VLM and the bridge completion dialog name the open gate; locked gates show why
+  ("Đi qua cầu để mở", "Hoàn thành Cánh Đồng để mở"). Stage logic: `src/ui/quest-chain-stage.ts`
+  (unit), card: `src/ui/quest-chain.ts`, e2e: `tests/e2e/quest-chain.spec.ts`.
+
 ## Next steps
 - Post-MVP: City "Thành Phố Con Số", Tower "Tháp Toán Học", tables 6-9 deeper practice, parent dashboard.
