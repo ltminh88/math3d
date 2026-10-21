@@ -1,5 +1,6 @@
 // Pointer and wheel input on the world canvas: drag orbits the camera, a tap (no drag) walks to
-// the tapped ground point, the wheel zooms. Ignored on the title screen and while paused.
+// the tapped ground point, the wheel zooms. Ignored on the title screen, while paused, and while
+// suspended (a level owns the canvas; a dialog closing meanwhile may have cleared `paused`).
 import { type PerspectiveCamera, Plane, Raycaster, Vector2, Vector3 } from 'three';
 import { clampPitch } from './camera-rig';
 
@@ -7,6 +8,7 @@ import { clampPitch } from './camera-rig';
 export interface WorldInputTarget {
   readonly active: boolean;
   readonly paused: boolean;
+  readonly suspended: boolean;
   yaw: number;
   pitch: number;
   moveToScreen(clientX: number, clientY: number): void;
@@ -23,14 +25,15 @@ interface DragState {
 /** Wires the canvas listeners (they live as long as the canvas; never detached). */
 export function attachWorldInput(canvas: HTMLCanvasElement, world: WorldInputTarget): void {
   let drag: DragState = { x: 0, y: 0, moved: false, id: -1 };
+  const ignored = () => !world.active || world.paused || world.suspended;
   canvas.addEventListener('pointerdown', (event) => {
-    if (!(!world.active || world.paused)) {
+    if (!ignored()) {
       drag = { x: event.clientX, y: event.clientY, moved: false, id: event.pointerId };
       canvas.setPointerCapture(event.pointerId);
     }
   });
   canvas.addEventListener('pointermove', (event) => {
-    if (drag.id !== event.pointerId || !world.active || world.paused) {
+    if (drag.id !== event.pointerId || ignored()) {
       return;
     }
     const dx = event.clientX - drag.x;
@@ -45,7 +48,7 @@ export function attachWorldInput(canvas: HTMLCanvasElement, world: WorldInputTar
   });
   canvas.addEventListener('pointerup', (event) => {
     if (drag.id === event.pointerId) {
-      if (!drag.moved && !world.paused) {
+      if (!drag.moved && !ignored()) {
         world.moveToScreen(event.clientX, event.clientY);
       }
       drag.id = -1;
@@ -57,7 +60,7 @@ export function attachWorldInput(canvas: HTMLCanvasElement, world: WorldInputTar
   canvas.addEventListener(
     'wheel',
     (event) => {
-      if (!(!world.active || world.paused)) {
+      if (!ignored()) {
         event.preventDefault();
         world.zoom(event.deltaY * 0.045);
       }

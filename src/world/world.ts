@@ -33,6 +33,7 @@ import { type Interactable, InteractableRegistry } from './world-interactables';
 import type { ProjectedPoint, WorldPublicApi } from './world-public-api';
 import { addWorldLights, createWorldRenderer, updateSunShadow } from './world-renderer-setup';
 import { projectToCanvas } from './world-screen-projection';
+import { WorldSuspension } from './world-suspension';
 
 export class World implements WorldPublicApi {
   readonly canvas: HTMLCanvasElement;
@@ -77,7 +78,7 @@ export class World implements WorldPublicApi {
   onSceneClick: ((nearMilo: boolean) => void) | undefined;
   private readonly playerParts: PlayerModelParts;
   private readonly interactables = new InteractableRegistry();
-  private suspended = false;
+  private readonly suspension = new WorldSuspension();
   private readonly observer: ResizeObserver;
   private frame = 0;
 
@@ -127,7 +128,7 @@ export class World implements WorldPublicApi {
   }
 
   jump(): void {
-    if (this.active && !this.paused && tryJump(this)) {
+    if (this.active && !this.paused && !this.suspended && tryJump(this)) {
       this.onJump?.();
     }
   }
@@ -180,21 +181,19 @@ export class World implements WorldPublicApi {
     return this.interactables.nearest(this.player.position.x, this.player.position.z);
   }
 
-  /** Stops the frame loop (no render, input ignored) while a level owns the renderer. */
-  suspend(): void {
-    if (this.suspended) return;
-    this.suspended = true;
-    this.paused = true;
-    this.clearInput();
-    cancelAnimationFrame(this.frame);
+  /** A level owns the renderer: no frame loop, world input ignored. */
+  get suspended(): boolean {
+    return this.suspension.active;
   }
 
-  /** Restarts the frame loop after `suspend()`; the first frame simulates no time (dt 0). */
+  /** Stops the frame loop (no render, input ignored) while a level owns the renderer. */
+  suspend(): void {
+    if (this.suspension.suspend(this)) cancelAnimationFrame(this.frame);
+  }
+
+  /** Restarts the loop after `suspend()` (pause state as before; first frame dt 0). */
   resume(): void {
-    if (!this.suspended) return;
-    this.suspended = false;
-    this.paused = false;
-    this.clearInput();
+    if (!this.suspension.resume(this)) return;
     this.resize();
     this.timer.reset();
     this.animate();

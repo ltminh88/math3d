@@ -7,7 +7,7 @@ import {
   type Region,
 } from '../config/regions';
 import { translateDomTree, translateLongText, translateText } from '../i18n/legacy-translator';
-import { currentGateStatus, gateStateText } from '../levels/shared/level-gates';
+import { currentGateStatus, gateStateText, isLevelRunning } from '../levels/shared/level-gates';
 import { tl } from '../levels/shared/level-host-strings';
 import { drawMap, type MapDrawState } from '../map/map-render';
 import {
@@ -99,7 +99,8 @@ function renderMapPanel(): void {
 /** Opens the world map (only while playing and no dialog is open); pauses the world. */
 export function openMap(): void {
   const world = getWorld();
-  if (!world.active || byId<HTMLDialogElement>('dialog').open) return;
+  // A level loading or running owns the screen (closing the map would unpause the world).
+  if (!world.active || isLevelRunning() || byId<HTMLDialogElement>('dialog').open) return;
   gameState.mapOpen = true;
   world.paused = true;
   world.clearInput();
