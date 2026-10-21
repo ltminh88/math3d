@@ -1,6 +1,7 @@
 // Field round flow (pure): planned facts -> rounds of type (a) build the plot then give the total,
 // (b) pick both equations that describe a planted plot, (c) recall the total (Leitner box 3+,
 // equation shown in either order). Answers walk the shared hint ladder (3 attempts).
+import { mulFactsForTables } from '../../learning/curriculum-tables';
 import { type FactKey, parseFactKey } from '../../learning/fact-key';
 import {
   createHintState,
@@ -12,6 +13,7 @@ import {
 } from '../../learning/hint-ladder';
 import { type Rng, shuffle } from '../../learning/seeded-rng';
 import type { QuestionOutcome } from '../../learning/session-recorder';
+import type { LevelDefinition, LevelLearning } from '../shared/level-types';
 
 export type FieldRoundType = 'build' | 'equations' | 'recall';
 
@@ -71,6 +73,15 @@ export function planFieldRounds({ facts, boxOf, rng }: PlanRoundsInput): FieldRo
       shownOrder: swap ? [cols, rows] : [rows, cols],
       options: type === 'equations' ? equationOptions(rows, cols, rng) : [],
     };
+  });
+}
+
+/** The run's rounds: the host planner picks the facts over the level's tables (3 and 4). */
+export function planRunRounds(learning: LevelLearning, definition: LevelDefinition): FieldRound[] {
+  return planFieldRounds({
+    facts: learning.planSession(mulFactsForTables(definition.tables), definition.rounds),
+    boxOf: (key) => learning.stats()[key]?.box ?? 1,
+    rng: learning.rng,
   });
 }
 

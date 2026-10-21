@@ -10,8 +10,7 @@ import {
 } from './field-round-flow';
 
 const rng = () => mulberry32(7);
-const plan = (facts: string[], box = 1) =>
-  planFieldRounds({ facts, boxOf: () => box, rng: rng() });
+const plan = (facts: string[], box = 1) => planFieldRounds({ facts, boxOf: () => box, rng: rng() });
 
 describe('planFieldRounds', () => {
   it('turns pooled facts into rows x cols plots, small factor as rows', () => {
@@ -21,7 +20,13 @@ describe('planFieldRounds', () => {
 
   it('alternates build (a) and equations (b) while the fact is new', () => {
     const rounds = plan(['mul:3x4', 'mul:4x7', 'mul:3x9', 'mul:2x4', 'mul:3x5']);
-    expect(rounds.map((r) => r.type)).toEqual(['build', 'equations', 'build', 'equations', 'build']);
+    expect(rounds.map((r) => r.type)).toEqual([
+      'build',
+      'equations',
+      'build',
+      'equations',
+      'build',
+    ]);
   });
 
   it('square facts never ask for two different equations', () => {
@@ -43,10 +48,12 @@ describe('planFieldRounds', () => {
     const round = plan(['mul:2x3', 'mul:3x4'])[1];
     const labels = round?.options.map((o) => o.label) ?? [];
     expect(new Set(labels).size).toBe(4);
-    expect(round?.options.filter((o) => o.correct).map((o) => o.label).sort()).toEqual([
-      '3 × 4',
-      '4 × 3',
-    ]);
+    expect(
+      round?.options
+        .filter((o) => o.correct)
+        .map((o) => o.label)
+        .sort(),
+    ).toEqual(['3 × 4', '4 × 3']);
     expect(round?.options.filter((o) => !o.correct).every((o) => o.value !== 12)).toBe(true);
   });
 });
