@@ -9,6 +9,30 @@ const HAIR = 0x513c32;
 const BOY_SHIRT = 0xebae42;
 const GIRL_SHIRT = 0x9774b8;
 
+/** Model-local point [x, y, z] where an outfit piece is attached (phase 19 cosmetics). */
+export type AnchorPoint = readonly [x: number, y: number, z: number];
+
+/** Named anchor points on a character; data only, so the recovered models stay unchanged. */
+export interface CharacterAnchors {
+  /** Top of the head (player: above the hair; VLM: on the hat brim). */
+  readonly head: AnchorPoint;
+  readonly neck: AnchorPoint;
+  /** Behind the back (player: past the backpack). */
+  readonly back: AnchorPoint;
+}
+
+export const PLAYER_ANCHORS: CharacterAnchors = {
+  head: [0, 2.1, 0],
+  neck: [0, 1.32, 0],
+  back: [0, 1.1, -0.64],
+};
+
+export const GUIDE_ANCHORS: CharacterAnchors = {
+  head: [0, 1.88, 0],
+  neck: [0, 1.2, 0],
+  back: [0, 0.8, -0.62],
+};
+
 /** Player parts the avatar switch and the walk cycle touch. */
 export interface PlayerModelParts {
   shirt: Mesh;
