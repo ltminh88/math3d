@@ -9,7 +9,7 @@
 - Description: Add a level gate in the meadow ("Cánh Đồng Phép Tính") and forest ("Rừng Nhân Chia") regions; walking up to it shows the existing interact button; entering pauses the world and runs a level scene on the same renderer; finishing records `LevelProgress` and returns the player to the gate. Levels self-register.
 - Priority: P1
 - Implementation status: done (tag phase-13)
-- Review status: not reviewed
+- Review status: reviewed (reports/reviewer-phase-13.md); H1, H2, M1-M4, L1, L2, L4, L5, L7 fixed (tag phase-13-reviewed)
 
 ## Key Insights
 - Keep original world behavior: regions stay walkable exactly as today (they unlock after the bridge quest). Only the level gate is gated: Field gate needs bridge quest complete, Forest gate needs Field completed. City/Tower show "Sắp ra mắt" on their sign; no gate.
@@ -120,3 +120,28 @@ Rollback: remove gates (config flag) -> world as after 12.
 - Deferred to 14: e2e enter/exit + renderer.info leak check on the real field level (no stub level
   is shipped; `__game.memory()` is ready for it). 14/15 must update `level-gate.spec.ts`, whose
   "Sắp ra mắt" expectations hold only while the levels are absent.
+
+## Review fixes (2026-10-21, tag phase-13-reviewed)
+- H1 fixed: the host stops after `update()` when the run ended (no render, no new frame).
+- H2 fixed: level runs go through the pending-commit queue (`src/ui/pending-session-commits.ts`)
+  like quiz batches, retried with the same batchId; the view gets XP/coins when the commit lands.
+  `commitLevelRun(run, bonus?)` now resolves to the committed delta (or undefined).
+- M1 fixed: world pointer/wheel input checks `suspended`; `resume()` gives back the pause state
+  from before `suspend()` (`src/world/world-suspension.ts`); the map and the shared dialog
+  (except a reload `notice`) refuse to open while a level loads or runs.
+- M2 fixed: the first-completion bonus is decided inside the queued commit from the store
+  (`firstCompletionBonus`); only a run with stars >= 1 (what sets `completedAt`) gets it.
+- M3 fixed: `exit({completed:true})` with no recorded round commits nothing and logs an error.
+- M4 fixed: renderer global state is snapshot on enter and restored on exit, before resume
+  (`renderer-state-snapshot.ts`, port `saveRendererState`).
+- L1 fixed: scene background/environment textures are disposed on exit. L2 fixed: equal-priority
+  ties fall back to distance. L4 fixed: the registry names the folder of a missing default export
+  or non-function `load`. L5 fixed: focus moves into the level layer and back on unmount.
+  L7 fixed: `LevelContext` docs (keys on `document` with `ctx.disposer.signal`, no `openDialog`,
+  leave the renderer alone).
+- Deferred to phase 18: L3 (no feedback during the level chunk load), L6 (`enter()` returns
+  'entered' for a run that exited during `start`).
+- Open question answered: `commitSession` keeps the first `completedAt` on replays
+  (`progress-repository.ts`: `prev.completedAt || ctx.now`, only when stars >= 1).
+- Gates: 362 unit tests, 34 e2e, parity 20/20 with no artifact change.
+
