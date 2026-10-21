@@ -1,0 +1,14 @@
+/* The ARIA announcer's live region (src/ui/kit/aria-announcer.ts): read by screen readers,
+   never drawn. Standard visually-hidden pattern; not display:none, which would silence it. */
+.kit-sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  margin: -1px;
+  padding: 0;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+  clip-path: inset(50%);
+  white-space: nowrap;
+  border: 0;
+}

@@ -1,3 +1,5 @@
+import '../../styles/aria-announcer.css';
+
 let region: HTMLElement | null = null;
 
 function ensureRegion(doc: Document): HTMLElement {
