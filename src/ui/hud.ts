@@ -4,6 +4,9 @@ import { isRegionUnlocked } from '../config/regions';
 import { BRIDGE_SEGMENTS, LEVEL_XP_THRESHOLDS } from '../config/world-constants';
 import { levelForXp } from '../game/xp-levels';
 import { translateDomTree, translateLongText } from '../i18n/legacy-translator';
+import { initShop } from '../shop/shop-init';
+import { openShop } from '../shop/shop-panel';
+import { tshop } from '../shop/shop-strings';
 import { appSettings } from '../store/app-settings';
 import { LABELED_REGIONS } from './dom-template';
 import { gameState } from './game-state';
@@ -68,6 +71,18 @@ function setMarkup(id: string, html: string): void {
   }
 }
 
+/** The toolbar's shop button (phase 19), added once next to the map button. */
+function ensureShopButton(): void {
+  if (document.getElementById('open-shop')) return;
+  const button = document.createElement('button');
+  button.id = 'open-shop';
+  button.className = 'tool-button';
+  button.innerHTML = `${icon('coin')}<span></span>`;
+  (button.querySelector('span') as HTMLElement).textContent = tshop('hudButton');
+  button.onclick = openShop;
+  byId('learn').before(button);
+}
+
 /** Re-renders every HUD field from the progress view, then re-runs the DOM translator on the HUD. */
 export function refreshHud(): void {
   const progress = gameState.progress;
@@ -101,6 +116,8 @@ export function refreshHud(): void {
   setMarkup('sound', icon(sound ? 'sound' : 'mute'));
   byId('sound').setAttribute('aria-label', sound ? 'Tắt âm thanh' : 'Bật âm thanh');
   gameState.audio.enabled = sound;
+  ensureShopButton();
+  initShop();
   translateDomTree(byId('hud'));
 }
 

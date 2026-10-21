@@ -1,0 +1,130 @@
+/* Shop panel inside the recovered dialog (recovered tokens, button classes and radii). */
+.shop-wallet {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  margin: 0 0 14px;
+  padding: 8px 14px;
+  border-radius: 999px;
+  background: var(--gold-soft);
+  color: var(--ink);
+  font-weight: 800;
+}
+
+.shop-wallet svg {
+  color: var(--gold-deep);
+}
+
+.shop-tabs {
+  display: flex;
+  gap: 6px;
+  margin-bottom: 14px;
+  padding: 4px;
+  border-radius: var(--radius-sm);
+  background: var(--paper-2);
+}
+
+.shop-tab {
+  flex: 1;
+  padding: 10px 8px;
+  border: 0;
+  border-radius: 10px;
+  background: none;
+  color: var(--muted);
+  font-weight: 800;
+}
+
+.shop-tab[aria-selected="true"] {
+  background: var(--paper);
+  color: var(--ink);
+  box-shadow: var(--shadow);
+}
+
+.shop-items {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 10px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.shop-card {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  padding: 14px;
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  background: var(--paper);
+}
+
+.shop-card[data-state="equipped"] {
+  border-color: var(--leaf);
+  background: var(--leaf-soft);
+}
+
+.shop-price,
+.shop-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  font-style: normal;
+  font-size: 14px;
+  font-weight: 800;
+  color: var(--gold-deep);
+}
+
+.shop-price svg,
+.shop-badge svg {
+  width: 16px;
+  height: 16px;
+}
+
+.shop-badge {
+  color: var(--ink-soft);
+}
+
+.shop-card[data-state="too-expensive"] .shop-price {
+  color: var(--muted-2);
+}
+
+.shop-card-actions {
+  margin-top: auto;
+}
+
+.shop-action {
+  width: 100%;
+  padding: 10px 12px;
+  font-size: 15px;
+}
+
+.shop-confirm {
+  margin: 0 0 6px;
+  font-size: 14px;
+  font-weight: 700;
+}
+
+.shop-confirm-actions {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.shop-confirm-actions .text-button {
+  justify-content: center;
+  padding: 6px 0;
+}
+
+.shop-status {
+  min-height: 1.4em;
+  margin: 14px 0 0;
+  font-weight: 700;
+  color: var(--ink-soft);
+}
+
+@media (max-width: 420px) {
+  .shop-items {
+    grid-template-columns: 1fr;
+  }
+}

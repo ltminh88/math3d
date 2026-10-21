@@ -185,3 +185,18 @@ export const LEVEL_GATES: readonly LevelGate[] = [
     sign: '12 : 3',
   },
 ];
+
+/** Ground spot on the village bank, [x, z] plus a facing (0 faces +z, towards the start view). */
+export interface VillageSpot {
+  readonly position: readonly [x: number, z: number];
+  readonly facing: number;
+}
+
+/**
+ * The cosmetics shop stall (phase 19): between the first cottages, off both village roads and
+ * clear of every recovered collision circle. Built after the scatter pass, like the level gates.
+ */
+export const SHOP_STALL: VillageSpot = { position: [-7, -4], facing: 0 };
+
+/** Where an equipped village decoration stands (beside the stall, off the roads). */
+export const VILLAGE_DECOR_SLOT: VillageSpot = { position: [-3.6, -4.4], facing: 0 };
