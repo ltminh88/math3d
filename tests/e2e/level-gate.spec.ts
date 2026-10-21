@@ -1,7 +1,7 @@
 // Level gates in the meadow and the forest (phase 13): locked until their requirement is met,
-// "Sắp ra mắt" while their level is not shipped (the forest, until phase 15; the field level ships
-// in phase 14 and is played in field-level.spec.ts), VLM's interact prompt unchanged, City/Tower
-// marked coming soon on their labels and on the map. Uses the test-build hook `window.__game`.
+// open once it is (both levels ship: field in phase 14, forest in phase 15, played in their own
+// specs), VLM's interact prompt unchanged, City/Tower marked coming soon on their labels and on
+// the map. Uses the test-build hook `window.__game`.
 import { type Page, test } from '@playwright/test';
 import { expect, SLOW_TEST_MS, waitForStoreBoot } from './legacy-live-save-fixtures';
 
@@ -10,7 +10,6 @@ test.describe.configure({ timeout: SLOW_TEST_MS });
 
 const LOCKED_BRIDGE = 'Hoàn thành Cây cầu tình bạn để mở cổng này nhé!';
 const LOCKED_FIELD = 'Hoàn thành Cánh Đồng Phép Tính để mở cổng này nhé!';
-const COMING_SOON_TOAST = 'Màn chơi này sắp ra mắt. Hẹn bạn quay lại nhé!';
 
 async function startPlaying(page: Page): Promise<void> {
   await page.goto('/');
@@ -49,9 +48,7 @@ test('gates stay locked before the bridge quest; VLM keeps his prompt', async ({
   expect(errors).toEqual([]);
 });
 
-test('the bridge opens the field gate; the forest says Sắp ra mắt until its level ships', async ({
-  page,
-}) => {
+test('the bridge opens the field gate; the field opens the forest gate', async ({ page }) => {
   await startPlaying(page);
   await page.evaluate(() => window.__game?.seedProgress({ bridgeComplete: true }));
   await expect(page.locator('#gate-field-label small')).toHaveText('Cổng đã mở');
@@ -62,17 +59,16 @@ test('the bridge opens the field gate; the forest says Sắp ra mắt until its 
   await useGate(page, 'forest');
   await expect(page.locator('#toast')).toHaveText(LOCKED_FIELD);
   await page.evaluate(() => window.__game?.seedProgress({ completedLevels: ['field'] }));
-  expect(await page.evaluate(() => window.__game?.gateStatus('forest'))).toBe('coming-soon');
-  await useGate(page, 'forest');
-  await expect(page.locator('#interact')).toContainText('Cổng Rừng Nhân Chia · Sắp ra mắt');
-  await expect(page.locator('#toast')).toHaveText(COMING_SOON_TOAST);
+  expect(await page.evaluate(() => window.__game?.gateStatus('forest'))).toBe('open');
+  await page.evaluate(() => window.__game?.teleportToGate('forest'));
+  await expect(page.locator('#interact')).toContainText('Vào Cổng Rừng Nhân Chia');
   expect(await page.evaluate(() => window.__game?.levelRunning())).toBe(false);
 
   // Progress survives a reload: the gates read it back from the store.
   await page.reload();
   await waitForStoreBoot(page);
   await page.waitForFunction(() => '__game' in window);
-  expect(await page.evaluate(gateStatuses)).toEqual(['completed', 'coming-soon']);
+  expect(await page.evaluate(gateStatuses)).toEqual(['completed', 'open']);
 });
 
 test('City and Tower say Sắp ra mắt; the map shows each region’s level state', async ({ page }) => {

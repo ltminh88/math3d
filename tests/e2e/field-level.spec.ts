@@ -150,8 +150,8 @@ test('the field level is played to the end and opens the way to the forest', asy
   const field = await page.evaluate(() => window.__game?.snapshot()?.levelProgress.field);
   expect(field?.stars ?? 0).toBeGreaterThanOrEqual(1);
   expect(await page.evaluate(() => window.__game?.gateStatus('field'))).toBe('completed');
-  // No forest level in this branch yet: its gate is unlocked but still "coming soon".
-  expect(await page.evaluate(() => window.__game?.gateStatus('forest'))).toBe('coming-soon');
+  // Completing the field opens the forest gate (its level ships in phase 15).
+  expect(await page.evaluate(() => window.__game?.gateStatus('forest'))).toBe('open');
   expect(errors).toEqual([]);
 });
 
