@@ -8,7 +8,7 @@
 - Date: 2026-10-18
 - Description: Implement old-06 Field level as a level module behind the meadow gate. Only deltas are written here.
 - Priority: P1
-- Implementation status: pending
+- Implementation status: done (2026-10-21, branch worktree-agent-phase14-field)
 - Review status: not reviewed
 
 ## Deltas vs old phase 06
@@ -46,12 +46,12 @@ tests/e2e/field-level.spec.ts
 6. E2E: `__game` seeds bridge complete -> teleport -> enter -> complete 5 rounds (keyboard path + touch path on mobile-pixel) -> back at gate; store has `field` completed; Forest gate opens.
 
 ## Todo list
-- [ ] grid model (+tests)
-- [ ] diorama + plant view
-- [ ] round flow (+tests)
-- [ ] rotation + labels
-- [ ] hints + celebration + result
-- [ ] e2e
+- [x] grid model (+tests)
+- [x] diorama + plant view
+- [x] round flow (+tests)
+- [x] rotation + labels
+- [x] hints + celebration + result
+- [x] e2e
 
 ## Success Criteria
 - Old 06 criteria + `npm run test:e2e -- field-level` green on desktop-chromium and mobile-pixel; `renderer.info.render.calls` <= 60 in level (asserted in e2e via `__game`).
@@ -69,6 +69,33 @@ Rollback: delete `src/levels/field/` -> gate shows "Sắp ra mắt".
 
 ## Security Considerations
 - None (local only).
+
+## Implementation notes (2026-10-21)
+- Files: `src/levels/field/` index (definition only; scene chunk `field-scene-*.js` ~27 kB), pure
+  `planting-grid.ts` + `field-round-flow.ts` (unit-tested RED first), stage (own scene background +
+  fog + hemisphere/sun from `WORLD_LIGHTING`; renderer state untouched), diorama (fence, barn,
+  scarecrow, hay, trees, 5 storm-flattened patches; repeated props instanced), plot meshes/view
+  (instanced mounds/stems/flower heads, row stakes, seedling basket, invisible hit proxies), HUD
+  (`.glass`, `.dialog-eyebrow`, `.feedback success|gentle`, `.hint-area`, `.answer`, `.primary`,
+  `.reward-pop`; kit number pad styled in `field-level.css`), projected DOM labels (equation,
+  skip count), test-only `window.__field`.
+- Rounds: `planSession(mulFactsForTables([3,4]), 5)`; box >= 3 -> recall (c, either order); else
+  even index -> build (a), odd -> equations (b, 2 of 4: r×c, c×r, r+c, r×(c+1)); square facts are
+  always (a). 3 attempts on the shared hint ladder; rung 1 encourage, 2 row highlight, 3 skip count
+  (last row "?"), 4 swapped fact (plot turns). A correct answer turns the plot to show c × r.
+  Rewards only via `learning.record`; the host adds the completion bonus.
+- Input: tap a cell / tap a row stake / drag from a cell or the basket across cells (shared
+  `createInteraction`); keyboard on `document` (capture, disposer signal): arrows move cell focus,
+  Enter/Space plants, R turns, H hint, 1-4 + Enter equations, digits/Enter number pad. Reduced
+  motion: instant turn, plants and patches appear without growing.
+- Measured (desktop-chromium, SwiftShader): 43 draw calls planting, 48 at the celebration (incl.
+  shadow pass); geometries 272 -> 296 in level -> 272 after exit and after 10 more cycles (e2e).
+- Deviation: rung 5 "requeue" is not replayed inside the run (5 fixed rounds); the revealed fact
+  drops a Leitner box and comes back through the planner next session.
+- Author review screenshots: `reports/phase-14-screens/` (start, mid-round, hint, celebration,
+  world at the gate).
+- `level-gate.spec.ts`: the field gate is now open (no "Sắp ra mắt"); forest stays coming-soon
+  until phase 15 (that spec's forest lines must change when 15 merges).
 
 ## Next steps
 - 18 playtest + perf on iPad.
