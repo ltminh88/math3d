@@ -8,7 +8,7 @@
 - Date: 2026-10-18
 - Description: Re-add the old-04 cosmetics shop, adapted to the recovered world: a shop stall in the village region opens a shop panel styled like recovered dialogs; coins buy visual-only items for VLM (guide NPC), the player avatar and village decor. Spending goes through the existing `purchaseCosmetic`/`equipCosmetic` store API.
 - Priority: P2
-- Implementation status: pending
+- Implementation status: done (2026-10-21), parity re-baseline pending (controller)
 - Review status: not reviewed
 
 ## Key Insights
@@ -50,12 +50,13 @@ Flow: interact/HUD -> panel -> `purchaseCosmetic` -> store event -> applier re-r
 6. E2E `shop-purchase.spec.ts`: seed coins via test hook -> stall -> buy -> equip -> visible -> reload -> still equipped; insufficient coins message. Parity re-baseline for stall shots only.
 
 ## Todo list
-- [ ] catalog + meshes (+ test)
-- [ ] purchase flow (+ tests)
-- [ ] anchors, stall, decor slots
-- [ ] panel + HUD button + strings
-- [ ] applier
-- [ ] e2e + parity re-baseline
+- [x] catalog + meshes (+ test)
+- [x] purchase flow (+ tests)
+- [x] anchors, stall, decor slots
+- [x] panel + HUD button + strings
+- [x] applier
+- [x] e2e (`shop-purchase.spec.ts`, both projects)
+- [ ] parity re-baseline (controller, after merge)
 
 ## Success Criteria
 - `npm test` + `npm run test:e2e -- shop-purchase` green; `npm run test:parity` green with only stall shots re-baselined.
@@ -80,3 +81,26 @@ Rollback: remove HUD button + stall registration -> shop unreachable; owned item
 
 ## Next steps
 - 17 syncs owned/equipped cosmetics; 18 a11y/perf covers shop.
+
+## Implementation notes (2026-10-21)
+- Catalog: 12 items, 4 per slot, prices 20-60; ids double as `shop` string keys; names vi/en,
+  guide name injected from `common-strings` (`{guide}`).
+- Unequip: the store needs a non-empty id and has no unequip, so an emptied slot stores the
+  sentinel `none` (`UNEQUIPPED`); `equippedItem()` ignores unknown, unowned or foreign-slot ids.
+- Meshes: every item and the stall are baked into ONE vertex-coloured geometry with one shared
+  material (`vertex-color-parts.ts`) -> 1 draw call + 1 shadow call each. With 3 slots worn the
+  e2e bound `<= baseline + 6` holds; geometries 237 -> 240 worn, back to 237 after 10 swaps.
+- Anchors are data only (`PLAYER_ANCHORS`, `GUIDE_ANCHORS` in `characters-milo-avatar.ts`): no
+  Object3D added, recovered models unchanged. Decor stands at `VILLAGE_DECOR_SLOT` (-3.6, -4.4)
+  with a collision circle pushed on place / removed on put-away.
+- Stall `SHOP_STALL` (-7, -4) facing +z, built after the world + gates (no RNG, obstacle circle
+  appended), interactable `shop-stall` (reach 2.9, default priority, ~7.6 from VLM).
+- Init: `refreshHud()` calls `ensureShopButton()` + idempotent `initShop()` (first call right after
+  the world build in `startWorld`, the next after the store hydrates) -> no bootstrap edit.
+- Panel: the shared recovered `<dialog>` via `openDialog(..., 'shop')` (pauses/restores the world
+  like every dialog); WAI-ARIA tabs with arrow keys, inline buy confirm, polite status + announcer.
+  `openShop()` ignores calls while a level runs or before Play; it flushes pending quiz coins first.
+- E2E coins come from a seeded legacy v1 save (imported at boot); `__game.seedProgress` untouched.
+- Edits outside `src/shop/**`: `src/ui/game-state.ts` (+ `'shop'` in `DialogKind`).
+- Parity expected to change: every world shot whose camera sees the village (stall mesh, plus
+  scene dumps gain `shop-stall`), and every HUD DOM shot (new `#open-shop` toolbar button).
