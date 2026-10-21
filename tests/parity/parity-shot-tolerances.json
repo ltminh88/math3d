@@ -6,7 +6,8 @@
     "liveVsOracle": "capture-live-baselines.mjs --origin oracle (recovered/original served locally + window.__parity)",
     "localVsLive": "capture-live-baselines.mjs --origin local / npm run test:parity (dist/ served under the live origin + window.__parity), 2026-10-19: canvas, shot JSON, traces and oracle scene dumps exact in every run",
     "localVsLocalR186": "phase 10 (three 0.186.1, retuned lighting): npm run parity:baselines, then capture-live-baselines.mjs --origin local + npm run test:parity, 2026-10-19: canvas PNGs, shot JSON, traces and scene dumps exact; DOM noise only on shots already listed, all within their existing tolerance/ceiling (none widened)",
-    "localVsLocalPhase12": "phase 12 (IndexedDB store, learning quiz, save-code buttons): npm run parity:baselines, then npm run test:parity: canvas PNGs, shot JSON, traces and scene dumps exact; one new DOM-noise shot (mobile milo-dialog, 2 px)"
+    "localVsLocalPhase12": "phase 12 (IndexedDB store, learning quiz, save-code buttons): npm run parity:baselines, then npm run test:parity: canvas PNGs, shot JSON, traces and scene dumps exact; one new DOM-noise shot (mobile milo-dialog, 2 px)",
+    "localVsLocalPhase19": "phases 14/15/19 merge (field, forest, shop): npm run parity:baselines, then npm run test:parity: canvas PNGs, shot JSON, traces and scene dumps exact; one new DOM-noise shot (mobile quiz-hint-1, 221 px, two-state raster)"
   },
   "policy": {
     "canvasPng": 0,
@@ -32,7 +33,8 @@
     "desktop-chromium/playthrough--bridge-built.dom.png": "1 px in 1 of 2 local-vs-local runs after the math3d rename (cause not isolated); shot JSON byte-exact. r186 verify: 1 px again (structural gate).",
     "desktop-chromium/bridge-3--play.dom.png": "off-edge world label, same as bridge-0/bridge-6: 20 px in 2 of 3 local CLI runs, 226 px (0.025%) in a full suite run 2026-10-19; live --verify 0; shot JSON byte-exact.",
     "mobile-pixel/playthrough--milo-dialog.dom.png": "2 px, dialog pop keyframe on a composited layer (phase 12 local full run, 1 of 6 runs); shot JSON byte-exact.",
-    "mobile-pixel/playthrough--quiz-correct.dom.png": "floating '+10 XP' reward text mid-animation: 39 px sub-pixel shift under machine load (fails 3/3 on fab59f8 and on 58db29b, capture tool reproduces baseline exactly); shot JSON byte-exact. Same class as quiz-correct-3/6."
+    "mobile-pixel/playthrough--quiz-correct.dom.png": "floating '+10 XP' reward text mid-animation: 39 px sub-pixel shift under machine load (fails 3/3 on fab59f8 and on 58db29b, capture tool reproduces baseline exactly); shot JSON byte-exact. Same class as quiz-correct-3/6.",
+    "mobile-pixel/playthrough--quiz-hint-1.dom.png": "221 px on one pixel row at the dialog's top edge (x 93-313, y 162; dialog pop keyframe layer). Two-state raster: the full parity:baselines run captured one state, the next full test:parity, two single-scenario reruns and a single-scenario capture-live-baselines run all the other (221 px each); shot JSON byte-exact in all. Gated structurally."
   },
   "recommendation": "Keep pixel gating for canvas shots (exact) and for DOM shots at tolerance 0. For the listed shots, do not raise global tolerance: either mask the off-screen world labels (#tower-label, #city-label when their translate x exceeds the viewport) in DOM shots, or gate them structurally via the shot JSON (html + cssHash + gl calls/triangles are exact) and the oracle scene JSON. Structural gating is preferred because it is exact and catches label text/position regressions that a mask would hide.",
   "shots": {
@@ -198,6 +200,13 @@
         "localVsLocalPhase12": {
           "diffPixels": 39
         }
+      },
+      "playthrough--quiz-hint-1.dom.png": {
+        "localVsLocalPhase19": {
+          "diffPixels": 221,
+          "ratio": 0.000639
+        },
+        "tolerance": 0.0013
       }
     }
   },
