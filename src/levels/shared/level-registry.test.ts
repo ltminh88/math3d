@@ -46,4 +46,12 @@ describe('level registry', () => {
       collectLevelDefinitions({ '/src/levels/field/index.ts': definition({ tables: [] }) }),
     ).toThrow(/tables/);
   });
+
+  it('names the folder of an index.ts without a default export or without a load function', () => {
+    expect(() => collectLevelDefinitions({ '/src/levels/field/index.ts': undefined })).toThrow(
+      /field.*default-export/,
+    );
+    const noLoad = { ...definition(), load: 'scene.ts' } as unknown as LevelDefinition;
+    expect(() => collectLevelDefinitions({ '/src/levels/field/index.ts': noLoad })).toThrow(/load/);
+  });
 });
