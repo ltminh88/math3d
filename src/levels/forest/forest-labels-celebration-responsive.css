@@ -1,0 +1,82 @@
+/* Forest level: count chips, celebration card and the narrow-screen layout. */
+.level-layer > .forest-labels {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+}
+.forest-chip {
+  position: absolute;
+  left: 0;
+  top: 0;
+  padding: 2px 10px;
+  border-radius: 999px;
+  background: var(--paper);
+  box-shadow: var(--shadow);
+  font-family: var(--font-display);
+  font-size: 18px;
+  font-weight: 800;
+  white-space: nowrap;
+}
+.forest-chip.ok {
+  background: #daefd1;
+  color: #31764c;
+}
+.forest-chip.tooMany,
+.forest-chip.tooFew {
+  background: #f9e5d6;
+  color: #a27350;
+}
+.forest-done {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  transform: translate(-50%, -50%);
+  width: min(420px, calc(100% - 32px));
+  padding: 22px 24px;
+  border-radius: var(--radius-lg);
+  background: var(--paper);
+  text-align: center;
+  animation: pop 0.5s;
+}
+.forest-done h2 {
+  margin: 0 0 8px;
+  font-family: var(--font-display);
+  font-size: 28px;
+}
+.forest-done__line {
+  color: var(--muted);
+  line-height: 1.6;
+}
+.forest-done .primary {
+  width: 100%;
+  margin-top: 14px;
+}
+@media (max-width: 760px), (max-height: 520px) and (max-width: 1000px) {
+  .forest-guide {
+    top: 70px;
+    width: calc(100% - 32px);
+    font-size: 13px;
+  }
+  .forest-panel {
+    top: auto;
+    left: 12px;
+    right: 12px;
+    bottom: max(12px, env(safe-area-inset-bottom));
+    width: auto;
+    max-height: 56%;
+    padding: 12px 14px;
+  }
+  .forest-equation {
+    margin: 2px 0 8px;
+    font-size: 32px;
+  }
+  .forest-panel .kit-pad {
+    grid-template-columns: repeat(6, 1fr);
+  }
+  .forest-panel .kit-pad__key {
+    min-height: 44px;
+  }
+  .forest-keys {
+    display: none;
+  }
+}
