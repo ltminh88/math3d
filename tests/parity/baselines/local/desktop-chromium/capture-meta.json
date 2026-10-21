@@ -1,5 +1,5 @@
 {
- "capturedAt": "2026-10-21T03:11:38.245Z",
+ "capturedAt": "2026-10-21T11:38:21.569Z",
  "origin": "local dist/ served under https://math.aigame3d.com",
  "chromium": "156.0.8078.4",
  "playwright": "1.64.1",
@@ -44,5 +44,5 @@
   "language-en"
  ],
  "files": 161,
- "durationSec": 534
+ "durationSec": 599
 }
