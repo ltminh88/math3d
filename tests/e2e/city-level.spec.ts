@@ -168,8 +168,8 @@ test('the city level plays five rounds and records facts of tables 6-9', async (
   await expect.poll(() => page.evaluate(() => window.__game?.levelRunning())).toBe(false);
   await expect(page.locator('#interact')).toContainText('Cổng Thành Phố Con Số');
   await expect.poll(() => page.evaluate(() => window.__game?.gateStatus('city'))).toBe('completed');
-  // No tower level in this branch: its gate is open but "Sắp ra mắt".
-  expect(await page.evaluate(() => window.__game?.gateStatus('tower'))).toBe('coming-soon');
+  // The city opens the tower gate.
+  expect(await page.evaluate(() => window.__game?.gateStatus('tower'))).toBe('open');
   const store = await page.evaluate(() => {
     const snap = window.__game?.snapshot();
     return {
