@@ -1,0 +1,199 @@
+/* Tower level HUD: recovered tokens (--ink, --paper, --gold, fonts), glass panels, and the
+   tower purple (#9b92cf, region colour) for the floor counter and the claim card. */
+.tower-guide {
+  position: absolute;
+  top: max(16px, env(safe-area-inset-top));
+  left: 50%;
+  transform: translate(-50%);
+  width: min(560px, calc(100% - 300px));
+  display: flex;
+  align-items: flex-start;
+  gap: 8px;
+  padding: 10px 16px;
+  border-radius: var(--radius);
+  font-size: 15px;
+  line-height: 1.45;
+}
+.tower-guide p {
+  margin: 0;
+  color: var(--ink-soft);
+  font-weight: 700;
+}
+.tower-guide__name {
+  font-family: var(--font-display);
+  color: var(--gold-deep);
+}
+.tower-guide__dot {
+  color: #9b92cf;
+}
+.tower-progress {
+  position: absolute;
+  top: max(16px, env(safe-area-inset-top));
+  right: max(16px, env(safe-area-inset-right));
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 10px 14px;
+  border-radius: 14px;
+  font-size: 14px;
+  font-weight: 900;
+}
+.tower-floors {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+.tower-floors li {
+  width: 26px;
+  height: 7px;
+  border-radius: 4px;
+  background: #ddd8ef;
+}
+.tower-floors li.done {
+  background: #ffd774;
+}
+.tower-floors li.current {
+  background: #9b92cf;
+  box-shadow: 0 0 0 2px #e4e0f5;
+}
+.tower-panel {
+  position: absolute;
+  top: 76px;
+  right: max(16px, env(safe-area-inset-right));
+  width: 340px;
+  max-height: calc(100% - 92px);
+  overflow: auto;
+  padding: 16px 18px;
+  border-radius: var(--radius-lg);
+  background: var(--glass-strong);
+}
+.tower-panel .question-intro {
+  margin: 0 0 4px;
+  font-size: 15px;
+  color: var(--ink);
+  font-weight: 700;
+}
+.tower-equation,
+.tower-claim {
+  margin: 6px 0 12px;
+  font-size: 38px;
+  white-space: nowrap;
+}
+.tower-claim {
+  padding: 4px 10px;
+  border-radius: 14px;
+  background: #ece9f8;
+}
+.tower-claim.is-false {
+  text-decoration: line-through;
+  text-decoration-color: #e1ad82;
+  color: #a27350;
+}
+.tower-claim.is-true {
+  background: #daefd1;
+  color: #31764c;
+}
+.tower-claim.wrong {
+  animation: shake 0.35s;
+}
+.tower-fix {
+  margin-top: 0;
+}
+.tower-blank {
+  display: inline-block;
+  min-width: 1.6em;
+  padding: 0 6px;
+  border-bottom: 4px dashed #c8b789;
+  color: var(--muted-2);
+  text-align: center;
+}
+.tower-blank.active {
+  border-bottom-style: solid;
+  border-color: var(--gold);
+  color: var(--ink);
+}
+.tower-blank.filled {
+  border-bottom-color: var(--leaf);
+  color: #31764c;
+}
+.tower-blank.revealed {
+  color: #976436;
+}
+.tower-blank.wrong {
+  animation: shake 0.35s;
+}
+.tower-house {
+  display: flex;
+  justify-content: center;
+  gap: 8px;
+  margin: 4px 0 8px;
+}
+.tower-house b {
+  min-width: 40px;
+  padding: 4px 8px;
+  border-radius: 12px;
+  background: #e4e0f5;
+  font-family: var(--font-display);
+  font-size: 20px;
+  text-align: center;
+}
+.tower-house b:last-child {
+  background: var(--gold-soft);
+}
+.tower-family {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 6px 12px;
+  margin-bottom: 10px;
+  font-family: var(--font-display);
+  font-size: 24px;
+  font-weight: 800;
+  text-align: center;
+}
+.tower-answers {
+  margin-bottom: 10px;
+}
+.tower-answers[data-count="2"] {
+  grid-template-columns: repeat(2, 1fr);
+}
+.tower-answers .answer {
+  min-height: 72px;
+}
+.tower-hint-button.offer {
+  color: var(--gold-deep);
+  text-decoration: underline;
+  animation: nudge 1.6s infinite ease-in-out;
+}
+.tower-panel .kit-pad {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 6px;
+}
+.tower-panel .kit-pad[hidden],
+.tower-answers[hidden] {
+  display: none;
+}
+.tower-panel .kit-pad__display {
+  display: none;
+}
+.tower-panel .kit-pad__key {
+  min-height: 48px;
+  border: 2px solid #e3e8d6;
+  border-bottom-width: 5px;
+  border-radius: 14px;
+  background: #f2f3e6;
+  font-family: var(--font-display);
+  font-size: 22px;
+  font-weight: 800;
+}
+.tower-panel .kit-pad__key--ok {
+  background: var(--ink);
+  border-color: #11392f;
+  color: #fffbea;
+}
+.tower-panel .kit-pad__key:disabled {
+  opacity: 0.5;
+}
