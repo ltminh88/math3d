@@ -1,0 +1,94 @@
+/* Forest level: count chips, celebration card and the narrow-screen layout. */
+.level-layer > .city-labels {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+}
+.city-chip {
+  position: absolute;
+  left: 0;
+  top: 0;
+  padding: 2px 10px;
+  border-radius: 999px;
+  background: var(--paper);
+  box-shadow: var(--shadow);
+  font-family: var(--font-display);
+  font-size: 18px;
+  font-weight: 800;
+  white-space: nowrap;
+}
+.city-chip--house {
+  background: #fffbea;
+  color: #3c4f6b;
+  border: 2px solid #8fb3c9;
+}
+.city-chip--parcel {
+  font-size: 16px;
+  background: #f9e5d6;
+  color: #7a4c33;
+}
+.city-chip--floor {
+  padding: 0 8px;
+  font-size: 14px;
+  background: var(--gold-soft);
+}
+.city-chip--band-a {
+  background: #f6b3d0;
+}
+.city-chip--band-b {
+  background: #9ad9f0;
+}
+.city-done {
+  position: absolute;
+  left: 50%;
+  bottom: max(16px, env(safe-area-inset-bottom));
+  transform: translateX(-50%);
+  width: min(420px, calc(100% - 32px));
+  padding: 22px 24px;
+  border-radius: var(--radius-lg);
+  background: var(--paper);
+  text-align: center;
+  animation: pop 0.5s;
+}
+.city-done h2 {
+  margin: 0 0 8px;
+  font-family: var(--font-display);
+  font-size: 28px;
+}
+.city-done__line {
+  color: var(--muted);
+  line-height: 1.6;
+}
+.city-done .primary {
+  width: 100%;
+  margin-top: 14px;
+}
+@media (max-width: 760px), (max-height: 520px) and (max-width: 1000px) {
+  .city-guide {
+    top: 70px;
+    width: calc(100% - 32px);
+    font-size: 13px;
+  }
+  .city-panel {
+    top: auto;
+    left: 12px;
+    right: 12px;
+    bottom: max(12px, env(safe-area-inset-bottom));
+    width: auto;
+    max-height: 56%;
+    padding: 12px 14px;
+  }
+  .city-equation {
+    margin: 2px 0 6px;
+    font-size: 32px;
+  }
+  .city-panel .kit-pad {
+    grid-template-columns: repeat(6, 1fr);
+  }
+  .city-panel .kit-pad__key {
+    min-height: 44px;
+  }
+  .city-keys {
+    display: none;
+  }
+}

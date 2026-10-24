@@ -6,7 +6,7 @@
 - Rules: `src/levels/shared/level-types.ts` doc comments; `docs/code-standards.md`
 
 ## Overview
-- Priority: P1. Status: pending. Depends on 01. Parallel with 03.
+- Priority: P1. Status: done (awaiting phase 04 merge). Depends on 01. Parallel with 03.
 - Story: VLM and the child help the city postman, who has mixed up the parcels. Each parcel shows a multiplication; each house shows a product. Then the lights in a building went out, and the child turns them on floor by floor.
 
 ## Key Insights
@@ -54,13 +54,25 @@ tests/e2e/city-level.spec.ts
 7. Screenshots for the author in `reports/city-screens/`.
 
 ## Todo list
-- [ ] round flow + tests
-- [ ] hints + tests
-- [ ] diorama, street, building
-- [ ] panel + input
-- [ ] celebration
-- [ ] e2e
-- [ ] screenshots
+- [x] round flow + tests
+- [x] hints + tests
+- [x] diorama, street, building
+- [x] panel + input
+- [x] celebration
+- [x] e2e
+- [x] screenshots
+
+## Implementation notes
+- Files: `index.ts`, `city-scene.ts` (wiring), `city-round-flow.ts` (pure planner + answer flow), `city-hints.ts` (pure rungs) + `city-hint-view.ts`, `city-round-controller.ts`, `city-input.ts` (3D facade + document keys), `city-panel.ts` + `city-choice-cards.ts`, `city-street-view.ts` (parcels, house zones), `city-building-view.ts` (instanced windows, floor proxies), `city-diorama-builder.ts`, `city-camera.ts`, `city-labels.ts`, `city-layout.ts`, `city-celebration.ts`, `city-strings.ts`, `city-test-hook.ts`, two CSS files. All under 200 lines.
+- Every answer is a number: house number (deliver), window total (windows), value of the chosen parcel expression (reverse); `CityRoundFlow.submit(value)` compares with the product. Round type: box ≥3 → reverse, else deliver/windows alternating (round 0 deliver). The 6–9 factor is `table` (windows per floor, shown first); when both factors are 6–9 the rng picks.
+- Deliver: 4 houses = product + `pickDistractors` (child's `errs` as the personal class) shuffled by `placeAnswer`. Reverse: `expressionChoice` (3 parcels, " x " shown as " × "). Both rounds also show house/parcel cards (keys 1–4) next to the 3D drag/tap/keyboard path.
+- Windows: tap a floor (invisible proxy), arrows + Enter, or "Bật đèn một tầng"; the running count shows lit floors and windows; total on the kit number pad. Lighting a floor by keyboard drops the 3D focus so the next Enter submits the pad.
+- Hints: 1 encourage; 2 `t = 5 + rest` (windows in two band colours with ■/● chips on the building, the same split in the hint card); 3 skip count per floor (`8, 16, 24, ?`, chips per floor in windows rounds); 4 commute when the other factor is 2–5 or 10, else near square (`7 × 8 = 7 × 7 + 7`), else count back from ten (`6 × 9 = 60 − 6`). 3 misses reveal.
+- Look: backdrop (ground, road, sidewalk, lamps, numbered blocks, trees, postman, VLM via `buildMiloModel`) baked to one mesh; four `buildHouse` cottages (roofs incl. `#8fb3c9`) baked to a second mesh hidden in windows rounds. Max draw calls in e2e: 7 (desktop and phone; budget 60).
+- Celebration: the card sits at the bottom and the camera frames a fully lit 8 × 7 building above it.
+- e2e: `city-level.spec.ts` (five rounds; desktop: wrong card → hint → 3D keyboard delivery, keyboard floor + button, 2 hints with bands, typed answers; phone: the same by taps incl. 3D parcel/house/floor taps) and `city-level-leak.spec.ts` (10 cycles). The leak spec waits for the world camera to settle (counted in frames) before its baseline: on the phone the world keeps uploading geometries for ~10 s after a teleport to the city gate (measured 271 → 279 with no level), which is not a level leak. Reverse delivery is unit-tested only (a fresh e2e profile has no box-3 facts and `seedProgress` cannot seed fact stats).
+- Expected failures for phase 04 (city gate now has a level): `level-gate.spec.ts` "the forest opens the city gate, the city the tower gate (both Sắp ra mắt without a level)" and `forest-level.spec.ts` map check `Cổng màn chơi: Sắp ra mắt` for the city.
+- Screenshots: `reports/city-screens/` (desktop + mobile: world at the gate, delivery, delivered, windows, hint bands, celebration).
 
 ## Success Criteria
 - Unit + `city-level` e2e green on desktop-chromium and mobile-pixel; full e2e green except tower expectations that phase 04 owns; lint/typecheck/build clean; own chunk.
