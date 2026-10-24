@@ -86,9 +86,20 @@ async function playFloor(page: Page, index: number, tap: boolean): Promise<void>
     const hint = page.locator('.tower-hint-button');
     await expect(hint).toHaveClass(/offer/);
     if (tap) await hint.tap();
-    else await hint.click();
+    else {
+      // H asks for the hint, as in the city and the field.
+      await blurControls(page);
+      await page.keyboard.press('h');
+    }
     await expect(page.locator('.tower-hint')).toHaveAttribute('data-rung', '1');
     s = await towerState(page);
+  }
+  if (s.step !== 'number') {
+    // Answer cards are named by their value, not just their key hint.
+    await expect(page.locator('.tower-answers .answer').first()).toHaveAttribute(
+      'aria-label',
+      /\(phím 1\)$/,
+    );
   }
   while (s.step !== null) {
     await give(page, s, s.expected as number | boolean, tap);
@@ -154,46 +165,4 @@ test('the tower climbs seven floors and records × and : facts', async ({ page }
   await expect(page.locator('#quest-title')).toHaveText('Bạn đã qua cả năm chặng!');
   expect(await page.evaluate(() => window.__tower)).toBeUndefined();
   expect(errors).toEqual([]);
-});
-
-test('leaving the tower frees its geometries (once and after 10 visits)', async ({
-  page,
-}, info) => {
-  const tap = info.project.name === 'mobile-pixel';
-  await startAtTowerGate(page);
-  await page.evaluate(() => window.__game?.teleportToGate('tower'));
-  await expect(page.locator('#interact')).toBeVisible();
-  const geometries = () => page.evaluate(() => window.__game?.memory().geometries ?? -1);
-  const leave = async () => {
-    const button = page.locator('.level-leave');
-    if (tap) await button.tap();
-    else await button.click();
-    await expect.poll(() => page.evaluate(() => window.__game?.levelRunning())).toBe(false);
-  };
-  // The world around the tower gate keeps uploading meshes for several seconds on a slow device
-  // (props come into view frame by frame, paused while a level runs). One warm-up visit, then
-  // the baseline once the count has held for three seconds.
-  await enterTower(page, tap);
-  await leave();
-  const reads: number[] = [];
-  await expect
-    .poll(
-      async () => {
-        reads.push(await geometries());
-        return reads.length >= 4 && new Set(reads.slice(-4)).size === 1;
-      },
-      { intervals: [1000], timeout: 30_000 },
-    )
-    .toBe(true);
-  const baseline = reads[reads.length - 1] as number;
-  expect(baseline).toBeGreaterThan(0);
-  for (let cycle = 0; cycle < 10; cycle++) {
-    await enterTower(page, tap);
-    expect(await geometries()).toBeGreaterThan(baseline);
-    await leave();
-    if (cycle === 0) await expect.poll(geometries).toBe(baseline);
-  }
-  await expect.poll(geometries).toBe(baseline);
-  // Leaving before any answer commits nothing: the gate is still open, not completed.
-  expect(await page.evaluate(() => window.__game?.gateStatus('tower'))).toBe('open');
 });

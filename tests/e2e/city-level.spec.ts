@@ -73,8 +73,11 @@ async function typeAnswer(page: Page, value: number, tap: boolean): Promise<void
   }
 }
 
-/** Delivers the parcel in 3D: tap parcel then house, or arrows + Enter (WCAG 2.5.7). */
-async function deliverIn3d(page: Page, house: number, tap: boolean): Promise<void> {
+/**
+ * Delivers the parcel in 3D: tap parcel then house, or arrows + Enter (WCAG 2.5.7). `zoneIndex`
+ * is the house's place among the houses still open (one answered wrong is out of play).
+ */
+async function deliverIn3d(page: Page, house: number, tap: boolean, zoneIndex = house) {
   if (tap) {
     await tapAt(page, 'parcel:0');
     await tapAt(page, `house:${house}`);
@@ -83,7 +86,7 @@ async function deliverIn3d(page: Page, house: number, tap: boolean): Promise<voi
   await blurControls(page);
   await page.keyboard.press('ArrowRight');
   await page.keyboard.press('Enter');
-  for (let i = 0; i < house; i++) await page.keyboard.press('ArrowRight');
+  for (let i = 0; i < zoneIndex; i++) await page.keyboard.press('ArrowRight');
   await page.keyboard.press('Enter');
 }
 
@@ -103,7 +106,9 @@ async function playRound(page: Page, index: number, tap: boolean, firstWindows: 
     await expect(page.locator('.city-hint-button')).toHaveClass(/offer/);
     await press(page, page.locator('.city-hint-button'), tap);
     await expect(page.locator('.city-hint')).toHaveAttribute('data-rung', '1');
-    await deliverIn3d(page, houses.indexOf(product), tap);
+    const right = houses.indexOf(product);
+    const open = houses.map((_, i) => i).filter((i) => houses[i] !== wrong);
+    await deliverIn3d(page, right, tap, open.indexOf(right));
   } else if (kind === 'windows') {
     if (firstWindows) {
       // Light the bottom floor in 3D (tap, or arrows + Enter), then one more with the button.
