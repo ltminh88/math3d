@@ -26,7 +26,12 @@ describe('tower fact pool and plan', () => {
   });
 
   it('puts weak facts first (lowest Leitner box)', () => {
-    const stats = { 'mul:7x8': stat(4), 'div:56/7': stat(1), 'mul:6x9': stat(2), 'div:24/3': stat(5) };
+    const stats = {
+      'mul:7x8': stat(4),
+      'div:56/7': stat(1),
+      'mul:6x9': stat(2),
+      'div:24/3': stat(5),
+    };
     const planned = ['mul:7x8', 'div:24/3', 'mul:6x9', 'div:56/7'];
     const facts = planTowerFacts(planned, stats, mulberry32(3), 4);
     expect(facts).toEqual(['div:56/7', 'mul:6x9', 'mul:7x8', 'div:24/3']);

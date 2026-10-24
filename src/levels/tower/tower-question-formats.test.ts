@@ -54,13 +54,14 @@ describe('tower question formats', () => {
 
   it('fact family: two multiplications and two divisions (two for squares)', () => {
     const q = buildQuestion('mul:3x8', 'family', rng(), []);
-    expect(q.steps.map((s) => [s.eq.x, s.eq.op, s.eq.y, s.kind === 'verdict' ? 0 : s.answer]))
-      .toEqual([
-        [3, 'mul', 8, 24],
-        [8, 'mul', 3, 24],
-        [24, 'div', 3, 8],
-        [24, 'div', 8, 3],
-      ]);
+    expect(
+      q.steps.map((s) => [s.eq.x, s.eq.op, s.eq.y, s.kind === 'verdict' ? 0 : s.answer]),
+    ).toEqual([
+      [3, 'mul', 8, 24],
+      [8, 'mul', 3, 24],
+      [24, 'div', 3, 8],
+      [24, 'div', 8, 3],
+    ]);
     expect(buildQuestion('div:49/7', 'family', rng(), []).steps).toHaveLength(2);
   });
 
