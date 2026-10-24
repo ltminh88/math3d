@@ -6,7 +6,7 @@
 - Learning core: `mulFactsForTables`, `divFactsForTables`, session planner (fluency order), distractor picker, expression choice, hint ladder
 
 ## Overview
-- Priority: P1. Status: pending. Depends on 01. Parallel with 02.
+- Priority: P1. Status: done (worktree branch, awaiting 04 merge). Depends on 01. Parallel with 02.
 - Story: the floating number stones of the tower fell down. Each correct answer puts a stone back and lights a floor; the child climbs up with VLM to the beacon at the top.
 
 ## Key Insights
@@ -53,14 +53,26 @@ tests/e2e/tower-level.spec.ts
 8. Screenshots in `reports/tower-screens/`.
 
 ## Todo list
-- [ ] question formats + tests
-- [ ] round flow + tests
-- [ ] hints + tests
-- [ ] diorama + climb camera
-- [ ] panel + input
-- [ ] celebration
-- [ ] e2e
-- [ ] screenshots
+- [x] question formats + tests
+- [x] round flow + tests
+- [x] hints + tests
+- [x] diorama + climb camera
+- [x] panel + input
+- [x] celebration
+- [x] e2e
+- [x] screenshots
+
+## Implementation notes
+- Host/registry handle `rounds: 7` generically (registry only checks a positive integer; the host never assumes 5).
+- Facts: `ctx.learning.planSession(towerFactPool(), 7)` (pool = `mul:` + `div:` over tables 2-9), then `planTowerFacts`: distinct facts, topped up to 7 (seen facts weakest first, then shuffled fresh ones), at least one × and one : (one fact swapped for its inverse if needed), sorted weakest Leitner box first. The planner shuffles its pick, so the weak-first order is applied here.
+- Formats (`assignFormats`): rotation choice → pad → missing → family → truefalse; a floor takes the next format that fits its operation (choice = × only, pad = : only) and differs from the previous floor, so no two floors in a row share one. Choice distractors come from `pickDistractors` fed by the fact's `errs`. True/false: 1/3 true claims; a false claim shows a table-neighbour product (p ± a, p ± b) or quotient ± 1 and must be fixed on the pad; verdict + fix = one recorded question; judging a false claim true banks the claimed number as the wrong answer.
+- Hints (`hintSpec`, pure): 1 encourage; 2 related fact (product → "? : x = y", division → "? × d = p", missing factor → "p : d = ?"); 3 split (`7 × 8 = 7 × 5 + 7 × 3 = 35 + 21`) for products with both factors ≥ 6, skip count (answer hidden) otherwise, skip count to p for divisions; 4 the step's full equation.
+- Look: baked tower (7 floors, cream cornices, gold roof, door, trees) = 1 mesh; instanced light bands (dim → gold) and instanced number stones (ground → beside their floor, arc + bob); beacon pulses at the top. Camera climbs one floor per finished floor (eased, instant with reduced motion) and frames the beacon above/beside the celebration card. Draw calls stay far under 60.
+- Keys: `tower-keyboard.ts` on `document` (capture, `ctx.disposer.signal`): 1-3 cards (1 Đúng / 2 Sai), digits + Enter to the kit pad on number steps (card steps consume digits so the hidden pad never types), Enter climbs after a floor.
+- Test hook `window.__tower` (test build only; absent from `dist/`): `state()`, `formats()`, `factKeys()`.
+- e2e `tower-level.spec.ts`: leak test takes one warm-up visit and waits for the world's geometry count to hold 3 s before the baseline (the world near the tower gate keeps uploading meshes for several seconds on the slow mobile project; without it the baseline was 12 short).
+- Screenshots: `reports/tower-screens/` (world near the gate, floor 1 and floor 4 on desktop + mobile, hint rung 3, top/celebration desktop + mobile).
+- Merge-time (04): `level-host-ports.ts` labels the level layer with `gateForest` for every non-field level (tower layer reads "Cổng Rừng Nhân Chia"); use `gateNameOf(definition.id)`. Specs expecting the tower gate "coming-soon"/"Sắp ra mắt" now fail (see report).
 
 ## Success Criteria
 - Unit + `tower-level` e2e green on both projects; lint/typecheck/build clean; own chunk; climb readable on mobile-pixel.

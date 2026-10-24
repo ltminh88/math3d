@@ -1,8 +1,6 @@
-// Tower level "Tháp Toán Học" (city/tower phase 03): seed bridge + field + forest + city, enter
-// through the tower gate, climb the seven floors (keyboard on desktop, taps on the phone), come
-// back to the gate with the level completed, × and : facts in the store and the quest chain's
-// closing card. Reads the floor through the test-build hook `window.__tower`; draw calls and
-// geometry leaks through `window.__game` and `.level-layer[data-max-draw-calls]`.
+// Tower level "Tháp Toán Học" (city/tower phase 03): seed the first four stages, enter through
+// the tower gate, climb seven floors (keys on desktop, taps on the phone), come back with the level
+// completed, × and : facts stored and the closing quest card. Uses `window.__tower`/`__game`.
 import { type Page, test } from '@playwright/test';
 import { expect, SLOW_TEST_MS, waitForStoreBoot } from './legacy-live-save-fixtures';
 
