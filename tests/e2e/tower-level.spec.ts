@@ -1,0 +1,199 @@
+// Tower level "Tháp Toán Học" (city/tower phase 03): seed the first four stages, enter through
+// the tower gate, climb seven floors (keys on desktop, taps on the phone), come back with the level
+// completed, × and : facts stored and the closing quest card. Uses `window.__tower`/`__game`.
+import { type Page, test } from '@playwright/test';
+import { expect, SLOW_TEST_MS, waitForStoreBoot } from './legacy-live-save-fixtures';
+
+test.use({ locale: 'vi-VN' });
+test.describe.configure({ timeout: SLOW_TEST_MS * 2 });
+
+const DRAW_CALL_BUDGET = 60;
+const FLOORS = 7;
+
+type TowerState = NonNullable<ReturnType<NonNullable<Window['__tower']>['state']>>;
+
+async function startAtTowerGate(page: Page): Promise<void> {
+  await page.goto('/');
+  await waitForStoreBoot(page);
+  await page.waitForFunction(() => '__game' in window);
+  await page.locator('#play').click();
+  await expect(page.locator('body')).toHaveClass(/playing/);
+  await page.evaluate(() =>
+    window.__game?.seedProgress({
+      bridgeComplete: true,
+      completedLevels: ['field', 'forest', 'city'],
+    }),
+  );
+  expect(await page.evaluate(() => window.__game?.gateStatus('tower'))).toBe('open');
+}
+
+async function enterTower(page: Page, tap: boolean): Promise<void> {
+  await page.evaluate(() => window.__game?.teleportToGate('tower'));
+  const interact = page.locator('#interact');
+  await expect(interact).toContainText('Vào Cổng Tháp Toán Học');
+  if (tap) await interact.tap();
+  else await interact.click();
+  await expect(page.locator('.tower-panel')).toBeVisible();
+  expect(await page.evaluate(() => window.__game?.levelRunning())).toBe(true);
+  // A few level frames have been rendered (SwiftShader is slow to draw the first ones).
+  await expect(page.locator('.level-layer')).toHaveAttribute('data-draw-calls', /\d+/);
+}
+
+const towerState = (page: Page) =>
+  page.evaluate(() => window.__tower?.state()) as Promise<TowerState>;
+
+/** Focus back on the page (the pad ignores keys aimed at other controls). */
+const blurControls = (page: Page) =>
+  page.evaluate(() => (document.activeElement as HTMLElement | null)?.blur());
+
+async function give(page: Page, s: TowerState, value: number | boolean, tap: boolean) {
+  if (s.step === 'number') {
+    if (tap) {
+      const pad = page.locator('.tower-panel .kit-pad');
+      for (const digit of String(value)) {
+        await pad.getByRole('button', { name: digit, exact: true }).tap();
+      }
+      await pad.getByRole('button', { name: 'Xong' }).tap();
+    } else {
+      await blurControls(page);
+      await page.keyboard.type(String(value));
+      await page.keyboard.press('Enter');
+    }
+    return;
+  }
+  const index = s.step === 'choice' ? s.choices.indexOf(value as number) : value === true ? 0 : 1;
+  if (tap) await page.locator(`.tower-answers .answer[data-index="${index}"]`).tap();
+  else {
+    await blurControls(page);
+    await page.keyboard.press(String(index + 1));
+  }
+}
+
+function wrongOf(s: TowerState): number | boolean {
+  if (s.step === 'verdict') return !s.expected;
+  if (s.step === 'choice') return s.choices.find((c) => c !== s.expected) as number;
+  return (s.expected as number) + 1;
+}
+
+async function playFloor(page: Page, index: number, tap: boolean): Promise<void> {
+  await expect(page.locator(`.tower-panel[data-floor="${index}"]`)).toBeVisible();
+  let s = await towerState(page);
+  expect(s.floor).toBe(index);
+  if (index === 0) {
+    // One wrong answer: gentle feedback, a hint is offered and taken (rung 1).
+    await give(page, s, wrongOf(s), tap);
+    await expect(page.locator('.tower-panel .feedback')).toHaveClass(/gentle/);
+    const hint = page.locator('.tower-hint-button');
+    await expect(hint).toHaveClass(/offer/);
+    if (tap) await hint.tap();
+    else await hint.click();
+    await expect(page.locator('.tower-hint')).toHaveAttribute('data-rung', '1');
+    s = await towerState(page);
+  }
+  while (s.step !== null) {
+    await give(page, s, s.expected as number | boolean, tap);
+    s = await towerState(page);
+  }
+  await expect(page.locator('.tower-panel .feedback')).toContainText('Đúng rồi!');
+  await expect(page.locator('.tower-next')).toBeFocused();
+  expect(s.litFloors).toBe(index + 1);
+  expect(s.cameraFloor).toBe(index + 1);
+}
+
+test('the tower climbs seven floors and records × and : facts', async ({ page }, info) => {
+  const tap = info.project.name === 'mobile-pixel';
+  const errors: string[] = [];
+  page.on('pageerror', (e) => errors.push(String(e)));
+  await startAtTowerGate(page);
+  await enterTower(page, tap);
+
+  const formats = (await page.evaluate(() => window.__tower?.formats())) ?? [];
+  const factKeys = (await page.evaluate(() => window.__tower?.factKeys())) ?? [];
+  expect(formats).toHaveLength(FLOORS);
+  for (let i = 1; i < formats.length; i++) expect(formats[i]).not.toBe(formats[i - 1]);
+  expect(factKeys.some((k) => k.startsWith('mul:'))).toBe(true);
+  expect(factKeys.some((k) => k.startsWith('div:'))).toBe(true);
+
+  for (let i = 0; i < FLOORS; i++) {
+    await playFloor(page, i, tap);
+    if (tap) await page.locator('.tower-next').tap();
+    else await page.keyboard.press('Enter');
+  }
+  const done = page.locator('.tower-done');
+  await expect(done).toBeVisible();
+  await expect(done).toContainText('Bạn đã lên tới đỉnh tháp!');
+  await expect(done).toContainText('VLM');
+  expect((await towerState(page)).cameraFloor).toBe(FLOORS);
+  const maxCalls = Number(await page.locator('.level-layer').getAttribute('data-max-draw-calls'));
+  expect(maxCalls).toBeGreaterThan(0);
+  expect(maxCalls).toBeLessThanOrEqual(DRAW_CALL_BUDGET);
+
+  const back = page.locator('.tower-back');
+  if (tap) await back.tap();
+  else {
+    await expect(back).toBeFocused();
+    await page.keyboard.press('Enter');
+  }
+  await expect.poll(() => page.evaluate(() => window.__game?.levelRunning())).toBe(false);
+  await expect(page.locator('#interact')).toContainText('Cổng Tháp Toán Học');
+  await expect
+    .poll(() => page.evaluate(() => window.__game?.gateStatus('tower')))
+    .toBe('completed');
+  const store = await page.evaluate(() => {
+    const snap = window.__game?.snapshot();
+    return {
+      completedAt: snap?.levelProgress.tower?.completedAt ?? 0,
+      keys: Object.keys(snap?.factStats ?? {}),
+    };
+  });
+  expect(store.completedAt).toBeGreaterThan(0);
+  expect(store.keys.some((k) => /^mul:\d+x\d+$/.test(k))).toBe(true);
+  expect(store.keys.some((k) => /^div:\d+\/\d+$/.test(k))).toBe(true);
+  for (const key of factKeys) expect(store.keys).toContain(key);
+  // All five stages done: the quest card shows the closing card.
+  await expect(page.locator('#quest-title')).toHaveText('Bạn đã qua cả năm chặng!');
+  expect(await page.evaluate(() => window.__tower)).toBeUndefined();
+  expect(errors).toEqual([]);
+});
+
+test('leaving the tower frees its geometries (once and after 10 visits)', async ({
+  page,
+}, info) => {
+  const tap = info.project.name === 'mobile-pixel';
+  await startAtTowerGate(page);
+  await page.evaluate(() => window.__game?.teleportToGate('tower'));
+  await expect(page.locator('#interact')).toBeVisible();
+  const geometries = () => page.evaluate(() => window.__game?.memory().geometries ?? -1);
+  const leave = async () => {
+    const button = page.locator('.level-leave');
+    if (tap) await button.tap();
+    else await button.click();
+    await expect.poll(() => page.evaluate(() => window.__game?.levelRunning())).toBe(false);
+  };
+  // The world around the tower gate keeps uploading meshes for several seconds on a slow device
+  // (props come into view frame by frame, paused while a level runs). One warm-up visit, then
+  // the baseline once the count has held for three seconds.
+  await enterTower(page, tap);
+  await leave();
+  const reads: number[] = [];
+  await expect
+    .poll(
+      async () => {
+        reads.push(await geometries());
+        return reads.length >= 4 && new Set(reads.slice(-4)).size === 1;
+      },
+      { intervals: [1000], timeout: 30_000 },
+    )
+    .toBe(true);
+  const baseline = reads[reads.length - 1] as number;
+  expect(baseline).toBeGreaterThan(0);
+  for (let cycle = 0; cycle < 10; cycle++) {
+    await enterTower(page, tap);
+    expect(await geometries()).toBeGreaterThan(baseline);
+    await leave();
+    if (cycle === 0) await expect.poll(geometries).toBe(baseline);
+  }
+  await expect.poll(geometries).toBe(baseline);
+  // Leaving before any answer commits nothing: the gate is still open, not completed.
+  expect(await page.evaluate(() => window.__game?.gateStatus('tower'))).toBe('open');
+});

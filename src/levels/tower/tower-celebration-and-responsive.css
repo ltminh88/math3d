@@ -1,0 +1,92 @@
+/* Tower level: next/keys rows, the celebration card at the top, and the narrow-screen layout. */
+.tower-next {
+  width: 100%;
+  margin-top: 10px;
+}
+.tower-keys {
+  margin: 10px 0 0;
+  font-size: 11px;
+  color: var(--muted-2);
+}
+.tower-panel .reward-pop {
+  top: 8px;
+}
+.tower-done {
+  position: absolute;
+  top: 76px;
+  right: max(16px, env(safe-area-inset-right));
+  width: 360px;
+  max-height: calc(100% - 92px);
+  overflow: auto;
+  padding: 22px 24px;
+  border-radius: var(--radius-lg);
+  background: var(--paper);
+  text-align: center;
+  animation: pop 0.5s;
+}
+.tower-done h2 {
+  margin: 0 0 6px;
+  font-family: var(--font-display);
+  font-size: 28px;
+}
+.tower-stars {
+  margin: 0;
+  color: var(--gold);
+  font-size: 30px;
+  letter-spacing: 6px;
+}
+.tower-done__line {
+  color: var(--muted);
+  line-height: 1.6;
+}
+.tower-done .primary {
+  width: 100%;
+  margin-top: 14px;
+}
+@media (max-width: 760px), (max-height: 520px) and (max-width: 1000px) {
+  .tower-guide {
+    top: 70px;
+    width: calc(100% - 32px);
+    font-size: 13px;
+  }
+  .tower-progress {
+    top: auto;
+    bottom: calc(56% + 20px);
+    padding: 6px 10px;
+  }
+  .tower-panel {
+    top: auto;
+    left: 12px;
+    right: 12px;
+    bottom: max(12px, env(safe-area-inset-bottom));
+    width: auto;
+    max-height: 56%;
+    padding: 12px 14px;
+  }
+  .tower-equation,
+  .tower-claim {
+    margin: 2px 0 8px;
+    font-size: 30px;
+  }
+  .tower-answers .answer {
+    min-height: 56px;
+  }
+  .tower-panel .kit-pad {
+    grid-template-columns: repeat(6, 1fr);
+  }
+  .tower-panel .kit-pad__key {
+    min-height: 44px;
+  }
+  .tower-keys {
+    display: none;
+  }
+  .tower-done {
+    top: auto;
+    left: 12px;
+    right: 12px;
+    bottom: max(12px, env(safe-area-inset-bottom));
+    width: auto;
+    max-height: 60%;
+    padding: 16px 18px;
+  }
+}
