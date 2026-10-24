@@ -1,0 +1,27 @@
+/*
+ * Quest chain step row (5 cells: bridge, field, forest, city, tower). The recovered `.quest-steps`
+ * rules were sized for the 6 numbered bridge cells; region names like "Thành Phố" wrapped onto two
+ * lines there. Keep each name on one line: slightly smaller type, tighter tracking, and checked
+ * cells give their width to the named ones. The recovered stylesheets stay byte-identical.
+ */
+.quest-steps:has(> span:nth-child(5):last-child) {
+  gap: 4px;
+}
+.quest-steps:has(> span:nth-child(5):last-child) > span {
+  flex: 1 1 auto;
+  min-width: 0;
+  padding: 0 3px;
+  white-space: nowrap;
+  overflow: hidden;
+  font-size: 11px;
+  letter-spacing: -0.01em;
+}
+.quest-steps:has(> span:nth-child(5):last-child) > span.done {
+  flex: 0.6 1 auto;
+}
+@media (max-width: 700px) {
+  .quest-steps:has(> span:nth-child(5):last-child) > span {
+    font-size: 9.5px;
+    padding: 0 2px;
+  }
+}

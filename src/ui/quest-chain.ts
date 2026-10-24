@@ -13,6 +13,7 @@ import { connectedStore } from './progress-sync';
 import { CHAIN_LEVELS, type ChainLevel, type QuestStage, questStage } from './quest-chain-stage';
 import { tq } from './quest-chain-strings';
 import { setMarkup } from './set-markup-if-changed';
+import './quest-chain-steps.css';
 
 /** Current quest stage (bridge flag from the progress view, levels from the store). */
 export function currentQuestStage(): QuestStage {
