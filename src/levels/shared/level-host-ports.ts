@@ -15,7 +15,7 @@ import { commitLevelRun, connectedStore } from '../../ui/progress-sync';
 import { showToast } from '../../ui/toast-and-persist';
 import type { WorldPublicApi } from '../../world/world-public-api';
 import type { LevelHostPorts, LevelRun } from './level-host';
-import { tl } from './level-host-strings';
+import { gateNameOf, tl } from './level-host-strings';
 import { firstCompletionBonus, levelRunToCommit } from './level-run-result';
 import { mountLevelRunUi } from './level-run-ui';
 import type { LevelDefinition, LevelResult } from './level-types';
@@ -53,8 +53,7 @@ function openLevelRun(
     now: Date.now,
     newId: () => crypto.randomUUID(),
   });
-  const gate = definition.id === 'field' ? tl('gateField') : tl('gateForest');
-  const ui = mountLevelRunUi(gate, () => exit({ completed: false }));
+  const ui = mountLevelRunUi(gateNameOf(definition.id), () => exit({ completed: false }));
   let closed = false;
   return {
     context: {
