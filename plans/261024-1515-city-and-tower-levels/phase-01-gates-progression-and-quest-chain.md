@@ -6,7 +6,7 @@
 - Code: `src/config/regions.ts` (`LEVEL_GATES`, `GateRequirement`, `COMING_SOON_REGIONS`), `src/levels/shared/level-progression.ts`, `level-gates.ts`, `level-host-strings.ts`, `level-registry.ts`, `test-debug-hook.ts`, `src/ui/quest-chain-stage.ts`, `quest-chain.ts`, `quest-chain-strings.ts`, `guide-dialog.ts`, `map-overlay.ts`, `world-labels.ts`
 
 ## Overview
-- Priority: P1. Status: pending. Blocks 02 and 03.
+- Priority: P1. Status: done (tag `city-tower-p01`). Blocks 02 and 03.
 - Make the shared layer ready for two more levels so that 02 and 03 only add their own folders.
 
 ## Key Insights
@@ -43,13 +43,22 @@ Data only plus unions: `LEVEL_GATES` drives gate building, labels, interactables
 7. Full gates plus parity re-baseline (new gate meshes and labels, quiz reshuffle), with per-artifact attribution.
 
 ## Todo list
-- [ ] unions + gates + obstacles
-- [ ] progression/gate tests
-- [ ] quest stages + strings + VLM line
-- [ ] remove coming-soon badges
-- [ ] (opt) shared baking helper
-- [ ] e2e updates
-- [ ] parity re-baseline + tag `city-tower-p01`
+- [x] unions + gates + obstacles
+- [x] progression/gate tests
+- [x] quest stages + strings + VLM line
+- [x] remove coming-soon badges
+- [x] (opt) shared baking helper
+- [x] e2e updates
+- [x] parity re-baseline + tag `city-tower-p01`
+
+## Implementation notes
+- Gate config moved out of `src/config/regions.ts` (already over 200 lines) into `src/config/level-gate-config.ts`: `GateRequirement = 'bridge' | 'field' | 'forest' | 'city' | null`, `LevelGate.levelId = 'field' | 'forest' | 'city' | 'tower'`, `LEVEL_GATES`. `REGIONS` untouched (golden byte-identical). `LevelDefinition.id` is now `LevelGate['levelId']`.
+- Gates: city `(58.5, 7.6)`, requires `forest`, sign "7 × 8"; tower `(60.6, -14.2)`, requires `city`, sign "56 : 7"; both `facing: 0`, just beside the road ends (57, 11) and (57, -15), clear of the city blocks, the tower blocker and scatter circles (e2e overlap check covers all four gates). Screenshots: `visuals/p01-gate-city.png`, `visuals/p01-gate-tower.png`.
+- Gate names, lock reasons and locked toasts are table-driven: `gateNameOf(levelId)` in `level-host-strings.ts`, `LEVEL_LOCK_KEYS` in `level-gates.ts`. New vi strings: "Cổng Thành Phố Con Số", "Cổng Tháp Toán Học", "Hoàn thành Rừng Nhân Chia để mở", "Hoàn thành Thành Phố Con Số để mở", and the toasts "Hoàn thành Rừng Nhân Chia để mở cổng này nhé!", "Hoàn thành Thành Phố Con Số để mở cổng này nhé!".
+- Quest chain: `CHAIN_LEVELS = ['field', 'forest', 'city', 'tower']` in `quest-chain-stage.ts`; `CHAIN_TEXT_KEYS` in `quest-chain.ts` drives card title/copy/progress/step and VLM's line. Closing card "Bạn đã qua cả năm chặng!", copy without the "sắp ra mắt" sentence.
+- `COMING_SOON_REGIONS` and the `.coming-soon` CSS are gone; the gate state ("Sắp ra mắt" while no level folder exists) shows on the gate label and the map detail.
+- `bakeVertexColoredGeometry` moved to `src/levels/shared/bake-vertex-colored-geometry.ts` (forest imports updated; no field equivalent existed).
+- Contract for 02/03: folder `src/levels/city|tower/index.ts` default-exports a LevelDefinition with `id: 'city'|'tower'`, `regionId: 'city'|'tower'`, `requires: 'forest'|'city'`. e2e seeding: `window.__game.seedProgress({ bridgeComplete: true, completedLevels: ['field', 'forest'] })` opens the city gate; add `'city'` to open the tower gate; `teleportToGate('city'|'tower')`.
 
 ## Success Criteria
 - lint (no new warnings), typecheck, unit, build, full e2e green; parity 20/20 after an attributed re-baseline; golden `--check` byte-identical.

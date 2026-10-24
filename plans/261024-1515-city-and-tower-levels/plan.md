@@ -1,6 +1,6 @@
 ---
 title: City and Tower levels (full map)
-status: pending
+status: in-progress
 priority: P1
 created: 2026-10-24
 effort: ~40h
@@ -21,7 +21,7 @@ Every map region except Khu Vườn gets a level. Quest chain: bridge → field 
 ## Phases
 | # | Phase | Effort | Status |
 |---|---|---|---|
-| 01 | [Gates, progression and quest chain for city/tower](phase-01-gates-progression-and-quest-chain.md) | 6h | Pending |
+| 01 | [Gates, progression and quest chain for city/tower](phase-01-gates-progression-and-quest-chain.md) | 6h | Done (city-tower-p01) |
 | 02 | [City level: Thành Phố Con Số](phase-02-city-level.md) | 14h | Pending |
 | 03 | [Tower level: Tháp Toán Học](phase-03-tower-level.md) | 15h | Pending |
 | 04 | [Merge, full-chain e2e, parity re-baseline, author review](phase-04-merge-e2e-parity-and-author-review.md) | 5h | Pending |
