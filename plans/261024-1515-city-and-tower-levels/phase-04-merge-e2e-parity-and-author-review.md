@@ -44,3 +44,27 @@
 
 ## Next steps
 - Back to the old plan's phases 16–18 (Supabase, accounts, Vercel deploy).
+
+## Review fixes
+Findings from `reports/reviewer-city-tower-levels.md`, fixed on main (commits c98fb25, dc008f8, 49c81df, 206b232; tag `full-map-reviewed`).
+
+| Finding | Outcome |
+|---|---|
+| H1 city windows count shows the product | Fixed: lit floors only, "3/9 tầng sáng"; announcement "Tầng n sáng đèn. Đã sáng a trên b tầng." No window total anywhere. Unit `city-strings.test.ts`, e2e `city-level.spec.ts` asserts the exact text. |
+| H2 tower rung 4 shows the answer, floor still correct | Fixed: rung 4 is a strategy from a known fact (× 1, 2, 5, 10) with the result as "?" (e.g. "Mốc dễ nhớ: 8 × 5 = 40. Thêm 2 lần 8 nữa là ra 8 × 7 = ?"). The result only appears on the three-miss path (recorded not correct, Leitner requeue). Unit test sweeps every pool fact × format × step. |
+| M3 city reverse hints name the right parcel | Fixed: own rungs (find / compare with p / rule out an untried parcel / "p : t = ?"); unit test: no rung ≥2 names the right parcel or both factors. |
+| M4 `hintSkip` mentions windows in delivery | Fixed: `hintCount` for delivery rounds. |
+| M5 tower hint carries to next step | Fixed: rung resets and the hint area clears on step advance (hints taken still count). |
+| M6 true claim "Đúng" credited as recall | Fixed with a confirm step: after "Đúng" the claim is replaced by the same equation with "?" on the pad; one recorded question. |
+| M7 tower per-frame allocations | Fixed: stone spots precomputed, camera target reused. No test (perf, not behavior). |
+| M8 tower equation never announced, cards unnamed | Fixed: floor and step equations announced in words ("mấy nhân 7 bằng 56"); cards named "56 (phím 1)". Unit test + e2e aria-label check. |
+| M9 tower leak baseline after warm-up | Fixed: `tower-level-leak.spec.ts` uses the settled baseline before the first visit (shared `city-and-tower-settled-memory.ts`); both leak specs assert geometries and textures. |
+| L10 wrong houses still accept drops | Fixed: a wrong house (or reverse parcel) leaves the drop zones / picks for that round. |
+| L11 inverse of 8 × 10 outside the pool | Fixed: 80 : 8. |
+| L12 `hintTen` ambiguous | Fixed: counts back on the factor closest to 10 with clearer wording. |
+| L13 text nits | Fixed: tower `wrong` "Chưa đúng, mình thử lại nhé!", shorter tower intro, city `hintCommute` rephrased. |
+| L14 tower duplicates tally, city has no stars | Fixed: shared `levels/shared/level-run-tally.ts` (tested) used by city and tower; city celebration shows the star row (e2e: equals stored stars). Field keeps its own tally (out of scope). |
+| L15 H key only in city | Fixed: H in tower too; in both levels only while focus is in the level layer (or nowhere). |
+
+Gates: lint 0 errors / 9 pre-existing warnings, typecheck clean, unit 71 files / 473 tests, build ok, e2e 63 passed + 1 skipped (desktop-only full chain) on both projects, parity 20/20 without re-baseline, golden byte-identical.
+Screens refreshed: `reports/city-screens/{desktop,mobile}-0{3,4,5}-*.png`, `reports/tower-screens/{desktop,mobile}-05-top-celebration.png`, new `reports/tower-screens/04-hint-rung-4.png`.
