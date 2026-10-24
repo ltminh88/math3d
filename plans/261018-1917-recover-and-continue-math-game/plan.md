@@ -37,6 +37,8 @@ Supersedes [261018-1803-vlm-math-game-mvp](../261018-1803-vlm-math-game-mvp/plan
 | 18 | [Polish, a11y, perf, e2e, Vercel deploy](phase-18-polish-a11y-perf-e2e-deploy.md) | Pending |
 | 19 | [Cosmetics shop in village](phase-19-cosmetics-shop-in-village.md) (runs in G7) | Done (phase-19) |
 
+Follow-up: the city and tower levels (full map) are planned and merged in [261024-1515-city-and-tower-levels](../261024-1515-city-and-tower-levels/plan.md) (tags `city-level`, `tower-level`, `full-map`).
+
 Effort (h) / depends: 01 7/- · 02 9/- (gate needs 01) · 03 7/01,02 · 04 5/01,02 · 05 10/03 · 06 12/05 · 07 5/03 · 08 14/03,04 · 09 6/06,07,08 · 10 6/09 · 11 3/09 · 12 15/10,11 · 13 7/12 · 14 12/13 · 15 12/13 · 16 8/12 · 17 16/13,16 · 19 6/13 · 18 14/14,15,17,19. Critical path 02>03>05>06>09>10>12>16>17>18 = 103h.
 
 ## Parallel groups + file ownership
