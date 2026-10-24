@@ -28,6 +28,7 @@ export class TowerClimbCamera {
   private y = floorMid(0);
   private targetY = floorMid(0);
   private halfHeight = HALF_HEIGHT;
+  private readonly target = new Vector3();
   /** Floor the camera is at (or climbing to); FLOOR_COUNT = the top. */
   floor = 0;
 
@@ -67,7 +68,7 @@ export class TowerClimbCamera {
     const fitWidth = HALF_WIDTH / (tanHalf * camera.aspect * (freeW / w));
     const fitHeight = this.halfHeight / (tanHalf * (freeH / h));
     const distance = Math.max(MIN_DISTANCE, fitWidth, fitHeight);
-    const target = new Vector3(0, this.y, 0);
+    const target = this.target.set(0, this.y, 0);
     camera.position.copy(target).addScaledVector(DIRECTION, distance);
     camera.lookAt(target);
     camera.setViewOffset(w, h, (w - freeW) / 2, (h - freeH) / 2, w, h);

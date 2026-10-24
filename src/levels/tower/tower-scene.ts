@@ -68,19 +68,19 @@ function start(ctx: LevelContext): LevelSession {
       floors.light(floor);
       climb.climbTo(floor + 1);
     },
-    onLevelDone(earned, tally) {
+    onLevelDone(earned, stars) {
       panel.hide();
       panel.say(ts('doneTitle'));
       floors.celebrate();
       climb.climbTo(FLOOR_COUNT);
       ctx.audio.celebrate();
       ctx.announce(ts('doneTitle'));
-      showTowerCelebration(ctx.ui, ts, earned, tally, () => ctx.exit({ completed: true }));
+      showTowerCelebration(ctx.ui, ts, earned, stars, () => ctx.exit({ completed: true }));
       frame();
     },
   });
   controller.current = c;
-  listenTowerKeys(c, ctx.disposer.signal);
+  listenTowerKeys(c, ctx.ui, ctx.disposer.signal);
   if (import.meta.env.MODE === 'test') {
     ctx.disposer.onDispose(installTowerTestHook(flow, floors, climb));
   }

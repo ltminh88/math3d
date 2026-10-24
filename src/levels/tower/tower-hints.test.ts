@@ -1,6 +1,10 @@
 import { describe, expect, it } from 'vitest';
-import { hintSpec } from './tower-hints';
-import type { TowerStep } from './tower-question-formats';
+import { defineStrings } from '../../i18n/i18n';
+import { mulberry32 } from '../../learning/seeded-rng';
+import { hintSpec, spokenEquation } from './tower-hints';
+import { buildQuestion, type TowerFormat, type TowerStep } from './tower-question-formats';
+import { towerFactPool } from './tower-round-flow';
+import { towerStrings } from './tower-strings';
 
 const product = (x: number, y: number): TowerStep => ({
   kind: 'number',
@@ -44,16 +48,49 @@ describe('tower hint ladder', () => {
     });
   });
 
-  it('rung 4 reveals the next step; a claim is checked against the true product', () => {
-    expect(hintSpec(4, missing)).toEqual({
-      key: 'hint4',
-      vars: { x: 8, op: 'mul', y: 7, z: 56 },
+  it('rung 4 is a strategy from a known fact, never the result', () => {
+    // 7 × 8 = ?: from 8 × 5 = 40, two more 8s.
+    expect(hintSpec(4, product(7, 8))).toEqual({
+      key: 'hint4MulUp',
+      vars: { b: 8, a: 7, k: 5, anchor: 40, n: 2 },
     });
-    const claim: TowerStep = {
-      kind: 'verdict',
-      eq: { x: 6, op: 'mul', y: 7, z: 48, blank: null },
-      answer: false,
-    };
-    expect(hintSpec(4, claim).vars).toEqual({ x: 6, op: 'mul', y: 7, z: 42 });
+    // 56 : 7 = ?: from 7 × 10 = 70, count back by 7 to 56.
+    expect(hintSpec(4, quotient)).toEqual({
+      key: 'hint4DivDown',
+      vars: { d: 7, k: 10, anchor: 70, p: 56 },
+    });
+    expect(hintSpec(4, missing).key).toBe('hint4DivDown');
+  });
+
+  it('rung 4 never shows the answer, on any step of any floor', () => {
+    const formats: TowerFormat[] = ['choice', 'pad', 'missing', 'family', 'truefalse'];
+    for (const key of towerFactPool()) {
+      for (const format of formats) {
+        for (const seed of [1, 2, 3]) {
+          const q = buildQuestion(key, format, mulberry32(seed), []);
+          for (const step of q.steps) {
+            const spec = hintSpec(4, step);
+            expect(spec.key).toMatch(/^hint4(Mul|Div)(Up|Down)$/);
+            const { x, op, y, z, blank } = step.eq;
+            const answer = blank === 'x' ? x : op === 'mul' ? x * y : x / y;
+            // Numbers the question already shows (a square's divisor is its quotient too).
+            const shown = blank === 'x' ? [y, z] : [x, y];
+            const extra = Object.values(spec.vars).filter((v) => !shown.includes(v as number));
+            expect(extra).not.toContain(answer);
+          }
+        }
+      }
+    }
+  });
+});
+
+describe('tower spoken equation (screen readers)', () => {
+  const ts = towerStrings(defineStrings);
+  it('reads the floor equation with words, the blank as "mấy"', () => {
+    expect(spokenEquation(ts, missing.eq)).toBe('mấy nhân 7 bằng 56');
+    expect(spokenEquation(ts, quotient.eq)).toBe('56 chia 7 bằng mấy');
+    expect(spokenEquation(ts, { x: 6, op: 'mul', y: 7, z: 48, blank: null })).toBe(
+      '6 nhân 7 bằng 48',
+    );
   });
 });

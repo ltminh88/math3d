@@ -65,7 +65,7 @@ describe('tower question formats', () => {
     expect(buildQuestion('div:49/7', 'family', rng(), []).steps).toHaveLength(2);
   });
 
-  it('true/false: a false claim must be fixed in the same question', () => {
+  it('true/false: a false claim is fixed, a true one confirmed, in the same question', () => {
     let sawFalse = false;
     let sawTrue = false;
     for (let seed = 1; seed < 40; seed++) {
@@ -76,7 +76,8 @@ describe('tower question formats', () => {
       if (verdict.answer) {
         sawTrue = true;
         expect(verdict.eq.z).toBe(42);
-        expect(q.steps).toHaveLength(1);
+        // "Đúng" alone is a judgment, not recall: the result is asked once more.
+        expect(fix).toMatchObject({ kind: 'number', answer: 42, eq: { z: 42, blank: 'z' } });
       } else {
         sawFalse = true;
         expect(verdict.eq.z).not.toBe(42);

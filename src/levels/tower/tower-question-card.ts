@@ -1,6 +1,7 @@
 // The floor's equation(s) in the answer panel: one equation with a blank (`8 × ? = 56` style),
-// the fact family's number house and rows, or the "đố vui" claim, which gets a fix row under it
-// once the child spots that it is wrong. Blanks are filled from the number pad or the choices.
+// the fact family's number house and rows, or the "đố vui" claim: a false one gets a fix row under
+// it, a true one is replaced by the same equation with its result hidden (the confirm step).
+// Blanks are filled from the number pad or the choices.
 import type { TowerEquation, TowerQuestion } from './tower-question-formats';
 import type { TowerStrings } from './tower-strings';
 
@@ -62,15 +63,20 @@ export class TowerQuestionCard {
     this.setActive(0);
   }
 
-  /** The claim was judged: mark it right/wrong and add the row to fix (if it was wrong). */
+  /** The claim was judged: a false one is marked and gets the fix row, a true one is hidden. */
   judged(question: TowerQuestion): void {
     const isTrue = question.steps[0]?.kind === 'verdict' && question.steps[0].answer;
     this.claim?.classList.add(isTrue ? 'is-true' : 'is-false');
-    const fix = question.steps[1];
-    if (fix) {
-      this.host.append(this.row(fix.eq, 1, 'equation tower-equation tower-fix'));
-      this.setActive(1);
-    }
+    const next = question.steps[1];
+    if (!next) return;
+    const row = this.row(
+      next.eq,
+      1,
+      `equation tower-equation ${isTrue ? 'tower-confirm' : 'tower-fix'}`,
+    );
+    if (isTrue && this.claim) this.claim.replaceWith(row);
+    else this.host.append(row);
+    this.setActive(1);
   }
 
   setActive(step: number): void {

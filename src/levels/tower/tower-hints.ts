@@ -1,5 +1,7 @@
 // Tower hint rungs: 1 encourage, 2 the related fact (division for a product, multiplication for
-// a division), 3 split strategy for big products or skip counting, 4 the next step revealed.
+// a division), 3 split strategy for big products or skip counting, 4 a strategy from a known
+// fact (× 1, 2, 5 or 10) with the result left as "?". The result itself is only shown by the
+// three-miss path, which records the floor as not correct (learning-core ladder, rung 5).
 // `hintSpec` is pure (tested); `renderHint` writes it into the recovered hint area.
 import type { HintRung } from '../../learning/hint-ladder';
 import type { TowerEquation, TowerStep } from './tower-question-formats';
@@ -13,7 +15,10 @@ type HintKey =
   | 'hint3Split'
   | 'hint3Count'
   | 'hint3CountTo'
-  | 'hint4';
+  | 'hint4MulUp'
+  | 'hint4MulDown'
+  | 'hint4DivUp'
+  | 'hint4DivDown';
 
 export interface HintSpec {
   key: HintKey;
@@ -29,10 +34,38 @@ function trueEquation(step: TowerStep): TowerEquation {
 const countBy = (step: number, terms: number): number[] =>
   Array.from({ length: terms }, (_, i) => step * (i + 1));
 
+/** Easy multipliers a rung-4 strategy starts from. */
+const ANCHORS = [1, 2, 5, 10] as const;
+
+/** The anchor nearest to `unknown` whose fact `base × k` does not show `answer`. */
+function anchorFor(unknown: number, base: number, answer: number): number {
+  let best: number = ANCHORS[2];
+  let distance = Number.POSITIVE_INFINITY;
+  for (const k of ANCHORS) {
+    if (k === unknown || k === answer || base * k === answer) continue;
+    if (Math.abs(k - unknown) < distance) [best, distance] = [k, Math.abs(k - unknown)];
+  }
+  return best;
+}
+
+/** Rung 4: from a known fact of the same table to the asked one, the result left as "?". */
+function strategy(eq: TowerEquation): HintSpec {
+  if (eq.op === 'mul' && eq.blank !== 'x') {
+    const [a, b] = eq.x <= eq.y ? [eq.x, eq.y] : [eq.y, eq.x];
+    const k = anchorFor(a, b, eq.z);
+    const vars = { b, a, k, anchor: b * k, n: Math.abs(a - k) };
+    return { key: k < a ? 'hint4MulUp' : 'hint4MulDown', vars };
+  }
+  // Unknown factor: p : d = ? or ? × d = p.
+  const [p, d, unknown] = eq.op === 'div' ? [eq.x, eq.y, eq.z] : [eq.z, eq.y, eq.x];
+  const k = anchorFor(unknown, d, unknown);
+  return { key: k < unknown ? 'hint4DivUp' : 'hint4DivDown', vars: { d, k, anchor: d * k, p } };
+}
+
 export function hintSpec(rung: HintRung, step: TowerStep): HintSpec {
   const eq = trueEquation(step);
   if (rung <= 1) return { key: 'hint1', vars: {} };
-  if (rung >= 4) return { key: 'hint4', vars: { x: eq.x, op: eq.op, y: eq.y, z: eq.z } };
+  if (rung >= 4) return strategy(eq);
   // Factor unknown: p : d = ? or ? × d = p.
   if (eq.op === 'div' || eq.blank === 'x') {
     const p = eq.op === 'div' ? eq.x : eq.z;
@@ -65,6 +98,16 @@ export function equationText(ts: TowerStrings, eq: TowerEquation, z: number = eq
   return `${eq.x} ${ts(eq.op === 'mul' ? 'mulSign' : 'divSign')} ${eq.y} = ${z}`;
 }
 
+/** The equation in words for screen readers: "mấy nhân 7 bằng 56". */
+export function spokenEquation(ts: TowerStrings, eq: TowerEquation): string {
+  const blank = ts('speakBlank');
+  return ts(eq.op === 'mul' ? 'speakMul' : 'speakDiv', {
+    x: eq.blank === 'x' ? blank : eq.x,
+    y: eq.y,
+    z: eq.blank === 'z' ? blank : eq.z,
+  });
+}
+
 /** Renders `rung` for `step` into the hint area and returns the text (for the announcement). */
 export function renderHint(
   area: HTMLElement,
@@ -73,10 +116,7 @@ export function renderHint(
   step: TowerStep,
 ): string {
   const spec = hintSpec(rung, step);
-  const text =
-    spec.key === 'hint4'
-      ? ts('hint4', { equation: equationText(ts, trueEquation(step)) })
-      : ts(spec.key, spec.vars);
+  const text = ts(spec.key, spec.vars);
   const p = document.createElement('p');
   p.textContent = text;
   area.replaceChildren(p);

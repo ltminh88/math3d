@@ -1,7 +1,7 @@
 import { describe, expect, it } from 'vitest';
 import type { FactStat } from '../../learning/learning-types';
 import { mulberry32 } from '../../learning/seeded-rng';
-import { buildQuestion } from './tower-question-formats';
+import { buildQuestion, type TowerQuestion } from './tower-question-formats';
 import { planTowerFacts, TowerRoundFlow, towerFactPool } from './tower-round-flow';
 
 const stat = (box: number): FactStat => ({
@@ -45,6 +45,14 @@ describe('tower fact pool and plan', () => {
     expect(facts.some((k) => k.startsWith('div:'))).toBe(true);
   });
 
+  it('an inverse stays in the pool: 8 × 10 becomes 80 : 8, never 80 : 10', () => {
+    const planned = ['mul:2x3', 'mul:3x4', 'mul:4x5', 'mul:5x6', 'mul:6x7', 'mul:7x9', 'mul:8x10'];
+    const facts = planTowerFacts(planned, {}, mulberry32(1), 7);
+    const pool = towerFactPool();
+    expect(facts).toContain('div:80/8');
+    for (const key of facts) expect(pool).toContain(key);
+  });
+
   it('turns one fact into its inverse when the plan has only one operation', () => {
     const planned = ['mul:2x3', 'mul:3x4', 'mul:4x5', 'mul:5x6', 'mul:6x7', 'mul:7x8', 'mul:8x9'];
     const facts = planTowerFacts(planned, {}, mulberry32(1), 7);
@@ -71,11 +79,37 @@ describe('tower round flow', () => {
     expect(outcomes[1]?.factKey).toBe('mul:3x8');
   });
 
-  it('a false claim then its fix is one question; the claimed product is the wrong answer', () => {
-    let q = buildQuestion('mul:6x7', 'truefalse', mulberry32(1), []);
-    for (let seed = 2; q.steps.length < 2; seed++) {
-      q = buildQuestion('mul:6x7', 'truefalse', mulberry32(seed), []);
+  const claim = (isTrue: boolean): TowerQuestion => {
+    for (let seed = 1; ; seed++) {
+      const q = buildQuestion('mul:6x7', 'truefalse', mulberry32(seed), []);
+      if (q.steps[0]?.answer === isTrue) return q;
     }
+  };
+
+  it('a true claim judged "Đúng" is not recorded until the result is confirmed', () => {
+    const flow = new TowerRoundFlow([claim(true)], () => 0);
+    expect(flow.submit(true)).toEqual({ verdict: 'correct' });
+    expect(flow.roundComplete).toBe(false);
+    expect(flow.step).toMatchObject({ kind: 'number', answer: 42 });
+    const done = flow.submit(42);
+    expect(done.outcome).toMatchObject({ correct: true, firstTry: true, usedHint: false });
+  });
+
+  it('a hint on one step does not carry its rung to the next step', () => {
+    const flow = new TowerRoundFlow([family], () => 0);
+    expect(flow.takeHint()).toBe(1);
+    expect(flow.takeHint()).toBe(2);
+    flow.submit(flow.expected() as number);
+    expect(flow.hint.rung).toBe(0);
+    expect(flow.takeHint()).toBe(1);
+    let result = flow.submit(flow.expected() as number);
+    while (!result.outcome) result = flow.submit(flow.expected() as number);
+    // Still one question that used hints.
+    expect(result.outcome).toMatchObject({ correct: true, usedHint: true });
+  });
+
+  it('a false claim then its fix is one question; the claimed product is the wrong answer', () => {
+    const q = claim(false);
     const claimed = q.steps[0]?.eq.z;
     const flow = new TowerRoundFlow([q], () => 0);
     expect(flow.submit(true).verdict).toBe('wrong');

@@ -6,6 +6,8 @@ export class TowerAnswerButtons {
 
   constructor(
     label: string,
+    /** Accessible name of card `n` (1-based): "56 (phím 1)", so the key hint is not read alone. */
+    private readonly nameOf: (label: string, n: number) => string,
     private readonly onPick: (index: number) => void,
   ) {
     this.element.className = 'answers tower-answers';
@@ -20,6 +22,7 @@ export class TowerAnswerButtons {
       button.type = 'button';
       button.className = 'answer';
       button.dataset.index = String(i);
+      button.setAttribute('aria-label', this.nameOf(label, i + 1));
       button.innerHTML = '<kbd></kbd><span></span>';
       (button.firstElementChild as HTMLElement).textContent = String(i + 1);
       (button.lastElementChild as HTMLElement).textContent = label;

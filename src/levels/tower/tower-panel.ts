@@ -52,7 +52,11 @@ export class TowerPanel {
     this.hint.addEventListener('click', handlers.onHint);
     this.next.addEventListener('click', handlers.onNext);
     this.next.hidden = true;
-    this.answers = new TowerAnswerButtons(ts('promptChoice'), handlers.onPick);
+    this.answers = new TowerAnswerButtons(
+      ts('promptChoice'),
+      (label, n) => ts('cardName', { label, n }),
+      handlers.onPick,
+    );
     this.pad = createNumberPad({
       maxDigits: 2,
       activeInput: true,
@@ -90,8 +94,7 @@ export class TowerPanel {
     this.prompt.textContent = prompt;
     this.say(guide);
     this.setFeedback('');
-    this.offerHint(false);
-    this.hintArea.hidden = true;
+    this.clearHint();
     this.next.textContent = this.ts(index === total - 1 ? 'nextTop' : 'next');
     this.setAnswered(false);
   }
@@ -104,6 +107,14 @@ export class TowerPanel {
     if (step.kind === 'choice') this.answers.show(step.choices.map(String));
     else if (step.kind === 'verdict') this.answers.show([this.ts('yes'), this.ts('no')]);
     else this.answers.hide();
+  }
+
+  /** Hides the hint and its offer (new floor, or the next step of the floor). */
+  clearHint(): void {
+    this.offerHint(false);
+    this.hintArea.hidden = true;
+    this.hintArea.replaceChildren();
+    delete this.hintArea.dataset.rung;
   }
 
   say(text: string): void {

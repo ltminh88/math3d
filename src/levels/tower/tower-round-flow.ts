@@ -32,10 +32,11 @@ export function towerFactPool(): FactKey[] {
   return [...mulFactsForTables(TOWER_TABLES), ...divFactsForTables(TOWER_TABLES)];
 }
 
-/** mul:a×b ↔ div:p/b (the larger factor as divisor). */
+/** mul:a×b ↔ div:p/b (the larger factor as divisor while it is a table 2-9: 8 × 10 → 80 : 8). */
 function inverseOf(key: FactKey): FactKey {
   const t = factTriple(key);
-  return t.op === 'mul' ? divKey(t.p, t.b) : mulKey(t.a, t.b);
+  if (t.op === 'div') return mulKey(t.a, t.b);
+  return divKey(t.p, t.b <= Math.max(...TOWER_TABLES) ? t.b : t.a);
 }
 
 /**
@@ -127,7 +128,11 @@ export class TowerRoundFlow {
     if (typeof value !== typeof step.answer) return { verdict: 'ignored' };
     if (value === step.answer) {
       this.stepIndex += 1;
-      if (this.stepIndex < question.steps.length) return { verdict: 'correct' };
+      // A new step starts its hints from rung 1 (hints taken still count for the question).
+      if (this.stepIndex < question.steps.length) {
+        this.hint = { ...this.hint, rung: 0 };
+        return { verdict: 'correct' };
+      }
       return { verdict: 'correct', outcome: this.finish(question, true) };
     }
     // A false claim judged true means the child believed its number: that is the slip to bank.

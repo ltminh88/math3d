@@ -2,17 +2,15 @@
 // completion medal, the run's stars, VLM's words, the floor rewards and "Về cổng", which ends
 // the level as completed (the host adds the one-time completion bonus).
 import { tc } from '../../i18n/common-strings';
-import { type SessionTally, starsFor } from '../../learning/scoring';
 import type { TowerStrings } from './tower-strings';
 
 export function showTowerCelebration(
   root: HTMLElement,
   ts: TowerStrings,
   earned: { xp: number; coins: number },
-  tally: SessionTally,
+  stars: number,
   onBack: () => void,
 ): HTMLElement {
-  const stars = starsFor(tally);
   const card = document.createElement('section');
   card.className = 'tower-done glass';
   card.setAttribute('role', 'group');

@@ -1,14 +1,26 @@
 // Keyboard for the tower (WCAG 2.5.7 alternative to tapping): 1-3 pick an answer card (1 Đúng,
 // 2 Sai on the "đố vui"), digits + Enter go to the kit number pad on number steps, Enter climbs
-// once the floor is done. Listens on `document` in the capture phase with the level's signal;
+// once the floor is done, H asks for a hint while focus is in the level layer (as in the city). Listens on `document` in the capture phase with the level's signal;
 // keys the cards take are consumed (preventDefault), so the pad never types into a hidden display.
 import type { TowerRoundController } from './tower-round-controller';
 
 const PAD_KEY = /^([0-9]|Enter|Backspace|Delete)$/;
 
-export function listenTowerKeys(controller: TowerRoundController, signal: AbortSignal): void {
+export function listenTowerKeys(
+  controller: TowerRoundController,
+  layer: HTMLElement,
+  signal: AbortSignal,
+): void {
   const onKey = (event: KeyboardEvent): void => {
     if (event.defaultPrevented || event.altKey || event.ctrlKey || event.metaKey) return;
+    if (event.key === 'h' || event.key === 'H') {
+      const focus = document.activeElement;
+      if (focus && focus !== document.body && !layer.contains(focus)) return;
+      if (controller.flow.done || controller.flow.roundComplete) return;
+      controller.hint();
+      event.preventDefault();
+      return;
+    }
     if (!PAD_KEY.test(event.key)) return;
     const flow = controller.flow;
     const onButton = document.activeElement instanceof HTMLButtonElement;

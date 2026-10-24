@@ -36,6 +36,9 @@ function placedSpot(i: number): Vector3 {
   const r = floorRadius(i) + 1.35;
   return new Vector3(Math.cos(angle) * r, floorMid(i), Math.sin(angle) * r);
 }
+/** Computed once: the stones are rewritten every frame without allocating. */
+const FALLEN = Array.from({ length: FLOOR_COUNT }, (_, i) => fallenSpot(i));
+const PLACED = Array.from({ length: FLOOR_COUNT }, (_, i) => placedSpot(i));
 
 export class TowerFloorView {
   private readonly bands: InstancedMesh;
@@ -121,7 +124,7 @@ export class TowerFloorView {
     for (let i = 0; i < FLOOR_COUNT; i++) {
       const t = this.rise[i] as number;
       const ease = t * t * (3 - 2 * t);
-      this.p.lerpVectors(fallenSpot(i), placedSpot(i), ease);
+      this.p.lerpVectors(FALLEN[i] as Vector3, PLACED[i] as Vector3, ease);
       // An arc on the way up, a gentle bob once placed.
       this.p.y += Math.sin(Math.PI * ease) * 1.2 + (t === 1 ? 0.12 * Math.sin(time * 1.6 + i) : 0);
       this.q.setFromAxisAngle(UP, time * 0.8 + i);

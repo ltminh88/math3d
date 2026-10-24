@@ -1,10 +1,9 @@
 // Runs the climb: floor setup, answers from the cards or the number pad, the "đố vui" verdict and
-// its fix, hints, rewards, lighting the floor and asking the camera to climb, then the hand-over
-// to the celebration. Rules live in tower-round-flow.ts and tower-question-formats.ts.
-import type { SessionTally } from '../../learning/scoring';
-import { questionReward } from '../../learning/scoring';
+// its fix or confirmation, hints, rewards, lighting the floor and asking the camera to climb, then
+// the hand-over to the celebration. Rules live in tower-round-flow.ts and tower-question-formats.ts.
+import { createLevelRunTally } from '../shared/level-run-tally';
 import type { LevelContext } from '../shared/level-types';
-import { equationText, renderHint } from './tower-hints';
+import { equationText, renderHint, spokenEquation } from './tower-hints';
 import type { TowerPanel } from './tower-panel';
 import type { TowerQuestionCard } from './tower-question-card';
 import type { TowerQuestion } from './tower-question-formats';
@@ -14,7 +13,7 @@ import type { TowerStrings } from './tower-strings';
 export interface TowerRoundHooks {
   /** Floor `floor` (0-based) is finished: light it and climb to the next one. */
   onFloorDone(floor: number): void;
-  onLevelDone(earned: { xp: number; coins: number }, tally: SessionTally): void;
+  onLevelDone(earned: { xp: number; coins: number }, stars: number): void;
 }
 
 function floorTexts(ts: TowerStrings, q: TowerQuestion): { prompt: string; guide: string } {
@@ -36,8 +35,7 @@ function floorTexts(ts: TowerStrings, q: TowerQuestion): { prompt: string; guide
 
 export class TowerRoundController {
   private idle = 0;
-  private earned = { xp: 0, coins: 0 };
-  private tally: SessionTally = { total: 0, firstTryClean: 0, hintsUsed: 0, completed: true };
+  private readonly tally = createLevelRunTally();
 
   constructor(
     private readonly ctx: LevelContext,
@@ -58,7 +56,7 @@ export class TowerRoundController {
     this.card.render(question);
     this.panel.showInput(step);
     this.idle = 0;
-    this.ctx.announce(texts.prompt);
+    this.ctx.announce(`${texts.prompt} ${spokenEquation(this.ts, step.eq)}`);
   }
 
   /** Answer card `index` (choice value or Đúng/Sai). */
@@ -98,14 +96,18 @@ export class TowerRoundController {
     else this.card.judged(question);
     const next = this.flow.step;
     if (!result.outcome && next) {
+      // After the verdict: fix a false claim, or confirm a true one with its result hidden.
       const fixing = step.kind === 'verdict';
-      if (fixing) this.panel.prompt.textContent = this.ts('promptFix');
+      const confirming = fixing && step.answer === true;
+      if (fixing)
+        this.panel.prompt.textContent = this.ts(confirming ? 'promptConfirm' : 'promptFix');
       else this.card.setActive(this.flow.stepIndex);
       this.panel.showInput(next);
-      const text = this.ts(fixing ? 'claimCaught' : 'correctStep');
+      this.panel.clearHint();
+      const text = this.ts(confirming ? 'claimTrue' : fixing ? 'claimCaught' : 'correctStep');
       this.panel.setFeedback(text, 'success');
       this.ctx.audio.tone(698, 0.12);
-      this.ctx.announce(text);
+      this.ctx.announce(`${text} ${spokenEquation(this.ts, next.eq)}`);
       return;
     }
     if (result.outcome) this.finishFloor(question, result.verdict === 'correct', result.outcome);
@@ -117,12 +119,7 @@ export class TowerRoundController {
     outcome: Parameters<LevelContext['learning']['record']>[0],
   ): void {
     this.ctx.learning.record(outcome);
-    const reward = questionReward(outcome);
-    this.earned.xp += reward.xp;
-    this.earned.coins += reward.coins;
-    this.tally.total += 1;
-    if (outcome.correct && outcome.firstTry && !outcome.usedHint) this.tally.firstTryClean += 1;
-    if (outcome.usedHint) this.tally.hintsUsed += 1;
+    const reward = this.tally.add(outcome);
     const last = question.steps[question.steps.length - 1];
     const equation = last ? equationText(this.ts, last.eq) : '';
     const text = this.ts(correct ? 'correct' : 'revealed', { equation });
@@ -151,7 +148,7 @@ export class TowerRoundController {
   next(): void {
     if (!this.flow.roundComplete) return;
     this.flow.next();
-    if (this.flow.done) this.hooks.onLevelDone(this.earned, this.tally);
+    if (this.flow.done) this.hooks.onLevelDone(this.tally.earned(), this.tally.stars());
     else this.startRound();
   }
 

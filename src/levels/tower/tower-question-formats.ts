@@ -1,6 +1,7 @@
 // Pure question formats of the tower (mixed × and : over tables 2-9). One floor = one question:
 // choice "a × b = ?", number pad "p : d = ?", missing factor "? × 7 = 56", fact family, and the
-// "đố vui" true/false claim, which is fixed on the pad when false (still one recorded question).
+// "đố vui" true/false claim, then the result on the pad: fixed when the claim is false, confirmed
+// when it is true ("Đúng" alone is a judgment, not recall). Still one recorded question.
 import { pickDistractors, placeAnswer } from '../../learning/distractor-picker';
 import { type FactKey, parseFactKey } from '../../learning/fact-key';
 import { pick, type Rng } from '../../learning/seeded-rng';
@@ -137,7 +138,7 @@ export function buildQuestion(
     const isTrue = rng() < TRUE_CLAIM_SHARE;
     const claim: TowerEquation = { ...eq, z: isTrue ? eq.z : plausibleWrong(t, rng), blank: null };
     const verdict: TowerStep = { kind: 'verdict', eq: claim, answer: isTrue };
-    return make(isTrue ? [verdict] : [verdict, { kind: 'number', eq, answer: eq.z }]);
+    return make([verdict, { kind: 'number', eq, answer: eq.z }]);
   }
   if (format === 'pad') return make([{ kind: 'number', eq, answer: eq.z }]);
   const distractors = pickDistractors(
