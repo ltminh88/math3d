@@ -157,6 +157,7 @@ test('the city level plays five rounds and records facts of tables 6-9', async (
   const maxCalls = Number(layer.maxDrawCalls);
   expect(maxCalls).toBeGreaterThan(0);
   expect(maxCalls).toBeLessThanOrEqual(DRAW_CALL_BUDGET);
+  info.annotations.push({ type: 'max-draw-calls', description: String(maxCalls) });
 
   const back = page.locator('.city-back');
   if (tap) await back.tap();
