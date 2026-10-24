@@ -2,7 +2,7 @@ import { describe, expect, it } from 'vitest';
 import { mulFactsForTables } from '../../learning/curriculum-tables';
 import { parseFactKey } from '../../learning/fact-key';
 import { mulberry32 } from '../../learning/seeded-rng';
-import { CityRoundFlow, type CityRound, planCityRounds, REVERSE_BOX } from './city-round-flow';
+import { type CityRound, CityRoundFlow, planCityRounds, REVERSE_BOX } from './city-round-flow';
 
 const plan = (facts: string[], box = 1, errs: number[] = []) =>
   planCityRounds({ facts, boxOf: () => box, errorsOf: () => errs, rng: mulberry32(11) });

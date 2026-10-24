@@ -1,0 +1,177 @@
+/* Forest level HUD: recovered tokens (--ink, --paper, --gold, fonts) and glass panels. */
+.city-guide {
+  position: absolute;
+  top: max(16px, env(safe-area-inset-top));
+  left: 50%;
+  transform: translate(-50%);
+  width: min(560px, calc(100% - 300px));
+  display: flex;
+  align-items: flex-start;
+  gap: 8px;
+  padding: 10px 16px;
+  border-radius: var(--radius);
+  font-size: 15px;
+  line-height: 1.45;
+}
+.city-guide p {
+  margin: 0;
+  color: var(--ink-soft);
+  font-weight: 700;
+}
+.city-guide__name {
+  font-family: var(--font-display);
+  color: var(--gold-deep);
+}
+.city-guide__dot {
+  color: var(--gold);
+}
+.city-progress {
+  position: absolute;
+  top: max(16px, env(safe-area-inset-top));
+  right: max(16px, env(safe-area-inset-right));
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 10px 14px;
+  border-radius: 14px;
+  font-size: 14px;
+  font-weight: 900;
+}
+.city-dots {
+  display: flex;
+  gap: 5px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+.city-dots li {
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  background: #dfe6d4;
+}
+.city-dots li.done {
+  background: var(--leaf);
+}
+.city-dots li.current {
+  background: var(--gold);
+  box-shadow: 0 0 0 3px var(--gold-soft);
+}
+.city-panel {
+  position: absolute;
+  top: 76px;
+  right: max(16px, env(safe-area-inset-right));
+  width: 340px;
+  max-height: calc(100% - 92px);
+  overflow: auto;
+  padding: 16px 18px;
+  border-radius: var(--radius-lg);
+  background: var(--glass-strong);
+}
+.city-panel .question-intro {
+  margin: 0 0 4px;
+  font-size: 15px;
+  color: var(--ink);
+  font-weight: 700;
+}
+.city-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-bottom: 10px;
+}
+.city-actions .secondary {
+  flex: 1 1 auto;
+  min-height: 48px;
+  padding: 10px 12px;
+  font-size: 14px;
+}
+.city-hint-button.offer {
+  color: var(--gold-deep);
+  text-decoration: underline;
+  animation: nudge 1.6s infinite ease-in-out;
+}
+.city-panel .kit-pad {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 6px;
+}
+.city-panel .kit-pad__display {
+  display: none;
+}
+.city-panel .kit-pad__key {
+  min-height: 48px;
+  border: 2px solid #e3e8d6;
+  border-bottom-width: 5px;
+  border-radius: 14px;
+  background: #f2f3e6;
+  font-family: var(--font-display);
+  font-size: 22px;
+  font-weight: 800;
+}
+.city-panel .kit-pad__key--ok {
+  background: var(--ink);
+  border-color: #11392f;
+  color: #fffbea;
+}
+.city-panel .kit-pad__key:disabled {
+  opacity: 0.5;
+}
+.city-next {
+  width: 100%;
+  margin-top: 10px;
+}
+.city-keys {
+  margin: 10px 0 0;
+  font-size: 11px;
+  color: var(--muted-2);
+}
+.city-panel .reward-pop {
+  top: 8px;
+}
+
+.city-equation {
+  margin: 6px 0 8px;
+  font-size: 40px;
+}
+.city-count {
+  margin: 0 0 10px;
+  padding: 6px 10px;
+  border-radius: 12px;
+  background: var(--gold-soft);
+  font-weight: 800;
+  color: var(--ink);
+}
+.city-choices {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 8px;
+  margin-bottom: 10px;
+}
+.city-choices .answer {
+  min-height: 52px;
+  font-family: var(--font-display);
+  font-size: 24px;
+}
+.city-choices .answer.incorrect::after {
+  content: " ✗";
+}
+.city-choices .answer.correct::after {
+  content: " ✓";
+}
+.city-bands {
+  margin: 6px 0 0;
+  font-family: var(--font-display);
+  font-size: 22px;
+  font-weight: 800;
+}
+.city-band {
+  padding: 0 8px;
+  border-radius: 10px;
+}
+.city-band--a {
+  background: #f6b3d0;
+}
+.city-band--b {
+  background: #9ad9f0;
+}
