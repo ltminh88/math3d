@@ -1,7 +1,7 @@
 // Runs the city rounds: sets up the street or the building, turns deliveries, lit floors and pad
 // entries into answers, hints, rewards and the hand-over to the celebration. Rules live in
 // city-round-flow.ts and city-hints.ts.
-import { questionReward } from '../../learning/scoring';
+import { createLevelRunTally } from '../shared/level-run-tally';
 import type { LevelContext } from '../shared/level-types';
 import type { CityBuildingView } from './city-building-view';
 import { renderCityHint } from './city-hint-view';
@@ -15,7 +15,7 @@ import type { CityStrings } from './city-strings';
 export interface CityRoundHooks {
   /** Props changed (new round, delivery, lit floor, hint): refresh pickables, labels, camera. */
   onChanged(newRound: boolean): void;
-  onLevelDone(earned: { xp: number; coins: number }): void;
+  onLevelDone(earned: { xp: number; coins: number }, stars: number): void;
 }
 
 export class CityRoundController {
@@ -23,7 +23,7 @@ export class CityRoundController {
   floorSteps: readonly string[] = [];
   bandTexts: readonly [string, string] | null = null;
   private idle = 0;
-  private earned = { xp: 0, coins: 0 };
+  private readonly tally = createLevelRunTally();
 
   constructor(
     private readonly ctx: LevelContext,
@@ -72,8 +72,9 @@ export class CityRoundController {
   private updateCount(): void {
     const round = this.round;
     if (round?.kind !== 'windows') return;
+    // Lit floors only: a running window total would give the answer away.
     const floors = this.building.litFloors;
-    this.panel.count.textContent = this.ts('litCount', { floors, windows: floors * round.table });
+    this.panel.count.textContent = this.ts('litCount', { floors, total: round.other });
     this.panel.panel.dataset.lit = String(floors);
     this.panel.light.disabled = this.building.darkFloors().length === 0 || this.flow.roundComplete;
   }
@@ -87,9 +88,8 @@ export class CityRoundController {
     this.idle = 0;
     this.ctx.audio.tone(523 + this.building.litFloors * 40, 0.08);
     this.updateCount();
-    this.ctx.announce(
-      this.ts('floorLit', { n: target + 1, windows: this.building.litFloors * round.table }),
-    );
+    const floors = this.building.litFloors;
+    this.ctx.announce(this.ts('floorLit', { n: target + 1, floors, total: round.other }));
     this.hooks.onChanged(false);
   }
 
@@ -118,6 +118,7 @@ export class CityRoundController {
     if (round.kind !== 'windows') this.panel.choices.mark(value, result.verdict === 'correct');
     if (result.verdict === 'wrong') {
       if (moved) this.street.returnHome(moved.parcel);
+      this.street.reject(value);
       this.panel.setFeedback(this.ts('wrong'), 'gentle');
       this.panel.offerHint(this.flow.hintOffered(0));
       this.ctx.audio.hint();
@@ -128,9 +129,7 @@ export class CityRoundController {
     this.showSolution(round, moved);
     if (!result.outcome) return;
     this.ctx.learning.record(result.outcome);
-    const reward = questionReward(result.outcome);
-    this.earned.xp += reward.xp;
-    this.earned.coins += reward.coins;
+    const reward = this.tally.add(result.outcome);
     const equation = `${round.table} × ${round.other} = ${round.product}`;
     const correct = result.verdict === 'correct';
     const text = this.ts(correct ? 'correct' : 'revealed', { equation });
@@ -163,7 +162,7 @@ export class CityRoundController {
   hint(): void {
     const round = this.round;
     if (!round || !this.active) return;
-    const hint = cityHint(this.flow.takeHint(), round);
+    const hint = cityHint(this.flow.takeHint(), round, this.flow.tried);
     const text = renderCityHint(this.panel.hintArea, this.ts, hint);
     if (round.kind === 'windows') {
       this.building.setBands(hint.bands);
@@ -182,7 +181,7 @@ export class CityRoundController {
   next(): void {
     if (!this.flow.roundComplete) return;
     this.flow.next();
-    if (this.flow.done) this.hooks.onLevelDone(this.earned);
+    if (this.flow.done) this.hooks.onLevelDone(this.tally.earned(), this.tally.stars());
     else this.startRound();
   }
 

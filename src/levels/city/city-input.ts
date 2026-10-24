@@ -65,7 +65,10 @@ export function wireCityInput(
   const onKey = (event: KeyboardEvent): void => {
     if (event.defaultPrevented || event.altKey || event.ctrlKey || event.metaKey) return;
     const key = event.key;
-    if ((key === 'h' || key === 'H') && controller.active) {
+    // H asks for a hint only while focus is in the level layer (or nowhere), like the tower.
+    const focus = document.activeElement;
+    const inLevel = !focus || focus === document.body || ctx.ui.contains(focus);
+    if ((key === 'h' || key === 'H') && controller.active && inLevel) {
       controller.hint();
       event.preventDefault();
     } else if (

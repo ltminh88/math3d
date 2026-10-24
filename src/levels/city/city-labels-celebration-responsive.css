@@ -55,6 +55,12 @@
   font-family: var(--font-display);
   font-size: 28px;
 }
+.city-stars {
+  margin: 0 0 6px;
+  color: var(--gold);
+  font-size: 30px;
+  letter-spacing: 6px;
+}
 .city-done__line {
   color: var(--muted);
   line-height: 1.6;

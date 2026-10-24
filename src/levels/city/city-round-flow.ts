@@ -135,6 +135,11 @@ export class CityRoundFlow {
     return this.index >= this.rounds.length;
   }
 
+  /** Wrong answers given in this round (hints rule out other parcels). */
+  get tried(): readonly number[] {
+    return this.wrongAnswers;
+  }
+
   submit(value: number): SubmitResult {
     const round = this.round;
     if (!round || this.roundComplete) return { verdict: 'ignored' };

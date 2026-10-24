@@ -81,7 +81,7 @@ function start(ctx: LevelContext): LevelSession {
       }
       frame();
     },
-    onLevelDone(earned) {
+    onLevelDone(earned, stars) {
       interaction.setPickables([]);
       interaction.setZones([]);
       labels.set([]);
@@ -94,7 +94,9 @@ function start(ctx: LevelContext): LevelSession {
       view.setFrame(buildingFrame(building.width, building.height));
       ctx.audio.celebrate();
       ctx.announce(ts('doneTitle'));
-      doneCard = showCityCelebration(ctx.ui, ts, earned, () => ctx.exit({ completed: true }));
+      doneCard = showCityCelebration(ctx.ui, ts, earned, stars, () =>
+        ctx.exit({ completed: true }),
+      );
       frame();
     },
   });

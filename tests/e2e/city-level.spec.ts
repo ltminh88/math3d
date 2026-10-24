@@ -116,7 +116,8 @@ async function playRound(page: Page, index: number, tap: boolean, firstWindows: 
       await expect(panel).toHaveAttribute('data-lit', '1');
       await press(page, page.locator('.city-light'), tap);
       await expect(panel).toHaveAttribute('data-lit', '2');
-      await expect(page.locator('.city-count')).toContainText(`${2 * state.table} cửa sổ`);
+      // Lit floors only: never a window total, which would give the answer away.
+      await expect(page.locator('.city-count')).toHaveText(`2/${state.other} tầng sáng`);
       // Two hints: the 5 + rest split shows colour bands on the building.
       for (let i = 0; i < 2; i++) await press(page, page.locator('.city-hint-button'), tap);
       await expect(page.locator('.city-hint')).toHaveAttribute('data-rung', '2');
@@ -151,6 +152,7 @@ test('the city level plays five rounds and records facts of tables 6-9', async (
   expect(played.map((r) => r.kind)).toContain('deliver');
   await expect(page.locator('.city-done')).toBeVisible();
   await expect(page.locator('.city-done')).toContainText('VLM');
+  const shownStars = Number(await page.locator('.city-stars').getAttribute('data-stars'));
   const layer = await page
     .locator('.level-layer')
     .evaluate((el) => ({ ...(el as HTMLElement).dataset }));
@@ -179,6 +181,7 @@ test('the city level plays five rounds and records facts of tables 6-9', async (
   });
   expect(store.city?.completedAt ?? 0).toBeGreaterThan(0);
   expect(store.city?.stars ?? 0).toBeGreaterThan(0);
+  expect(shownStars).toBe(store.city?.stars);
   for (const { factKey } of played) {
     expect(factKey).toMatch(/^mul:\d+x\d+$/);
     const factors = factKey.slice(4).split('x').map(Number);

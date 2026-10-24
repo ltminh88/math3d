@@ -13,18 +13,17 @@ import {
 import type { DropZone } from '../../core/input/drop-zone';
 import type { GroundPoint } from '../../core/input/interaction-types';
 import type { Pickable } from '../../core/input/raycast-picker';
-import { bakeVertexColoredGeometry } from '../shared/bake-vertex-colored-geometry';
 import type { CityLabel } from './city-labels';
 import {
   HOUSE_X,
   HOUSE_ZONE_RADIUS,
   houseZoneCenter,
-  PARCEL_SIZE,
   PARCEL_Y,
   PARCEL_Z,
   parcelSlots,
   REVERSE_HOUSE,
 } from './city-layout';
+import { parcelGeometry } from './city-parcel-geometry';
 import type { CityRound } from './city-round-flow';
 
 const MAX_PARCELS = 3;
@@ -35,17 +34,6 @@ export const parcelId = (index: number): string => `parcel:${index}`;
 export const parcelIndexOf = (id: string): number => Number(id.slice('parcel:'.length));
 export const houseZoneId = (index: number): string => `house:${index}`;
 export const houseIndexOf = (id: string): number => Number(id.slice('house:'.length));
-
-function parcelGeometry() {
-  const scratch = new Group();
-  const part = (w: number, h: number, d: number, color: number) =>
-    scratch.add(new Mesh(new BoxGeometry(w, h, d), new MeshStandardMaterial({ color })));
-  const s = PARCEL_SIZE;
-  part(s, s * 0.8, s, 0xc9935a);
-  part(s * 1.02, s * 0.82, s * 0.16, 0xe85d5d);
-  part(s * 0.16, s * 0.82, s * 1.02, 0xe85d5d);
-  return bakeVertexColoredGeometry(scratch);
-}
 
 /** Houses that take a parcel in `round` (all four, or the one waiting in reverse delivery). */
 export const roundHouses = (round: CityRound): number[] =>
@@ -59,6 +47,8 @@ export class CityStreetView {
   private readonly targets: Vector3[] = [];
   private round: CityRound | undefined;
   private delivered = new Set<number>();
+  /** Houses (delivery) or parcels (reverse) already answered wrong: out of play this round. */
+  private rejected = new Set<string>();
 
   constructor(private readonly reducedMotion: boolean) {
     const geometry = parcelGeometry();
@@ -87,6 +77,7 @@ export class CityStreetView {
   show(round: CityRound): void {
     this.round = round;
     this.delivered.clear();
+    this.rejected.clear();
     const slots = parcelSlots(round.parcels.length);
     this.parcels.forEach((parcel, i) => {
       const x = slots[i];
@@ -110,12 +101,26 @@ export class CityStreetView {
     return this.proxies
       .slice(0, count)
       .map((object, i) => ({ id: parcelId(i), object }))
-      .filter((_, i) => !this.delivered.has(i));
+      .filter((_, i) => !this.delivered.has(i) && !this.rejected.has(parcelId(i)));
+  }
+
+  /** A wrong answer `value` takes its house (delivery) or its parcel (reverse) out of play. */
+  reject(value: number): void {
+    const round = this.round;
+    if (!round) return;
+    if (round.kind === 'reverse') {
+      const parcel = round.parcels.findIndex((p) => p.value === value && !p.correct);
+      if (parcel >= 0) this.rejected.add(parcelId(parcel));
+    } else {
+      const house = round.houses.indexOf(value);
+      if (house >= 0 && value !== round.product) this.rejected.add(houseZoneId(house));
+    }
   }
 
   zones(): DropZone[] {
     if (!this.round) return [];
-    return roundHouses(this.round).map((house) => ({
+    const open = roundHouses(this.round).filter((h) => !this.rejected.has(houseZoneId(h)));
+    return open.map((house) => ({
       id: houseZoneId(house),
       center: houseZoneCenter(house),
       shape: { kind: 'circle', radius: HOUSE_ZONE_RADIUS },
