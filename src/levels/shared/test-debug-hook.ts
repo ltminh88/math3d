@@ -1,7 +1,7 @@
 // Test builds only (`vite build --mode test`): `window.__game` lets e2e specs seed progress,
 // teleport the player and read the store and gate states. Imported behind
 // `import.meta.env.MODE === 'test'`, so production bundles never contain it.
-import { LEVEL_GATES } from '../../config/regions';
+import { LEVEL_GATES } from '../../config/level-gate-config';
 import { BRIDGE_SEGMENTS } from '../../config/world-constants';
 import type { DeltaLevel } from '../../learning/learning-types';
 import type { GameSnapshot } from '../../store/progress-repository';

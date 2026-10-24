@@ -1,5 +1,6 @@
 // The quest chain after the bridge: the quest card, VLM and the completion dialog point at the
-// next open gate (field, then forest), locked gates say why, and a closing card ends the chain.
+// next open gate (field, forest, city, then tower), locked gates say why, and a closing card ends
+// the chain.
 // Uses the test-build hook `window.__game`.
 import { type Page, test } from '@playwright/test';
 import { expect, SLOW_TEST_MS, waitForStoreBoot } from './legacy-live-save-fixtures';
@@ -81,7 +82,9 @@ test('crossing the bridge leads to the field gate', async ({ page }) => {
   );
 });
 
-test('the field leads to the forest gate, the forest to the closing card', async ({ page }) => {
+test('the field leads to the forest, city and tower gates, then the closing card', async ({
+  page,
+}) => {
   await startPlaying(page);
   await page.evaluate(() => window.__game?.seedProgress({ bridgeComplete: true }));
   await expectCard(page, 'NHIỆM VỤ TIẾP THEO', 'Cánh Đồng Phép Tính', 'Đến Cổng Cánh Đồng');
@@ -98,14 +101,38 @@ test('the field leads to the forest gate, the forest to the closing card', async
   await page.locator('#close-dialog').click();
 
   await page.evaluate(() => window.__game?.seedProgress({ completedLevels: ['forest'] }));
-  await expectCard(page, 'CHÚC MỪNG BẠN', 'Bạn đã qua cả ba chặng!', '✓ Hoàn thành');
-  await expect(page.locator('#quest-copy')).toHaveText(
-    'Bạn có thể luyện thêm cùng VLM, hoặc ghé Cửa hàng trong làng để tiêu xu. Thành Phố Con Số và Tháp Toán Học sắp ra mắt!',
-  );
+  await expectCard(page, 'NHIỆM VỤ TIẾP THEO', 'Thành Phố Con Số', 'Đến Cổng Thành Phố Con Số');
+  await expect(page.locator('#quest-copy')).toContainText('✨ Cổng Thành Phố Con Số');
+  const steps = page.locator('#quest-steps > span');
+  await expect(steps).toHaveCount(5);
+  await expect(steps.nth(3)).toHaveText('Thành Phố');
+  await expect(steps.nth(4)).toHaveText('Tháp');
   await expect(page.locator('#quest-steps .done')).toHaveCount(3);
+  await talkToVlm(page);
+  await expect(page.locator('#dialog .dialog-copy')).toContainText(
+    'Cổng Thành Phố Con Số đã mở! Cổng đang chờ bạn ở cuối con đường bên kia cầu, phía thành phố con số.',
+  );
+  await page.locator('#close-dialog').click();
+
+  await page.evaluate(() => window.__game?.seedProgress({ completedLevels: ['city'] }));
+  await expectCard(page, 'NHIỆM VỤ TIẾP THEO', 'Tháp Toán Học', 'Đến Cổng Tháp Toán Học');
+  await expect(page.locator('#quest-copy')).toContainText('✨ Cổng Tháp Toán Học');
+  await expect(page.locator('#quest-steps .done')).toHaveCount(4);
+  await talkToVlm(page);
+  await expect(page.locator('#dialog .dialog-copy')).toContainText(
+    'Cổng Tháp Toán Học đã mở! Cổng đang chờ bạn ở cuối con đường bên kia cầu, dưới chân ngọn tháp cao nhất.',
+  );
+  await page.locator('#close-dialog').click();
+
+  await page.evaluate(() => window.__game?.seedProgress({ completedLevels: ['tower'] }));
+  await expectCard(page, 'CHÚC MỪNG BẠN', 'Bạn đã qua cả năm chặng!', '✓ Hoàn thành');
+  await expect(page.locator('#quest-copy')).toHaveText(
+    'Bạn có thể luyện thêm cùng VLM, hoặc ghé Cửa hàng trong làng để tiêu xu.',
+  );
+  await expect(page.locator('#quest-steps .done')).toHaveCount(5);
 
   // The stage is read back from the store after a reload.
   await page.reload();
   await waitForStoreBoot(page);
-  await expectCard(page, 'CHÚC MỪNG BẠN', 'Bạn đã qua cả ba chặng!', '✓ Hoàn thành');
+  await expectCard(page, 'CHÚC MỪNG BẠN', 'Bạn đã qua cả năm chặng!', '✓ Hoàn thành');
 });

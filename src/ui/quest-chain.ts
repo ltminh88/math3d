@@ -1,16 +1,16 @@
 // The quest card's content for every quest in the chain: the bridge quest (recovered copy, kept
-// byte-identical), then the field gate, the forest gate and a closing card. The stage comes from
+// byte-identical), then the field, forest, city and tower gates and a closing card. The stage comes from
 // the same state the level gates read, so the card follows a level commit and a reload.
 import { BRIDGE_SEGMENTS } from '../config/world-constants';
 import { tc } from '../i18n/common-strings';
-import { tl } from '../levels/shared/level-host-strings';
+import { gateNameOf } from '../levels/shared/level-host-strings';
 import { progressionState } from '../levels/shared/level-progression';
 import { LEVEL_COMPLETE_BONUS } from '../levels/shared/level-run-result';
 import { tshop } from '../shop/shop-strings';
 import { gameState } from './game-state';
 import { byId, icon } from './icons';
 import { connectedStore } from './progress-sync';
-import { type QuestStage, questStage } from './quest-chain-stage';
+import { CHAIN_LEVELS, type ChainLevel, type QuestStage, questStage } from './quest-chain-stage';
 import { tq } from './quest-chain-strings';
 import { setMarkup } from './set-markup-if-changed';
 
@@ -47,13 +47,26 @@ function bridgeStepsHtml(): string {
   ).join('');
 }
 
-const CHAIN_STEPS = ['stepBridge', 'stepField', 'stepForest'] as const;
-const STAGE_INDEX: Record<QuestStage, number> = { bridge: 0, field: 1, forest: 2, done: 3 };
+type QuestKey = Parameters<typeof tq>[0];
+
+/** Per chain level: card title, copy, progress line, step-row name and VLM's pointer line. */
+export const CHAIN_TEXT_KEYS = {
+  field: ['titleField', 'copyField', 'progressField', 'stepField', 'guideField'],
+  forest: ['titleForest', 'copyForest', 'progressForest', 'stepForest', 'guideForest'],
+  city: ['titleCity', 'copyCity', 'progressCity', 'stepCity', 'guideCity'],
+  tower: ['titleTower', 'copyTower', 'progressTower', 'stepTower', 'guideTower'],
+} as const satisfies Record<ChainLevel, readonly QuestKey[]>;
+
+const CHAIN_STEPS: readonly QuestKey[] = [
+  'stepBridge',
+  ...CHAIN_LEVELS.map((levelId) => CHAIN_TEXT_KEYS[levelId][3]),
+];
+const STAGES: readonly QuestStage[] = ['bridge', ...CHAIN_LEVELS, 'done'];
 
 /** One cell per quest of the chain: a check once done, else its short name. */
 function chainStepsHtml(stage: QuestStage): string {
   return CHAIN_STEPS.map((key, i) => {
-    const done = i < STAGE_INDEX[stage];
+    const done = i < STAGES.indexOf(stage);
     const name = tq(key);
     const label = tq(done ? 'stepDone' : 'stepTodo', { n: i + 1, name });
     return `<span class="${done ? 'done' : ''}" aria-label="${label}">${done ? icon('check') : name}</span>`;
@@ -84,13 +97,10 @@ interface CardCopy {
 function chainCopy(stage: Exclude<QuestStage, 'bridge'>): CardCopy {
   const { xp, coins } = LEVEL_COMPLETE_BONUS;
   const next = { eyebrow: tq('eyebrowNext'), reward: tq('rewardLevel', { xp, coins }) };
-  if (stage === 'field') {
-    const copy = tq('copyField', { gate: tl('gateField') });
-    return { ...next, title: tq('titleField'), copy, progress: tq('progressField') };
-  }
-  if (stage === 'forest') {
-    const copy = tq('copyForest', { gate: tl('gateForest') });
-    return { ...next, title: tq('titleForest'), copy, progress: tq('progressForest') };
+  if (stage !== 'done') {
+    const [title, copy, progress] = CHAIN_TEXT_KEYS[stage];
+    const gate = gateNameOf(stage);
+    return { ...next, title: tq(title), copy: tq(copy, { gate }), progress: tq(progress) };
   }
   return {
     eyebrow: tq('eyebrowDone'),

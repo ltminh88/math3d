@@ -1,14 +1,14 @@
 // Talking to VLM (E key or interact button when he is the nearest interactable, his label, or
 // clicking him): quest intro, the way to the next open gate, or a practice offer.
 import { BRIDGE_SEGMENTS } from '../config/world-constants';
-import { tl } from '../levels/shared/level-host-strings';
+import { gateNameOf } from '../levels/shared/level-host-strings';
 import { openDialog } from './dialog';
 import { gameState, getWorld } from './game-state';
 import { refreshHud } from './hud';
 import { byId, icon } from './icons';
 import { interactWithNearest } from './interact-target';
 import { saveQuestAccepted } from './progress-sync';
-import { currentQuestStage } from './quest-chain';
+import { CHAIN_TEXT_KEYS, currentQuestStage } from './quest-chain';
 import { tq } from './quest-chain-strings';
 import { openQuiz } from './quiz-dialog';
 import { showToast } from './toast-and-persist';
@@ -16,9 +16,10 @@ import { showToast } from './toast-and-persist';
 /** After the bridge quest: VLM points at the next open gate (or offers practice at the end). */
 function afterQuestLine(): string {
   const stage = currentQuestStage();
-  if (stage === 'field') return tq('guideField', { gate: tl('gateField') });
-  if (stage === 'forest') return tq('guideForest', { gate: tl('gateForest') });
-  return 'Bạn muốn cùng mình luyện thêm phép nhân không?';
+  if (stage === 'bridge' || stage === 'done') {
+    return 'Bạn muốn cùng mình luyện thêm phép nhân không?';
+  }
+  return tq(CHAIN_TEXT_KEYS[stage][4], { gate: gateNameOf(stage) });
 }
 
 function miloBodyHtml(bridgeDone: boolean): string {

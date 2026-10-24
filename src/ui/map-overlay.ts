@@ -1,11 +1,6 @@
 // Minimap and full-screen world map overlay: drawing, region list/detail panel, open/close.
-import {
-  COMING_SOON_REGIONS,
-  isRegionUnlocked,
-  LEVEL_GATES,
-  REGIONS,
-  type Region,
-} from '../config/regions';
+import { LEVEL_GATES } from '../config/level-gate-config';
+import { isRegionUnlocked, REGIONS, type Region } from '../config/regions';
 import { translateDomTree, translateLongText, translateText } from '../i18n/legacy-translator';
 import { currentGateStatus, gateStateText, isLevelRunning } from '../levels/shared/level-gates';
 import { tl } from '../levels/shared/level-host-strings';
@@ -65,15 +60,11 @@ function drawOverlayFrame(): void {
 
 function regionButtonHtml(region: Region): string {
   const unlocked = isRegionUnlocked(region, gameState.progress.questComplete);
-  const soon = COMING_SOON_REGIONS.has(region.id) ? comingSoonHtml() : '';
-  return `<button class="map-region${unlocked ? '' : ' locked'}" data-region="${region.id}" aria-pressed="${gameState.selectedRegionId === region.id}"><span class="map-region-icon" style="--tint:${region.color}">${unlocked ? region.icon : '🔒'}</span><span><strong>${region.name}</strong><small>${region.subtitle}</small>${soon}</span>${gameState.currentRegionId === region.id ? '<em>Bạn ở đây</em>' : ''}</button>`;
+  return `<button class="map-region${unlocked ? '' : ' locked'}" data-region="${region.id}" aria-pressed="${gameState.selectedRegionId === region.id}"><span class="map-region-icon" style="--tint:${region.color}">${unlocked ? region.icon : '🔒'}</span><span><strong>${region.name}</strong><small>${region.subtitle}</small></span>${gameState.currentRegionId === region.id ? '<em>Bạn ở đây</em>' : ''}</button>`;
 }
 
-const comingSoonHtml = (): string => `<em class="coming-soon">${tl('comingSoon')}</em>`;
-
-/** Region detail line about levels: "Sắp ra mắt" for City/Tower, the gate state for gate regions. */
+/** Region detail line about levels: the gate state for regions with a level gate. */
 function regionLevelHtml(region: Region): string {
-  if (COMING_SOON_REGIONS.has(region.id)) return `<p class="map-soon">${comingSoonHtml()}</p>`;
   const gate = LEVEL_GATES.find((g) => g.regionId === region.id);
   if (!gate) return '';
   const state = gateStateText(gate.levelId, currentGateStatus(gate));

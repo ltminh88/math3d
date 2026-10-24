@@ -1,7 +1,8 @@
 // DOM labels pinned to world points (VLM, bridge, level gates, regions) and the current-area
 // badge/toast.
 import { Vector3 } from 'three';
-import { isRegionUnlocked, LEVEL_GATES, regionAtPoint } from '../config/regions';
+import { LEVEL_GATES } from '../config/level-gate-config';
+import { isRegionUnlocked, regionAtPoint } from '../config/regions';
 import { getLegacyLanguage, translateText } from '../i18n/legacy-translator';
 import { LABELED_REGIONS } from './dom-template';
 import { gameState, getWorld } from './game-state';

@@ -1,3 +1,4 @@
+import type { LevelGate } from '../../config/level-gate-config';
 import { defineStrings } from '../../i18n/i18n';
 
 /** Level host + gate strings (vi source; en names follow the recovered translator's). */
@@ -5,15 +6,21 @@ export const tl = defineStrings('levelHost', {
   vi: {
     gateField: 'Cổng Cánh Đồng Phép Tính',
     gateForest: 'Cổng Rừng Nhân Chia',
+    gateCity: 'Cổng Thành Phố Con Số',
+    gateTower: 'Cổng Tháp Toán Học',
     enter: 'Vào {gate}',
     lockReasonBridge: 'Đi qua cầu để mở',
     lockReasonField: 'Hoàn thành Cánh Đồng để mở',
+    lockReasonForest: 'Hoàn thành Rừng Nhân Chia để mở',
+    lockReasonCity: 'Hoàn thành Thành Phố Con Số để mở',
     stateOpen: 'Cổng đã mở',
     stateCompleted: 'Đã hoàn thành {stars}',
     comingSoon: 'Sắp ra mắt',
     lockedBridge: 'Hãy giúp {guide} xây xong cây cầu, rồi đi qua cầu để mở cổng này nhé!',
     lockedBridgeCross: 'Cầu đã xây xong! Bạn đi qua cầu là cổng này sẽ mở nhé!',
     lockedField: 'Hoàn thành Cánh Đồng Phép Tính để mở cổng này nhé!',
+    lockedForest: 'Hoàn thành Rừng Nhân Chia để mở cổng này nhé!',
+    lockedCity: 'Hoàn thành Thành Phố Con Số để mở cổng này nhé!',
     comingSoonToast: 'Màn chơi này sắp ra mắt. Hẹn bạn quay lại nhé!',
     mapGate: 'Cổng màn chơi: {state}',
     leave: 'Về thế giới',
@@ -24,15 +31,21 @@ export const tl = defineStrings('levelHost', {
   en: {
     gateField: 'Math Meadow Gate',
     gateForest: 'Multiplication Forest Gate',
+    gateCity: 'Number City Gate',
+    gateTower: 'Math Tower Gate',
     enter: 'Enter {gate}',
     lockReasonBridge: 'Cross the bridge to open',
     lockReasonField: 'Finish the Meadow to open',
+    lockReasonForest: 'Finish the Multiplication Forest to open',
+    lockReasonCity: 'Finish Number City to open',
     stateOpen: 'Gate open',
     stateCompleted: 'Completed {stars}',
     comingSoon: 'Coming soon',
     lockedBridge: 'Help {guide} finish the bridge, then cross it to open this gate!',
     lockedBridgeCross: 'The bridge is ready! Cross it to open this gate!',
     lockedField: 'Finish the Math Meadow to open this gate!',
+    lockedForest: 'Finish the Multiplication Forest to open this gate!',
+    lockedCity: 'Finish Number City to open this gate!',
     comingSoonToast: 'This level is coming soon. See you again!',
     mapGate: 'Level gate: {state}',
     leave: 'Back to the world',
@@ -41,3 +54,13 @@ export const tl = defineStrings('levelHost', {
     backAtGate: 'You are back at the gate.',
   },
 });
+
+const GATE_NAME_KEYS = {
+  field: 'gateField',
+  forest: 'gateForest',
+  city: 'gateCity',
+  tower: 'gateTower',
+} as const satisfies Record<LevelGate['levelId'], Parameters<typeof tl>[0]>;
+
+/** The gate's display name ("Cổng Thành Phố Con Số"). */
+export const gateNameOf = (levelId: LevelGate['levelId']): string => tl(GATE_NAME_KEYS[levelId]);

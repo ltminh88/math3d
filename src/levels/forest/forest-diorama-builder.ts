@@ -16,7 +16,7 @@ import { buildTree } from '../../world/props-house-tree';
 import type { WorldBuildContext } from '../../world/world-build-context';
 import { WORLD_LIGHTING } from '../../world/world-lighting-tuning';
 import { addBox, addCylinder, addSphere } from '../../world/world-primitives';
-import { bakeVertexColoredGeometry } from './bake-vertex-colored-geometry';
+import { bakeVertexColoredGeometry } from '../shared/bake-vertex-colored-geometry';
 import { PILE_CENTER } from './forest-layout';
 
 /** Forest ground, path and stump colours of the recovered forest region builder. */

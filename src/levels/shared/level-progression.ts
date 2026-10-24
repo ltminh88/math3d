@@ -1,7 +1,7 @@
 // Region progression for level gates (pure). Regions themselves stay walkable after the bridge
-// exactly as in the original; only the gates are gated: field needs the bridge quest, forest
-// needs a completed field run.
-import type { GateRequirement } from '../../config/regions';
+// exactly as in the original; only the gates are gated: field needs the bridge quest, forest a
+// completed field run, city a completed forest run and tower a completed city run.
+import type { GateRequirement } from '../../config/level-gate-config';
 
 export interface ProgressionState {
   readonly bridgeComplete: boolean;

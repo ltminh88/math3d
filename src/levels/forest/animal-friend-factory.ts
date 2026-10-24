@@ -8,7 +8,7 @@ import {
   Mesh,
   MeshStandardMaterial,
 } from 'three';
-import { bakeVertexColoredGeometry } from './bake-vertex-colored-geometry';
+import { bakeVertexColoredGeometry } from '../shared/bake-vertex-colored-geometry';
 import type { ANIMAL_NAME_KEYS } from './forest-strings';
 
 export type AnimalKind = (typeof ANIMAL_NAME_KEYS)[number];

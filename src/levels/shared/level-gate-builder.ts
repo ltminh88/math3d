@@ -3,7 +3,7 @@
 // Built after the world's scatter pass and outside the static merge; its collision circles are
 // appended to the obstacle list, so no RNG draw shifts.
 import { DoubleSide, Group, Mesh, MeshStandardMaterial, PlaneGeometry, TorusGeometry } from 'three';
-import type { LevelGate } from '../../config/regions';
+import type { LevelGate } from '../../config/level-gate-config';
 import type { WorldBuildContext } from '../../world/world-build-context';
 import { addBox, addCylinder, addMesh, addSphere } from '../../world/world-primitives';
 import { addSign } from '../../world/world-text-sign';

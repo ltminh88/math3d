@@ -167,13 +167,15 @@ test('the forest level plays five rounds and records division facts', async ({ p
   expect(store.completedAt).toBeGreaterThan(0);
   expect(store.divKeys.length).toBeGreaterThan(0);
 
-  // City and Tower are still "coming soon" on the map.
+  // The forest opens the city gate (its level is not shipped yet); the tower waits on the city.
   await page.locator('#open-map').click();
   await expect(page.locator('#world-map')).toBeVisible();
-  for (const region of ['city', 'tower']) {
-    await page.locator(`[data-region="${region}"]`).click();
-    await expect(page.locator('#map-detail .coming-soon')).toHaveText('Sắp ra mắt');
-  }
+  await page.locator('[data-region="city"]').click();
+  await expect(page.locator('#map-detail .map-gate')).toHaveText('Cổng màn chơi: Sắp ra mắt');
+  await page.locator('[data-region="tower"]').click();
+  await expect(page.locator('#map-detail .map-gate')).toHaveText(
+    'Cổng màn chơi: Hoàn thành Thành Phố Con Số để mở',
+  );
   expect(errors).toEqual([]);
 });
 

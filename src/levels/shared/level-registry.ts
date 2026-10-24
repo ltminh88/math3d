@@ -1,7 +1,7 @@
 // Levels self-register: every `src/levels/<id>/index.ts` default-exports its LevelDefinition.
 // The definitions are tiny and eager (a gate must know whether its level exists before anyone
 // walks up to it); the scene code behind `definition.load()` stays a separate chunk.
-import { LEVEL_GATES } from '../../config/regions';
+import { LEVEL_GATES } from '../../config/level-gate-config';
 import type { LevelDefinition } from './level-types';
 
 const FOLDER_PATTERN = /^\/src\/levels\/([^/]+)\/index\.ts$/;

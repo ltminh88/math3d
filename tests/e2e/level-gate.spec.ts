@@ -1,7 +1,7 @@
-// Level gates in the meadow and the forest (phase 13): locked until their requirement is met,
-// open once it is (both levels ship: field in phase 14, forest in phase 15, played in their own
-// specs), VLM's interact prompt unchanged, City/Tower marked coming soon on their labels and on
-// the map. Uses the test-build hook `window.__game`.
+// Level gates in the meadow, forest, city and tower: locked until their requirement is met, open
+// once it is (field and forest ship and are played in their own specs; a gate whose level folder
+// is missing says "Sắp ra mắt"), VLM's interact prompt unchanged, no region badge on the labels or
+// the map (the gate state says it). Uses the test-build hook `window.__game`.
 import { type Page, test } from '@playwright/test';
 import { expect, SLOW_TEST_MS, waitForStoreBoot } from './legacy-live-save-fixtures';
 
@@ -10,6 +10,16 @@ test.describe.configure({ timeout: SLOW_TEST_MS });
 
 const LOCKED_BRIDGE = 'Hãy giúp VLM xây xong cây cầu, rồi đi qua cầu để mở cổng này nhé!';
 const LOCKED_FIELD = 'Hoàn thành Cánh Đồng Phép Tính để mở cổng này nhé!';
+const LOCKED_FOREST = 'Hoàn thành Rừng Nhân Chia để mở cổng này nhé!';
+const LOCKED_CITY = 'Hoàn thành Thành Phố Con Số để mở cổng này nhé!';
+const LEVEL_IDS = ['field', 'forest', 'city', 'tower'] as const;
+/** Gate centres from LEVEL_GATES (src/config/level-gate-config.ts). */
+const GATE_POSITIONS = [
+  [29, -14.5],
+  [37.2, 13.4],
+  [58.5, 7.6],
+  [60.6, -14.2],
+] as const;
 
 async function startPlaying(page: Page): Promise<void> {
   await page.goto('/');
@@ -19,10 +29,8 @@ async function startPlaying(page: Page): Promise<void> {
   await expect(page.locator('body')).toHaveClass(/playing/);
 }
 
-const gateStatuses = () => [
-  window.__game?.gateStatus('field'),
-  window.__game?.gateStatus('forest'),
-];
+const gateStatuses = (page: Page) =>
+  page.evaluate((ids) => ids.map((id) => window.__game?.gateStatus(id)), [...LEVEL_IDS]);
 
 async function useGate(page: Page, levelId: string): Promise<void> {
   await page.evaluate((id) => window.__game?.teleportToGate(id), levelId);
@@ -43,11 +51,27 @@ test('gates stay locked before the bridge quest; VLM keeps his prompt', async ({
   );
   await expect(page.locator('#gate-field-label small')).toHaveText('Đi qua cầu để mở');
   await expect(page.locator('#gate-forest-label small')).toHaveText('Hoàn thành Cánh Đồng để mở');
+  await expect(page.locator('#gate-city-label small')).toHaveText(
+    'Hoàn thành Rừng Nhân Chia để mở',
+  );
+  await expect(page.locator('#gate-tower-label small')).toHaveText(
+    'Hoàn thành Thành Phố Con Số để mở',
+  );
   await expect(page.locator('#toast')).toHaveText(LOCKED_BRIDGE);
 
   await useGate(page, 'forest');
   await expect(page.locator('#toast')).toHaveText(LOCKED_FIELD);
-  expect(await page.evaluate(gateStatuses)).toEqual(['locked', 'locked']);
+  await useGate(page, 'city');
+  await expect(page.locator('#interact')).toContainText(
+    'Cổng Thành Phố Con Số 🔒 · Hoàn thành Rừng Nhân Chia để mở',
+  );
+  await expect(page.locator('#toast')).toHaveText(LOCKED_FOREST);
+  await useGate(page, 'tower');
+  await expect(page.locator('#interact')).toContainText(
+    'Cổng Tháp Toán Học 🔒 · Hoàn thành Thành Phố Con Số để mở',
+  );
+  await expect(page.locator('#toast')).toHaveText(LOCKED_CITY);
+  expect(await gateStatuses(page)).toEqual(['locked', 'locked', 'locked', 'locked']);
   expect(errors).toEqual([]);
 });
 
@@ -71,17 +95,50 @@ test('the bridge opens the field gate; the field opens the forest gate', async (
   await page.reload();
   await waitForStoreBoot(page);
   await page.waitForFunction(() => '__game' in window);
-  expect(await page.evaluate(gateStatuses)).toEqual(['completed', 'open']);
+  expect(await gateStatuses(page)).toEqual(['completed', 'open', 'locked', 'locked']);
 });
 
-test('City and Tower say Sắp ra mắt; the map shows each region’s level state', async ({ page }) => {
+test('the forest opens the city gate, the city the tower gate (both Sắp ra mắt without a level)', async ({
+  page,
+}) => {
   await startPlaying(page);
-  await expect(page.locator('#city-label .coming-soon')).toHaveText('Sắp ra mắt');
-  await expect(page.locator('#tower-label .coming-soon')).toHaveText('Sắp ra mắt');
+  await page.evaluate(() =>
+    window.__game?.seedProgress({ bridgeComplete: true, completedLevels: ['field', 'forest'] }),
+  );
+  expect(await gateStatuses(page)).toEqual(['completed', 'completed', 'coming-soon', 'locked']);
+  await expect(page.locator('#gate-city-label small')).toHaveText('Sắp ra mắt');
+  await useGate(page, 'city');
+  await expect(page.locator('#interact')).toContainText('Cổng Thành Phố Con Số · Sắp ra mắt');
+  await expect(page.locator('#toast')).toHaveText('Màn chơi này sắp ra mắt. Hẹn bạn quay lại nhé!');
+  await useGate(page, 'tower');
+  await expect(page.locator('#toast')).toHaveText(LOCKED_CITY);
+
+  await page.evaluate(() => window.__game?.seedProgress({ completedLevels: ['city'] }));
+  expect(await gateStatuses(page)).toEqual([
+    'completed',
+    'completed',
+    'coming-soon',
+    'coming-soon',
+  ]);
+  await expect(page.locator('#gate-tower-label small')).toHaveText('Sắp ra mắt');
+  expect(await page.evaluate(() => window.__game?.levelRunning())).toBe(false);
+});
+
+test('no region badges; the map shows each region’s gate state', async ({ page }) => {
+  await startPlaying(page);
+  await expect(page.locator('#city-label')).toBeAttached();
+  await expect(page.locator('.coming-soon')).toHaveCount(0);
   await page.locator('#open-map').click();
   await expect(page.locator('#world-map')).toBeVisible();
+  await expect(page.locator('#map-regions')).not.toContainText('Sắp ra mắt');
   await page.locator('[data-region="city"]').click();
-  await expect(page.locator('#map-detail .coming-soon')).toHaveText('Sắp ra mắt');
+  await expect(page.locator('#map-detail .map-gate')).toHaveText(
+    'Cổng màn chơi: Hoàn thành Rừng Nhân Chia để mở',
+  );
+  await page.locator('[data-region="tower"]').click();
+  await expect(page.locator('#map-detail .map-gate')).toHaveText(
+    'Cổng màn chơi: Hoàn thành Thành Phố Con Số để mở',
+  );
   await page.locator('[data-region="meadow"]').click();
   await expect(page.locator('#map-detail .map-gate')).toHaveText('Cổng màn chơi: Đi qua cầu để mở');
   await page.locator('[data-region="village"]').click();
@@ -90,12 +147,9 @@ test('City and Tower say Sắp ra mắt; the map shows each region’s level sta
 
 test('gates stand on free ground: no tree, rock or prop overlaps a gate', async ({ page }) => {
   await startPlaying(page);
-  const overlaps = await page.evaluate(() => {
+  const overlaps = await page.evaluate((positions) => {
     const obstacles = window.__parity?.obstacles ?? [];
-    const gates = [
-      [29, -14.5],
-      [37.2, 13.4],
-    ];
+    const gates = positions;
     const GATE_HALF_WIDTH = 1.6;
     return gates.flatMap(([gx, gz]) =>
       obstacles.filter((o) => {
@@ -104,6 +158,6 @@ test('gates stand on free ground: no tree, rock or prop overlaps a gate', async 
         return !ownCircle && d < o.radius + GATE_HALF_WIDTH;
       }),
     );
-  });
+  }, GATE_POSITIONS);
   expect(overlaps).toEqual([]);
 });

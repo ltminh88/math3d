@@ -2,7 +2,7 @@
 // refreshed from progress (every 2nd world frame, cheap: DOM and materials change only when a
 // gate's status changes). Using a gate either explains why it is closed, says "Sắp ra mắt" when
 // its level is not shipped yet, or enters the level through the level host.
-import { LEVEL_GATES, type LevelGate } from '../../config/regions';
+import { LEVEL_GATES, type LevelGate } from '../../config/level-gate-config';
 import { BRIDGE_SEGMENTS } from '../../config/world-constants';
 import { tc } from '../../i18n/common-strings';
 import { gameState } from '../../ui/game-state';
@@ -14,7 +14,7 @@ import type { WorldPublicApi } from '../../world/world-public-api';
 import { buildLevelGate, type LevelGateView } from './level-gate-builder';
 import { LevelHost } from './level-host';
 import { createLevelHostPorts } from './level-host-ports';
-import { tl } from './level-host-strings';
+import { gateNameOf, tl } from './level-host-strings';
 import { type GateStatus, gateStatus, progressionState } from './level-progression';
 import { levelDefinition } from './level-registry';
 import './level-host.css';
@@ -32,14 +32,25 @@ interface GateEntry {
 const gates: GateEntry[] = [];
 let host: LevelHost | undefined;
 
-export const gateName = (gate: LevelGate): string =>
-  gate.levelId === 'field' ? tl('gateField') : tl('gateForest');
+type Requirement = Exclude<LevelGate['requires'], null | 'bridge'>;
+
+/** Locked label line and toast for a gate that waits on a completed level. */
+const LEVEL_LOCK_KEYS = {
+  field: ['lockReasonField', 'lockedField'],
+  forest: ['lockReasonForest', 'lockedForest'],
+  city: ['lockReasonCity', 'lockedCity'],
+} as const satisfies Record<Requirement, readonly Parameters<typeof tl>[0][]>;
+
+export const gateName = (gate: LevelGate): string => gateNameOf(gate.levelId);
 
 const starsText = (stars: number): string => '★'.repeat(stars) + '☆'.repeat(3 - stars);
 
-/** Why a locked gate is closed (field: the bridge quest, forest: the field level). */
-const lockReason = (levelId: string): string =>
-  levelId === 'field' ? tl('lockReasonBridge') : tl('lockReasonField');
+/** Why a locked gate is closed: the bridge quest, or the level its gate requires. */
+function lockReason(levelId: string): string {
+  const requires = LEVEL_GATES.find((g) => g.levelId === levelId)?.requires;
+  if (!requires || requires === 'bridge') return tl('lockReasonBridge');
+  return tl(LEVEL_LOCK_KEYS[requires][0]);
+}
 
 /** Short state line for the gate label and the map detail. */
 export function gateStateText(levelId: string, status: GateStatus): string {
@@ -79,7 +90,7 @@ async function enterGate(gate: LevelGate): Promise<void> {
 }
 
 function lockedToast(gate: LevelGate): string {
-  if (gate.requires === 'field') return tl('lockedField');
+  if (gate.requires && gate.requires !== 'bridge') return tl(LEVEL_LOCK_KEYS[gate.requires][1]);
   return gameState.progress.bridge === BRIDGE_SEGMENTS
     ? tl('lockedBridgeCross')
     : tl('lockedBridge', { guide: tc('guideName') });

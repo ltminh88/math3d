@@ -21,7 +21,17 @@ describe('quest chain stage', () => {
     expect(questStage(progressionState(true, done('field')))).toBe('forest');
   });
 
-  it('ends on the closing card once the forest is completed', () => {
-    expect(questStage(progressionState(true, done('field', 'forest')))).toBe('done');
+  it('points at the city gate once the forest is completed', () => {
+    expect(questStage(progressionState(true, done('field', 'forest')))).toBe('city');
+  });
+
+  it('points at the tower gate once the city is completed', () => {
+    expect(questStage(progressionState(true, done('field', 'forest', 'city')))).toBe('tower');
+  });
+
+  it('ends on the closing card once the tower is completed', () => {
+    expect(questStage(progressionState(true, done('field', 'forest', 'city', 'tower')))).toBe(
+      'done',
+    );
   });
 });

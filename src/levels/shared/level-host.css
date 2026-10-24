@@ -34,26 +34,6 @@
   filter: grayscale(0.6);
 }
 
-.region-label .coming-soon {
-  grid-column: 2;
-  justify-self: start;
-}
-
-.world-label .coming-soon,
-.map-region .coming-soon,
-.map-detail .coming-soon {
-  display: inline-block;
-  margin: 2px 0 0;
-  padding: 1px 7px;
-  border-radius: 999px;
-  background: #fff1c2;
-  color: #6b4a1c;
-  font-size: 0.68rem;
-  font-weight: 800;
-  font-style: normal;
-  letter-spacing: 0.02em;
-}
-
 .map-gate {
   font-weight: 700;
 }
