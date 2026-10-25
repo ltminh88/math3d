@@ -5,6 +5,7 @@ import { mapSaveV1ToProgress } from './legacy-save-import';
 import type { GameSnapshot } from './progress-repository';
 import {
   crc32Hex,
+  type DecodedSaveCode,
   decodeSaveCode,
   encodeSaveCode,
   MAX_SAVE_CODE_CHARS,
@@ -12,6 +13,13 @@ import {
 } from './save-code-codec';
 import { newProfile } from './save-schema';
 import { snapshotToSaveV1 } from './store-to-save-v1';
+
+/** These cases cover M3D1 codes; a v2 result here is a test failure. */
+function decodeV1(code: string): Extract<DecodedSaveCode, { version: 1 }> {
+  const decoded = decodeSaveCode(code);
+  if (decoded.version !== 1) throw new Error('expected an M3D1 code');
+  return decoded;
+}
 
 const AT = Date.UTC(2026, 9, 20, 8, 30, 15);
 
@@ -74,7 +82,7 @@ describe('save code codec', () => {
     expect(code).toMatch(/^M3D1-[A-Za-z0-9_-]+-[0-9a-f]{8}$/);
     expect(code.length).toBeLessThan(2048);
 
-    const decoded = decodeSaveCode(code);
+    const decoded = decodeV1(code);
     expect(decoded.save).toEqual(save);
     const records = mapSaveV1ToProgress(decoded.save, AT, decoded.boxes);
     expect(records.wallet).toEqual({ xp: 1230, coins: 415 });
@@ -95,7 +103,7 @@ describe('save code codec', () => {
   it('accepts whitespace and line breaks pasted into the code', () => {
     const code = encodeSaveCode(defaultSave(), {});
     const spaced = ` ${code.slice(0, 10)}\n${code.slice(10)} `;
-    expect(decodeSaveCode(spaced).save).toEqual(defaultSave());
+    expect(decodeV1(spaced).save).toEqual(defaultSave());
   });
 
   it('a full 90-fact save still fits a chat message', () => {
@@ -111,7 +119,7 @@ describe('save code codec', () => {
         };
     const code = encodeSaveCode({ ...save, xp: 9999999, coins: 9999999 }, {});
     expect(code.length).toBeLessThan(MAX_SAVE_CODE_CHARS);
-    expect(Object.keys(decodeSaveCode(code).save.questionStats)).toHaveLength(90);
+    expect(Object.keys(decodeV1(code).save.questionStats)).toHaveLength(90);
   });
 
   it('rejects typos, truncation, wrong prefix, bad checksum and oversize with a reason', () => {
@@ -121,25 +129,25 @@ describe('save code codec', () => {
     );
     const mid = code.indexOf('-') + 8;
     const typo = code.slice(0, mid) + (code[mid] === 'A' ? 'B' : 'A') + code.slice(mid + 1);
-    expect(errorReason(() => decodeSaveCode(typo))).toBe('checksum');
-    expect(errorReason(() => decodeSaveCode(code.slice(0, -3)))).toBe('format');
+    expect(errorReason(() => decodeV1(typo))).toBe('checksum');
+    expect(errorReason(() => decodeV1(code.slice(0, -3)))).toBe('format');
     expect(['format', 'checksum']).toContain(
-      errorReason(() => decodeSaveCode(code.slice(0, code.length - 20))),
+      errorReason(() => decodeV1(code.slice(0, code.length - 20))),
     );
-    expect(errorReason(() => decodeSaveCode(`X${code.slice(1)}`))).toBe('prefix');
-    expect(errorReason(() => decodeSaveCode(code.replace('M3D1-', 'M3D2-')))).toBe('version');
-    expect(errorReason(() => decodeSaveCode(`${code.slice(0, -8)}00000000`))).toBe('checksum');
-    expect(
-      errorReason(() => decodeSaveCode(`M3D1-${'A'.repeat(MAX_SAVE_CODE_CHARS)}-00000000`)),
-    ).toBe('too-long');
-    expect(errorReason(() => decodeSaveCode(''))).toBe('format');
+    expect(errorReason(() => decodeV1(`X${code.slice(1)}`))).toBe('prefix');
+    expect(errorReason(() => decodeV1(code.replace('M3D1-', 'M3D3-')))).toBe('version');
+    expect(errorReason(() => decodeV1(`${code.slice(0, -8)}00000000`))).toBe('checksum');
+    expect(errorReason(() => decodeV1(`M3D1-${'A'.repeat(MAX_SAVE_CODE_CHARS)}-00000000`))).toBe(
+      'too-long',
+    );
+    expect(errorReason(() => decodeV1(''))).toBe('format');
   });
 
   it('rejects a well-checksummed payload that is not a save', () => {
     for (const json of ['[1]', '{"x":"lots"}', '{"f":[[2,3,"x"]]}', 'not json']) {
       const payload = b64url(json);
       expect(
-        errorReason(() => decodeSaveCode(`M3D1-${payload}-${crc32Hex(payload)}`)),
+        errorReason(() => decodeV1(`M3D1-${payload}-${crc32Hex(payload)}`)),
         json,
       ).toBe('payload');
     }
@@ -148,7 +156,7 @@ describe('save code codec', () => {
   it('clamps forged values through the v1 validator', () => {
     const json = JSON.stringify({ x: -5, c: 1e12, b: 99, t: 13, f: [[7, 8, 2, 1, 50, 0, 9]] });
     const payload = b64url(json);
-    const { save, boxes } = decodeSaveCode(`M3D1-${payload}-${crc32Hex(payload)}`);
+    const { save, boxes } = decodeV1(`M3D1-${payload}-${crc32Hex(payload)}`);
     expect(save).toMatchObject({ xp: 0, coins: 10000000, bridge: 6, table: 0 });
     expect(save.questionStats.m7_8).toMatchObject({ correct: 2, wrong: 1, attempts: 3 });
     expect(boxes).toEqual({});
@@ -159,11 +167,9 @@ describe('decodeSaveCode outside the Date range', () => {
   it('a well-checksummed fact time no Date can hold is a payload error, not a RangeError', () => {
     for (const seenSec of [8.64e12 + 1, 1e15]) {
       const payload = b64url(JSON.stringify({ f: [[7, 8, 2, 1, 50, seenSec]] }));
-      expect(errorReason(() => decodeSaveCode(`M3D1-${payload}-${crc32Hex(payload)}`))).toBe(
-        'payload',
-      );
+      expect(errorReason(() => decodeV1(`M3D1-${payload}-${crc32Hex(payload)}`))).toBe('payload');
     }
     const edge = b64url(JSON.stringify({ f: [[7, 8, 2, 1, 50, 8.64e12]] }));
-    expect(decodeSaveCode(`M3D1-${edge}-${crc32Hex(edge)}`).save.questionStats.m7_8).toBeDefined();
+    expect(decodeV1(`M3D1-${edge}-${crc32Hex(edge)}`).save.questionStats.m7_8).toBeDefined();
   });
 });

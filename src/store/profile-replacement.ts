@@ -9,6 +9,7 @@ import {
   META_ACTIVE_PROFILE,
   META_LEGACY_IMPORT,
   metaGameKey,
+  metaSessionCountKey,
   newProfile,
   type Profile,
 } from './save-schema';
@@ -20,6 +21,10 @@ export interface ProgressRecords {
   levels: Record<string, Omit<LevelProgress, 'profileId' | 'levelId'>>;
   facts: Record<FactKey, FactStat>;
   gameMeta: GameMeta;
+  /** Shop items owned and worn (save code M3D2); absent = none. */
+  cosmetics?: { owned: string[]; equipped: Record<string, string> };
+  /** Committed session counter (keeps `lastSeenSession` spacing meaningful); absent = 0. */
+  sessionCount?: number;
 }
 
 export const emptyProgressRecords = (): ProgressRecords => ({
@@ -53,7 +58,9 @@ export async function writeReplacementProfile(
   now: number,
   options: ReplaceOptions = {},
 ): Promise<Profile> {
-  const profile: Profile = { ...newProfile(profileId, 'guest'), avatarId: records.avatarId };
+  const base = newProfile(profileId, 'guest');
+  const equipped = { ...(records.cosmetics?.equipped ?? {}) };
+  const profile: Profile = { ...base, avatarId: records.avatarId, settings: { equipped } };
   await tx.objectStore('profiles').put(profile);
   await tx.objectStore('wallet').put({ profileId, ...records.wallet });
   for (const [levelId, level] of Object.entries(records.levels)) {
@@ -64,8 +71,13 @@ export async function writeReplacementProfile(
   for (const [key, stat] of Object.entries(records.facts)) {
     await tx.objectStore('factStats').put({ ...stat, profileId, key });
   }
+  for (const cosmeticId of records.cosmetics?.owned ?? []) {
+    await tx.objectStore('ownedCosmetics').put({ profileId, cosmeticId, acquiredAt: now });
+  }
   const meta = tx.objectStore('meta');
   await meta.put({ key: metaGameKey(profileId), value: { ...records.gameMeta } });
+  if (records.sessionCount)
+    await meta.put({ key: metaSessionCountKey(profileId), value: records.sessionCount });
   await meta.put({ key: META_ACTIVE_PROFILE, value: profileId });
   // Any replacement supersedes the legacy save: a later import retry must never overwrite it.
   if (options.legacyImport || !(await hasLegacyImportMarker(tx))) {

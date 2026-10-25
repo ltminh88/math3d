@@ -1,17 +1,27 @@
 // Save codes: progress as text a child or parent can paste on another device or domain.
-//   M3D1-<base64url(compact JSON)>-<CRC32 of the base64url payload, 8 hex>
-// The version digit allows M3D2 later; the checksum catches typos and truncation. A code is
-// progress, not a credential: it holds no secret, and a decoded code passes the same v1 save
-// validator as the localStorage blob (clamped numbers, regex fact keys).
+//   M3D<version>-<base64url(compact JSON)>-<CRC32 of the base64url payload, 8 hex>
+// M3D1 (old): the legacy v1 save (xp, coins, bridge, meta, x facts + Leitner boxes); still
+// decoded exactly as before. M3D2 (written now): the whole store snapshot, incl. levels and
+// cosmetics (save-code-v2-payload.ts). The checksum catches typos and truncation. A code is
+// progress, not a credential: it holds no secret, and every decoded field is validated.
 import { mulKey } from '../learning/fact-key';
 import { decodeSaveV1 } from '../save/save-storage';
 import type { SaveV1 } from '../save/save-types';
+import { mapSaveV1ToProgress } from './legacy-save-import';
+import type { GameSnapshot } from './progress-repository';
 import { compactToSaveV1Json, saveV1ToCompact } from './save-code-compact-json';
+import {
+  compactV2ToImport,
+  type SaveCodeAudio,
+  type SaveCodeImport,
+  snapshotToCompactV2,
+} from './save-code-v2-payload';
 
-export const SAVE_CODE_VERSION = 1;
+/** Version written by export. */
+export const SAVE_CODE_VERSION = 2;
 const PREFIX = 'M3D';
-/** Refuse anything longer before decoding (a full 90-fact save is ~3 KB). */
-export const MAX_SAVE_CODE_CHARS = 4096;
+/** Refuse anything longer before decoding (a full save, every fact and item, is ~11 KB). */
+export const MAX_SAVE_CODE_CHARS = 16384;
 const CODE_PATTERN = /^M3D(\d+)-([A-Za-z0-9_-]+)-([0-9a-f]{8})$/;
 
 export type SaveCodeErrorReason =
@@ -29,11 +39,14 @@ export class SaveCodeError extends Error {
   }
 }
 
-export interface DecodedSaveCode {
-  save: SaveV1;
-  /** Leitner box per fact key carried by the code (absent for facts without one). */
-  boxes: Record<string, number>;
-}
+export type DecodedSaveCode =
+  | {
+      version: 1;
+      save: SaveV1;
+      /** Leitner box per fact key carried by the code (absent for facts without one). */
+      boxes: Record<string, number>;
+    }
+  | { version: 2; data: SaveCodeImport };
 
 const CRC_TABLE = Array.from({ length: 256 }, (_, n) => {
   let c = n;
@@ -55,10 +68,28 @@ const toBase64Url = (ascii: string): string =>
 const fromBase64Url = (payload: string): string =>
   atob(payload.replace(/-/g, '+').replace(/_/g, '/'));
 
-/** Encodes a v1 save (plus optional Leitner boxes per fact key). */
+function frame(version: number, compact: unknown): string {
+  const payload = toBase64Url(JSON.stringify(compact));
+  return `${PREFIX}${version}-${payload}-${crc32Hex(payload)}`;
+}
+
+/** Encodes an old-format M3D1 code (v1 save plus optional Leitner boxes per fact key). */
 export function encodeSaveCode(save: SaveV1, boxes: Readonly<Record<string, number>>): string {
-  const payload = toBase64Url(JSON.stringify(saveV1ToCompact(save, boxes)));
-  return `${PREFIX}${SAVE_CODE_VERSION}-${payload}-${crc32Hex(payload)}`;
+  return frame(1, saveV1ToCompact(save, boxes));
+}
+
+/** Encodes the current M3D2 code: the whole progress snapshot plus audio settings. */
+export const encodeSaveCodeV2 = (snapshot: GameSnapshot, audio: SaveCodeAudio): string =>
+  frame(2, snapshotToCompactV2(snapshot, audio));
+
+/** Store records + audio settings to import for a decoded code of either version. */
+export function importOfDecodedSaveCode(decoded: DecodedSaveCode, now: number): SaveCodeImport {
+  if (decoded.version === 2) return decoded.data;
+  const { save, boxes } = decoded;
+  return {
+    records: mapSaveV1ToProgress(save, now, boxes),
+    audio: { sound: save.sound, music: save.music },
+  };
 }
 
 /** Decodes a pasted code (whitespace ignored). Throws SaveCodeError; never returns partial data. */
@@ -70,13 +101,18 @@ export function decodeSaveCode(input: string): DecodedSaveCode {
   const match = CODE_PATTERN.exec(code);
   if (!match) throw new SaveCodeError('format');
   const [, version, payload = '', crc] = match;
-  if (Number(version) !== SAVE_CODE_VERSION) throw new SaveCodeError('version');
+  if (version !== '1' && version !== '2') throw new SaveCodeError('version');
   if (crc32Hex(payload) !== crc) throw new SaveCodeError('checksum');
   let compact: unknown;
   try {
     compact = JSON.parse(fromBase64Url(payload));
   } catch {
     throw new SaveCodeError('payload');
+  }
+  if (version === '2') {
+    const data = compactV2ToImport(compact);
+    if (!data) throw new SaveCodeError('payload');
+    return { version: 2, data };
   }
   const expanded = compactToSaveV1Json(compact);
   const save = expanded && decodeSaveV1(JSON.stringify(expanded.v1), { cap: false });
@@ -86,5 +122,5 @@ export function decodeSaveCode(input: string): DecodedSaveCode {
     const [a, b] = id.slice(1).split('_').map(Number) as [number, number];
     if (save.questionStats[id]) boxes[mulKey(a, b)] = box;
   }
-  return { save, boxes };
+  return { version: 1, save, boxes };
 }
