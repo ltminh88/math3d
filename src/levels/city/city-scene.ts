@@ -53,21 +53,18 @@ function start(ctx: LevelContext): LevelSession {
   let doneCard: HTMLElement | undefined;
 
   const frame = (): void => {
-    const box = panel.panel.getBoundingClientRect();
     const canvas = ctx.canvas.getBoundingClientRect();
-    const wide =
-      !panel.panel.hidden && box.width < canvas.width * 0.6 && box.top < canvas.top + 120;
-    // The celebration card sits at the bottom, below the lit building.
-    const cardTop = doneCard?.getBoundingClientRect().top;
+    // What covers the canvas: VLM's line on top, and the panel (or the celebration card) on the
+    // right when it stands there (wide, short landscape) or along the bottom (portrait).
+    const cover = doneCard ?? (panel.panel.hidden ? undefined : panel.panel);
+    const box = cover?.getBoundingClientRect();
+    const right = !!box && box.left > canvas.left + canvas.width * 0.4;
+    const guide = panel.guide.getBoundingClientRect();
     view.setArea({
       ...size,
-      coverRight: wide ? canvas.right - box.left + 8 : 0,
-      coverBottom:
-        cardTop !== undefined
-          ? canvas.bottom - cardTop + 8
-          : !panel.panel.hidden && !wide
-            ? canvas.bottom - box.top + 8
-            : 0,
+      coverTop: guide.height > 0 ? Math.max(0, guide.bottom - canvas.top + 6) : 0,
+      coverRight: box && right ? canvas.right - box.left + 8 : 0,
+      coverBottom: box && !right ? canvas.bottom - box.top + 8 : 0,
     });
     labels.place(view.camera);
   };
