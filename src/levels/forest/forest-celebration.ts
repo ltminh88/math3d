@@ -8,6 +8,8 @@ export function showForestCelebration(
   ts: ForestStrings,
   earned: { xp: number; coins: number },
   onBack: () => void,
+  /** First clear: the one-time bonus the host adds on commit (QA m-12), else null. */
+  bonus: { xp: number; coins: number } | null = null,
 ): HTMLElement {
   const card = document.createElement('section');
   card.className = 'forest-done glass';
@@ -21,6 +23,12 @@ export function showForestCelebration(
     `${tc('guideName')}:`;
   (card.querySelector('.forest-done__line span') as HTMLElement).textContent = ts('doneLine');
   (card.querySelector('.completion-rewards') as HTMLElement).textContent = ts('doneScore', earned);
+  if (bonus) {
+    const line = document.createElement('p');
+    line.className = 'completion-rewards forest-bonus';
+    line.textContent = ts('bonusLine', bonus);
+    card.querySelector('.completion-rewards')?.after(line);
+  }
   const back = card.querySelector('.forest-back') as HTMLButtonElement;
   back.textContent = ts('backToGate');
   back.addEventListener('click', onBack, { once: true });

@@ -157,6 +157,10 @@ test('the city level plays five rounds and records facts of tables 6-9', async (
   expect(played.map((r) => r.kind)).toContain('deliver');
   await expect(page.locator('.city-done')).toBeVisible();
   await expect(page.locator('.city-done')).toContainText('VLM');
+  // First clear: the one-time bonus is shown with the round rewards (QA m-12).
+  await expect(page.locator('.city-done .city-bonus')).toHaveText(
+    'Thưởng lần đầu hoàn thành: +50 XP · +10 xu',
+  );
   const shownStars = Number(await page.locator('.city-stars').getAttribute('data-stars'));
   const layer = await page
     .locator('.level-layer')

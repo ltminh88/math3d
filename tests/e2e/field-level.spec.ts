@@ -121,6 +121,10 @@ async function playFiveRounds(page: Page, touch: boolean): Promise<void> {
   }
   await waitPhase(page, 'done');
   await expect(page.locator('.field-panel--done .field-stars')).toBeVisible();
+  // First clear: the one-time bonus is shown (QA m-12).
+  await expect(page.locator('.field-bonus')).toHaveText(
+    'Thưởng lần đầu hoàn thành: +50 XP · +10 xu',
+  );
 }
 
 test('the field level is played to the end and opens the way to the forest', async ({

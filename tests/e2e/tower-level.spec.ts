@@ -142,6 +142,10 @@ test('the tower climbs seven floors and records × and : facts', async ({ page }
   await expect(done).toBeVisible();
   await expect(done).toContainText('Bạn đã lên tới đỉnh tháp!');
   await expect(done).toContainText('VLM');
+  // First clear: the one-time bonus is shown with the floor rewards (QA m-12).
+  await expect(done.locator('.tower-bonus')).toHaveText(
+    'Thưởng lần đầu hoàn thành: +50 XP · +10 xu',
+  );
   expect((await towerState(page)).cameraFloor).toBe(FLOORS);
   const maxCalls = Number(await page.locator('.level-layer').getAttribute('data-max-draw-calls'));
   expect(maxCalls).toBeGreaterThan(0);

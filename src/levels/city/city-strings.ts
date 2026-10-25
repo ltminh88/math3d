@@ -49,6 +49,7 @@ const define = (defineFn: typeof defineStrings) =>
       doneTitle: 'Thành phố sáng đèn rồi!',
       doneLine: 'Gói hàng nào cũng đến đúng nhà. Cảm ơn bạn đã giúp bác đưa thư!',
       doneScore: '+{xp} XP · +{coins} xu',
+      bonusLine: 'Thưởng lần đầu hoàn thành: +{xp} XP · +{coins} xu',
       stars: '{n}/3 sao',
       backToGate: 'Về cổng',
       keysHelp: 'Mũi tên chọn gói hàng hoặc tầng, Enter để đặt. Phím 1–4 chọn nhà, H xem gợi ý.',
@@ -98,6 +99,7 @@ const define = (defineFn: typeof defineStrings) =>
       doneTitle: 'The city lights are on!',
       doneLine: 'Every parcel reached the right house. Thank you for helping the postman!',
       doneScore: '+{xp} XP · +{coins} coins',
+      bonusLine: 'First-clear bonus: +{xp} XP · +{coins} coins',
       stars: '{n}/3 stars',
       backToGate: 'Back to the gate',
       keysHelp:

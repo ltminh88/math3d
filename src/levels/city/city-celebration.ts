@@ -10,6 +10,8 @@ export function showCityCelebration(
   earned: { xp: number; coins: number },
   stars: number,
   onBack: () => void,
+  /** First clear: the one-time bonus the host adds on commit (QA m-12), else null. */
+  bonus: { xp: number; coins: number } | null = null,
 ): HTMLElement {
   const card = document.createElement('section');
   card.className = 'city-done glass';
@@ -28,6 +30,12 @@ export function showCityCelebration(
     `${tc('guideName')}:`;
   (card.querySelector('.city-done__line span') as HTMLElement).textContent = ts('doneLine');
   (card.querySelector('.completion-rewards') as HTMLElement).textContent = ts('doneScore', earned);
+  if (bonus) {
+    const line = document.createElement('p');
+    line.className = 'completion-rewards city-bonus';
+    line.textContent = ts('bonusLine', bonus);
+    card.querySelector('.completion-rewards')?.after(line);
+  }
   const back = card.querySelector('.city-back') as HTMLButtonElement;
   back.textContent = ts('backToGate');
   back.addEventListener('click', onBack, { once: true });

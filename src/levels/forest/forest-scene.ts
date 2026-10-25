@@ -2,6 +2,7 @@
 // shared input facade (drag + tap-select + keyboard) and the number pad to the round controller.
 import { Scene } from 'three';
 import type { InteractionEvent } from '../../core/input/interaction-types';
+import { LEVEL_COMPLETE_BONUS } from '../shared/level-run-result';
 import type { LevelContext, LevelModule, LevelSession } from '../shared/level-types';
 import { createAnimalMaterial } from './animal-friend-factory';
 import { FactFamilyCard } from './fact-family-card';
@@ -86,7 +87,8 @@ function start(ctx: LevelContext): LevelSession {
       table.celebrate();
       ctx.audio.celebrate();
       ctx.announce(ts('doneTitle'));
-      showForestCelebration(ctx.ui, ts, earned, () => ctx.exit({ completed: true }));
+      const bonus = ctx.firstCompletion ? LEVEL_COMPLETE_BONUS : null;
+      showForestCelebration(ctx.ui, ts, earned, () => ctx.exit({ completed: true }), bonus);
       frame();
     },
   });

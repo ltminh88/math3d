@@ -2,6 +2,7 @@
 // wires the shared input facade and the panel to the round controller, and ends with the
 // celebration ("Về cổng" exits as completed after every round was recorded).
 import { Scene } from 'three';
+import { LEVEL_COMPLETE_BONUS } from '../shared/level-run-result';
 import type { LevelContext, LevelModule, LevelSession } from '../shared/level-types';
 import { CityBuildingView } from './city-building-view';
 import { buildingFrame, CityCamera, STREET_FRAME } from './city-camera';
@@ -91,9 +92,9 @@ function start(ctx: LevelContext): LevelSession {
       view.setFrame(buildingFrame(building.width, building.height));
       ctx.audio.celebrate();
       ctx.announce(ts('doneTitle'));
-      doneCard = showCityCelebration(ctx.ui, ts, earned, stars, () =>
-        ctx.exit({ completed: true }),
-      );
+      const bonus = ctx.firstCompletion ? LEVEL_COMPLETE_BONUS : null;
+      const exit = () => ctx.exit({ completed: true });
+      doneCard = showCityCelebration(ctx.ui, ts, earned, stars, exit, bonus);
       frame();
     },
   });
