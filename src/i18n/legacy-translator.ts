@@ -7,6 +7,7 @@
 // Va=getLegacyLanguage, rg=setLegacyLanguage, Cn=translateText, Ln=translateLongText,
 // Wa=translateDomTree, jl=LEGACY_TRANSLATIONS_EN.
 import { appSettings } from '../store/app-settings';
+import { applyEnglishTermOverrides } from './english-term-overrides';
 import { LEGACY_TRANSLATIONS_EN } from './legacy-translations-en';
 
 export type LegacyLanguage = 'vi' | 'en';
@@ -48,7 +49,7 @@ export function setLegacyLanguage(language: LegacyLanguage): void {
 /** Whole-string lookup; unknown text is returned unchanged. */
 export function translateText(text: string): string {
   if (currentLanguage === 'vi') return text;
-  return LEGACY_TRANSLATIONS_EN[text] ?? text;
+  return applyEnglishTermOverrides(LEGACY_TRANSLATIONS_EN[text] ?? text);
 }
 
 /** Substring replacement (longest key first) plus hint-sentence patterns, for HTML/long text. */
@@ -56,7 +57,7 @@ export function translateLongText(text: string): string {
   if (currentLanguage === 'vi') return text;
   let out = ENTRIES_LONGEST_FIRST.reduce((acc, [vi, en]) => acc.split(vi).join(en), text);
   for (const [pattern, replacement] of SENTENCE_RULES) out = out.replace(pattern, replacement);
-  return out;
+  return applyEnglishTermOverrides(out);
 }
 
 /** Translates text nodes (exact match) and aria-label/title attributes. Never sets innerHTML. */

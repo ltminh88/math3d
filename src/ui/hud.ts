@@ -3,7 +3,7 @@
 import { isRegionUnlocked } from '../config/regions';
 import { BRIDGE_SEGMENTS, LEVEL_XP_THRESHOLDS } from '../config/world-constants';
 import { levelForXp } from '../game/xp-levels';
-import { translateDomTree, translateLongText } from '../i18n/legacy-translator';
+import { translateDomTree, translateLongText, translateText } from '../i18n/legacy-translator';
 import { initShop } from '../shop/shop-init';
 import { openShop } from '../shop/shop-panel';
 import { tshop } from '../shop/shop-strings';
@@ -67,7 +67,7 @@ export function refreshHud(): void {
   }
   const { sound } = appSettings.get();
   setMarkup('sound', icon(sound ? 'sound' : 'mute'));
-  byId('sound').setAttribute('aria-label', sound ? 'Tắt âm thanh' : 'Bật âm thanh');
+  byId('sound').setAttribute('aria-label', translateText(sound ? 'Tắt âm thanh' : 'Bật âm thanh'));
   gameState.audio.enabled = sound;
   ensureShopButton();
   initShop();

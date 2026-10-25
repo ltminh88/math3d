@@ -48,7 +48,7 @@ export const tq = defineStrings('questChain', {
     eyebrowNext: 'NEXT QUEST',
     eyebrowDone: 'WELL DONE',
     titleField: 'Math Meadow',
-    titleForest: 'Multiplication Forest',
+    titleForest: 'Sharing Forest',
     titleCity: 'Number City',
     titleTower: 'Math Tower',
     titleDone: 'You finished all five stages!',
