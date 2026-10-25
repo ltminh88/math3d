@@ -131,10 +131,19 @@ the head tooling and requires them to be equal. PR label `parity-change` skips i
   nothing and write no marker (retried next boot).
 - Settings: one source, `math3d.settings` (`src/store/app-settings.ts`); until it is first
   written, language / quest card / sound / music come from the legacy keys.
-- Save codes (`save-code-codec.ts`): `M3D1-` + base64url(compact JSON: short keys, defaults
-  omitted, facts as `[a, b, correct, wrong, responseMs, lastAnsweredSec, box?]`) + `-` + CRC32
-  (8 hex) of the payload; max 4096 chars; decoded through the same v1 validator. Import: start
-  screen "Nhập mã lưu"; export: settings "Xuất mã lưu".
+- Save codes (`save-code-codec.ts`): `M3D<v>-` + base64url(compact JSON) + `-` + CRC32 (8 hex)
+  of the payload; max 16384 chars. Export writes **M3D2** (`save-code-v2-payload.ts`): the whole
+  store snapshot — `x` xp, `c` coins, `a` avatar, `g` [table, combo, started], `s` [sound, music],
+  `n` session count, `l` {levelId: [stars, bestScore, completedSec, progress, acceptedSec]} for
+  bridge/field/forest/city/tower, `o` owned cosmetic ids, `e` {slot: equipped id}, `f` fact tuples
+  `[key, attempts, correct, totalMs, box, lastSeenSession, lastSeenSec, streak?, fluent?, errs?]`
+  (key without op prefix: `3x7`, `21/3`). Decoding is strict (unknown key, wrong type,
+  out-of-range number, id not `^[a-z0-9-]{1,40}$`, unknown level, duplicate fact -> `payload`).
+  A full save (126 facts, 5 levels, 12 items) is ~9 KB, a typical one ~4.5 KB. **M3D1** (old,
+  still imported exactly as before): the v1 save (`[a, b, correct, wrong, responseMs,
+  lastAnsweredSec, box?]` facts, bridge only, no levels or cosmetics) through the v1 validator.
+  Both import through `store.replaceProgress` (one transaction, new active profile). Import:
+  start screen "Nhập mã lưu"; export: settings "Xuất mã lưu".
 - Quiz: facts from the Leitner session planner over the chosen table, options from the
   distractor classes (practice) or expression choice (bridge); rewards stay the original
   (`src/quiz/quiz-rewards.ts`, asserted against the original bundle).

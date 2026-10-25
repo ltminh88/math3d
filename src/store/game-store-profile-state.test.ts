@@ -89,6 +89,29 @@ describe.each(backends)('profile state on %s', (_label, open) => {
     store.close();
   });
 
+  it('replaceProgress restores owned and equipped cosmetics and the session counter', async () => {
+    const store = await open();
+    await store.replaceProgress({
+      ...imported(),
+      levels: {
+        ...imported().levels,
+        tower: { stars: 2, bestScore: 9, completedAt: 6, progress: 0, acceptedAt: 6 },
+      },
+      cosmetics: {
+        owned: ['avatar-gold-crown', 'decor-fountain'],
+        equipped: { 'avatar-outfit': 'avatar-gold-crown' },
+      },
+      sessionCount: 12,
+    });
+    const snap = store.getSnapshot();
+    expect([...snap.ownedCosmetics].sort()).toEqual(['avatar-gold-crown', 'decor-fountain']);
+    expect(snap.profile.settings.equipped).toEqual({ 'avatar-outfit': 'avatar-gold-crown' });
+    expect(snap.sessionCount).toBe(12);
+    expect(snap.levelProgress.tower).toMatchObject({ stars: 2, completedAt: 6 });
+    expect(store.nextSessionNo()).toBe(13);
+    store.close();
+  });
+
   it('a legacy import happens once (marker written in the same transaction)', async () => {
     const store = await open();
     expect(await store.replaceProgress(imported(), { legacyImport: true })).toBe('replaced');

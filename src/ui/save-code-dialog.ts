@@ -1,16 +1,16 @@
 // Save codes in the UI: "Nhập mã lưu" on the start screen (paste -> confirm overwrite when there
-// is progress -> import) and "Xuất mã lưu" in settings (code + copy button). A bad code never
-// touches the store; the error is shown in the dialog.
+// is progress -> import) and "Xuất mã lưu" in settings (code + copy button). Export writes M3D2
+// (levels and cosmetics included); import also takes old M3D1 codes. A bad code never touches
+// the store; the error is shown in the dialog.
 import '../styles/save-code-dialog.css';
 import { appSettings } from '../store/app-settings';
-import { mapSaveV1ToProgress } from '../store/legacy-save-import';
 import {
   type DecodedSaveCode,
   decodeSaveCode,
-  encodeSaveCode,
+  encodeSaveCodeV2,
+  importOfDecodedSaveCode,
   SaveCodeError,
 } from '../store/save-code-codec';
-import { snapshotToSaveV1 } from '../store/store-to-save-v1';
 import { closeDialog, openDialog } from './dialog';
 import { gameState } from './game-state';
 import { byId, icon } from './icons';
@@ -39,14 +39,15 @@ function hasProgress(): boolean {
 }
 
 async function applyImport(decoded: DecodedSaveCode, draft: string): Promise<void> {
-  const records = mapSaveV1ToProgress(decoded.save, Date.now(), decoded.boxes);
+  // Through the store API (one transaction, new active profile), never localStorage.
+  const { records, audio } = importOfDecodedSaveCode(decoded, Date.now());
   if (!(await replaceAllProgress(records))) {
     openSaveCodeImport(draft);
     showError(ts('errorStore'));
     return;
   }
-  appSettings.update({ sound: decoded.save.sound, music: decoded.save.music });
-  gameState.audio.enabled = decoded.save.sound;
+  appSettings.update({ sound: audio.sound, music: audio.music });
+  gameState.audio.enabled = audio.sound;
   renderProgress();
   closeDialog();
   showToast(ts('imported'));
@@ -93,8 +94,8 @@ export async function openSaveCodeExport(): Promise<void> {
   await flushProgress();
   const store = connectedStore();
   if (!store) return;
-  const { save, boxes } = snapshotToSaveV1(store.getSnapshot(), appSettings.get());
-  const code = encodeSaveCode(save, boxes);
+  const { sound, music } = appSettings.get();
+  const code = encodeSaveCodeV2(store.getSnapshot(), { sound, music });
   openDialog(
     ts('exportTitle'),
     `<p class="dialog-copy">${ts('exportIntro')}</p><textarea id="save-code-output" class="save-code-input" readonly spellcheck="false" aria-label="${ts('codeLabel')}"></textarea><button id="save-code-copy" class="primary wide">${icon('save')} ${ts('copy')}</button><button id="save-code-back" class="text-button centered">${ts('back')}</button>`,

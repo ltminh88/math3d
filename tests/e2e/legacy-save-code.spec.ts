@@ -49,7 +49,7 @@ test('export -> fresh site data -> import round-trips', async ({ browser }) => {
   await page.locator('#settings').click();
   await page.locator('#export-save-code').click();
   const exported = await page.locator('#save-code-output').inputValue();
-  expect(exported).toMatch(/^M3D1-[A-Za-z0-9_-]+-[0-9a-f]{8}$/);
+  expect(exported).toMatch(/^M3D2-[A-Za-z0-9_-]+-[0-9a-f]{8}$/);
   await first.close();
 
   const fresh = await browser.newContext({ locale: 'vi-VN' });

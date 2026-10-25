@@ -3,6 +3,7 @@
 // then opens the store and hydrates progress (store-boot.ts). Without WebGL the loading card
 // turns into a "could not open the 3D world" notice.
 import { translateDomTree } from '../i18n/legacy-translator';
+import { translatePaddedTextNodes } from '../i18n/translate-padded-text-nodes';
 import { initLevelGates } from '../levels/shared/level-gates';
 import { World } from '../world/world';
 import type { WorldPublicApi } from '../world/world-public-api';
@@ -70,6 +71,7 @@ export function bootstrapGame(): Promise<void> {
   const app = byId('app');
   app.innerHTML = gameShellHtml();
   translateDomTree(app);
+  translatePaddedTextNodes(app);
   wireControls();
   startWorld();
   return bootStore();

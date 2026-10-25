@@ -101,7 +101,10 @@ function chainCopy(stage: Exclude<QuestStage, 'bridge'>): CardCopy {
   if (stage !== 'done') {
     const [title, copy, progress] = CHAIN_TEXT_KEYS[stage];
     const gate = gateNameOf(stage);
-    return { ...next, title: tq(title), copy: tq(copy, { gate }), progress: tq(progress) };
+    // Touch screens have no E key: name only the Enter button there (QA p-7).
+    const coarse = globalThis.matchMedia?.('(pointer: coarse)').matches ?? false;
+    const enter = tq(coarse ? 'enterTap' : 'enterKeyOrTap');
+    return { ...next, title: tq(title), copy: tq(copy, { gate, enter }), progress: tq(progress) };
   }
   return {
     eyebrow: tq('eyebrowDone'),

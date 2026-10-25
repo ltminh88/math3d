@@ -4,6 +4,7 @@
 // in the app settings store (shared with the legacy translator).
 import { appSettings } from '../store/app-settings';
 import type { SettingsStore } from '../store/settings-store';
+import { applyEnglishTermOverrides } from './english-term-overrides';
 
 export type Language = 'vi' | 'en';
 export const LANGUAGES: readonly Language[] = ['vi', 'en'];
@@ -60,7 +61,8 @@ export function t(fullKey: string, params?: Params): string {
     warnMissing(fullKey);
     return fullKey;
   }
-  return interpolate(text, params);
+  const shown = interpolate(text, params);
+  return current === 'en' ? applyEnglishTermOverrides(shown) : shown;
 }
 
 /** Stored setting > navigator language starting with "vi" > en for other known langs > vi. */

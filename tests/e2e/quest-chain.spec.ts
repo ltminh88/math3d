@@ -136,3 +136,18 @@ test('the field leads to the forest, city and tower gates, then the closing card
   await waitForStoreBoot(page);
   await expectCard(page, 'CHÚC MỪNG BẠN', 'Bạn đã qua cả năm chặng!', '✓ Hoàn thành');
 });
+
+test('the quest card names the E key only where there is a keyboard-like pointer', async ({
+  page,
+}) => {
+  await startPlaying(page);
+  await page.evaluate(() => window.__game?.seedProgress({ bridgeComplete: true }));
+  const coarse = await page.evaluate(() => matchMedia('(pointer: coarse)').matches);
+  const copy = page.locator('#quest-copy');
+  if (coarse) {
+    await expect(copy).toContainText('Phép Tính, rồi bấm nút Vào cổng nhé!');
+    await expect(copy).not.toContainText('nhấn E');
+  } else {
+    await expect(copy).toContainText('rồi nhấn E hoặc bấm nút Vào cổng nhé!');
+  }
+});

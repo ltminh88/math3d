@@ -1,6 +1,7 @@
 import { readFileSync } from 'node:fs';
 import { afterEach, describe, expect, it, vi } from 'vitest';
 import { applyProductRename } from '../config/load-golden-trace-for-tests';
+import { applyEnglishTermOverrides } from './english-term-overrides';
 
 type Corpus = { mapEntries: [string, string][]; entries: [string, string, string][] };
 
@@ -14,6 +15,11 @@ const corpus: Corpus = JSON.parse(
 // (math3d / VLM), so the table and translator equal the original ones modulo the rename.
 const rename = applyProductRename;
 const renamedEntries = corpus.entries.map((e) => e.map(rename) as [string, string, string]);
+// English outputs also pass through the documented English term overrides (QA m-9).
+const expectedEnEntries = renamedEntries.map(
+  ([input, cn, ln]) =>
+    [input, applyEnglishTermOverrides(cn), applyEnglishTermOverrides(ln)] as const,
+);
 
 function fakeStorage(initial: Record<string, string>) {
   const data = new Map(Object.entries(initial));
@@ -49,7 +55,7 @@ describe('legacy translator vs original golden corpus (after the math3d/VLM rena
     const t = await loadTranslator(fakeStorage({ aigame3d_language: 'en' }));
     expect(t.getLegacyLanguage()).toBe('en');
     expect(corpus.entries.length).toBeGreaterThan(1000);
-    const mismatches = renamedEntries.filter(
+    const mismatches = expectedEnEntries.filter(
       ([input, cn, ln]) => t.translateText(input) !== cn || t.translateLongText(input) !== ln,
     );
     expect(mismatches).toEqual([]);

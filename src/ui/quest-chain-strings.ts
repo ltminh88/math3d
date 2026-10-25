@@ -11,13 +11,15 @@ export const tq = defineStrings('questChain', {
     titleTower: 'Tháp Toán Học',
     titleDone: 'Bạn đã qua cả năm chặng!',
     copyField:
-      'Đi theo con đường bên kia cầu tới cánh đồng lúa vàng. Tìm cổng có dấu ✨ {gate}, rồi nhấn E hoặc bấm nút Vào cổng nhé!',
+      'Đi theo con đường bên kia cầu tới cánh đồng lúa vàng. Tìm cổng có dấu ✨ {gate}, {enter}',
     copyForest:
-      'Cổng mới đã mở! Đi theo con đường bên kia cầu tới khu rừng xanh. Tìm cổng có dấu ✨ {gate}, rồi nhấn E hoặc bấm nút Vào cổng nhé!',
+      'Cổng mới đã mở! Đi theo con đường bên kia cầu tới khu rừng xanh. Tìm cổng có dấu ✨ {gate}, {enter}',
     copyCity:
-      'Cổng mới đã mở! Đi theo con đường bên kia cầu tới thành phố của những tòa nhà mang số. Tìm cổng có dấu ✨ {gate}, rồi nhấn E hoặc bấm nút Vào cổng nhé!',
+      'Cổng mới đã mở! Đi theo con đường bên kia cầu tới thành phố của những tòa nhà mang số. Tìm cổng có dấu ✨ {gate}, {enter}',
     copyTower:
-      'Chặng cuối đã mở! Đi theo con đường bên kia cầu tới ngọn tháp cao nhất. Tìm cổng có dấu ✨ {gate}, rồi nhấn E hoặc bấm nút Vào cổng nhé!',
+      'Chặng cuối đã mở! Đi theo con đường bên kia cầu tới ngọn tháp cao nhất. Tìm cổng có dấu ✨ {gate}, {enter}',
+    enterKeyOrTap: 'rồi nhấn E hoặc bấm nút Vào cổng nhé!',
+    enterTap: 'rồi bấm nút Vào cổng nhé!',
     copyDone: 'Bạn có thể luyện thêm cùng {guide}, hoặc ghé {shop} trong làng để tiêu xu.',
     progressField: 'Đến Cổng Cánh Đồng',
     progressForest: 'Đến Cổng Rừng Nhân Chia',
@@ -48,18 +50,20 @@ export const tq = defineStrings('questChain', {
     eyebrowNext: 'NEXT QUEST',
     eyebrowDone: 'WELL DONE',
     titleField: 'Math Meadow',
-    titleForest: 'Multiplication Forest',
+    titleForest: 'Sharing Forest',
     titleCity: 'Number City',
     titleTower: 'Math Tower',
     titleDone: 'You finished all five stages!',
     copyField:
-      'Follow the road across the bridge to the golden meadow. Find the ✨ {gate}, then press E or tap Enter to go in!',
+      'Follow the road across the bridge to the golden meadow. Find the ✨ {gate}, {enter}',
     copyForest:
-      'A new gate is open! Follow the road across the bridge to the green forest. Find the ✨ {gate}, then press E or tap Enter to go in!',
+      'A new gate is open! Follow the road across the bridge to the green forest. Find the ✨ {gate}, {enter}',
     copyCity:
-      'A new gate is open! Follow the road across the bridge to the city of numbered buildings. Find the ✨ {gate}, then press E or tap Enter to go in!',
+      'A new gate is open! Follow the road across the bridge to the city of numbered buildings. Find the ✨ {gate}, {enter}',
     copyTower:
-      'The last stage is open! Follow the road across the bridge to the tallest tower. Find the ✨ {gate}, then press E or tap Enter to go in!',
+      'The last stage is open! Follow the road across the bridge to the tallest tower. Find the ✨ {gate}, {enter}',
+    enterKeyOrTap: 'then press E or tap Enter to go in!',
+    enterTap: 'then tap Enter to go in!',
     copyDone: 'Practise more with {guide}, or visit the {shop} in the village to spend your coins.',
     progressField: 'Reach the Meadow Gate',
     progressForest: 'Reach the Forest Gate',
