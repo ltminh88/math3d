@@ -8,7 +8,7 @@ import { applyHintPlan, hintPlan } from './field-hints';
 import type { FieldHud } from './field-hud';
 import type { PlantingInput } from './field-planting-input';
 import type { ProjectedLabels } from './field-projected-labels';
-import { showRoundResult } from './field-round-feedback';
+import { showFieldCelebration, showRoundResult } from './field-round-feedback';
 import * as flow from './field-round-flow';
 import { createRunTally } from './field-run-tally';
 import { tf } from './field-strings';
@@ -39,16 +39,19 @@ export function createFieldGame({ ctx, view, hud, labels, diorama, planting }: F
   let widget: AnswerWidget | undefined;
   let startedAt = performance.now();
   let equationShown = true;
+  /** Bumped when a round starts or the run ends: a plot turn begun before then is stale. */
+  let serial = 0;
 
   const equationLabel = (suffix: string) => {
     const at = view.worldOf('front');
     const text = `${grid.rows} × ${grid.cols}${suffix}`;
-    labels.set(at && equationShown ? [{ text, at }] : []);
+    labels.set(at && equationShown ? [{ text, at, anchor: 'top' }] : []);
   };
-  const clearFocus = () => {
-    focus = null;
-    view.setFocus(null);
+  const setFocus = (cell: model.GridCell | null) => {
+    focus = cell;
+    view.setFocus(cell);
   };
+  const clearFocus = () => setFocus(null);
   const dropWidget = () => {
     widget?.destroy();
     widget = undefined;
@@ -61,6 +64,9 @@ export function createFieldGame({ ctx, view, hud, labels, diorama, planting }: F
 
   function beginRound(i: number): void {
     index = i;
+    serial += 1;
+    view.stopTurn(); // a turn of the previous plot ends here, never on the new one (QA M-1)
+    labels.hide(false);
     const round = rounds[i] as flow.FieldRound;
     state = flow.startRound(round);
     startedAt = performance.now();
@@ -81,9 +87,8 @@ export function createFieldGame({ ctx, view, hud, labels, diorama, planting }: F
       planting.enable();
       return;
     }
-    hud.speak(
-      i === 0 ? tf('intro') : tf(round.type === 'equations' ? 'equationsPrompt' : 'recallPrompt'),
-    );
+    const prompt = round.type === 'equations' ? 'equationsPrompt' : 'recallPrompt';
+    hud.speak(tf(i === 0 ? 'intro' : prompt));
     askAnswer();
   }
 
@@ -96,18 +101,17 @@ export function createFieldGame({ ctx, view, hud, labels, diorama, planting }: F
     hud.setTools({ rotate: true, hint: true });
     if (round.type === 'equations') {
       hud.setPrompt(tf('equationsPrompt'), tf('equationsTip'));
-      widget = mountEquationChoices(hud.body, round.options, answerEquations);
+      widget = mountEquationChoices(hud.body, round.options, (ids) =>
+        ids.length === 2
+          ? settle(flow.answerEquations(state, ids))
+          : hud.setFeedback(tf('pickTwo'), 'gentle'),
+      );
       return;
     }
     const title = round.type === 'build' ? tf('totalPrompt') : tf('recallPrompt');
-    hud.setPrompt(title, '');
+    hud.setPrompt(title, tf('toolsKeysTip'));
     equationLabel(' = ?');
     widget = mountNumberPad(hud.body, (value) => settle(flow.answerTotal(state, value)));
-  }
-
-  function answerEquations(ids: string[]): void {
-    if (ids.length !== 2) hud.setFeedback(tf('pickTwo'), 'gentle');
-    else settle(flow.answerEquations(state, ids));
   }
 
   function settle(result: { state: flow.RoundState; verdict: flow.Verdict }): void {
@@ -132,7 +136,8 @@ export function createFieldGame({ ctx, view, hud, labels, diorama, planting }: F
     equationShown = true;
     equationLabel(` = ${total}`);
     diorama.restorePatch(index, ctx.reducedMotion);
-    hud.speak(tf('rotateLine', { rows: grid.rows, cols: grid.cols, total }));
+    const line = rows === cols ? 'squareLine' : 'rotateLine';
+    hud.speak(tf(line, { rows: grid.rows, cols: grid.cols, total }));
     const last = index === rounds.length - 1;
     hud.setNext(tf(last ? 'finish' : 'next'), () => (last ? celebrate() : beginRound(index + 1)));
     if (correct && rows !== cols) void rotate();
@@ -140,22 +145,20 @@ export function createFieldGame({ ctx, view, hud, labels, diorama, planting }: F
 
   function celebrate(): void {
     phase = 'done';
+    serial += 1;
     dropWidget();
     labels.set([]);
     for (let i = 0; i < rounds.length; i++) diorama.restorePatch(i, ctx.reducedMotion);
-    hud.celebrate(tf('doneScore', tally.score()), tally.stars(), () =>
-      ctx.exit({ completed: true }),
-    );
-    audio.celebrate();
-    ctx.announce(tf('doneTitle'));
+    showFieldCelebration(ctx, hud, tally);
   }
 
   async function rotate(): Promise<void> {
     if (view.animating || phase === 'planting' || phase === 'done') return;
+    const turnOf = serial;
     labels.hide(true);
     await view.rotate();
+    if (turnOf !== serial) return; // a new round started or the run ended while the plot turned
     showGrid(model.rotateGrid(grid));
-    if ((phase as FieldPhase) === 'done') return; // the run ended while the plot turned
     labels.hide(false);
     equationLabel(phase === 'solved' ? ` = ${state.round.total}` : ' = ?');
     ctx.announce(tf('rotated', { rows: grid.rows, cols: grid.cols }));
@@ -186,10 +189,7 @@ export function createFieldGame({ ctx, view, hud, labels, diorama, planting }: F
     start: () => beginRound(0),
     plantCell: (row: number, col: number) => plant(model.plantCell(grid, row, col)),
     plantRow: (row: number) => plant(model.plantRow(grid, row)),
-    setFocus(cell: model.GridCell | null) {
-      focus = cell;
-      view.setFocus(cell);
-    },
+    setFocus,
     rotate,
     hint,
     widgetKey: (key: string) => widget?.key(key) ?? false,

@@ -2,6 +2,7 @@
 // wires the shared input facade and the panel to the round controller, and ends with the
 // celebration ("Về cổng" exits as completed after every round was recorded).
 import { Scene } from 'three';
+import { LEVEL_COMPLETE_BONUS } from '../shared/level-run-result';
 import type { LevelContext, LevelModule, LevelSession } from '../shared/level-types';
 import { CityBuildingView } from './city-building-view';
 import { buildingFrame, CityCamera, STREET_FRAME } from './city-camera';
@@ -53,21 +54,19 @@ function start(ctx: LevelContext): LevelSession {
   let doneCard: HTMLElement | undefined;
 
   const frame = (): void => {
-    const box = panel.panel.getBoundingClientRect();
     const canvas = ctx.canvas.getBoundingClientRect();
-    const wide =
-      !panel.panel.hidden && box.width < canvas.width * 0.6 && box.top < canvas.top + 120;
-    // The celebration card sits at the bottom, below the lit building.
-    const cardTop = doneCard?.getBoundingClientRect().top;
+    // What covers the canvas: VLM's line on top, and the panel (or the celebration card) on the
+    // right when it stands there (wide, short landscape) or along the bottom (portrait).
+    const cover = doneCard ?? (panel.panel.hidden ? undefined : panel.panel);
+    const box = cover?.getBoundingClientRect();
+    // By its centre: the card pops in scaled about its centre, and a centred card is at the bottom.
+    const right = !!box && box.left + box.width / 2 > canvas.left + canvas.width * 0.6;
+    const guide = panel.guide.getBoundingClientRect();
     view.setArea({
       ...size,
-      coverRight: wide ? canvas.right - box.left + 8 : 0,
-      coverBottom:
-        cardTop !== undefined
-          ? canvas.bottom - cardTop + 8
-          : !panel.panel.hidden && !wide
-            ? canvas.bottom - box.top + 8
-            : 0,
+      coverTop: guide.height > 0 ? Math.max(0, guide.bottom - canvas.top + 6) : 0,
+      coverRight: box && right ? canvas.right - box.left + 8 : 0,
+      coverBottom: box && !right ? canvas.bottom - box.top + 8 : 0,
     });
     labels.place(view.camera);
   };
@@ -94,9 +93,10 @@ function start(ctx: LevelContext): LevelSession {
       view.setFrame(buildingFrame(building.width, building.height));
       ctx.audio.celebrate();
       ctx.announce(ts('doneTitle'));
-      doneCard = showCityCelebration(ctx.ui, ts, earned, stars, () =>
-        ctx.exit({ completed: true }),
-      );
+      const bonus = ctx.firstCompletion ? LEVEL_COMPLETE_BONUS : null;
+      const exit = () => ctx.exit({ completed: true });
+      doneCard = showCityCelebration(ctx.ui, ts, earned, stars, exit, bonus);
+      doneCard.addEventListener('animationend', frame, { once: true });
       frame();
     },
   });

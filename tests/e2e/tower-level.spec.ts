@@ -92,6 +92,14 @@ async function playFloor(page: Page, index: number, tap: boolean): Promise<void>
       await page.keyboard.press('h');
     }
     await expect(page.locator('.tower-hint')).toHaveAttribute('data-rung', '1');
+    // Rungs 2-4; after the last taught rung the button is spent, as in the field (QA m-4).
+    for (const rung of ['2', '3', '4']) {
+      await expect(hint).toBeEnabled();
+      if (tap) await hint.tap();
+      else await hint.click();
+      await expect(page.locator('.tower-hint')).toHaveAttribute('data-rung', rung);
+    }
+    await expect(hint).toBeDisabled();
     s = await towerState(page);
   }
   if (s.step !== 'number') {
@@ -134,6 +142,10 @@ test('the tower climbs seven floors and records × and : facts', async ({ page }
   await expect(done).toBeVisible();
   await expect(done).toContainText('Bạn đã lên tới đỉnh tháp!');
   await expect(done).toContainText('VLM');
+  // First clear: the one-time bonus is shown with the floor rewards (QA m-12).
+  await expect(done.locator('.tower-bonus')).toHaveText(
+    'Thưởng lần đầu hoàn thành: +50 XP · +10 xu',
+  );
   expect((await towerState(page)).cameraFloor).toBe(FLOORS);
   const maxCalls = Number(await page.locator('.level-layer').getAttribute('data-max-draw-calls'));
   expect(maxCalls).toBeGreaterThan(0);

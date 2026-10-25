@@ -2,6 +2,7 @@
 // Keyboard (WCAG 2.5.7 alternative to dragging): arrows move the cell focus, Enter plants,
 // R turns the plot, H asks for a hint, 1-4 + Enter pick equations. Listens on `document` with the
 // level disposer's signal, in the capture phase so planting keys never reach the 3D tap layer.
+import { Box3, Vector3 } from 'three';
 import type { LevelContext, LevelSession } from '../shared/level-types';
 import { buildFieldDiorama } from './field-diorama-builder';
 import { createFieldGame, type FieldGame } from './field-game';
@@ -9,17 +10,27 @@ import { createFieldHud } from './field-hud';
 import { createMaterialCache } from './field-materials';
 import { createPlantingInput } from './field-planting-input';
 import { createProjectedLabels } from './field-projected-labels';
-import { createFieldStage } from './field-stage';
+import { createFieldStage, measureFieldViewport, plotBox } from './field-stage';
 import { tf } from './field-strings';
 import { installFieldTestHook } from './field-test-hook';
 import { isPlanted, moveFocus } from './planting-grid';
 import { CELL, createGridView } from './planting-grid-view';
 
-/** Camera framing radius of a plot (same either way round) plus its stakes and basket. */
-const frameRadius = (rows: number, cols: number) =>
-  Math.max(5.2, 0.5 * Math.hypot(rows, cols) * CELL + 1.8);
-/** The celebration pulls back to show every restored patch. */
-const CELEBRATION_RADIUS = 11;
+/**
+ * Framing half-sizes [x, z] of the plot. While planting (the plot cannot turn) it is framed as it
+ * lies, so the cells are as big as the screen allows; once it may turn, by its larger side both
+ * ways, so a turn never moves the camera.
+ */
+function plotFraming(phase: string, rows: number, cols: number): [number, number] {
+  const half = (n: number) => Math.max(1.5, (n * CELL) / 2);
+  if (phase === 'planting') return [half(cols), half(rows)];
+  const side = Math.max(2.4, half(Math.max(rows, cols)));
+  return [side, side];
+}
+/** Every restored patch of the meadow (field-diorama-builder's PATCHES with their tufts). */
+const CELEBRATION_BOX = new Box3(new Vector3(-11, 0, -9.5), new Vector3(11, 1, 3));
+/** Test builds: the last level frame's draw calls and the run's maximum on `.level-layer`. */
+const TRACK_DRAW_CALLS = import.meta.env.MODE === 'test';
 
 function handleKey(event: KeyboardEvent, game: FieldGame, ctx: LevelContext): void {
   if (event.defaultPrevented || event.altKey || event.ctrlKey || event.metaKey) return;
@@ -69,13 +80,20 @@ export function start(ctx: LevelContext): LevelSession {
   });
   const fieldGame = createFieldGame({ ctx, view, hud, labels, diorama, planting });
   game = fieldGame;
-  const size = { width: ctx.canvas.clientWidth, height: ctx.canvas.clientHeight, radius: 0 };
+  const size = { width: ctx.canvas.clientWidth, height: ctx.canvas.clientHeight, x: 0, z: 0 };
   const frame = (width: number, height: number) => {
     size.width = width;
     size.height = height;
-    stage.fit(width, height, size.radius);
+    const viewport = measureFieldViewport(ctx.canvas, hud, width, height);
+    if (size.x < 0) stage.fit(viewport, CELEBRATION_BOX, false);
+    else stage.fit(viewport, plotBox(size.x, size.z), true);
     labels.place(stage.camera, width, height);
   };
+  // The HUD grows and shrinks (pad, hints, speech length): frame the plot in what it leaves free.
+  const hudResize = new ResizeObserver(() => frame(size.width, size.height));
+  hudResize.observe(hud.speech);
+  hudResize.observe(hud.panel);
+  ctx.disposer.onDispose(() => hudResize.disconnect());
   fieldGame.start();
   document.addEventListener('keydown', (e) => handleKey(e, fieldGame, ctx), {
     capture: true,
@@ -85,25 +103,36 @@ export function start(ctx: LevelContext): LevelSession {
     ctx.disposer.onDispose(installFieldTestHook(fieldGame, view, stage.camera, ctx.canvas));
   }
   let wasAnimating = false;
+  let frames = 0;
+  let maxCalls = 0;
   return {
     scene: stage.scene,
     camera: stage.camera,
     update(dt) {
       const { grid, phase } = fieldGame.status();
-      const radius = phase === 'done' ? CELEBRATION_RADIUS : frameRadius(grid.rows, grid.cols);
-      if (radius !== size.radius) {
-        // A new round's plot: reframe (turning the plot keeps the radius, so no camera jump).
-        size.radius = radius;
+      // -1: the celebration frames the whole meadow instead of a plot.
+      const [x, z] = phase === 'done' ? [-1, -1] : plotFraming(phase, grid.rows, grid.cols);
+      if (x !== size.x || z !== size.z) {
+        // A new plot or phase: reframe (turning the plot keeps the framing, so no camera jump).
+        Object.assign(size, { x, z });
         frame(size.width, size.height);
       }
       view.update(dt);
       diorama.update(dt);
       if (wasAnimating && !view.animating) labels.place(stage.camera, size.width, size.height);
       wasAnimating = view.animating;
+      frames += 1;
+      if (TRACK_DRAW_CALLS && frames > 2) {
+        // The previous frame's level render (the host renders after update).
+        const calls = ctx.renderer.info.render.calls;
+        maxCalls = Math.max(maxCalls, calls);
+        Object.assign(ctx.ui.dataset, { drawCalls: calls, maxDrawCalls: maxCalls });
+      }
     },
     resize: frame,
     dispose() {
       fieldGame.dispose();
+      stage.dispose();
       hud.root.remove();
     },
   };

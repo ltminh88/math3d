@@ -36,6 +36,8 @@ export interface GridView {
   setRowHighlight(on: boolean): void;
   /** Quarter turn of the plot; resolves when done (the caller then shows the rotated model). */
   rotate(): Promise<void>;
+  /** Ends a running turn at once (plot back to rest) and resolves its promise. */
+  stopTurn(): void;
   readonly animating: boolean;
   /** Unplanted cells + rows that still have room (pointer targets). */
   targets(): { pickables: Pickable[]; zones: DropZone[] };
@@ -133,6 +135,12 @@ export function createGridView(mat: MaterialCache, reducedMotion: boolean): Grid
       return new Promise<void>((resolve) => {
         turn = { t: 0, resolve };
       });
+    },
+    stopTurn() {
+      const done = turn?.resolve;
+      turn = null;
+      plot.rotation.y = 0;
+      done?.();
     },
     get animating() {
       return turn !== null;

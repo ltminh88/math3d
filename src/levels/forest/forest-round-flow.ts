@@ -36,7 +36,6 @@ export const CONCRETE_MAX_FRUIT = 20;
 /** Facts at this Leitner box or higher skip the objects (fact family only). */
 export const SYMBOLIC_BOX = 3;
 const FOREST_TABLES = [2, 3, 4, 5] as const;
-const STARTER_TABLES = [2, 3] as const;
 const MIN_KNOWN_FACTS = 3;
 const ROUND_KINDS: readonly RoundKind[] = ['share', 'pack', 'family', 'share', 'pack'];
 
@@ -50,8 +49,8 @@ function divParts(key: FactKey): { dividend: number; divisor: number } {
 
 /**
  * Division builds on multiplication: inverse divisions of known (box 3+) multiplication facts and
- * divisions already practised; until there are a few, the concrete starter set (tables 2 and 3,
- * at most 20 fruit).
+ * divisions already practised; until there are a few, the concrete starter set (tables 2-5, at
+ * most 20 fruit, so a first run is not all ÷2).
  */
 export function forestFactPool(stats: Stats): FactKey[] {
   const known = divFactsForTables(FOREST_TABLES).filter((key) => {
@@ -60,7 +59,7 @@ export function forestFactPool(stats: Stats): FactKey[] {
     return (inverse?.box ?? 0) >= SYMBOLIC_BOX || (stats[key]?.attempts ?? 0) > 0;
   });
   if (known.length >= MIN_KNOWN_FACTS) return known;
-  return divFactsForTables(STARTER_TABLES).filter(
+  return divFactsForTables(FOREST_TABLES).filter(
     (key) => divParts(key).dividend <= CONCRETE_MAX_FRUIT,
   );
 }

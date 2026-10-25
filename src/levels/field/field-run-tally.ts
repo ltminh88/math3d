@@ -16,3 +16,5 @@ export function createRunTally() {
     score: () => ({ correct: tally.correct, total: tally.total }),
   };
 }
+
+export type FieldRunTally = ReturnType<typeof createRunTally>;

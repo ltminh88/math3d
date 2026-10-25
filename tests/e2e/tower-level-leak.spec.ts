@@ -3,8 +3,8 @@
 // baseline is the settled world before the first visit (as in city-level-leak), so a leak of the
 // very first entry is not hidden by a warm-up visit. Read through `window.__game.memory()`.
 import { test } from '@playwright/test';
-import { rendererMemory, settledMemory } from './city-and-tower-settled-memory';
 import { expect, SLOW_TEST_MS, waitForStoreBoot } from './legacy-live-save-fixtures';
+import { rendererMemory, settledMemory } from './settled-renderer-memory';
 
 test.use({ locale: 'vi-VN' });
 test.describe.configure({ timeout: SLOW_TEST_MS * 2 });

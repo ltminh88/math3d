@@ -53,6 +53,7 @@ const define = (defineFn: typeof defineStrings) =>
       doneLine:
         'Ngọn đèn trên đỉnh tháp sáng rực rồi. Bạn đã ôn cả phép nhân lẫn phép chia, giỏi quá!',
       doneScore: '+{xp} XP · +{coins} xu',
+      bonusLine: 'Thưởng lần đầu hoàn thành: +{xp} XP · +{coins} xu',
       stars: '{n}/3 sao',
       cardName: '{label} (phím {n})',
       speakMul: '{x} nhân {y} bằng {z}',
@@ -110,6 +111,7 @@ const define = (defineFn: typeof defineStrings) =>
       doneTitle: 'You reached the top of the tower!',
       doneLine: 'The light on top of the tower is shining. You practised multiplying and dividing!',
       doneScore: '+{xp} XP · +{coins} coins',
+      bonusLine: 'First-clear bonus: +{xp} XP · +{coins} coins',
       stars: '{n}/3 stars',
       cardName: '{label} (key {n})',
       speakMul: '{x} times {y} is {z}',

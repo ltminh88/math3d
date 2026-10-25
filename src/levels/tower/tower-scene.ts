@@ -2,6 +2,7 @@
 // plans the seven floors (weak facts first, × and :) and wires answers, keys, the climbing camera
 // and the celebration at the beacon.
 import { Scene } from 'three';
+import { LEVEL_COMPLETE_BONUS } from '../shared/level-run-result';
 import type { LevelContext, LevelModule, LevelSession } from '../shared/level-types';
 import { showTowerCelebration } from './tower-celebration';
 import { TowerClimbCamera } from './tower-climb-camera';
@@ -75,7 +76,9 @@ function start(ctx: LevelContext): LevelSession {
       climb.climbTo(FLOOR_COUNT);
       ctx.audio.celebrate();
       ctx.announce(ts('doneTitle'));
-      showTowerCelebration(ctx.ui, ts, earned, stars, () => ctx.exit({ completed: true }));
+      const bonus = ctx.firstCompletion ? LEVEL_COMPLETE_BONUS : null;
+      const exit = () => ctx.exit({ completed: true });
+      showTowerCelebration(ctx.ui, ts, earned, stars, exit, bonus);
       frame();
     },
   });

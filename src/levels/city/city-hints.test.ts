@@ -55,6 +55,26 @@ describe('cityHint', () => {
     expect(cityHint(4, fact(8, 8)).params).toMatchObject({ ten: 80, minus: 16 });
   });
 
+  it('rung 4 uses ×10 only for a 9 or 8, else a ×5 fact (QA m-5: 6 × 6 is not 60 - 4 × 6)', () => {
+    expect(cityHint(4, fact(6, 6))).toMatchObject({
+      key: 'hintFive',
+      params: { a: 6, b: 6, n: 1, five: 30 },
+    });
+    expect(cityHint(4, fact(7, 7))).toMatchObject({ key: 'hintFive', params: { a: 7, n: 2 } });
+    // 8 × 6: from 8 × 5 = 40, one more 8 (not 6 × 10 - 2 × 6).
+    expect(cityHint(4, fact(8, 6))).toMatchObject({
+      key: 'hintFive',
+      params: { a: 8, b: 6, n: 1, five: 40 },
+    });
+    for (let t = 6; t <= 9; t++) {
+      for (let m = 1; m <= 10; m++) {
+        const hint = cityHint(4, fact(t, m));
+        if (hint.key === 'hintTen') expect(Math.max(t, m)).toBeGreaterThanOrEqual(8);
+        if (m > 1) expect(Object.values(hint.params)).not.toContain(t * m);
+      }
+    }
+  });
+
   it('delivery rounds skip count without windows (rung 3)', () => {
     const hint = cityHint(3, { ...fact(8, 4), kind: 'deliver' });
     expect(hint.key).toBe('hintCount');

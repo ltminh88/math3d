@@ -1,5 +1,5 @@
-// Camera over the street. The answer panel covers part of the canvas (right side on wide
-// screens, bottom on narrow ones), so the view is shifted into the free area and pulled back
+// Camera over the street. VLM's line covers the top and the answer panel part of the canvas
+// (right side on wide or short screens, bottom on narrow ones), so the view is shifted into the free area and pulled back
 // until the round's subject (the street, or the building) fits there.
 import { PerspectiveCamera, Vector3 } from 'three';
 
@@ -18,6 +18,7 @@ export interface CityFrame {
 export interface FreeArea {
   width: number;
   height: number;
+  coverTop: number;
   coverRight: number;
   coverBottom: number;
 }
@@ -40,7 +41,7 @@ export function buildingFrame(width: number, height: number): CityFrame {
 export class CityCamera {
   readonly camera = new PerspectiveCamera(FOV, 1, 0.5, 150);
   private frame: CityFrame = STREET_FRAME;
-  private area: FreeArea = { width: 1, height: 1, coverRight: 0, coverBottom: 0 };
+  private area: FreeArea = { width: 1, height: 1, coverTop: 0, coverRight: 0, coverBottom: 0 };
 
   setFrame(frame: CityFrame): void {
     this.frame = frame;
@@ -53,11 +54,11 @@ export class CityCamera {
   }
 
   private apply(): void {
-    const { width, height, coverRight, coverBottom } = this.area;
+    const { width, height, coverTop, coverRight, coverBottom } = this.area;
     const w = Math.max(1, width);
     const h = Math.max(1, height);
     const freeW = Math.max(w * 0.35, w - coverRight);
-    const freeH = Math.max(h * 0.35, h - coverBottom);
+    const freeH = Math.max(h * 0.2, h - coverBottom - coverTop);
     const camera = this.camera;
     camera.aspect = w / h;
     const tanHalf = Math.tan((FOV * Math.PI) / 360);
@@ -66,8 +67,9 @@ export class CityCamera {
     const distance = Math.max(MIN_DISTANCE, fitWidth, fitHeight);
     camera.position.copy(this.frame.target).addScaledVector(DIRECTION, distance);
     camera.lookAt(this.frame.target);
-    // Centre of the view = centre of the uncovered part of the canvas.
-    camera.setViewOffset(w, h, (w - freeW) / 2, (h - freeH) / 2, w, h);
+    // Centre of the view = centre of the uncovered part of the canvas (below VLM's line).
+    const top = Math.min(coverTop, h - freeH);
+    camera.setViewOffset(w, h, (w - freeW) / 2, h / 2 - (top + freeH / 2), w, h);
     camera.updateProjectionMatrix();
     camera.updateMatrixWorld();
   }

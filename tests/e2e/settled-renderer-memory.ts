@@ -1,5 +1,5 @@
-// Shared by the city and tower leak specs: the world's renderer memory once its camera has
-// settled. On the phone the follow camera keeps bringing world objects into view (uploaded on
+// Shared by the field, city and tower leak specs: the world's renderer memory once its camera
+// has settled. On the phone the follow camera keeps bringing world objects into view (uploaded on
 // first sight) for many frames after a teleport, which is not a level leak. Counted in frames,
 // since SwiftShader under load draws slowly.
 import type { Page } from '@playwright/test';

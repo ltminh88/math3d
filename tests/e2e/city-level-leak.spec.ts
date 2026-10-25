@@ -2,8 +2,8 @@
 // Số" gives every geometry and texture back, once and after 10 visits, and leaving early commits
 // nothing. Read through the test build (`window.__game.memory()` = `renderer.info.memory`).
 import { test } from '@playwright/test';
-import { rendererMemory, settledMemory } from './city-and-tower-settled-memory';
 import { expect, SLOW_TEST_MS, waitForStoreBoot } from './legacy-live-save-fixtures';
+import { rendererMemory, settledMemory } from './settled-renderer-memory';
 
 test.use({ locale: 'vi-VN' });
 test.describe.configure({ timeout: SLOW_TEST_MS * 2 });

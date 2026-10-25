@@ -62,6 +62,35 @@ describe('tower hint ladder', () => {
     expect(hintSpec(4, missing).key).toBe('hint4DivDown');
   });
 
+  it('rung 4 anchors on ×2 or ×5, ×10 only for an 8 or 9, ×1 only for a 2 (QA m-5)', () => {
+    expect(hintSpec(4, product(6, 6))).toEqual({
+      key: 'hint4MulUp',
+      vars: { b: 6, a: 6, k: 5, anchor: 30, n: 1 },
+    });
+    // 3 × 6 = ?: from 3 × 5 = 15, one more 3 (the smaller table to add on).
+    expect(hintSpec(4, product(3, 6))).toEqual({
+      key: 'hint4MulUp',
+      vars: { b: 3, a: 6, k: 5, anchor: 15, n: 1 },
+    });
+    // 9 × 7 = ?: 7 × 10 = 70, take one 7 away.
+    expect(hintSpec(4, product(9, 7))).toEqual({
+      key: 'hint4MulDown',
+      vars: { b: 7, a: 9, k: 10, anchor: 70, n: 1 },
+    });
+    const formats: TowerFormat[] = ['choice', 'pad', 'missing', 'family', 'truefalse'];
+    for (const key of towerFactPool()) {
+      for (const format of formats) {
+        const q = buildQuestion(key, format, mulberry32(4), []);
+        for (const step of q.steps) {
+          const { vars } = hintSpec(4, step);
+          const unknown = 'a' in vars ? vars.a : Number(vars.p) / Number(vars.d);
+          if (vars.k === 10) expect(unknown).toBeGreaterThanOrEqual(8);
+          if (vars.k === 1) expect(unknown).toBe(2);
+        }
+      }
+    }
+  });
+
   it('rung 4 never shows the answer, on any step of any floor', () => {
     const formats: TowerFormat[] = ['choice', 'pad', 'missing', 'family', 'truefalse'];
     for (const key of towerFactPool()) {

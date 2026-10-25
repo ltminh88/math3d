@@ -2,6 +2,7 @@
 // shared input facade (drag + tap-select + keyboard) and the number pad to the round controller.
 import { Scene } from 'three';
 import type { InteractionEvent } from '../../core/input/interaction-types';
+import { LEVEL_COMPLETE_BONUS } from '../shared/level-run-result';
 import type { LevelContext, LevelModule, LevelSession } from '../shared/level-types';
 import { createAnimalMaterial } from './animal-friend-factory';
 import { FactFamilyCard } from './fact-family-card';
@@ -9,6 +10,7 @@ import { ForestCamera } from './forest-camera';
 import { showForestCelebration } from './forest-celebration';
 import { ForestCountLabels } from './forest-count-labels';
 import { buildForestDiorama } from './forest-diorama-builder';
+import { varyForestFacts } from './forest-fact-variety';
 import { FRUIT_Y } from './forest-layout';
 import { ForestPanel } from './forest-panel';
 import { ForestRoundController } from './forest-round-controller';
@@ -30,7 +32,9 @@ function start(ctx: LevelContext): LevelSession {
   const view = new ForestCamera();
   const labels = new ForestCountLabels(ctx.ui);
   const stats = ctx.learning.stats();
-  const facts = ctx.learning.planSession(forestFactPool(stats), ctx.definition.rounds);
+  const pool = forestFactPool(stats);
+  const planned = ctx.learning.planSession(pool, ctx.definition.rounds);
+  const facts = varyForestFacts(planned, pool, ctx.learning.rng);
   const flow = new ForestRoundFlow(planForestRounds(facts, stats), () => performance.now());
   const controller: { current?: ForestRoundController } = {};
   const run = (fn: (c: ForestRoundController) => void) => () => {
@@ -83,7 +87,8 @@ function start(ctx: LevelContext): LevelSession {
       table.celebrate();
       ctx.audio.celebrate();
       ctx.announce(ts('doneTitle'));
-      showForestCelebration(ctx.ui, ts, earned, () => ctx.exit({ completed: true }));
+      const bonus = ctx.firstCompletion ? LEVEL_COMPLETE_BONUS : null;
+      showForestCelebration(ctx.ui, ts, earned, () => ctx.exit({ completed: true }), bonus);
       frame();
     },
   });

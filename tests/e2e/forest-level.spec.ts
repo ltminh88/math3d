@@ -137,8 +137,11 @@ test('the forest level plays five rounds and records division facts', async ({ p
     else await page.keyboard.press('Enter');
   }
   expect(kinds).toContain('family');
-  await expect(page.locator('.forest-done')).toBeVisible();
   await expect(page.locator('.forest-done')).toContainText('VLM');
+  // QA m-12: the first clear shows the one-time bonus.
+  await expect(page.locator('.forest-done .forest-bonus')).toHaveText(
+    'Thưởng lần đầu hoàn thành: +50 XP · +10 xu',
+  );
   const layerData = await page
     .locator('.level-layer')
     .evaluate((el) => ({ ...(el as HTMLElement).dataset }));

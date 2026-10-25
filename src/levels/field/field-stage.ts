@@ -1,7 +1,9 @@
 // Scene, lights and camera of the field level, tuned like the world (sky horizon colour, fog,
 // hemisphere fill + shadow-casting sun). The renderer's global state is never touched: the sky is
-// the scene background. The camera frames the plot inside the canvas area the HUD leaves free.
+// the scene background. The camera frames the plot as large as the canvas area the HUD leaves
+// free allows (measured, so phone cells stay finger-sized; QA M-5).
 import {
+  Box3,
   Color,
   DirectionalLight,
   Fog,
@@ -15,17 +17,37 @@ import { WORLD_LIGHTING } from '../../world/world-lighting-tuning';
 
 const FOV = 40;
 const ELEVATION = (54 * Math.PI) / 180;
-/** Canvas share the HUD covers: right column in landscape, lower part in portrait. */
-const PANEL_RIGHT_PX = 392;
-const PANEL_BOTTOM_SHARE = 0.57;
-const SPEECH_TOP_PX = 88;
+/** Phones (portrait or short landscape) look down more steeply: rows as far apart as cells. */
+const STEEP_ELEVATION = (70 * Math.PI) / 180;
+/** Gap kept between the framed plot and the canvas edges or the HUD (CSS px). */
+const EDGE_PX = 12;
+/** Room under the plot's front edge for the equation label hanging below it (CSS px). */
+const LABEL_PX = 56;
+
+/** Canvas size and the CSS px the HUD covers on each side (measured from the DOM). */
+export interface FieldViewport {
+  width: number;
+  height: number;
+  top: number;
+  bottom: number;
+  right: number;
+}
 
 export interface FieldStage {
   readonly scene: Scene;
   readonly camera: PerspectiveCamera;
-  /** Frames a plot of `radius` world units for a `width` x `height` canvas (CSS px). */
-  fit(width: number, height: number, radius: number): void;
+  /**
+   * Frames `box` as large as the free canvas allows. A plot (`plot`) keeps room below it for its
+   * equation label and is seen more steeply on phones; the celebration's meadow is not.
+   */
+  fit(view: FieldViewport, box: Box3, plot: boolean): void;
+  /** Frees the sun's shadow map (a render target the scene disposer never reaches; QA M-3). */
+  dispose(): void;
 }
+
+/** A plot's bounding box: cells, row stakes + basket on the left/front, flowers up to ~1 u. */
+export const plotBox = (x: number, z: number): Box3 =>
+  new Box3(new Vector3(-x - 1.2, 0, -z - 0.4), new Vector3(x + 0.4, 1, z + 1.3));
 
 export function createFieldStage(lowPower: boolean): FieldStage {
   const scene = new Scene();
@@ -57,32 +79,87 @@ export function createFieldStage(lowPower: boolean): FieldStage {
   sun.shadow.camera.updateProjectionMatrix();
   scene.add(sun, sun.target);
   const camera = new PerspectiveCamera(FOV, 1, 0.5, 120);
-  const target = new Vector3(0, 0.3, 0.4);
+  const corner = new Vector3();
+
+  let elevation = ELEVATION;
+  const place = (target: Vector3, distance: number) => {
+    camera.position.set(
+      target.x,
+      target.y + Math.sin(elevation) * distance,
+      target.z + Math.cos(elevation) * distance,
+    );
+    camera.lookAt(target);
+    camera.updateMatrixWorld();
+  };
 
   return {
     scene,
     camera,
-    fit(width, height, radius) {
+    fit(view, box, plot) {
+      const { width, height } = view;
       if (width <= 0 || height <= 0) return;
-      const portrait = width <= height * 1.05;
-      const right = portrait ? 0 : Math.min(PANEL_RIGHT_PX, width * 0.45);
-      const bottom = portrait ? height * PANEL_BOTTOM_SHARE : 0;
-      const top = SPEECH_TOP_PX;
-      const availW = Math.max(width - right, width * 0.4);
-      const availH = Math.max(height - bottom - top, height * 0.3);
-      const tanHalf = Math.tan(((FOV / 2) * Math.PI) / 180);
-      const distance = Math.max(8, (radius * height) / (tanHalf * Math.min(availW, availH)));
+      const free = {
+        left: EDGE_PX,
+        right: Math.max(width - view.right - EDGE_PX, width * 0.4),
+        top: view.top + EDGE_PX,
+        bottom: Math.max(
+          height - view.bottom - EDGE_PX - (plot ? LABEL_PX : 0),
+          view.top + height * 0.25,
+        ),
+      };
       camera.aspect = width / height;
-      camera.position.set(
-        target.x,
-        target.y + Math.sin(ELEVATION) * distance,
-        target.z + Math.cos(ELEVATION) * distance,
-      );
-      camera.lookAt(target);
-      const centerX = availW / 2;
-      const centerY = top + availH / 2;
+      const phone = width <= height * 1.05 || height < 500;
+      elevation = plot && phone ? STEEP_ELEVATION : ELEVATION;
+      const centerX = (free.left + free.right) / 2;
+      const centerY = (free.top + free.bottom) / 2;
       camera.setViewOffset(width, height, width / 2 - centerX, height / 2 - centerY, width, height);
       camera.updateProjectionMatrix();
+      const target = box.getCenter(new Vector3());
+      const fits = (distance: number): boolean => {
+        place(target, distance);
+        for (let i = 0; i < 8; i++) {
+          corner.set(
+            i & 1 ? box.max.x : box.min.x,
+            i & 2 ? box.max.y : box.min.y,
+            i & 4 ? box.max.z : box.min.z,
+          );
+          const p = corner.project(camera);
+          const x = ((p.x + 1) / 2) * width;
+          const y = ((1 - p.y) / 2) * height;
+          if (x < free.left || x > free.right || y < free.top || y > free.bottom) return false;
+        }
+        return true;
+      };
+      // Closest camera that still shows the whole box (the fit only loosens with distance).
+      let near = 4;
+      let far = 120;
+      for (let i = 0; i < 28; i++) {
+        const mid = (near + far) / 2;
+        if (fits(mid)) far = mid;
+        else near = mid;
+      }
+      place(target, far);
     },
+    dispose: () => sun.shadow.dispose(),
+  };
+}
+
+/** What the HUD covers of the canvas: speech line on top, panel below (portrait) or right. */
+export function measureFieldViewport(
+  canvas: HTMLElement,
+  hud: { speech: HTMLElement; panel: HTMLElement },
+  width: number,
+  height: number,
+): FieldViewport {
+  const area = canvas.getBoundingClientRect();
+  const speech = hud.speech.getBoundingClientRect();
+  const panel = hud.panel.getBoundingClientRect();
+  const below = panel.width > area.width * 0.6;
+  return {
+    width,
+    height,
+    top: Math.max(0, speech.bottom - area.top),
+    bottom: below ? Math.max(0, area.bottom - panel.top) : 0,
+    right: below ? 0 : Math.max(0, area.right - panel.left),
   };
 }

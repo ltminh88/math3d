@@ -30,3 +30,11 @@ export function roundTexts(ts: ForestStrings, round: ForestRound): RoundTexts {
     deal: ts('dealShare'),
   };
 }
+
+/** "Almost" only for an answer one away from the blank's number; otherwise a neutral retry. */
+export function wrongFeedbackKey(
+  value: number,
+  expected: number | undefined,
+): 'wrong' | 'wrongClose' {
+  return expected !== undefined && Math.abs(value - expected) === 1 ? 'wrongClose' : 'wrong';
+}

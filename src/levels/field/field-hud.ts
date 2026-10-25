@@ -9,6 +9,9 @@ export type FeedbackTone = 'success' | 'gentle' | '';
 
 export interface FieldHud {
   readonly root: HTMLElement;
+  /** VLM's speech line and the round panel (the scene frames the plot around them). */
+  readonly speech: HTMLElement;
+  readonly panel: HTMLElement;
   /** Holds the round's answer widget (number pad or equation choices). */
   readonly body: HTMLElement;
   speak(text: string): void;
@@ -21,8 +24,8 @@ export interface FieldHud {
   /** Shows the main action button (null hides it). */
   setNext(label: string | null, onClick?: () => void): void;
   rewardPop(text: string): void;
-  /** Celebration card: VLM's thank-you, stars, and the way back to the gate. */
-  celebrate(score: string, stars: number, onBack: () => void): void;
+  /** Celebration card: VLM's thank-you, stars, the first-clear bonus line, the way back. */
+  celebrate(score: string, stars: number, onBack: () => void, bonus: string | null): void;
 }
 
 function el<K extends keyof HTMLElementTagNameMap>(
@@ -81,6 +84,8 @@ export function createFieldHud(
 
   return {
     root,
+    speech,
+    panel,
     body,
     speak(text) {
       line.textContent = text;
@@ -126,7 +131,7 @@ export function createFieldHud(
       pop.textContent = text;
       pop.addEventListener('animationend', () => pop.remove());
     },
-    celebrate(score, stars, onBack) {
+    celebrate(score, stars, onBack, bonus) {
       panel.classList.add('field-panel--done');
       for (const dot of dots.children) dot.className = 'done';
       line.textContent = tf('doneLine');
@@ -145,6 +150,7 @@ export function createFieldHud(
       starLine.textContent = '★'.repeat(stars) + '☆'.repeat(3 - stars);
       starLine.setAttribute('aria-label', `${stars}/3`);
       body.replaceChildren(starLine);
+      if (bonus) el('p', 'field-tip field-bonus', body).textContent = bonus;
     },
   };
 }

@@ -29,13 +29,14 @@ const round = (kind: ForestRound['kind'], dividend: number, divisor: number): Fo
 });
 
 describe('forest fact pool', () => {
-  it('starts concrete: tables 2 and 3, at most 20 fruit, division keys only', () => {
+  it('starts concrete: tables 2-5, at most 20 fruit, division keys only', () => {
     const pool = forestFactPool({});
     expect(pool.length).toBeGreaterThan(5);
+    expect(pool).toEqual(expect.arrayContaining(['div:12/4', 'div:15/5']));
     for (const key of pool) {
       const m = /^div:(\d+)\/(\d+)$/.exec(key);
       expect(m).not.toBeNull();
-      expect([2, 3]).toContain(Number(m?.[2]));
+      expect([2, 3, 4, 5]).toContain(Number(m?.[2]));
       expect(Number(m?.[1])).toBeLessThanOrEqual(20);
     }
   });
