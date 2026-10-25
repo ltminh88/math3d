@@ -1,7 +1,7 @@
 // Hint rungs of the city (pure): 1 encourage, 2 split the 6-9 factor into 5 + rest (colour bands
 // on the building), 3 skip count (floor by floor in a windows round), 4 a known fact: the swapped
-// table when it is one of 2-5 or 10, else a near square (7 × 8 = 7 × 7 + 7) or counting back from
-// ten. Reverse delivery has its own rungs that never name the right parcel: compare with the
+// table when it is one of 2-5 or 10, else a near square (7 × 8 = 7 × 7 + 7), counting back from
+// ten for a 9 (or 8), or on from a ×5 fact. Reverse delivery has its own rungs that never name the right parcel: compare with the
 // house number, rule out a parcel not tried yet, then the inverse division with a "?".
 import type { HintRung } from '../../learning/hint-ladder';
 import type { CityRoundKind, ParcelOption } from './city-round-flow';
@@ -17,6 +17,7 @@ export type CityHintKey =
   | 'hintCommute'
   | 'hintNearSquare'
   | 'hintTen'
+  | 'hintFive'
   | 'hintReverse1'
   | 'hintReverseCompare'
   | 'hintReverseRuleOut'
@@ -50,15 +51,21 @@ export function skipSteps({ table, other }: Fact): string[] {
 
 function knownFact(rung: HintRung, { table: t, other: m }: Fact): CityHint {
   const base = { rung, bands: null, steps: [] };
-  if (KNOWN_TABLES.includes(m)) return { ...base, key: 'hintCommute', params: { t, m } };
+  if (m === 1 || KNOWN_TABLES.includes(m)) return { ...base, key: 'hintCommute', params: { t, m } };
   if (Math.abs(t - m) === 1) {
     const s = Math.min(t, m);
     return { ...base, key: 'hintNearSquare', params: { t, m, s, square: s * s } };
   }
-  // Count back from ten on the factor closest to 10: 6 × 9 = 6 × 10 - 6.
+  // Both factors 6-9 (QA m-5: the ×10 trick only helps near 10). A 9, or an 8 when that is
+  // closer than ×5, counts back from ten (6 × 9 = 6 × 10 - 6); otherwise from a ×5 fact on
+  // the other factor (8 × 6 = 8 × 5 + 8).
   const [a, b] = t <= m ? [t, m] : [m, t];
   const back = 10 - b;
-  return { ...base, key: 'hintTen', params: { a, b, back, ten: a * 10, minus: a * back } };
+  const extra = a - 5;
+  if (b === 9 || (b === 8 && back < extra)) {
+    return { ...base, key: 'hintTen', params: { a, b, back, ten: a * 10, minus: a * back } };
+  }
+  return { ...base, key: 'hintFive', params: { a: b, b: a, n: extra, five: b * 5 } };
 }
 
 /** Reverse delivery: `tried` holds the parcel values the child already gave. */

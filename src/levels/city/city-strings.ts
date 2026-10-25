@@ -38,6 +38,7 @@ const define = (defineFn: typeof defineStrings) =>
       hintCount: 'Đếm thêm {t}, đếm {m} lần: {steps}',
       hintCommute: 'Đổi chỗ hai số: {t} × {m} = {m} × {t}. Tính theo bảng {m} cho dễ nhé!',
       hintNearSquare: '{t} × {m} = {s} × {s} + {s}. Mà {s} × {s} = {square} đó.',
+      hintFive: 'Mốc dễ nhớ: {a} × 5 = {five}. Thêm {n} lần {a} nữa là ra {a} × {b}.',
       hintTen:
         'Mẹo số 10: {a} × 10 = {ten}. Bớt đi {back} lần {a} (tức là bớt {minus}) là ra {a} × {b}.',
       hintReverse1: 'Gói nào nhân ra đúng {p}? Bạn tính thử từng gói nhé!',
@@ -86,6 +87,7 @@ const define = (defineFn: typeof defineStrings) =>
       hintCount: 'Count by {t}, {m} times: {steps}',
       hintCommute: 'Swap the numbers: {t} × {m} = {m} × {t}. The {m} table is easier!',
       hintNearSquare: '{t} × {m} = {s} × {s} + {s}. And {s} × {s} = {square}.',
+      hintFive: 'Start from {a} × 5 = {five}. Add {n} more {a}s to get {a} × {b}.',
       hintTen:
         'Use 10: {a} × 10 = {ten}. Take away {back} times {a} (that is {minus}) to get {a} × {b}.',
       hintReverse1: 'Which parcel makes exactly {p}? Work out each one!',

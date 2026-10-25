@@ -1,7 +1,7 @@
 // Tower hint rungs: 1 encourage, 2 the related fact (division for a product, multiplication for
 // a division), 3 split strategy for big products or skip counting, 4 a strategy from a known
-// fact (× 1, 2, 5 or 10) with the result left as "?". The result itself is only shown by the
-// three-miss path, which records the floor as not correct (learning-core ladder, rung 5).
+// fact (× 2 or 5; × 10 only near 10) with the result left as "?". The result itself is only shown
+// by the three-miss path, which records the floor as not correct (learning-core ladder, rung 5).
 // `hintSpec` is pure (tested); `renderHint` writes it into the recovered hint area.
 import type { HintRung } from '../../learning/hint-ladder';
 import type { TowerEquation, TowerStep } from './tower-question-formats';
@@ -34,31 +34,42 @@ function trueEquation(step: TowerStep): TowerEquation {
 const countBy = (step: number, terms: number): number[] =>
   Array.from({ length: terms }, (_, i) => step * (i + 1));
 
-/** Easy multipliers a rung-4 strategy starts from. */
-const ANCHORS = [1, 2, 5, 10] as const;
-
-/** The anchor nearest to `unknown` whose fact `base × k` does not show `answer`. */
-function anchorFor(unknown: number, base: number, answer: number): number {
-  let best: number = ANCHORS[2];
-  let distance = Number.POSITIVE_INFINITY;
-  for (const k of ANCHORS) {
-    if (k === unknown || k === answer || base * k === answer) continue;
-    if (Math.abs(k - unknown) < distance) [best, distance] = [k, Math.abs(k - unknown)];
-  }
-  return best;
+/**
+ * Known facts a rung-4 strategy starts from (QA m-5: the ×10 trick only helps near 10): ×2 and
+ * ×5 always, ×10 for an 8 or a 9, ×1 only to double (an unknown 2).
+ */
+function anchorsFor(unknown: number): number[] {
+  return [unknown === 2 ? 1 : 0, 2, 5, unknown >= 8 ? 10 : 0].filter((k) => k > 0);
 }
 
-/** Rung 4: from a known fact of the same table to the asked one, the result left as "?". */
+/** Nearest usable anchor `base × k` to `base × unknown` that does not show `answer`. */
+function anchorFor(unknown: number, base: number, answer: number): number | undefined {
+  const usable = anchorsFor(unknown).filter(
+    (k) => k !== unknown && k !== answer && base * k !== answer,
+  );
+  return usable.sort((p, q) => Math.abs(p - unknown) - Math.abs(q - unknown))[0];
+}
+
+/** Rung 4: from a known fact to the asked one, the result left as "?". */
 function strategy(eq: TowerEquation): HintSpec {
   if (eq.op === 'mul' && eq.blank !== 'x') {
-    const [a, b] = eq.x <= eq.y ? [eq.x, eq.y] : [eq.y, eq.x];
-    const k = anchorFor(a, b, eq.z);
-    const vars = { b, a, k, anchor: b * k, n: Math.abs(a - k) };
-    return { key: k < a ? 'hint4MulUp' : 'hint4MulDown', vars };
+    // Either factor may be the unknown multiplier (the commuted fact is often easier): fewest
+    // extra steps wins, then adding rather than taking away, then the smaller table.
+    const options = [
+      [eq.x, eq.y],
+      [eq.y, eq.x],
+    ].flatMap(([a = 0, b = 0]) => {
+      const k = anchorFor(a, b, eq.z);
+      return k === undefined ? [] : [{ a, b, k, n: Math.abs(a - k), up: k < a }];
+    });
+    options.sort((p, q) => p.n - q.n || Number(q.up) - Number(p.up) || p.b - q.b);
+    const best = options[0] ?? { a: eq.x, b: eq.y, k: 5, n: Math.abs(eq.x - 5), up: eq.x > 5 };
+    const vars = { b: best.b, a: best.a, k: best.k, anchor: best.b * best.k, n: best.n };
+    return { key: best.up ? 'hint4MulUp' : 'hint4MulDown', vars };
   }
   // Unknown factor: p : d = ? or ? × d = p.
   const [p, d, unknown] = eq.op === 'div' ? [eq.x, eq.y, eq.z] : [eq.z, eq.y, eq.x];
-  const k = anchorFor(unknown, d, unknown);
+  const k = anchorFor(unknown, d, unknown) ?? 5;
   return { key: k < unknown ? 'hint4DivUp' : 'hint4DivDown', vars: { d, k, anchor: d * k, p } };
 }
 
