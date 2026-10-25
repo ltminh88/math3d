@@ -7,7 +7,7 @@ import type { ForestCountLabels } from './forest-count-labels';
 import { renderHint } from './forest-hints';
 import type { ForestPanel } from './forest-panel';
 import { CONCRETE_MAX_FRUIT, type ForestRound, type ForestRoundFlow } from './forest-round-flow';
-import { roundTexts } from './forest-round-texts';
+import { roundTexts, wrongFeedbackKey } from './forest-round-texts';
 import type { ForestStrings } from './forest-strings';
 import { type ForestTableView, zoneSpot } from './forest-table-view';
 import {
@@ -137,16 +137,18 @@ export class ForestRoundController {
     const round = this.round;
     if (!round) return;
     const blank = this.flow.blank;
+    const expected = this.flow.expected();
     const result = this.flow.submit(value);
     if (result.verdict === 'ignored') return;
     this.panel.pad.clear();
     this.idle = 0;
     if (result.verdict === 'wrong') {
       this.card.shake();
-      this.panel.setFeedback(this.ts('wrong'), 'gentle');
+      const text = this.ts(wrongFeedbackKey(value, expected));
+      this.panel.setFeedback(text, 'gentle');
       this.panel.offerHint(this.flow.hintOffered(0));
       this.ctx.audio.hint();
-      this.ctx.announce(this.ts('wrong'));
+      this.ctx.announce(text);
       return;
     }
     if (result.verdict === 'correct') this.card.fill(blank, value);

@@ -9,6 +9,7 @@ import { ForestCamera } from './forest-camera';
 import { showForestCelebration } from './forest-celebration';
 import { ForestCountLabels } from './forest-count-labels';
 import { buildForestDiorama } from './forest-diorama-builder';
+import { varyForestFacts } from './forest-fact-variety';
 import { FRUIT_Y } from './forest-layout';
 import { ForestPanel } from './forest-panel';
 import { ForestRoundController } from './forest-round-controller';
@@ -30,7 +31,9 @@ function start(ctx: LevelContext): LevelSession {
   const view = new ForestCamera();
   const labels = new ForestCountLabels(ctx.ui);
   const stats = ctx.learning.stats();
-  const facts = ctx.learning.planSession(forestFactPool(stats), ctx.definition.rounds);
+  const pool = forestFactPool(stats);
+  const planned = ctx.learning.planSession(pool, ctx.definition.rounds);
+  const facts = varyForestFacts(planned, pool, ctx.learning.rng);
   const flow = new ForestRoundFlow(planForestRounds(facts, stats), () => performance.now());
   const controller: { current?: ForestRoundController } = {};
   const run = (fn: (c: ForestRoundController) => void) => () => {
