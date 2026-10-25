@@ -21,8 +21,8 @@ export interface FieldHud {
   /** Shows the main action button (null hides it). */
   setNext(label: string | null, onClick?: () => void): void;
   rewardPop(text: string): void;
-  /** Celebration card: VLM's thank-you, stars, and the way back to the gate. */
-  celebrate(score: string, stars: number, onBack: () => void): void;
+  /** Celebration card: VLM's thank-you, stars, the first-clear bonus line, the way back. */
+  celebrate(score: string, stars: number, onBack: () => void, bonus: string | null): void;
 }
 
 function el<K extends keyof HTMLElementTagNameMap>(
@@ -126,7 +126,7 @@ export function createFieldHud(
       pop.textContent = text;
       pop.addEventListener('animationend', () => pop.remove());
     },
-    celebrate(score, stars, onBack) {
+    celebrate(score, stars, onBack, bonus) {
       panel.classList.add('field-panel--done');
       for (const dot of dots.children) dot.className = 'done';
       line.textContent = tf('doneLine');
@@ -145,6 +145,7 @@ export function createFieldHud(
       starLine.textContent = '★'.repeat(stars) + '☆'.repeat(3 - stars);
       starLine.setAttribute('aria-label', `${stars}/3`);
       body.replaceChildren(starLine);
+      if (bonus) el('p', 'completion-rewards field-bonus', body).textContent = bonus;
     },
   };
 }

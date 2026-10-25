@@ -52,7 +52,7 @@ export function hintPlan(rung: HintRung, grid: PlantingGrid, view: GridView): Hi
     };
   }
   return {
-    text: tf('hint4', { rows, cols }),
+    text: tf(rows === cols ? 'hint4Square' : 'hint4', { rows, cols }),
     highlightRows: true,
     skipLabels: [],
     rotate: rows !== cols,

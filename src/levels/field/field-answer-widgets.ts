@@ -11,6 +11,8 @@ export interface AnswerWidget {
   setDisabled(disabled: boolean): void;
   /** Marks the options green/orange after a verdict (equations only). */
   mark(correctIds: readonly string[] | null): void;
+  /** Empties the entered answer (the pad on a reveal, so a wrong number is not left showing). */
+  clear(): void;
   destroy(): void;
 }
 
@@ -25,6 +27,7 @@ export function mountNumberPad(body: HTMLElement, onSubmit: (value: number) => v
       if (!disabled) pad.clear();
     },
     mark: () => {},
+    clear: () => pad.clear(),
     destroy: () => pad.destroy(),
   };
 }
@@ -105,6 +108,7 @@ export function mountEquationChoices(
         }
       }
     },
+    clear: () => {},
     destroy: () => wrap.remove(),
   };
 }
