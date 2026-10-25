@@ -1,5 +1,6 @@
 // Keyboard (WASD/arrows, Space, E, M, Esc, quiz keys 1-3), focus/visibility handling and the
-// touch joystick. Quirk kept: losing window focus while playing opens the settings dialog.
+// touch joystick. Quirk kept: losing window focus while playing opens the settings dialog, but
+// not when a plain Tab just moved focus out of the page to the browser chrome (QA m-10).
 import { isLevelRunning } from '../levels/shared/level-gates';
 import { appSettings } from '../store/app-settings';
 import { gameState, getWorld } from './game-state';
@@ -11,6 +12,9 @@ import { openSettings } from './settings-dialog';
 const NO_REPEAT_KEYS = ['e', ' ', 'Escape', 'm', 'M'];
 const MOVE_KEYS = ['w', 'a', 's', 'd', 'arrowup', 'arrowdown', 'arrowleft', 'arrowright', ' '];
 const JOYSTICK_RADIUS = 34;
+/** A window blur this soon after a plain Tab is keyboard navigation, not leaving the app. */
+const TAB_BLUR_WINDOW_MS = 1000;
+let lastPlainTabAt = Number.NEGATIVE_INFINITY;
 const KNOB_TRAVEL = 30;
 
 function onKeyDown(event: KeyboardEvent): void {
@@ -50,9 +54,19 @@ function onKeyDown(event: KeyboardEvent): void {
 }
 
 function wireFocusAndVisibility(): void {
+  document.addEventListener(
+    'keydown',
+    (event) => {
+      if (event.key === 'Tab' && !event.altKey && !event.ctrlKey && !event.metaKey)
+        lastPlainTabAt = performance.now();
+    },
+    { capture: true },
+  );
   window.addEventListener('blur', () => {
     gameState.world?.clearInput();
+    const tabbedOut = performance.now() - lastPlainTabAt < TAB_BLUR_WINDOW_MS;
     if (
+      !tabbedOut &&
       gameState.world?.active &&
       !gameState.mapOpen &&
       !isLevelRunning() &&
