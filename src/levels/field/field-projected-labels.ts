@@ -6,6 +6,8 @@ export interface PinnedLabel {
   readonly text: string;
   readonly at: Vector3;
   readonly className?: string;
+  /** `top`: the label hangs below its point (the equation under the plot, never over cells). */
+  readonly anchor?: 'center' | 'top';
 }
 
 export interface ProjectedLabels {
@@ -28,7 +30,7 @@ export function createProjectedLabels(parent: HTMLElement): ProjectedLabels {
     camera.updateMatrixWorld();
     for (const { label, node } of current) {
       const p = label.at.clone().project(camera);
-      node.style.transform = `translate(${((p.x + 1) / 2) * width}px, ${((1 - p.y) / 2) * height}px) translate(-50%, -50%)`;
+      node.style.transform = `translate(${((p.x + 1) / 2) * width}px, ${((1 - p.y) / 2) * height}px) translate(-50%, ${label.anchor === 'top' ? '0' : '-50%'})`;
       node.hidden = p.z > 1;
     }
   };

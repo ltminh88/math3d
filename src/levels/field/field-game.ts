@@ -45,7 +45,7 @@ export function createFieldGame({ ctx, view, hud, labels, diorama, planting }: F
   const equationLabel = (suffix: string) => {
     const at = view.worldOf('front');
     const text = `${grid.rows} × ${grid.cols}${suffix}`;
-    labels.set(at && equationShown ? [{ text, at }] : []);
+    labels.set(at && equationShown ? [{ text, at, anchor: 'top' }] : []);
   };
   const setFocus = (cell: model.GridCell | null) => {
     focus = cell;

@@ -9,6 +9,9 @@ export type FeedbackTone = 'success' | 'gentle' | '';
 
 export interface FieldHud {
   readonly root: HTMLElement;
+  /** VLM's speech line and the round panel (the scene frames the plot around them). */
+  readonly speech: HTMLElement;
+  readonly panel: HTMLElement;
   /** Holds the round's answer widget (number pad or equation choices). */
   readonly body: HTMLElement;
   speak(text: string): void;
@@ -81,6 +84,8 @@ export function createFieldHud(
 
   return {
     root,
+    speech,
+    panel,
     body,
     speak(text) {
       line.textContent = text;

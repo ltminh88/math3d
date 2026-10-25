@@ -9,17 +9,24 @@ import { createFieldHud } from './field-hud';
 import { createMaterialCache } from './field-materials';
 import { createPlantingInput } from './field-planting-input';
 import { createProjectedLabels } from './field-projected-labels';
-import { createFieldStage } from './field-stage';
+import { createFieldStage, measureFieldViewport } from './field-stage';
 import { tf } from './field-strings';
 import { installFieldTestHook } from './field-test-hook';
 import { isPlanted, moveFocus } from './planting-grid';
 import { CELL, createGridView } from './planting-grid-view';
 
-/** Camera framing radius of a plot (same either way round) plus its stakes and basket. */
-const frameRadius = (rows: number, cols: number) =>
-  Math.max(5.2, 0.5 * Math.hypot(rows, cols) * CELL + 1.8);
-/** The celebration pulls back to show every restored patch. */
-const CELEBRATION_RADIUS = 11;
+/**
+ * Framing half-sizes [x, z] of the plot. While planting (the plot cannot turn) it is framed as it
+ * lies, so the cells are as big as the screen allows; once it may turn, by its larger side both
+ * ways, so a turn never moves the camera. The celebration pulls back to every restored patch.
+ */
+function plotFraming(phase: string, rows: number, cols: number): [number, number] {
+  if (phase === 'done') return [8.5, 8.5];
+  const half = (n: number) => Math.max(1.5, (n * CELL) / 2);
+  if (phase === 'planting') return [half(cols), half(rows)];
+  const side = Math.max(2.4, half(Math.max(rows, cols)));
+  return [side, side];
+}
 /** Test builds: the last level frame's draw calls and the run's maximum on `.level-layer`. */
 const TRACK_DRAW_CALLS = import.meta.env.MODE === 'test';
 
@@ -71,13 +78,18 @@ export function start(ctx: LevelContext): LevelSession {
   });
   const fieldGame = createFieldGame({ ctx, view, hud, labels, diorama, planting });
   game = fieldGame;
-  const size = { width: ctx.canvas.clientWidth, height: ctx.canvas.clientHeight, radius: 0 };
+  const size = { width: ctx.canvas.clientWidth, height: ctx.canvas.clientHeight, x: 0, z: 0 };
   const frame = (width: number, height: number) => {
     size.width = width;
     size.height = height;
-    stage.fit(width, height, size.radius);
+    stage.fit(measureFieldViewport(ctx.canvas, hud, width, height), size.x, size.z);
     labels.place(stage.camera, width, height);
   };
+  // The HUD grows and shrinks (pad, hints, speech length): frame the plot in what it leaves free.
+  const hudResize = new ResizeObserver(() => frame(size.width, size.height));
+  hudResize.observe(hud.speech);
+  hudResize.observe(hud.panel);
+  ctx.disposer.onDispose(() => hudResize.disconnect());
   fieldGame.start();
   document.addEventListener('keydown', (e) => handleKey(e, fieldGame, ctx), {
     capture: true,
@@ -94,10 +106,10 @@ export function start(ctx: LevelContext): LevelSession {
     camera: stage.camera,
     update(dt) {
       const { grid, phase } = fieldGame.status();
-      const radius = phase === 'done' ? CELEBRATION_RADIUS : frameRadius(grid.rows, grid.cols);
-      if (radius !== size.radius) {
-        // A new round's plot: reframe (turning the plot keeps the radius, so no camera jump).
-        size.radius = radius;
+      const [x, z] = plotFraming(phase, grid.rows, grid.cols);
+      if (x !== size.x || z !== size.z) {
+        // A new plot or phase: reframe (turning the plot keeps the framing, so no camera jump).
+        Object.assign(size, { x, z });
         frame(size.width, size.height);
       }
       view.update(dt);
