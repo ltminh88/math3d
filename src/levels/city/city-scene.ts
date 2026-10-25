@@ -59,7 +59,8 @@ function start(ctx: LevelContext): LevelSession {
     // right when it stands there (wide, short landscape) or along the bottom (portrait).
     const cover = doneCard ?? (panel.panel.hidden ? undefined : panel.panel);
     const box = cover?.getBoundingClientRect();
-    const right = !!box && box.left > canvas.left + canvas.width * 0.4;
+    // By its centre: the card pops in scaled about its centre, and a centred card is at the bottom.
+    const right = !!box && box.left + box.width / 2 > canvas.left + canvas.width * 0.6;
     const guide = panel.guide.getBoundingClientRect();
     view.setArea({
       ...size,
@@ -95,6 +96,7 @@ function start(ctx: LevelContext): LevelSession {
       const bonus = ctx.firstCompletion ? LEVEL_COMPLETE_BONUS : null;
       const exit = () => ctx.exit({ completed: true });
       doneCard = showCityCelebration(ctx.ui, ts, earned, stars, exit, bonus);
+      doneCard.addEventListener('animationend', frame, { once: true });
       frame();
     },
   });

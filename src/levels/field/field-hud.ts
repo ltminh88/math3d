@@ -150,7 +150,7 @@ export function createFieldHud(
       starLine.textContent = '★'.repeat(stars) + '☆'.repeat(3 - stars);
       starLine.setAttribute('aria-label', `${stars}/3`);
       body.replaceChildren(starLine);
-      if (bonus) el('p', 'completion-rewards field-bonus', body).textContent = bonus;
+      if (bonus) el('p', 'field-tip field-bonus', body).textContent = bonus;
     },
   };
 }

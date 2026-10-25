@@ -58,7 +58,7 @@ export class CityCamera {
     const w = Math.max(1, width);
     const h = Math.max(1, height);
     const freeW = Math.max(w * 0.35, w - coverRight);
-    const freeH = Math.max(h * 0.35, h - coverBottom - coverTop);
+    const freeH = Math.max(h * 0.2, h - coverBottom - coverTop);
     const camera = this.camera;
     camera.aspect = w / h;
     const tanHalf = Math.tan((FOV * Math.PI) / 360);

@@ -2,6 +2,7 @@
 // Keyboard (WCAG 2.5.7 alternative to dragging): arrows move the cell focus, Enter plants,
 // R turns the plot, H asks for a hint, 1-4 + Enter pick equations. Listens on `document` with the
 // level disposer's signal, in the capture phase so planting keys never reach the 3D tap layer.
+import { Box3, Vector3 } from 'three';
 import type { LevelContext, LevelSession } from '../shared/level-types';
 import { buildFieldDiorama } from './field-diorama-builder';
 import { createFieldGame, type FieldGame } from './field-game';
@@ -9,7 +10,7 @@ import { createFieldHud } from './field-hud';
 import { createMaterialCache } from './field-materials';
 import { createPlantingInput } from './field-planting-input';
 import { createProjectedLabels } from './field-projected-labels';
-import { createFieldStage, measureFieldViewport } from './field-stage';
+import { createFieldStage, measureFieldViewport, plotBox } from './field-stage';
 import { tf } from './field-strings';
 import { installFieldTestHook } from './field-test-hook';
 import { isPlanted, moveFocus } from './planting-grid';
@@ -18,15 +19,16 @@ import { CELL, createGridView } from './planting-grid-view';
 /**
  * Framing half-sizes [x, z] of the plot. While planting (the plot cannot turn) it is framed as it
  * lies, so the cells are as big as the screen allows; once it may turn, by its larger side both
- * ways, so a turn never moves the camera. The celebration pulls back to every restored patch.
+ * ways, so a turn never moves the camera.
  */
 function plotFraming(phase: string, rows: number, cols: number): [number, number] {
-  if (phase === 'done') return [8.5, 8.5];
   const half = (n: number) => Math.max(1.5, (n * CELL) / 2);
   if (phase === 'planting') return [half(cols), half(rows)];
   const side = Math.max(2.4, half(Math.max(rows, cols)));
   return [side, side];
 }
+/** Every restored patch of the meadow (field-diorama-builder's PATCHES with their tufts). */
+const CELEBRATION_BOX = new Box3(new Vector3(-11, 0, -9.5), new Vector3(11, 1, 3));
 /** Test builds: the last level frame's draw calls and the run's maximum on `.level-layer`. */
 const TRACK_DRAW_CALLS = import.meta.env.MODE === 'test';
 
@@ -82,7 +84,9 @@ export function start(ctx: LevelContext): LevelSession {
   const frame = (width: number, height: number) => {
     size.width = width;
     size.height = height;
-    stage.fit(measureFieldViewport(ctx.canvas, hud, width, height), size.x, size.z);
+    const viewport = measureFieldViewport(ctx.canvas, hud, width, height);
+    if (size.x < 0) stage.fit(viewport, CELEBRATION_BOX, false);
+    else stage.fit(viewport, plotBox(size.x, size.z), true);
     labels.place(stage.camera, width, height);
   };
   // The HUD grows and shrinks (pad, hints, speech length): frame the plot in what it leaves free.
@@ -106,7 +110,8 @@ export function start(ctx: LevelContext): LevelSession {
     camera: stage.camera,
     update(dt) {
       const { grid, phase } = fieldGame.status();
-      const [x, z] = plotFraming(phase, grid.rows, grid.cols);
+      // -1: the celebration frames the whole meadow instead of a plot.
+      const [x, z] = phase === 'done' ? [-1, -1] : plotFraming(phase, grid.rows, grid.cols);
       if (x !== size.x || z !== size.z) {
         // A new plot or phase: reframe (turning the plot keeps the framing, so no camera jump).
         Object.assign(size, { x, z });

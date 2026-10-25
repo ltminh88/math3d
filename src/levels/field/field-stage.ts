@@ -37,16 +37,16 @@ export interface FieldStage {
   readonly scene: Scene;
   readonly camera: PerspectiveCamera;
   /**
-   * Frames a plot reaching `halfX` / `halfZ` world units from its centre, with its stakes and
-   * basket, as large as the free canvas allows.
+   * Frames `box` as large as the free canvas allows. A plot (`plot`) keeps room below it for its
+   * equation label and is seen more steeply on phones; the celebration's meadow is not.
    */
-  fit(view: FieldViewport, halfX: number, halfZ: number): void;
+  fit(view: FieldViewport, box: Box3, plot: boolean): void;
   /** Frees the sun's shadow map (a render target the scene disposer never reaches; QA M-3). */
   dispose(): void;
 }
 
-/** The plot's bounding box: cells, row stakes + basket on the left/front, flowers up to ~1 u. */
-const plotBox = (x: number, z: number): Box3 =>
+/** A plot's bounding box: cells, row stakes + basket on the left/front, flowers up to ~1 u. */
+export const plotBox = (x: number, z: number): Box3 =>
   new Box3(new Vector3(-x - 1.2, 0, -z - 0.4), new Vector3(x + 0.4, 1, z + 1.3));
 
 export function createFieldStage(lowPower: boolean): FieldStage {
@@ -95,22 +95,25 @@ export function createFieldStage(lowPower: boolean): FieldStage {
   return {
     scene,
     camera,
-    fit(view, halfX, halfZ) {
+    fit(view, box, plot) {
       const { width, height } = view;
       if (width <= 0 || height <= 0) return;
       const free = {
         left: EDGE_PX,
         right: Math.max(width - view.right - EDGE_PX, width * 0.4),
         top: view.top + EDGE_PX,
-        bottom: Math.max(height - view.bottom - EDGE_PX - LABEL_PX, view.top + height * 0.25),
+        bottom: Math.max(
+          height - view.bottom - EDGE_PX - (plot ? LABEL_PX : 0),
+          view.top + height * 0.25,
+        ),
       };
       camera.aspect = width / height;
-      elevation = width <= height * 1.05 || height < 500 ? STEEP_ELEVATION : ELEVATION;
+      const phone = width <= height * 1.05 || height < 500;
+      elevation = plot && phone ? STEEP_ELEVATION : ELEVATION;
       const centerX = (free.left + free.right) / 2;
       const centerY = (free.top + free.bottom) / 2;
       camera.setViewOffset(width, height, width / 2 - centerX, height / 2 - centerY, width, height);
       camera.updateProjectionMatrix();
-      const box = plotBox(halfX, halfZ);
       const target = box.getCenter(new Vector3());
       const fits = (distance: number): boolean => {
         place(target, distance);
