@@ -1,0 +1,21 @@
+/* QA p-6: on touch screens the top-bar buttons (38 px under 700 px) and the quest toggle
+   (26 px tall) take taps over at least 44 x 44 px. An invisible ::after grows the hit area; the
+   look is unchanged (src/styles/game/* stays byte-equal to the recovered styles). */
+@media (pointer: coarse) {
+  .top-right .icon-button,
+  .quest-head {
+    position: relative;
+  }
+  .top-right .icon-button::after,
+  .quest-head::after {
+    content: "";
+    position: absolute;
+  }
+  /* 38 px border box, 36 px padding box: -4 px each side gives 44 px. */
+  .top-right .icon-button::after {
+    inset: -4px;
+  }
+  .quest-head::after {
+    inset: -9px 0;
+  }
+}

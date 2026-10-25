@@ -1,5 +1,6 @@
 // HUD refresh (level, XP bar, coins, avatar, quest card, region locks, sound button) and the
 // collapsible quest card. Called ad hoc after every progress change, like the original `_n()`.
+import '../styles/touch-hit-areas.css';
 import { isRegionUnlocked } from '../config/regions';
 import { BRIDGE_SEGMENTS, LEVEL_XP_THRESHOLDS } from '../config/world-constants';
 import { levelForXp } from '../game/xp-levels';
