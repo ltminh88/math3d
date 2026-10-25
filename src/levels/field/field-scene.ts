@@ -20,6 +20,8 @@ const frameRadius = (rows: number, cols: number) =>
   Math.max(5.2, 0.5 * Math.hypot(rows, cols) * CELL + 1.8);
 /** The celebration pulls back to show every restored patch. */
 const CELEBRATION_RADIUS = 11;
+/** Test builds: the last level frame's draw calls and the run's maximum on `.level-layer`. */
+const TRACK_DRAW_CALLS = import.meta.env.MODE === 'test';
 
 function handleKey(event: KeyboardEvent, game: FieldGame, ctx: LevelContext): void {
   if (event.defaultPrevented || event.altKey || event.ctrlKey || event.metaKey) return;
@@ -85,6 +87,8 @@ export function start(ctx: LevelContext): LevelSession {
     ctx.disposer.onDispose(installFieldTestHook(fieldGame, view, stage.camera, ctx.canvas));
   }
   let wasAnimating = false;
+  let frames = 0;
+  let maxCalls = 0;
   return {
     scene: stage.scene,
     camera: stage.camera,
@@ -100,10 +104,18 @@ export function start(ctx: LevelContext): LevelSession {
       diorama.update(dt);
       if (wasAnimating && !view.animating) labels.place(stage.camera, size.width, size.height);
       wasAnimating = view.animating;
+      frames += 1;
+      if (TRACK_DRAW_CALLS && frames > 2) {
+        // The previous frame's level render (the host renders after update).
+        const calls = ctx.renderer.info.render.calls;
+        maxCalls = Math.max(maxCalls, calls);
+        Object.assign(ctx.ui.dataset, { drawCalls: calls, maxDrawCalls: maxCalls });
+      }
     },
     resize: frame,
     dispose() {
       fieldGame.dispose();
+      stage.dispose();
       hud.root.remove();
     },
   };

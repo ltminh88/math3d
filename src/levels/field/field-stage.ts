@@ -25,6 +25,8 @@ export interface FieldStage {
   readonly camera: PerspectiveCamera;
   /** Frames a plot of `radius` world units for a `width` x `height` canvas (CSS px). */
   fit(width: number, height: number, radius: number): void;
+  /** Frees the sun's shadow map (a render target the scene disposer never reaches; QA M-3). */
+  dispose(): void;
 }
 
 export function createFieldStage(lowPower: boolean): FieldStage {
@@ -84,5 +86,6 @@ export function createFieldStage(lowPower: boolean): FieldStage {
       camera.setViewOffset(width, height, width / 2 - centerX, height / 2 - centerY, width, height);
       camera.updateProjectionMatrix();
     },
+    dispose: () => sun.shadow.dispose(),
   };
 }

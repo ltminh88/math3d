@@ -1,14 +1,14 @@
 // Field level "Cánh Đồng Phép Tính" (phase 14): seed the bridge, walk to the meadow gate, play the
 // five rounds (keyboard on desktop, touch on the phone), come back at the gate with the level
-// completed; the scene stays within 60 draw calls and gives every geometry back on exit.
+// completed; the scene stays within 60 draw calls and gives every geometry and texture back.
 import { type Page, test } from '@playwright/test';
 import { expect, SLOW_TEST_MS, waitForStoreBoot } from './legacy-live-save-fixtures';
+import { rendererMemory, settledMemory } from './settled-renderer-memory';
 
 test.use({ locale: 'vi-VN' });
 test.describe.configure({ timeout: SLOW_TEST_MS * 2 });
 
 const fieldState = (page: Page) => page.evaluate(() => window.__field?.state());
-const memory = (page: Page) => page.evaluate(() => window.__game?.memory().geometries ?? -1);
 
 /** Draw calls of the last rendered frame (the level's while it runs). */
 const drawCalls = (page: Page) =>
@@ -137,6 +137,10 @@ test('the field level is played to the end and opens the way to the forest', asy
 
   await playFiveRounds(page, touch);
   expect(await drawCalls(page)).toBeLessThanOrEqual(60);
+  // The run's maximum, exposed like the other levels (QA p-8).
+  const maxCalls = await page.locator('.level-layer').getAttribute('data-max-draw-calls');
+  expect(Number(maxCalls)).toBeGreaterThan(0);
+  expect(Number(maxCalls)).toBeLessThanOrEqual(60);
   const back = page.getByRole('button', { name: 'Về cổng' });
   if (touch) await back.tap();
   else await page.keyboard.press('Enter');
@@ -155,21 +159,24 @@ test('the field level is played to the end and opens the way to the forest', asy
   expect(errors).toEqual([]);
 });
 
-test('leaving the field gives every geometry back, also after 10 runs', async ({ page }) => {
+test('leaving the field frees its geometries and textures (once and after 10 visits)', async ({
+  page,
+}) => {
   await startWithBridge(page);
   await page.evaluate(() => window.__game?.teleportToGate('field'));
-  await drawCalls(page);
-  const baseline = await memory(page);
+  // Settled world baseline: right after a teleport the phone's follow camera still swings in and
+  // uploads world objects on first sight (QA M-4: +1 world cylinder, not a level leak).
+  const baseline = await settledMemory(page);
+  expect(baseline.geometries).toBeGreaterThan(0);
   const leaveOnce = async () => {
     await enterField(page);
-    expect(await memory(page)).toBeGreaterThan(baseline);
+    expect((await rendererMemory(page)).geometries).toBeGreaterThan(baseline.geometries);
     await page.locator('.level-leave').click();
     await page.waitForFunction(() => window.__game?.levelRunning() === false);
-    await drawCalls(page);
   };
   await leaveOnce();
-  expect(await memory(page)).toBe(baseline);
+  await expect.poll(() => rendererMemory(page)).toEqual(baseline);
   for (let i = 0; i < 10; i++) await leaveOnce();
-  expect(await memory(page)).toBe(baseline);
+  await expect.poll(() => rendererMemory(page)).toEqual(baseline);
   expect(await page.evaluate(() => window.__field)).toBeUndefined();
 });
