@@ -68,3 +68,9 @@ Findings from `reports/reviewer-city-tower-levels.md`, fixed on main (commits c9
 
 Gates: lint 0 errors / 9 pre-existing warnings, typecheck clean, unit 71 files / 473 tests, build ok, e2e 63 passed + 1 skipped (desktop-only full chain) on both projects, parity 20/20 without re-baseline, golden byte-identical.
 Screens refreshed: `reports/city-screens/{desktop,mobile}-0{3,4,5}-*.png`, `reports/tower-screens/{desktop,mobile}-05-top-celebration.png`, new `reports/tower-screens/04-hint-rung-4.png`.
+
+## QA fixes
+Fixes for `reports/qa-full-playthrough.md` (M-1..M-7, m-1..m-5, m-9..m-12, p-5..p-8), merged on main (tag `qa-fixes`): screenshots 3557ce3, merges 1329a52 (`fix/app-shell-qa`) and ea3bac9 (`fix/level-qa-fixes`), no conflicts; parity 9196d9e. Details: `docs/project-changelog.md`.
+
+Gates on the merged main: lint 0 errors / 9 pre-existing warnings, typecheck clean, unit 77 files / 497 tests, build ok, e2e 77 passed + 5 skipped (project-gated phone/desktop-only specs) of 82, no flake, parity 9/20 → re-baselined (`reports/parity-rebaseline-qa-fixes.md`) → 20/20, golden byte-identical.
+Screens: `reports/qa-fix-screens/`. Open: m-6, m-7, m-8, p-1..p-4, p-9.

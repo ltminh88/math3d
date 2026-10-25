@@ -24,7 +24,7 @@ Every map region except Khu Vườn gets a level. Quest chain: bridge → field 
 | 01 | [Gates, progression and quest chain for city/tower](phase-01-gates-progression-and-quest-chain.md) | 6h | Done (city-tower-p01) |
 | 02 | [City level: Thành Phố Con Số](phase-02-city-level.md) | 14h | Done (city-level) |
 | 03 | [Tower level: Tháp Toán Học](phase-03-tower-level.md) | 15h | Done (tower-level) |
-| 04 | [Merge, full-chain e2e, parity re-baseline, author review](phase-04-merge-e2e-parity-and-author-review.md) | 5h | In progress (merged and verified; author review pending) |
+| 04 | [Merge, full-chain e2e, parity re-baseline, author review](phase-04-merge-e2e-parity-and-author-review.md) | 5h | In progress (merged and verified; QA fixes merged, tag `qa-fixes`; author review pending) |
 
 ## Dependencies and parallel groups
 - 01 first: the registry refuses a level whose gate is not in `LEVEL_GATES`, and the gate requirement type must accept `forest`/`city`.
