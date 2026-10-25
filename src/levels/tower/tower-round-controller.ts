@@ -104,6 +104,7 @@ export class TowerRoundController {
       else this.card.setActive(this.flow.stepIndex);
       this.panel.showInput(next);
       this.panel.clearHint();
+      this.panel.hint.disabled = false;
       const text = this.ts(confirming ? 'claimTrue' : fixing ? 'claimCaught' : 'correctStep');
       this.panel.setFeedback(text, 'success');
       this.ctx.audio.tone(698, 0.12);
@@ -140,6 +141,8 @@ export class TowerRoundController {
     const rung = this.flow.takeHint();
     const text = renderHint(this.panel.hintArea, this.ts, rung, step);
     this.panel.offerHint(false);
+    // The last taught rung is shown: the button is spent until the next step (QA m-4).
+    this.panel.hint.disabled = rung >= 4;
     this.ctx.audio.hint();
     this.ctx.announce(text);
     this.idle = 0;

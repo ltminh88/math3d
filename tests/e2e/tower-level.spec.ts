@@ -92,6 +92,14 @@ async function playFloor(page: Page, index: number, tap: boolean): Promise<void>
       await page.keyboard.press('h');
     }
     await expect(page.locator('.tower-hint')).toHaveAttribute('data-rung', '1');
+    // Rungs 2-4; after the last taught rung the button is spent, as in the field (QA m-4).
+    for (const rung of ['2', '3', '4']) {
+      await expect(hint).toBeEnabled();
+      if (tap) await hint.tap();
+      else await hint.click();
+      await expect(page.locator('.tower-hint')).toHaveAttribute('data-rung', rung);
+    }
+    await expect(hint).toBeDisabled();
     s = await towerState(page);
   }
   if (s.step !== 'number') {
