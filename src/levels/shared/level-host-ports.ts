@@ -90,6 +90,7 @@ function openLevelRun(
       defineStrings,
       announce: (message) => announce(message),
       reducedMotion: matchMedia('(prefers-reduced-motion: reduce)').matches,
+      firstCompletion: !((store.getSnapshot().levelProgress[definition.id]?.completedAt ?? 0) > 0),
     },
     close(result) {
       if (closed) return;

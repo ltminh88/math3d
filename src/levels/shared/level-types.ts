@@ -86,6 +86,12 @@ export interface LevelContext {
    */
   readonly disposer: SceneDisposer;
   readonly reducedMotion: boolean;
+  /**
+   * Read-only: the store had no completion of this level when the run opened, so a run that ends
+   * completed with a star earns the one-time bonus (`LEVEL_COMPLETE_BONUS`) for the celebration
+   * to show. The host still decides the bonus against the store at commit time.
+   */
+  readonly firstCompletion: boolean;
   /** Ends the run: stops the loop, disposes the scene, commits the result, resumes the world. */
   exit(result: LevelResult): void;
 }
