@@ -1,5 +1,6 @@
 import { tableOfFact } from './curriculum-tables';
-import type { FactKey } from './fact-key';
+import { factGroup } from './fact-group';
+import { type FactKey, isSkillKey } from './fact-key';
 import type { FactStat } from './learning-types';
 import { type Rng, shuffle } from './seeded-rng';
 
@@ -12,7 +13,7 @@ const KNOWN_SHARE = 0.7;
 
 export interface PlanInput {
   stats: Readonly<Record<FactKey, FactStat | undefined>>;
-  /** Facts the level drills. */
+  /** Facts the level drills: × / : facts and `sk:` skills may be mixed. */
   pool: readonly FactKey[];
   /** The level's tables in fluency order. */
   tables: readonly number[];
@@ -34,13 +35,13 @@ function isKnown(table: number, input: PlanInput): boolean {
   return solid.length / facts.length >= KNOWN_SHARE;
 }
 
-/** No two neighbours from the same table where avoidable. */
+/** No two neighbours from the same group (table, or skill family) where avoidable. */
 function interleave(keys: FactKey[], tables: readonly number[]): FactKey[] {
   const rest = keys.slice();
   const out: FactKey[] = [];
   while (rest.length > 0) {
-    const last = out.length > 0 ? tableOfFact(out[out.length - 1] as FactKey, tables) : undefined;
-    const idx = rest.findIndex((k) => tableOfFact(k, tables) !== last);
+    const last = out.length > 0 ? factGroup(out[out.length - 1] as FactKey, tables) : undefined;
+    const idx = rest.findIndex((k) => factGroup(k, tables) !== last);
     out.push(...rest.splice(idx === -1 ? 0 : idx, 1));
   }
   return out;
@@ -48,7 +49,8 @@ function interleave(keys: FactKey[], tables: readonly number[]): FactKey[] {
 
 /**
  * ~60% due/weak, ~30% new (max 3), ~10% mastered check; shortages spill to the next source and
- * finally repeat the chosen facts. Interleaves tables once two are known, otherwise teaches them blocked.
+ * finally repeat the chosen facts. Interleaves tables once two are known, otherwise teaches them blocked;
+ * skills (`sk:`) are never blocked and are spread by family.
  */
 export function planSession(input: PlanInput): FactKey[] {
   const { stats, pool, tables, sessionNo, rng } = input;
@@ -80,7 +82,7 @@ export function planSession(input: PlanInput): FactKey[] {
     rng,
     mixed || blockedTable === undefined
       ? unseen
-      : unseen.filter((k) => tableOfFact(k, tables) === blockedTable),
+      : unseen.filter((k) => isSkillKey(k) || tableOfFact(k, tables) === blockedTable),
   );
 
   const weakQ = Math.round(length * 0.6);
@@ -106,5 +108,6 @@ export function planSession(input: PlanInput): FactKey[] {
   for (let i = 0; plan.length < length; i++) plan.push(base[i % base.length] as FactKey);
 
   const shuffled = shuffle(rng, plan);
-  return mixed ? interleave(shuffled, tables) : shuffled;
+  // Skills are never taught blocked by table, so a pool with skills is always interleaved.
+  return mixed || plan.some(isSkillKey) ? interleave(shuffled, tables) : shuffled;
 }

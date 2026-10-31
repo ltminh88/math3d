@@ -1,13 +1,13 @@
 // Save codes in the UI: "Nhập mã lưu" on the start screen (paste -> confirm overwrite when there
-// is progress -> import) and "Xuất mã lưu" in settings (code + copy button). Export writes M3D2
-// (levels and cosmetics included); import also takes old M3D1 codes. A bad code never touches
+// is progress -> import) and "Xuất mã lưu" in settings (code + copy button). Export writes M3D3
+// (levels, cosmetics and skills included); import also takes old M3D1/M3D2 codes. A bad code never touches
 // the store; the error is shown in the dialog.
 import '../styles/save-code-dialog.css';
 import { appSettings } from '../store/app-settings';
 import {
   type DecodedSaveCode,
   decodeSaveCode,
-  encodeSaveCodeV2,
+  encodeSaveCodeV3,
   importOfDecodedSaveCode,
   SaveCodeError,
 } from '../store/save-code-codec';
@@ -95,7 +95,7 @@ export async function openSaveCodeExport(): Promise<void> {
   const store = connectedStore();
   if (!store) return;
   const { sound, music } = appSettings.get();
-  const code = encodeSaveCodeV2(store.getSnapshot(), { sound, music });
+  const code = encodeSaveCodeV3(store.getSnapshot(), { sound, music });
   openDialog(
     ts('exportTitle'),
     `<p class="dialog-copy">${ts('exportIntro')}</p><textarea id="save-code-output" class="save-code-input" readonly spellcheck="false" aria-label="${ts('codeLabel')}"></textarea><button id="save-code-copy" class="primary wide">${icon('save')} ${ts('copy')}</button><button id="save-code-back" class="text-button centered">${ts('back')}</button>`,

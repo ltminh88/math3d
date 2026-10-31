@@ -135,7 +135,7 @@ describe('save code codec', () => {
       errorReason(() => decodeV1(code.slice(0, code.length - 20))),
     );
     expect(errorReason(() => decodeV1(`X${code.slice(1)}`))).toBe('prefix');
-    expect(errorReason(() => decodeV1(code.replace('M3D1-', 'M3D3-')))).toBe('version');
+    expect(errorReason(() => decodeV1(code.replace('M3D1-', 'M3D9-')))).toBe('version');
     expect(errorReason(() => decodeV1(`${code.slice(0, -8)}00000000`))).toBe('checksum');
     expect(errorReason(() => decodeV1(`M3D1-${'A'.repeat(MAX_SAVE_CODE_CHARS)}-00000000`))).toBe(
       'too-long',
