@@ -106,10 +106,13 @@ export async function openSaveCodeExport(): Promise<void> {
   output.value = code;
   byId('save-code-copy').onclick = () => {
     output.select();
-    navigator.clipboard?.writeText(code).then(
-      () => showToast(ts('copied')),
-      () => document.execCommand?.('copy'),
-    );
+    const copied = () => showToast(ts('copied'));
+    // Plain-http LAN pages have no `navigator.clipboard`; copy the selection the old way there.
+    const copySelection = () => {
+      if (document.execCommand('copy')) copied();
+    };
+    if (navigator.clipboard) navigator.clipboard.writeText(code).then(copied, copySelection);
+    else copySelection();
   };
   byId('save-code-back').onclick = openSettings;
 }

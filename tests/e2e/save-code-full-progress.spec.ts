@@ -98,3 +98,17 @@ test('export after all levels and a purchase -> fresh context import restores ev
   await expectFullProgress(again);
   await fresh.close();
 });
+
+// Plain-http LAN pages have no `navigator.clipboard`; "Sao chép mã" falls back to copying the
+// selected text and still confirms with a toast.
+test('copy works without the clipboard API (plain-http LAN)', async ({ page }) => {
+  await page.addInitScript(() => {
+    Object.defineProperty(Navigator.prototype, 'clipboard', { get: () => undefined });
+  });
+  await page.goto('/');
+  await play(page);
+  await page.locator('#settings').click();
+  await page.locator('#export-save-code').click();
+  await page.locator('#save-code-copy').click();
+  await expect(page.locator('#toast')).toHaveText('Đã sao chép mã lưu.');
+});
