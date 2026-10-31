@@ -5,7 +5,7 @@
 - `src/learning/fact-key.ts`, `curriculum-tables.ts`, `session-planner.ts`, `session-recorder.ts`; `src/store/delta-validation.ts`, `save-code-*.ts`; `docs/recovery-notes.md` "Progress storage and save codes"
 
 ## Overview
-- Date 2026-10-31. Priority P1. Status pending. Review: not started. No deps; parallel with 03.
+- Date 2026-10-31. Priority P1. Status **done** (branch `feat/ch2-p01-skill-keys`, not merged). Review: not started. No deps; parallel with 03.
 - Foundation for every later phase: a bounded skill-key grammar so non-table items get Leitner stats, pure seeded reasoning generators with box-based tiers, a new save-code version that carries skills, shared step-answer widgets, and a tablet e2e project.
 
 ## Key Insights
@@ -61,14 +61,14 @@ Co-located `*.test.ts` for each pure module. All files <200 lines (`game-store.t
 9. Lint, typecheck, unit, build, golden `--check`.
 
 ## Todo list
-- [ ] skill catalog commit
-- [ ] fact key + group + planner + validation
-- [ ] KNTT reasoning verification
-- [ ] generators + tests
-- [ ] M3D3 + tests
-- [ ] step kit
-- [ ] seedFactStats hook, tablet projects + baseline report
-- [ ] docs
+- [x] skill catalog commit
+- [x] fact key + group + planner + validation
+- [x] KNTT reasoning verification
+- [x] generators + tests
+- [x] M3D3 + tests
+- [x] step kit
+- [x] seedFactStats hook, tablet projects + baseline report
+- [x] docs
 
 ## Success Criteria
 - Unit green; mul/div behaviour byte-equal (existing tests untouched); M3D1/M3D2 fixtures decode identical; goldens byte-identical; lint/typecheck/build clean.
@@ -94,3 +94,15 @@ Co-located `*.test.ts` for each pure module. All files <200 lines (`game-store.t
 
 ## Next steps
 - 02 after catalog commit; 04–08 consume generators, tiers and kit.
+
+## Implementation notes (2026-10-31)
+- Catalog `src/learning/skill-catalog.ts` (39 ids, family + KNTT lesson; append-only, frozen-order test).
+- Keys: `FACT_KEY_PATTERN_SOURCE` + `|sk:[a-z][a-z0-9-]{1,38}`; `isFactKey`/`parseKey` accept catalog skills. **Deviation:** `parseFactKey` stays mul/div-only (null for `sk:`) and `parseKey` returns `{op:'skill', id}` — tower/quiz/question-generator (other owners) keep compiling and still reject skills loudly.
+- `factGroup` (`fact-group.ts`): table for × / :, family for skills; the planner never blocks skills by table and interleaves mixed pools by group. Pure mul/div pools plan byte-identically (existing tests untouched).
+- Tiers `skill-tiers.ts`: box 1-2 → 1, 3-4 → 2, 5 → 3.
+- `src/reasoning/`: 18 seeded generators (word problems, remainders, unknowns, patterns, expressions, choose-all, true/false + fix), named misconception distractors, strings vi/en, `reasoning-step-answers.ts` (answer check, verdict-with-fix → extra number step). Tests: 1000 seeds × 3 tiers × 18 skills — independent oracles for every answer, options unique (choice 3-4, one correct), every number/partial result/answer integer 0..100, deterministic; all prompts render in vi/en.
+- KNTT verification → `research/researcher-02-kntt-reasoning-verification.md` (B3/B13/B24-B28/B38/B39 titles; CĐ4 ≤100, B25 dư < số chia, B38 bracket examples ≤100, B39 hiệu vs thương). Patterns and B3/B13 ranges remain [K]; author cap makes them ≤100 anyway.
+- Save code **M3D3** (`save-code-v3-payload.ts`, `save-code-v3-skills.ts`): M3D2 fields + `k` skills; **deviation:** level set is a frozen list of 9 ids (bridge + chapter 1 + garden/valley/workshop/cave) instead of "LEVEL_GATES", so the format is fixed at ship time; a test fails if a gate is missing. M3D2 levels frozen to the 5 shipped ids; a frozen shipped M3D2 code fixture decodes identically. Export (`ui/save-code-dialog.ts`, 2 lines outside ownership) writes M3D3; two e2e regexes moved M3D2 → M3D3.
+- Step kit `src/ui/kit/`: `step-card.ts`, `multi-select-buttons.ts`, `verdict-buttons.ts`, `step-kit.css` (targets ≥48 px, no key hints). Not mounted in the game yet (phase 04); e2e `tests/e2e/step-kit-touch.spec.ts` mounts it through the test hook and solves 5 skills by `tap()` on phone/tablets (click on desktop), asserting every button ≥44 px and hittable.
+- Test hook: `seedFactStats(stats)`, `mountStepCard(skillId, seed, tier)`.
+- Playwright: `tablet-portrait` / `tablet-landscape` (iPad Pro 11 viewports on Chromium, touch, isMobile). Baseline → `reports/tablet-baseline.md`.
