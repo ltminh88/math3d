@@ -7,7 +7,8 @@
     "localVsLive": "capture-live-baselines.mjs --origin local / npm run test:parity (dist/ served under the live origin + window.__parity), 2026-10-19: canvas, shot JSON, traces and oracle scene dumps exact in every run",
     "localVsLocalR186": "phase 10 (three 0.186.1, retuned lighting): npm run parity:baselines, then capture-live-baselines.mjs --origin local + npm run test:parity, 2026-10-19: canvas PNGs, shot JSON, traces and scene dumps exact; DOM noise only on shots already listed, all within their existing tolerance/ceiling (none widened)",
     "localVsLocalPhase12": "phase 12 (IndexedDB store, learning quiz, save-code buttons): npm run parity:baselines, then npm run test:parity: canvas PNGs, shot JSON, traces and scene dumps exact; one new DOM-noise shot (mobile milo-dialog, 2 px)",
-    "localVsLocalPhase19": "phases 14/15/19 merge (field, forest, shop): npm run parity:baselines, then npm run test:parity: canvas PNGs, shot JSON, traces and scene dumps exact; one new DOM-noise shot (mobile quiz-hint-1, 221 px, two-state raster)"
+    "localVsLocalPhase19": "phases 14/15/19 merge (field, forest, shop): npm run parity:baselines, then npm run test:parity: canvas PNGs, shot JSON, traces and scene dumps exact; one new DOM-noise shot (mobile quiz-hint-1, 221 px, two-state raster)",
+    "localVsLocalP03": "chapter 2 map expansion (phase 03): npm run parity:baselines, then npm run test:parity x3 + menus/playthrough repeats, 2026-11-01: canvas PNGs, shot JSON, traces and scene dumps exact; new DOM noise on desktop quest-complete (third off-edge label, structural ceiling 0.009), desktop map-region-forest 3 px, mobile book-table-7 155 px + map-open 2 px (two-state)"
   },
   "policy": {
     "canvasPng": 0,
@@ -19,7 +20,10 @@
   },
   "nonDeterministic": {
     "desktop-chromium/playthrough--after-quest.dom.png": "tower-label world label hangs off the right viewport edge (x~1313/1280); Chrome rasterizes the clipped layer differently run to run (~0.13%). Since city-tower-p01 the tower gate label also hangs off that edge (x~1180-1280): two raster states, 1523 px (0.17%) or 6115 px (0.66%) against the same baseline. Gated structurally up to 0.008 (pixel tolerance stays under the 0.002 cap; city-tower phase 04 hit 6115 px again on an unchanged baseline).",
-    "desktop-chromium/playthrough--quest-complete.dom.png": "same off-edge tower-label, under the dialog backdrop blur (~0.05%). Since city-tower-p01 plus the off-edge tower gate label: 528 px (0.06%) or 4676 px (0.51%). Gated structurally up to 0.0065 (city-tower phase 04 hit 4676 px again on an unchanged baseline).",
+    "desktop-chromium/playthrough--quest-complete.dom.png": "same off-edge tower-label, under the dialog backdrop blur (~0.05%). Since city-tower-p01 plus the off-edge tower gate label: 528 px (0.06%) or 4676 px (0.51%). Gated structurally up to 0.0065 (city-tower phase 04 hit 4676 px again on an unchanged baseline). Since map-expansion p03 the garden gate label also hangs off that edge (x~1270): 11 px or 6882 px (0.75%) against the same baseline in 3 local runs; ceiling 0.009.",
+    "mobile-pixel/menus--book-table-7.dom.png": "two-state raster after map-expansion p03: identical 155 px in 2 of 4 local runs (same menus run also gives 2 px on menus--map-open), 0 px in the others; shot JSON byte-exact in all.",
+    "mobile-pixel/menus--map-open.dom.png": "2 px, same run state as menus--book-table-7 (map-in keyframe layer); shot JSON byte-exact.",
+    "desktop-chromium/menus--map-region-forest.dom.png": "3 px in 1 of 3 local runs after map-expansion p03 (map canvas under the overlay's composited layer, as menus--map-open); shot JSON byte-exact.",
     "desktop-chromium/bridge-6--play.dom.png": "20 px on an off-edge world label (0.002%).",
     "desktop-chromium/menus--map-open.dom.png": "3 px, map overlay map-in keyframe animation on a composited layer (oracle run only).",
     "mobile-pixel/playthrough--quiz-correct-3.dom.png": "3 px, dialog pop/reward-pop keyframe animation on a composited layer.",
@@ -76,7 +80,18 @@
           "diffPixels": 539,
           "ratio": 0.000585
         },
-        "structuralCeiling": 0.0065
+        "localVsLocalP03": {
+          "diffPixels": 6882,
+          "ratio": 0.007467
+        },
+        "structuralCeiling": 0.009
+      },
+      "menus--map-region-forest.dom.png": {
+        "localVsLocalP03": {
+          "diffPixels": 3,
+          "ratio": 3.3e-6
+        },
+        "tolerance": 0.0001
       },
       "menus--map-open.dom.png": {
         "liveVsOracle": {
@@ -141,6 +156,20 @@
       }
     },
     "mobile-pixel": {
+      "menus--book-table-7.dom.png": {
+        "localVsLocalP03": {
+          "diffPixels": 155,
+          "ratio": 0.000448
+        },
+        "tolerance": 0.0009
+      },
+      "menus--map-open.dom.png": {
+        "localVsLocalP03": {
+          "diffPixels": 2,
+          "ratio": 5.8e-6
+        },
+        "tolerance": 0.0001
+      },
       "playthrough--quiz-correct-3.dom.png": {
         "liveVsLive": {
           "diffPixels": 3,

@@ -22,5 +22,11 @@ Every differing file was attributed with a diff script (capture vs committed bas
 No diff was left unexplained. The help dialog's touch text and the hidden E/M key badges (coarse pointer only) do not show up: no parity scenario captures them under a coarse pointer.
 
 ## After the re-baseline
-- `npm run test:parity`: see final gate counts in the phase file (expected 20/20).
+- Phase 02 merged from main after the re-baseline (pure `src/geometry`, `src/measurement`; no bundle-visible change): parity unchanged.
+- Determinism runs (`npm run test:parity`, 4 full runs + targeted repeats): canvas PNGs, shot JSON, traces and scene dumps exact in every run. DOM-PNG raster noise only, all with byte-exact shot JSON:
+  - desktop `playthrough--quest-complete.dom.png`: two states, 11 px or 6882 px (0.75%) — the new garden gate label hangs off the right edge like the tower and tower-gate labels already listed; structural ceiling 0.0065 → 0.009.
+  - desktop `menus--map-region-forest.dom.png`: 3 px in 1 of 3 runs → tolerance 1e-4.
+  - mobile `menus--book-table-7.dom.png` 155 px + `menus--map-open.dom.png` 2 px, identical in 2 of 4 runs (two-state) → tolerances 9e-4 / 1e-4 (rule: max ratio × 2).
+  All recorded in `tests/parity/parity-shot-tolerances.json` (`localVsLocalP03`).
+- Final `npm run test:parity`: **20 passed**.
 - Goldens: `node tools/recovery/golden/generate-golden-traces.mjs --check` byte-identical (REGIONS, ROADS, WALKABLE_BOUNDS untouched).
