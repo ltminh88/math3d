@@ -6,6 +6,13 @@ const port = Number(process.env.E2E_PORT ?? 4173);
 const baseURL = `http://localhost:${port}`;
 const webglArgs = ['--use-gl=angle', '--use-angle=swiftshader', '--enable-unsafe-swiftshader'];
 
+type Device = (typeof devices)[string];
+/** Keep the iPad viewport/UA/touch but run it on Chromium (the only engine installed). */
+function tablet(device: Device) {
+  const { defaultBrowserType: _webkit, ...rest } = device;
+  return { ...rest, browserName: 'chromium' as const, hasTouch: true, isMobile: true };
+}
+
 export default defineConfig({
   testDir: 'tests/e2e',
   fullyParallel: true,
@@ -25,6 +32,15 @@ export default defineConfig({
     {
       name: 'mobile-pixel',
       use: { ...devices['Pixel 7'], hasTouch: true, launchOptions: { args: webglArgs } },
+    },
+    // iPad Pro 11 viewports on Chromium: touch + coarse pointer, same SwiftShader WebGL.
+    {
+      name: 'tablet-portrait',
+      use: { ...tablet(devices['iPad Pro 11']), launchOptions: { args: webglArgs } },
+    },
+    {
+      name: 'tablet-landscape',
+      use: { ...tablet(devices['iPad Pro 11 landscape']), launchOptions: { args: webglArgs } },
     },
   ],
   webServer: {

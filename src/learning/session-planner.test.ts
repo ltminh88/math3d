@@ -1,5 +1,6 @@
 import { describe, expect, it } from 'vitest';
 import { levelFactPool, levelTables, tableOfFact } from './curriculum-tables';
+import { factGroup } from './fact-group';
 import type { FactStat } from './learning-types';
 import { newFactStat } from './leitner-box';
 import { mulberry32 } from './seeded-rng';
@@ -71,5 +72,47 @@ describe('planSession', () => {
     expect(planSession({ stats: {}, pool: [], tables, sessionNo: 1, rng: mulberry32(1) })).toEqual(
       [],
     );
+  });
+
+  it('mixed pool: skills join the new items while a table is taught blocked', () => {
+    const skills = ['sk:wp-times-then-add', 'sk:div-rem-floor', 'sk:pattern-add'];
+    const stats: Record<string, FactStat> = {};
+    for (const k of pool) if (tableOfFact(k, tables) === 2) stats[k] = stat(1, 5);
+    const plans = Array.from({ length: 20 }, (_, seed) =>
+      planSession({
+        stats,
+        pool: [...pool, ...skills],
+        tables,
+        sessionNo: 5,
+        rng: mulberry32(seed),
+      }),
+    );
+    expect(plans.some((p) => p.some((k) => skills.includes(k)))).toBe(true);
+  });
+
+  it('mixed pool: interleaves skills by family next to tables', () => {
+    const stats: Record<string, FactStat> = {};
+    for (const k of pool) stats[k] = stat(3, 5);
+    const skills = [
+      'sk:wp-times-then-add',
+      'sk:wp-divide-then-add',
+      'sk:wp-unit-then-times',
+      'sk:div-rem-floor',
+      'sk:div-rem-ceil',
+      'sk:pattern-add',
+    ];
+    for (const k of skills) stats[k] = stat(1, 1);
+    const plan = planSession({
+      stats,
+      pool: [...pool, ...skills],
+      tables,
+      sessionNo: 5,
+      rng: mulberry32(4),
+    });
+    expect(plan).toHaveLength(10);
+    for (const k of skills) expect(plan).toContain(k);
+    const group = (k: string) => factGroup(k, tables);
+    const repeats = plan.filter((k, i) => i > 0 && group(k) === group(plan[i - 1] as string));
+    expect(repeats).toEqual([]);
   });
 });

@@ -1,0 +1,90 @@
+/* Step kit (step card, multi-select, Đúng/Sai). Touch first: every target is at least 48px,
+   nothing needs a key, and no key hint is ever shown. Levels may restyle colours. */
+.kit-step-card {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  max-width: 100%;
+  font-size: clamp(16px, 2.4vw, 20px);
+}
+
+.kit-step-card__story {
+  margin: 0;
+  line-height: 1.45;
+  font-weight: 600;
+}
+
+.kit-step-card__steps {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  margin: 0;
+  padding-left: 1.4em;
+}
+
+.kit-step__prompt,
+.kit-step__statement {
+  margin: 0 0 8px;
+}
+
+.kit-step__statement {
+  font-weight: 700;
+  font-size: 1.1em;
+}
+
+.kit-step--done .kit-step__answer {
+  font-weight: 700;
+}
+
+.kit-step-card button {
+  min-width: 48px;
+  min-height: 48px;
+  touch-action: manipulation;
+  font: inherit;
+}
+
+.kit-verdict,
+.kit-multi,
+.kit-step-card .kit-choices {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+
+.kit-verdict button {
+  flex: 1 1 120px;
+}
+
+.kit-multi__option {
+  flex: 1 1 100%;
+  text-align: left;
+  padding: 10px 14px;
+}
+
+.kit-multi__option[aria-pressed="true"] {
+  outline: 3px solid currentColor;
+  outline-offset: -3px;
+  font-weight: 700;
+}
+
+.kit-multi__option[aria-pressed="true"]::before {
+  content: "✓ ";
+}
+
+.kit-multi__done {
+  flex: 1 1 100%;
+}
+
+.kit-step-card .kit-pad {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(48px, 1fr));
+  gap: 8px;
+  max-width: 320px;
+}
+
+.kit-step-card .kit-pad__display {
+  grid-column: 1 / -1;
+  min-height: 48px;
+  font-size: 1.4em;
+  text-align: center;
+}

@@ -132,7 +132,14 @@ the head tooling and requires them to be equal. PR label `parity-change` skips i
 - Settings: one source, `math3d.settings` (`src/store/app-settings.ts`); until it is first
   written, language / quest card / sound / music come from the legacy keys.
 - Save codes (`save-code-codec.ts`): `M3D<v>-` + base64url(compact JSON) + `-` + CRC32 (8 hex)
-  of the payload; max 16384 chars. Export writes **M3D2** (`save-code-v2-payload.ts`): the whole
+  of the payload; max 16384 chars. Export writes **M3D3** (chapter 2, `save-code-v3-payload.ts`):
+  every M3D2 field below, levels for bridge + field/forest/city/tower/garden/valley/workshop/cave
+  (frozen list; a test fails when a new gate is not in it), plus `k` skill tuples
+  `[id, attempts, correct, totalMs, box, lastSeenSession, lastSeenSec, streak?, fluent?]` (`id` =
+  catalog id without `sk:`, errs not carried). An unknown skill id, a `sk:` key inside `f` or an
+  unknown level -> `payload`. A full save (every × / : fact of tables 1-10, 39 skills, 9 levels, 12 items) stays under
+  the cap. A new skill id or level gate needs **M3D4** (the catalog is append-only).
+  **M3D2** (`save-code-v2-payload.ts`, still decoded exactly as shipped, frozen fixture test): the whole
   store snapshot — `x` xp, `c` coins, `a` avatar, `g` [table, combo, started], `s` [sound, music],
   `n` session count, `l` {levelId: [stars, bestScore, completedSec, progress, acceptedSec]} for
   bridge/field/forest/city/tower, `o` owned cosmetic ids, `e` {slot: equipped id}, `f` fact tuples
@@ -142,8 +149,14 @@ the head tooling and requires them to be equal. PR label `parity-change` skips i
   A full save (126 facts, 5 levels, 12 items) is ~9 KB, a typical one ~4.5 KB. **M3D1** (old,
   still imported exactly as before): the v1 save (`[a, b, correct, wrong, responseMs,
   lastAnsweredSec, box?]` facts, bridge only, no levels or cosmetics) through the v1 validator.
-  Both import through `store.replaceProgress` (one transaction, new active profile). Import:
+  All versions import through `store.replaceProgress` (one transaction, new active profile). Import:
   start screen "Nhập mã lưu"; export: settings "Xuất mã lưu".
+- Skill keys (chapter 2): `sk:<id>` next to `mul:`/`div:` in `factStats`, deltas and the
+  outbox; `FACT_KEY_PATTERN_SOURCE` grew by alternation only
+  (`^(mul:…|div:…|sk:[a-z][a-z0-9-]{1,38})$`). A future SQL check copies the pattern verbatim
+  and must also whitelist the catalog ids (`src/learning/skill-catalog.ts`), since the pattern
+  checks shape only. No IndexedDB migration: keys are plain strings. The legacy v1 export skips
+  `sk:` keys; `parseFactKey` stays mul/div-only, `parseKey` adds skills.
 - Quiz: facts from the Leitner session planner over the chosen table, options from the
   distractor classes (practice) or expression choice (bridge); rewards stay the original
   (`src/quiz/quiz-rewards.ts`, asserted against the original bundle).
