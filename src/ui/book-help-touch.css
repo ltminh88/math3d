@@ -1,0 +1,9 @@
+/* Touch screens (coarse pointer) have no keyboard: hide the key badges of the interact button
+   ("E") and the minimap ("M"); the help dialog swaps its text too (book-help-touch-text.ts).
+   The recovered markup stays byte-equal; only these badges stop rendering on coarse pointers. */
+@media (pointer: coarse) {
+  .interact kbd,
+  .minimap-key {
+    display: none;
+  }
+}
