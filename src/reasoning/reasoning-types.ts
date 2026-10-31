@@ -25,7 +25,32 @@ export type Misconception =
   | 'ignore-brackets'
   | 'wrong-inverse'
   | 'wrong-step'
-  | 'near-miss';
+  | 'near-miss'
+  // Geometry and measurement (src/geometry, src/measurement)
+  | 'whole-not-half'
+  | 'half-not-double'
+  | 'radius-diameter-swap'
+  | 'not-through-centre'
+  | 'all-sides'
+  | 'upright-only'
+  | 'not-a-right-angle'
+  | 'missed-count'
+  | 'right-angles-only'
+  | 'equal-sides-only'
+  | 'wrong-shape'
+  | 'flat-not-solid'
+  | 'two-equal-is-cube'
+  | 'visible-only'
+  | 'read-end-not-length'
+  | 'ignore-unit'
+  | 'count-marks'
+  | 'count-weights'
+  | 'one-side-missed'
+  | 'half-perimeter'
+  | 'square-times-two'
+  | 'perimeter-not-area'
+  | 'area-not-perimeter'
+  | 'wrong-unit';
 
 export interface ChoiceOption {
   readonly id: string;
