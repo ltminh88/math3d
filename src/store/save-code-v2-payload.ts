@@ -4,8 +4,9 @@
 //   n committed sessions · l {levelId: [stars, bestScore, completedSec, progress, acceptedSec]}
 //   o owned cosmetic ids · e {slot: equipped id} · f fact tuples (save-code-v2-facts.ts)
 // Decoding is strict (unknown key, wrong type or out-of-range value -> null): a code is pasted
-// text, so nothing in it reaches the store unchecked.
-import { LEVEL_GATES } from '../config/level-gate-config';
+// text, so nothing in it reaches the store unchecked. M3D3 (save-code-v3-payload.ts) reuses the
+// same fields with its own level set and adds skills; M3D2 itself never changes.
+import { isSkillKey } from '../learning/fact-key';
 import { BRIDGE_LEVEL_ID } from './legacy-save-import';
 import type { ProgressRecords } from './profile-replacement';
 import type { GameSnapshot } from './progress-repository';
@@ -29,11 +30,18 @@ export interface SaveCodeImport {
   audio: SaveCodeAudio;
 }
 
-type Compact = Record<string, unknown>;
+export type Compact = Record<string, unknown>;
 
 /** Same rule as the shop catalog and the server's owned_cosmetics check. */
 const ID_PATTERN = /^[a-z0-9-]{1,40}$/;
-const KNOWN_LEVELS = new Set<string>([BRIDGE_LEVEL_ID, ...LEVEL_GATES.map((g) => g.levelId)]);
+/** Frozen: the five levels shipped with M3D2 (bridge + field, forest, city, tower gates). */
+const M3D2_LEVELS: ReadonlySet<string> = new Set([
+  BRIDGE_LEVEL_ID,
+  'field',
+  'forest',
+  'city',
+  'tower',
+]);
 const MAX_WALLET = 10_000_000;
 const MAX_COMBO = 1_000_000;
 const MAX_TABLE = 10;
@@ -42,11 +50,16 @@ const MAX_LEVEL_PROGRESS = 1000;
 const MAX_SESSIONS = 10_000_000;
 const MAX_COSMETICS = 64;
 const MAX_SLOTS = 8;
-const ALLOWED = new Set(['x', 'c', 'a', 'g', 's', 'n', 'l', 'o', 'e', 'f']);
+export const M3D2_KEYS: readonly string[] = ['x', 'c', 'a', 'g', 's', 'n', 'l', 'o', 'e', 'f'];
 
 const bit = (b: boolean): number => (b ? 1 : 0);
 
-export function snapshotToCompactV2(snapshot: GameSnapshot, audio: SaveCodeAudio): Compact {
+/** M3D2 fields of a snapshot for a level set (skills are never in `f`: M3D3 carries them in `k`). */
+export function snapshotToCompactFields(
+  snapshot: GameSnapshot,
+  audio: SaveCodeAudio,
+  knownLevels: ReadonlySet<string>,
+): Compact {
   const out: Compact = {};
   const { wallet, gameMeta: m, profile } = snapshot;
   if (wallet.xp) out.x = wallet.xp;
@@ -55,7 +68,7 @@ export function snapshotToCompactV2(snapshot: GameSnapshot, audio: SaveCodeAudio
   if (m.table || m.combo || m.started) out.g = [m.table, m.combo, bit(m.started)];
   out.s = [bit(audio.sound), bit(audio.music)];
   if (snapshot.sessionCount) out.n = snapshot.sessionCount;
-  const levels = Object.values(snapshot.levelProgress).filter((l) => KNOWN_LEVELS.has(l.levelId));
+  const levels = Object.values(snapshot.levelProgress).filter((l) => knownLevels.has(l.levelId));
   if (levels.length)
     out.l = Object.fromEntries(
       levels.map((l) => [
@@ -66,20 +79,28 @@ export function snapshotToCompactV2(snapshot: GameSnapshot, audio: SaveCodeAudio
   if (snapshot.ownedCosmetics.length) out.o = [...snapshot.ownedCosmetics];
   const equipped = profile.settings.equipped;
   if (Object.keys(equipped).length) out.e = { ...equipped };
-  const facts = Object.entries(snapshot.factStats).filter(([, s]) => s.attempts > 0);
+  const facts = Object.entries(snapshot.factStats).filter(
+    ([key, s]) => s.attempts > 0 && !isSkillKey(key),
+  );
   if (facts.length) out.f = facts.map(([key, stat]) => factToTuple(key, stat));
   return out;
 }
 
+export const snapshotToCompactV2 = (snapshot: GameSnapshot, audio: SaveCodeAudio): Compact =>
+  snapshotToCompactFields(snapshot, audio, M3D2_LEVELS);
+
 const isFlag = (v: unknown): v is 0 | 1 => v === 0 || v === 1;
-const isPlainObject = (v: unknown): v is Compact =>
+export const isPlainObject = (v: unknown): v is Compact =>
   typeof v === 'object' && v !== null && !Array.isArray(v);
 
-function decodeLevels(raw: unknown): ProgressRecords['levels'] | null {
+function decodeLevels(
+  raw: unknown,
+  knownLevels: ReadonlySet<string>,
+): ProgressRecords['levels'] | null {
   if (!isPlainObject(raw)) return null;
   const levels: ProgressRecords['levels'] = {};
   for (const [id, t] of Object.entries(raw)) {
-    if (!KNOWN_LEVELS.has(id) || !Array.isArray(t) || t.length !== 5) return null;
+    if (!knownLevels.has(id) || !Array.isArray(t) || t.length !== 5) return null;
     const [stars, bestScore, doneSec, progress, acceptedSec] = t as unknown[];
     if (
       !isIntIn(stars, 0, 3) ||
@@ -108,9 +129,13 @@ function decodeCosmetics(owned: unknown, equipped: unknown): ProgressRecords['co
   return { owned: [...(o as string[])], equipped: { ...(e as Record<string, string>) } };
 }
 
-/** Compact payload -> import, or null for anything malformed. */
-export function compactV2ToImport(raw: unknown): SaveCodeImport | null {
-  if (!isPlainObject(raw) || !Object.keys(raw).every((k) => ALLOWED.has(k))) return null;
+/** Compact payload -> import for a level set and allowed keys, or null for anything malformed. */
+export function compactFieldsToImport(
+  raw: unknown,
+  knownLevels: ReadonlySet<string>,
+  allowedKeys: readonly string[],
+): SaveCodeImport | null {
+  if (!isPlainObject(raw) || !Object.keys(raw).every((k) => allowedKeys.includes(k))) return null;
   const { x = 0, c = 0, a = 'default', g, s = [1, 0], n = 0 } = raw;
   if (!isIntIn(x, 0, MAX_WALLET) || !isIntIn(c, 0, MAX_WALLET) || !isIntIn(n, 0, MAX_SESSIONS))
     return null;
@@ -121,7 +146,7 @@ export function compactV2ToImport(raw: unknown): SaveCodeImport | null {
   if (!isIntIn(table, 0, MAX_TABLE) || !isIntIn(combo, 0, MAX_COMBO) || !isFlag(started))
     return null;
   if (!Array.isArray(s) || s.length !== 2 || !s.every(isFlag)) return null;
-  const levels = decodeLevels(raw.l ?? {});
+  const levels = decodeLevels(raw.l ?? {}, knownLevels);
   const cosmetics = decodeCosmetics(raw.o, raw.e);
   const facts = tuplesToFacts(raw.f ?? []);
   if (!levels || !cosmetics || !facts) return null;
@@ -138,3 +163,6 @@ export function compactV2ToImport(raw: unknown): SaveCodeImport | null {
     audio: { sound: s[0] === 1, music: s[1] === 1 },
   };
 }
+
+export const compactV2ToImport = (raw: unknown): SaveCodeImport | null =>
+  compactFieldsToImport(raw, M3D2_LEVELS, M3D2_KEYS);
