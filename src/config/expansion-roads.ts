@@ -16,7 +16,7 @@ export const EXPANSION_ROADS: readonly (readonly RoadPoint[])[] = [
   ],
   // Cave (west bank): from the gazebo road, east of the gazebo mound.
   [
-    [-38.13, 10],
+    [-36.5, 6.5],
     [-30, 26.5],
   ],
 ];

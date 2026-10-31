@@ -82,7 +82,7 @@ export const LEVEL_GATES: readonly LevelGate[] = [
     position: [21.8, -6],
     facing: 0,
     requires: 'tower',
-    sign: '2, 4, 6, ?',
+    sign: '2, 4, ?',
   },
   {
     levelId: 'valley',

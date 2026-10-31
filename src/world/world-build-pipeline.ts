@@ -3,6 +3,7 @@
 import type { Group, Mesh } from 'three';
 import { buildBridge } from './bridge-segments';
 import { buildMiloModel, buildPlayerModel, type PlayerModelParts } from './characters-milo-avatar';
+import { clearExpansionGround, scatterMeshesFrom } from './expansion-scatter-clearing';
 import { mergeStaticMeshes } from './merge-static-meshes';
 import { buildCity, buildTower } from './regions/city-tower-builder';
 import { buildForest, buildMathMeadow } from './regions/meadow-forest-builder';
@@ -36,7 +37,16 @@ export function buildWorldScene(ctx: WorldBuildTargets): PlayerModelParts {
   const playerParts = buildPlayerModel(ctx, ctx.player);
   buildMiloModel(ctx, ctx.milo);
   buildBridge(ctx, ctx.bridge);
+  const scatterChildren = ctx.scene.children.length;
+  const scatterObstacles = ctx.obstacles.length;
   scatterWorld(ctx, ctx.lowPower);
+  // Chapter 2 ground: removes scatter there afterwards (no RNG draw, no new three object).
+  clearExpansionGround(
+    scatterMeshesFrom(ctx.scene, scatterChildren),
+    ctx.obstacles,
+    scatterObstacles,
+    ctx.obstacles.length,
+  );
   buildCloudsAndMountains(ctx, ctx.clouds);
   ctx.scene.add(ctx.player, ctx.milo, ctx.bridge);
   mergeStaticMeshes(ctx.scene, ctx.materials.values(), [
