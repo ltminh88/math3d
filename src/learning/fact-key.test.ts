@@ -1,5 +1,15 @@
 import { describe, expect, it } from 'vitest';
-import { divKey, FACT_KEY_PATTERN, isFactKey, mulKey, parseFactKey } from './fact-key';
+import {
+  divKey,
+  FACT_KEY_PATTERN,
+  FACT_KEY_PATTERN_SOURCE,
+  isFactKey,
+  isSkillKey,
+  mulKey,
+  parseFactKey,
+  parseKey,
+  skillKey,
+} from './fact-key';
 
 describe('fact-key', () => {
   it('round-trips every 2..10 x 1..10 multiplication and its inverse division', () => {
@@ -40,5 +50,28 @@ describe('fact-key', () => {
     expect(() => divKey(7, 2)).toThrow();
     expect(() => mulKey(0, 3)).toThrow();
     expect(() => mulKey(2.5, 3)).toThrow();
+  });
+
+  it('skill keys: sk:<catalog id> only, mul/div branches of the pattern unchanged', () => {
+    expect(FACT_KEY_PATTERN_SOURCE).toBe(
+      '^(mul:[1-9][0-9]{0,2}x[1-9][0-9]{0,2}|div:[1-9][0-9]{0,2}/[1-9][0-9]{0,2}|sk:[a-z][a-z0-9-]{1,38})$',
+    );
+    expect(skillKey('expr-brackets')).toBe('sk:expr-brackets');
+    expect(isFactKey('sk:expr-brackets')).toBe(true);
+    expect(isSkillKey('sk:expr-brackets')).toBe(true);
+    expect(isSkillKey('mul:2x3')).toBe(false);
+    expect(parseKey('sk:div-rem-ceil')).toEqual({ op: 'skill', id: 'div-rem-ceil' });
+    expect(parseKey('mul:2x3')).toEqual({ op: 'mul', min: 2, max: 3 });
+    // Arithmetic callers (quiz, tower, generator) keep their mul|div-only contract.
+    expect(parseFactKey('sk:expr-brackets')).toBeNull();
+    for (const bad of [
+      'sk:unknown-skill',
+      'sk:',
+      'sk:Expr',
+      'sk:expr-brackets ',
+      'skill:expr-order',
+    ])
+      expect(isFactKey(bad), bad).toBe(false);
+    expect(() => skillKey('not-a-skill')).toThrow();
   });
 });
