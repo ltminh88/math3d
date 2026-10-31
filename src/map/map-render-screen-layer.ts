@@ -2,6 +2,7 @@
 // pills, VLM marker and the pulsing player arrow. Runs after the world transform is restored.
 import { REGIONS } from '../config/regions';
 import type { MapDrawState, RegionUnlockPredicate } from './map-draw-state';
+import { drawExpansionLabels } from './map-render-expansion-layer';
 import type { MapView } from './map-view-transform';
 
 const LABEL_TEXT_COLOR = '#194f42';
@@ -110,6 +111,7 @@ export function drawMapScreenLayer(
 ): void {
   const toScreen = createToScreen(width, height, view);
   drawRegionLabels(ctx, state, view.scale, toScreen, isUnlocked);
+  drawExpansionLabels(ctx, state, view.scale, toScreen);
   drawMiloMarker(ctx, state, toScreen);
   drawPlayerMarker(ctx, state, view, toScreen);
 }
