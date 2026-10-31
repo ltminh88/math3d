@@ -8,6 +8,7 @@ import {
 import { validateDelta } from './delta-validation';
 import type { GameStore, OpenStoreOptions, SessionCommittedEvent } from './game-store-api';
 import { isMemoryGameDb } from './memory-database';
+import { newId as randomId } from './new-id';
 import { openDbOrMemory } from './open-game-db-with-memory-fallback';
 import { hasLegacyImportMarker, writeReplacementProfile } from './profile-replacement';
 import { loadOrCreateActiveProfile } from './profile-repository';
@@ -39,7 +40,7 @@ function notify<A>(listeners: Set<(a: A) => void>, arg: A): void {
 
 export async function openGameStore(options: OpenStoreOptions = {}): Promise<GameStore> {
   const now = options.now ?? Date.now;
-  const newId = options.newId ?? (() => crypto.randomUUID());
+  const newId = options.newId ?? randomId;
   const db = await openDbOrMemory(options);
   const profile = await loadOrCreateActiveProfile(db, newId);
   let snapshot = await loadSnapshot(db, profile);

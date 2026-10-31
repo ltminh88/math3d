@@ -8,6 +8,7 @@ import { defineStrings } from '../../i18n/i18n';
 import { FLUENCY_ORDER } from '../../learning/curriculum-tables';
 import { planSession } from '../../learning/session-planner';
 import { createSessionRecorder, type SessionResult } from '../../learning/session-recorder';
+import { newId } from '../../store/new-id';
 import { gameState } from '../../ui/game-state';
 import { refreshHud } from '../../ui/hud';
 import { announce } from '../../ui/kit/aria-announcer';
@@ -51,7 +52,7 @@ function openLevelRun(
     sessionNo,
     getStat: (key) => stats()[key],
     now: Date.now,
-    newId: () => crypto.randomUUID(),
+    newId,
   });
   const ui = mountLevelRunUi(gateNameOf(definition.id), () => exit({ completed: false }));
   let closed = false;

@@ -16,6 +16,7 @@ import {
 import { ProfileSwitchedError } from '../store/active-profile-guard';
 import type { GameStore } from '../store/game-store-api';
 import { BRIDGE_LEVEL_ID } from '../store/legacy-save-import';
+import { newId } from '../store/new-id';
 import type { ProgressRecords } from '../store/profile-replacement';
 import type { GameMeta } from '../store/save-schema';
 import { progressViewFromSnapshot } from '../store/store-to-save-v1';
@@ -116,7 +117,7 @@ export function recordQuizQuestion(
     sessionNo: s.nextSessionNo(),
     getStat: (key) => s.getSnapshot().factStats[key],
     now: Date.now,
-    newId: () => crypto.randomUUID(),
+    newId,
   });
   batch.recordQuestion(outcome, reward);
   if (gameState.quizMode === 'bridge')
@@ -152,9 +153,7 @@ export const saveQuestAccepted = (): Promise<boolean> =>
 export function saveQuestComplete(): Promise<boolean> {
   void flushProgress();
   return enqueue((s) =>
-    s.commitSession(
-      questCompleteDelta(s.getSnapshot().profile.id, crypto.randomUUID(), Date.now()),
-    ),
+    s.commitSession(questCompleteDelta(s.getSnapshot().profile.id, newId(), Date.now())),
   );
 }
 

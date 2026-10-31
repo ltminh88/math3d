@@ -37,3 +37,22 @@ test('serves the manifest with the game name', async ({ request }) => {
   expect(manifest.theme_color).toBe('#194f42');
   expect(manifest.lang).toBe('vi');
 });
+
+// Plain-http LAN addresses (http://192.168.x.x) are not a secure context, so the browser has no
+// `crypto.randomUUID`; the store must still open and save there.
+test('the store opens and saves without crypto.randomUUID (plain-http LAN)', async ({ page }) => {
+  const errors: string[] = [];
+  page.on('pageerror', (e) => errors.push(String(e)));
+  page.on('console', (m) => {
+    if (m.type() === 'error') errors.push(m.text());
+  });
+  await page.addInitScript(() => {
+    Object.defineProperty(Crypto.prototype, 'randomUUID', { value: undefined });
+  });
+  await page.goto('/');
+  await page.locator('#play').click();
+  await expect(page.locator('body')).toHaveClass(/playing/);
+  await expect(page.locator('#hud')).toBeVisible();
+  await page.waitForTimeout(1000);
+  expect(errors).toEqual([]);
+});

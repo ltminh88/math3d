@@ -4,6 +4,7 @@
 import { LEVEL_GATES } from '../../config/level-gate-config';
 import { BRIDGE_SEGMENTS } from '../../config/world-constants';
 import type { DeltaLevel } from '../../learning/learning-types';
+import { newId } from '../../store/new-id';
 import type { GameSnapshot } from '../../store/progress-repository';
 import { progressViewFromSnapshot } from '../../store/store-to-save-v1';
 import { gameState, getWorld } from '../../ui/game-state';
@@ -48,7 +49,7 @@ async function seedProgress(seed: SeedProgress): Promise<void> {
   if (seed.bridgeComplete) levels.bridge = { stars: 1, bestScore: 0, progress: BRIDGE_SEGMENTS };
   for (const levelId of seed.completedLevels ?? []) levels[levelId] = { stars: 1, bestScore: 0 };
   await store.commitSession({
-    batchId: crypto.randomUUID(),
+    batchId: newId(),
     profileId: store.getSnapshot().profile.id,
     clientTs: Date.now(),
     v: 1,
