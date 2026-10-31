@@ -139,9 +139,33 @@ test('touch screens show no key hints: Enter button, minimap and help name the t
   await page.locator('#understood').click();
   test.skip(!coarse, 'touch targets: coarse pointers only');
   await expect(page.locator('#interact')).toBeVisible();
-  for (const selector of ['#interact', '#open-map', '#minimap', '#help', '#jump']) {
-    const box = await page.locator(selector).boundingBox();
-    expect(box?.width ?? 0, selector).toBeGreaterThanOrEqual(44);
-    expect(box?.height ?? 0, selector).toBeGreaterThanOrEqual(44);
-  }
+  // A tap 21.5 px from the centre in each direction still lands on the control (44 px target,
+  // counting an invisible hit-area extension).
+  const selectors = [
+    '#interact',
+    '#open-map',
+    '#open-shop',
+    '#learn',
+    '#minimap',
+    '#help',
+    '#jump',
+  ];
+  const hits = await page.evaluate((list) => {
+    return Object.fromEntries(
+      list.map((selector) => {
+        const el = document.querySelector(selector) as HTMLElement;
+        const r = el.getBoundingClientRect();
+        const cx = r.left + r.width / 2;
+        const cy = r.top + r.height / 2;
+        const points = [
+          [cx, cy - 21.5],
+          [cx, cy + 21.5],
+          [cx - 21.5, cy],
+          [cx + 21.5, cy],
+        ] as const;
+        return [selector, points.every(([x, y]) => el.contains(document.elementFromPoint(x, y)))];
+      }),
+    );
+  }, selectors);
+  expect(hits).toEqual(Object.fromEntries(selectors.map((s) => [s, true])));
 });
