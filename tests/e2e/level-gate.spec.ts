@@ -18,6 +18,11 @@ const GATE_POSITIONS = [
   [37.2, 13.4],
   [58.5, 7.6],
   [60.6, -14.2],
+  // Chapter 2 (garden, valley, workshop, cave).
+  [21.8, -6],
+  [44, -36.5],
+  [50.5, 37],
+  [-27, 30],
 ] as const;
 
 async function startPlaying(page: Page): Promise<void> {

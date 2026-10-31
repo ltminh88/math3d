@@ -1,4 +1,5 @@
-// The whole map chain bridge → field → forest → city → tower → done (city/tower phase 04): seed
+// The whole chapter 1 chain bridge → field → forest → city → tower (city/tower phase 04), then the
+// chapter 2 hand-off (garden gate "Sắp ra mắt" until its level ships, phase 05): seed
 // progression stage by stage and check the next gate's status, the quest card, VLM's pointer line
 // and the map ("Sắp ra mắt" nowhere); enter each newly opened gate once and leave through the host's
 // "Về thế giới" button. Desktop only (the per-level specs cover the phone). Uses `window.__game`.
@@ -151,14 +152,16 @@ test('the full chain: each stage opens the next gate, every level loads and exit
   }
 
   await page.evaluate(() => window.__game?.seedProgress({ completedLevels: ['tower'] }));
-  await expect(page.locator('#quest-title')).toHaveText('Bạn đã qua cả năm chặng!');
-  await expect(page.locator('#quest-progress')).toHaveText('✓ Hoàn thành');
-  await expect(page.locator('#quest-steps .done')).toHaveCount(5);
+  await expect(page.locator('#quest-title')).toHaveText('Khu Vườn Quy Luật');
+  await expect(page.locator('#quest-chapter')).toHaveText('Chương 2 · 0/4');
+  await expect(page.locator('#quest-steps .done')).toHaveCount(0);
   expect(
     await page.evaluate(() =>
-      (['field', 'forest', 'city', 'tower'] as const).map((id) => window.__game?.gateStatus(id)),
+      (['field', 'forest', 'city', 'tower', 'garden', 'valley'] as const).map((id) =>
+        window.__game?.gateStatus(id),
+      ),
     ),
-  ).toEqual(['completed', 'completed', 'completed', 'completed']);
-  await expect(page.locator('body')).not.toContainText('Sắp ra mắt');
+  ).toEqual(['completed', 'completed', 'completed', 'completed', 'coming-soon', 'locked']);
+  await expect(page.locator('#gate-garden-label small')).toHaveText('Sắp ra mắt');
   expect(errors).toEqual([]);
 });
