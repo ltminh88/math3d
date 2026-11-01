@@ -4,8 +4,8 @@ import {
   playableSteps,
   type StepAnswer,
 } from '../../reasoning/reasoning-step-answers';
-import { renderPrompt } from '../../reasoning/reasoning-strings';
-import type { ReasoningItem, ReasoningStep } from '../../reasoning/reasoning-types';
+import { renderPrompt as renderReasoningPrompt } from '../../reasoning/reasoning-strings';
+import type { PromptRef, ReasoningItem, ReasoningStep } from '../../reasoning/reasoning-types';
 import { announce } from './aria-announcer';
 import { createChoiceButtons } from './choice-buttons';
 import { createMultiSelectButtons } from './multi-select-buttons';
@@ -24,6 +24,8 @@ export interface StepCardOptions {
   onAnswer?: (event: StepAnswerEvent) => void;
   /** All steps answered. */
   onComplete: () => void;
+  /** Prompt text for the item's family (geometry/measurement pass their own); reasoning by default. */
+  render?: (prompt: PromptRef) => string;
 }
 
 export interface StepCard {
@@ -39,7 +41,7 @@ interface Widget {
   destroy(): void;
 }
 
-const answerText = (step: ReasoningStep): string => {
+const answerText = (step: ReasoningStep, renderPrompt: (p: PromptRef) => string): string => {
   if (step.kind === 'number') return String(step.answer);
   if (step.kind === 'verdict') return tk(step.answer ? 'yes' : 'no');
   return step.options
@@ -57,6 +59,7 @@ export function createStepCard(
   options: StepCardOptions,
   doc: Document = document,
 ): StepCard {
+  const renderPrompt = options.render ?? renderReasoningPrompt;
   const steps = playableSteps(item);
   let index = 0;
   let widget: Widget | null = null;
@@ -78,9 +81,9 @@ export function createStepCard(
     row.classList.add('kit-step--done');
     const done = doc.createElement('span');
     done.className = 'kit-step__answer';
-    done.textContent = `✓ ${answerText(step)}`;
+    done.textContent = `✓ ${answerText(step, renderPrompt)}`;
     row.appendChild(done);
-    announce(tk('stepDone', { answer: answerText(step) }), doc);
+    announce(tk('stepDone', { answer: answerText(step, renderPrompt) }), doc);
     index += 1;
     if (index < steps.length) showStep();
     else options.onComplete();
