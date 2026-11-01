@@ -1,6 +1,6 @@
 // Answers and hints of a level's reasoning round (pure). The step card checks each answer; this
 // keeps the shared hint ladder: three misses over the item reveal the answer (recorded, not
-// correct). Hints: 1 encourage, 2 the picture / first step, 3 the strategy (no rung 4 here).
+// correct). Hints: 1 encourage, 2 the picture, 3 the strategy + this step's operation (no rung 4).
 import {
   createHintState,
   type HintState,
@@ -10,8 +10,8 @@ import {
 } from '../../learning/hint-ladder';
 import type { QuestionOutcome } from '../../learning/session-recorder';
 import { playableSteps, type StepAnswer } from '../../reasoning/reasoning-step-answers';
+import { reasoningHint } from './reasoning-round-hints';
 import type { ReasoningRoundPlan } from './reasoning-round-slot';
-import { reasoningHint } from './reasoning-round-strings';
 
 export const LAST_REASONING_RUNG = 3;
 
@@ -63,7 +63,7 @@ export class ReasoningRoundFlow {
   /** Next hint text (the same last one once the ladder is spent). */
   takeHint(): string {
     if (this.canHint) this.hint = takeHint(this.hint);
-    return reasoningHint(this.plan.item, Math.max(1, this.hint.rung));
+    return reasoningHint(this.plan.item, Math.max(1, this.hint.rung), this.stepIndex);
   }
 
   private finish(solved: boolean): QuestionOutcome {

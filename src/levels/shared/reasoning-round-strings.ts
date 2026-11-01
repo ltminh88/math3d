@@ -1,7 +1,7 @@
 // Texts of the old levels' reasoning round (vi source, en mirror): the panel, and the hint ladder
-// per skill — 1 encourage, 2 the picture ("sơ đồ đoạn thẳng") or the first step, 3 the strategy.
+// per skill (built in reasoning-round-hints.ts) — 1 encourage, 2 the picture ("sơ đồ đoạn
+// thẳng"), 3 the strategy plus the current step's operation with "?".
 import { defineStrings } from '../../i18n/i18n';
-import type { ReasoningItem } from '../../reasoning/reasoning-types';
 
 export const trr = defineStrings('reasoningRound', {
   vi: {
@@ -13,7 +13,9 @@ export const trr = defineStrings('reasoningRound', {
     stepRight: 'Đúng rồi! Làm tiếp bước sau nhé.',
     reward: '+{xp} XP',
     encourage: 'Bình tĩnh đọc lại đề nhé: bài cho biết gì, bài hỏi gì?',
-    firstStep: 'Làm từng bước nhé: bước đầu tiên ra {first}.',
+    thisStep: 'Bước này: {op}',
+    opThenAdd: '{a} × {n} = ? rồi cộng thêm {a}',
+    opDivRem: '{total} : {per} = ? (dư ?)',
     lookWp:
       'Vẽ sơ đồ đoạn thẳng: mỗi bạn (mỗi rổ) là một đoạn, “gấp mấy lần” là mấy đoạn bằng nhau.',
     planTimesAdd: 'Tìm phần của bạn thứ hai trước (phép nhân), rồi cộng với phần của bạn thứ nhất.',
@@ -39,7 +41,9 @@ export const trr = defineStrings('reasoningRound', {
     stepRight: 'Right! On to the next step.',
     reward: '+{xp} XP',
     encourage: 'Take your time and read it again: what do you know, what is asked?',
-    firstStep: 'One step at a time: the first step gives {first}.',
+    thisStep: 'This step: {op}',
+    opThenAdd: '{a} × {n} = ?, then add {a}',
+    opDivRem: '{total} : {per} = ? (remainder ?)',
     lookWp:
       'Draw a bar model: each person (or basket) is a bar; “n times as many” is n equal bars.',
     planTimesAdd: 'Find the second amount first (multiply), then add the first amount.',
@@ -60,34 +64,4 @@ export const trr = defineStrings('reasoningRound', {
   },
 });
 
-type Key = Parameters<typeof trr>[0];
-
-const HINTS: Readonly<Record<string, readonly [look: Key, plan: Key]>> = {
-  'wp-times-then-add': ['lookWp', 'planTimesAdd'],
-  'wp-times-compare': ['lookWp', 'planTimesCompare'],
-  'pattern-skip-count': ['lookPattern', 'planPattern'],
-  'div-rem-floor': ['lookDiv', 'planFloor'],
-  'div-rem-ceil': ['lookDiv', 'planCeil'],
-  'unknown-mul-div': ['lookUnknown', 'planUnknown'],
-  'expr-brackets': ['lookExpr', 'planExpr'],
-  'expr-order': ['lookExpr', 'planExpr'],
-  'tf-explain': ['lookClaim', 'planClaim'],
-};
-
-/** Steps that show a first intermediate result worth giving as a hint. */
-const FIRST_STEP_SKILLS = new Set([
-  'wp-times-then-add',
-  'div-rem-floor',
-  'expr-brackets',
-  'expr-order',
-]);
-
-/** Hint text for `rung` (1-3) of the item. */
-export function reasoningHint(item: ReasoningItem, rung: number): string {
-  const [look, plan] = HINTS[item.skillId] ?? (['lookExpr', 'planExpr'] as const);
-  if (rung <= 1) return trr('encourage');
-  if (rung === 2) return trr(look);
-  const first = item.work[0];
-  const tail = FIRST_STEP_SKILLS.has(item.skillId) && item.work.length > 1 && first !== undefined;
-  return tail ? `${trr(plan)} ${trr('firstStep', { first })}` : trr(plan);
-}
+export type ReasoningStringKey = Parameters<typeof trr>[0];
