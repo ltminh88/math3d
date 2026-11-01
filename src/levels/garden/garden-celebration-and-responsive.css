@@ -1,0 +1,78 @@
+/* Garden level: the celebration card, and the narrow-screen layout (panel along the bottom on
+   phones and tablet portrait; the side panel stays on wide screens and tablet landscape). */
+.garden-done {
+  position: absolute;
+  top: 76px;
+  right: max(16px, env(safe-area-inset-right));
+  width: 360px;
+  max-height: calc(100% - 92px);
+  overflow: auto;
+  padding: 22px 24px;
+  border-radius: var(--radius-lg);
+  background: var(--paper);
+  text-align: center;
+  animation: pop 0.5s;
+}
+.garden-done h2 {
+  margin: 0 0 6px;
+  font-family: var(--font-display);
+  font-size: 28px;
+}
+.garden-done .completion-medal {
+  color: #5aab59;
+}
+.garden-stars {
+  margin: 0;
+  color: var(--gold);
+  font-size: 30px;
+  letter-spacing: 6px;
+}
+.garden-done__line {
+  color: var(--muted);
+  line-height: 1.6;
+}
+.garden-done .primary {
+  width: 100%;
+  min-height: 44px;
+  margin-top: 14px;
+}
+@media (max-width: 760px), (max-height: 520px) and (max-width: 1000px) {
+  .garden-guide {
+    top: 70px;
+    width: calc(100% - 32px);
+    font-size: 13px;
+  }
+  .garden-progress {
+    top: auto;
+    bottom: calc(58% + 20px);
+    padding: 6px 10px;
+  }
+  .garden-panel {
+    top: auto;
+    left: 12px;
+    right: 12px;
+    bottom: max(12px, env(safe-area-inset-bottom));
+    width: auto;
+    max-height: 58%;
+    padding: 12px 14px;
+  }
+  .garden-card .kit-step-card .kit-pad {
+    grid-template-columns: repeat(6, minmax(44px, 1fr));
+    max-width: none;
+  }
+  .garden-card .kit-pad__key {
+    min-height: 44px;
+  }
+  .garden-keys {
+    display: none;
+  }
+  .garden-done {
+    top: auto;
+    left: 12px;
+    right: 12px;
+    bottom: max(12px, env(safe-area-inset-bottom));
+    width: auto;
+    max-height: 60%;
+    padding: 16px 18px;
+  }
+}

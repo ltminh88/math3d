@@ -1,0 +1,171 @@
+/* Garden level HUD: recovered tokens (--ink, --paper, --gold, fonts), glass panels and the garden
+   green (#c9dd7c region colour, #5aab59 leaves). Touch first: every target is at least 44px, and
+   the key line is hidden on narrow and coarse-pointer screens. */
+.garden-guide {
+  position: absolute;
+  top: max(16px, env(safe-area-inset-top));
+  left: 50%;
+  transform: translate(-50%);
+  width: min(560px, calc(100% - 300px));
+  display: flex;
+  align-items: flex-start;
+  gap: 8px;
+  padding: 10px 16px;
+  border-radius: var(--radius);
+  font-size: 15px;
+  line-height: 1.45;
+}
+.garden-guide p {
+  margin: 0;
+  color: var(--ink-soft);
+  font-weight: 700;
+}
+.garden-guide__name {
+  font-family: var(--font-display);
+  color: var(--gold-deep);
+}
+.garden-guide__dot {
+  color: #5aab59;
+}
+.garden-progress {
+  position: absolute;
+  top: max(16px, env(safe-area-inset-top));
+  right: max(16px, env(safe-area-inset-right));
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 10px 14px;
+  border-radius: 14px;
+  font-size: 14px;
+  font-weight: 900;
+}
+.garden-dots {
+  display: flex;
+  gap: 4px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+.garden-dots li {
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+  background: #e3ecc6;
+}
+.garden-dots li.done {
+  background: #5aab59;
+}
+.garden-dots li.current {
+  background: #c9dd7c;
+  box-shadow: 0 0 0 2px #5aab59;
+}
+.garden-panel {
+  position: absolute;
+  top: 76px;
+  right: max(16px, env(safe-area-inset-right));
+  width: 360px;
+  max-height: calc(100% - 92px);
+  overflow: auto;
+  padding: 16px 18px;
+  border-radius: var(--radius-lg);
+  background: var(--glass-strong);
+}
+.garden-panel .garden-kind {
+  margin: 0 0 8px;
+  font-family: var(--font-display);
+  font-size: 18px;
+  color: #3f7d3e;
+}
+.garden-pots {
+  display: flex;
+  gap: 6px;
+  margin: 0 0 10px;
+  padding: 0;
+  list-style: none;
+}
+.garden-pots[hidden] {
+  display: none;
+}
+.garden-pot {
+  flex: 1 1 0;
+  min-height: 44px;
+  display: grid;
+  place-items: center;
+  border-radius: 12px 12px 18px 18px;
+  background: #e9b08e;
+  color: #5a3a24;
+  font-family: var(--font-display);
+  font-size: 20px;
+  font-weight: 800;
+}
+.garden-pot[data-state="empty"] {
+  background: #f6e6d6;
+  color: var(--muted-2);
+  border: 2px dashed #c9784f;
+}
+.garden-pot.current {
+  border-style: solid;
+  box-shadow: 0 0 0 3px var(--gold);
+}
+.garden-card .kit-step-card {
+  font-size: 17px;
+}
+.garden-card .kit-step-card__story {
+  font-size: 19px;
+}
+.garden-card .kit-step--done {
+  color: #31764c;
+}
+.garden-card .kit-pad__display {
+  border-radius: 12px;
+  background: #fffbea;
+  font-family: var(--font-display);
+  font-weight: 800;
+}
+.garden-card .kit-pad__key {
+  min-height: 48px;
+  border: 2px solid #e3e8d6;
+  border-bottom-width: 5px;
+  border-radius: 14px;
+  background: #f2f3e6;
+  font-family: var(--font-display);
+  font-size: 22px;
+  font-weight: 800;
+}
+.garden-card .kit-pad__key--ok {
+  background: var(--ink);
+  border-color: #11392f;
+  color: #fffbea;
+}
+.garden-card .kit-choices button {
+  flex: 1 1 90px;
+  min-height: 56px;
+  font-family: var(--font-display);
+  font-size: 20px;
+}
+.garden-hint-button,
+.garden-next {
+  min-height: 44px;
+}
+.garden-hint-button.offer {
+  color: var(--gold-deep);
+  text-decoration: underline;
+  animation: nudge 1.6s infinite ease-in-out;
+}
+.garden-next {
+  width: 100%;
+  margin-top: 10px;
+}
+.garden-keys {
+  margin: 10px 0 0;
+  font-size: 11px;
+  color: var(--muted-2);
+}
+.garden-panel .reward-pop {
+  top: 8px;
+}
+@media (pointer: coarse) {
+  .garden-keys {
+    display: none;
+  }
+}
