@@ -79,6 +79,6 @@ tests/e2e/cave-level.spec.ts  cave-level-leak.spec.ts
 - Planning: planner picks → seen skills weakest first → fresh; one of each required format (word, remainder, choose-all, tf-explain, geo-meas), top-up ≤2 per format, sorted weakest box first, then reordered only where needed so no format repeats (feasibility-checked greedy).
 - Chambers use the kit step card with the family's renderer (reasoning/geometry/measurement); the round flow re-checks every answer with `isStepAnswerCorrect`, so verdict + fix and choose-all (all and only) are one recorded question. Expression = generator's own steps (choice of value / first part + pad by tier).
 - Hints: 3 taught rungs (button spent after rung 3); rung 3 works the first calculation from the story/statement numbers with "?" (circle: "r + r", "nửa của d" so no literal 2 leaks); choose-all names one false sentence. Sweep test: every skill × tier × 25 seeds × step × rung.
-- Draw calls: rock (1) + glow (1) + crystals (1) + chest (2) — see report for the measured max.
+- Draw calls: rock (1) + glow (1) + crystals (1) + chest (2) — measured max 3 (desktop), 5 (phone) of the 60 budget.
 - Shared file touched: `tests/e2e/chapter2-gates-and-regions.spec.ts` (`SHIPPED` list: a shipped level's gate is `open`, not "Sắp ra mắt"). Phases 05–07 add their ids there.
 - Screenshots: `reports/p08-screens/` (chamber 1, multi-select, explain fix step, celebration, closing card per project).
