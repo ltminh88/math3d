@@ -5,7 +5,7 @@
 - Reference levels: `src/levels/city/**`, `src/levels/tower/**` (multi-step, test hook, leak spec); garden scenery `src/world/regions/village-garden-builder.ts:64-81`
 
 ## Overview
-- Date 2026-10-31. Priority P1. Status pending. Review: not started. Depends on 01, 03. Parallel with 04, 06–08.
+- Date 2026-10-31. Priority P1. Status done on branch `feat/ch2-p05-garden` (awaiting 09 merge). Review: not started. Depends on 01, 03. Parallel with 04, 06–08.
 - Story: the riverside garden's gardener planted everything by rules; the rules got muddled. VLM and the child continue flower rows, balance watering cans to find the hidden number, and work out seed-bag expressions step by step.
 
 ## Key Insights
@@ -43,15 +43,15 @@ tests/e2e/garden-level.spec.ts  garden-level-leak.spec.ts
 3. Diorama + views; panel + input (tap first, then keys).
 4. Celebration + `exit({completed:true})`.
 5. e2e: seed chapter 1 completed → garden gate (desktop E; phone/tablet `#interact` tap) → 6 rounds (desktop keyboard; phone, tablet portrait, tablet landscape taps only) → back at gate; `garden` completed; valley gate opens; `sk:` keys recorded; ≤60 draw calls; leak 10 cycles with settled baseline.
-6. Screenshots `reports/garden-screens/` (desktop, phone, tablet portrait/landscape).
+6. Screenshots `reports/p05-screens/<project>/` (desktop, phone, tablet portrait/landscape).
 
 ## Todo list
-- [ ] round flow + tests
-- [ ] hints + tests
-- [ ] diorama, views, panel, input
-- [ ] celebration
-- [ ] e2e 4 projects + leak
-- [ ] screenshots
+- [x] round flow + tests
+- [x] hints + tests
+- [x] diorama, views, panel, input
+- [x] celebration
+- [x] e2e 4 projects + leak
+- [x] screenshots
 
 ## Success Criteria
 - Unit + garden e2e green on desktop, phone, tablet portrait, tablet landscape; lint/typecheck/build clean; own chunk; ≤60 draw calls; no leaks.
@@ -72,6 +72,15 @@ tests/e2e/garden-level.spec.ts  garden-level-leak.spec.ts
 
 ## Security Considerations
 - None.
+
+## Implementation notes (2026-11-02)
+- Rounds: `planSession(pool, 6)` keeps its order inside each kind; kinds cycle in the order the plan first names them (missing kinds after), so no two rounds in a row share a kind and all three kinds appear. A kind the plan lacks takes its least-used skill (`garden-round-plan.ts`).
+- Tier 1 patterns pick the last term from 3 seed packets; tier 2-3 use the pad. Expression items (`exprValue`) get "Phải tính phần nào trước?" (choice of neighbouring pairs: brackets / ×: first vs left-to-right / ignore-brackets) then the part's value, then the generator's remaining steps.
+- Pots are asked in step order (no tap-to-select a pot: the highlighted `?` pot is the one asked). Pot numbers are DOM chips in the panel, no 3D text.
+- `tables: [2..9]` kept in the definition: the registry rejects an empty list; the run uses the skill pool only.
+- Hints: rung 2 rule in words, rung 3 the step worked with "?", rung 4 count / check / left-to-right; tested to never state the step's answer.
+- Portrait tablets (≤1100 px, portrait) use the bottom-panel layout.
+- Shared specs updated for the shipped garden: `chapter2-gates-and-regions.spec.ts` (garden gate opens and enters), `full-chain.spec.ts` (garden `open`, "Cổng đã mở").
 
 ## Next steps
 - 09 merge.
