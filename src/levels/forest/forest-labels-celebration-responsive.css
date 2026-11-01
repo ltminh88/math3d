@@ -80,3 +80,10 @@
     display: none;
   }
 }
+
+/* Touch screens (coarse pointer) have no keyboard: no key help row or key badges (phase 04). */
+@media (pointer: coarse) {
+  .forest-keys {
+    display: none;
+  }
+}
