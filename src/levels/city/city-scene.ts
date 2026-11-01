@@ -7,12 +7,13 @@ import type { LevelContext, LevelModule, LevelSession } from '../shared/level-ty
 import { CityBuildingView } from './city-building-view';
 import { buildingFrame, CityCamera, STREET_FRAME } from './city-camera';
 import { showCityCelebration } from './city-celebration';
+import { planCityRun, startCityReasoningRound } from './city-compare-round';
 import { buildCityDiorama } from './city-diorama-builder';
 import { wireCityInput } from './city-input';
 import { CityLabels } from './city-labels';
 import { CityPanel } from './city-panel';
 import { CityRoundController } from './city-round-controller';
-import { CityRoundFlow, planRunRounds } from './city-round-flow';
+import { CityRoundFlow } from './city-round-flow';
 import { CityStreetView } from './city-street-view';
 import { cityStrings } from './city-strings';
 import { installCityTestHook } from './city-test-hook';
@@ -33,9 +34,9 @@ function start(ctx: LevelContext): LevelSession {
   root.add(street.group, building.group);
   const view = new CityCamera();
   const labels = new CityLabels(ctx.ui);
-  const flow = new CityRoundFlow(planRunRounds(ctx.learning, ctx.definition), () =>
-    performance.now(),
-  );
+  const cityRun = planCityRun(ctx.learning, ctx.definition);
+  const flow = new CityRoundFlow(cityRun.rounds, () => performance.now(), cityRun.total);
+  let reasoned = false;
   // Created before the number pad: both listen on document, and the 3D keyboard layer must see
   // Enter first (it leaves Enter to the pad unless a parcel, house or floor has 3D focus).
   const interaction = ctx.input.createInteraction(view.camera);
@@ -84,6 +85,16 @@ function start(ctx: LevelContext): LevelSession {
       interaction.setPickables([]);
       interaction.setZones([]);
       labels.set([]);
+      const { reasoning } = cityRun;
+      if (reasoning && !reasoned) {
+        // The last round: the parcel puzzle, then this celebration with its outcome counted.
+        reasoned = true;
+        startCityReasoningRound(ctx, ts, panel, c, { ...cityRun, reasoning }, () =>
+          this.onLevelDone(c.tally.earned(), c.tally.stars()),
+        );
+        frame();
+        return;
+      }
       panel.hide();
       panel.say(ts('doneTitle'));
       street.hide();

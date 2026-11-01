@@ -23,7 +23,7 @@ export class CityRoundController {
   floorSteps: readonly string[] = [];
   bandTexts: readonly [string, string] | null = null;
   private idle = 0;
-  private readonly tally = createLevelRunTally();
+  readonly tally = createLevelRunTally();
 
   constructor(
     private readonly ctx: LevelContext,
@@ -62,7 +62,7 @@ export class CityRoundController {
     this.bandTexts = null;
     const prompt = this.ts(`${round.kind}Prompt`, { t, m, p });
     const guide = this.ts(`${round.kind}Guide`);
-    this.panel.showRound(round, this.flow.index, this.flow.rounds.length, prompt, guide);
+    this.panel.showRound(round, this.flow.index, this.flow.total, prompt, guide);
     this.updateCount();
     this.idle = 0;
     this.hooks.onChanged(true);
