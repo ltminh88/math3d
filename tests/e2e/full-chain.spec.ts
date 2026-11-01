@@ -1,5 +1,5 @@
 // The whole chapter 1 chain bridge → field → forest → city → tower (city/tower phase 04), then the
-// chapter 2 hand-off (garden gate "Sắp ra mắt" until its level ships, phase 05): seed
+// chapter 2 hand-off (the garden gate opens; its level shipped in phase 05): seed
 // progression stage by stage and check the next gate's status, the quest card, VLM's pointer line
 // and the map ("Sắp ra mắt" nowhere); enter each newly opened gate once and leave through the host's
 // "Về thế giới" button. Desktop only (the per-level specs cover the phone). Uses `window.__game`.
@@ -161,7 +161,7 @@ test('the full chain: each stage opens the next gate, every level loads and exit
         window.__game?.gateStatus(id),
       ),
     ),
-  ).toEqual(['completed', 'completed', 'completed', 'completed', 'coming-soon', 'locked']);
-  await expect(page.locator('#gate-garden-label small')).toHaveText('Sắp ra mắt');
+  ).toEqual(['completed', 'completed', 'completed', 'completed', 'open', 'locked']);
+  await expect(page.locator('#gate-garden-label small')).toHaveText('Cổng đã mở');
   expect(errors).toEqual([]);
 });
