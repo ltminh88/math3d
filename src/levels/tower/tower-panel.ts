@@ -7,6 +7,7 @@ import { createNumberPad, type NumberPad } from '../../ui/kit/number-pad';
 import { TowerAnswerButtons } from './tower-answer-buttons';
 import type { TowerStep } from './tower-question-formats';
 import type { TowerStrings } from './tower-strings';
+import { answerCardName } from './tower-touch-text';
 
 export interface TowerPanelHandlers {
   onPick(index: number): void;
@@ -54,7 +55,7 @@ export class TowerPanel {
     this.next.hidden = true;
     this.answers = new TowerAnswerButtons(
       ts('promptChoice'),
-      (label, n) => ts('cardName', { label, n }),
+      (label, n) => answerCardName(ts, label, n),
       handlers.onPick,
     );
     this.pad = createNumberPad({

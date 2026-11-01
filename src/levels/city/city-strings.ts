@@ -10,6 +10,8 @@ const define = (defineFn: typeof defineStrings) =>
       title: 'Thành Phố Con Số',
       intro: 'Bác đưa thư làm lẫn hết gói hàng rồi! Mình cùng giúp bác giao đúng nhà nhé.',
       round: 'Lượt {n}/{total}',
+      reasoningLine: 'Gói hàng cuối là một câu đố của bác bưu tá. Bạn thử sức nhé!',
+      reasoningTitle: 'Câu đố của bác bưu tá',
       deliverPrompt: 'Gói hàng {t} × {m} giao đến nhà số mấy?',
       windowsPrompt: 'Tòa nhà có {m} tầng, mỗi tầng {t} cửa sổ. Có tất cả bao nhiêu cửa sổ?',
       reversePrompt: 'Nhà số {p} đang chờ gói hàng. Gói nào là của nhà này?',
@@ -60,6 +62,8 @@ const define = (defineFn: typeof defineStrings) =>
       intro:
         'The postman mixed up all the parcels! Let’s help him deliver each one to the right house.',
       round: 'Round {n}/{total}',
+      reasoningLine: 'The last parcel is the postman’s puzzle. Have a go!',
+      reasoningTitle: 'The postman’s puzzle',
       deliverPrompt: 'Which house number gets the parcel {t} × {m}?',
       windowsPrompt: 'The building has {m} floors with {t} windows each. How many windows in all?',
       reversePrompt: 'House {p} is waiting for a parcel. Which parcel is it?',

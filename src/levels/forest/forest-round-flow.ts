@@ -107,6 +107,8 @@ export class ForestRoundFlow {
   constructor(
     readonly rounds: readonly ForestRound[],
     private readonly now: () => number,
+    /** Rounds shown to the child (a reasoning round may follow these). */
+    readonly total = rounds.length,
   ) {
     this.startedAt = now();
   }

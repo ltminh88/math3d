@@ -10,11 +10,11 @@ import { ForestCamera } from './forest-camera';
 import { showForestCelebration } from './forest-celebration';
 import { ForestCountLabels } from './forest-count-labels';
 import { buildForestDiorama } from './forest-diorama-builder';
-import { varyForestFacts } from './forest-fact-variety';
 import { FRUIT_Y } from './forest-layout';
 import { ForestPanel } from './forest-panel';
+import { planForestRun, startForestReasoningRound } from './forest-remainder-round';
 import { ForestRoundController } from './forest-round-controller';
-import { ForestRoundFlow, forestFactPool, planForestRounds } from './forest-round-flow';
+import { ForestRoundFlow } from './forest-round-flow';
 import { forestStrings } from './forest-strings';
 import { ForestTableView } from './forest-table-view';
 import { fruitIndexOf } from './fruit-pile';
@@ -31,11 +31,8 @@ function start(ctx: LevelContext): LevelSession {
   const table = new ForestTableView(root, createAnimalMaterial(), ts, ctx.reducedMotion);
   const view = new ForestCamera();
   const labels = new ForestCountLabels(ctx.ui);
-  const stats = ctx.learning.stats();
-  const pool = forestFactPool(stats);
-  const planned = ctx.learning.planSession(pool, ctx.definition.rounds);
-  const facts = varyForestFacts(planned, pool, ctx.learning.rng);
-  const flow = new ForestRoundFlow(planForestRounds(facts, stats), () => performance.now());
+  const forestRun = planForestRun(ctx.learning, ctx.definition);
+  const flow = new ForestRoundFlow(forestRun.rounds, () => performance.now(), forestRun.total);
   const controller: { current?: ForestRoundController } = {};
   const run = (fn: (c: ForestRoundController) => void) => () => {
     if (controller.current) fn(controller.current);
@@ -54,6 +51,7 @@ function start(ctx: LevelContext): LevelSession {
   });
   const card = new FactFamilyCard(panel.question, ts);
   let size = { width: 1, height: 1 };
+  let reasoned = false;
 
   const frame = (): void => {
     const box = panel.panel.getBoundingClientRect();
@@ -82,6 +80,16 @@ function start(ctx: LevelContext): LevelSession {
       interaction.setPickables([]);
       interaction.setZones([]);
       labels.set([]);
+      const { reasoning } = forestRun;
+      if (reasoning && !reasoned) {
+        // The last round: the remainder puzzle, then this celebration.
+        reasoned = true;
+        startForestReasoningRound(ctx, ts, panel, { ...forestRun, reasoning }, earned, () =>
+          this.onLevelDone(earned),
+        );
+        frame();
+        return;
+      }
       panel.hide();
       panel.say(ts('doneTitle'));
       table.celebrate();

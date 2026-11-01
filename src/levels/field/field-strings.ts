@@ -1,4 +1,5 @@
 import { defineStrings } from '../../i18n/i18n';
+import { isCoarsePointer } from '../../ui/pointer-kind';
 
 /** Field level strings: vi is the source, written for kids aged 7-9. */
 export const tf = defineStrings('field', {
@@ -12,7 +13,8 @@ export const tf = defineStrings('field', {
     toolsKeysTip: 'Bàn phím: R để xoay ruộng, H để xem gợi ý.',
     totalPrompt: 'Ruộng có tất cả bao nhiêu cây?',
     equationsPrompt: 'Chọn 2 phép tính đúng với ruộng này',
-    equationsTip: 'Chạm 2 phép tính rồi bấm Kiểm tra (phím 1-4, Enter).',
+    equationsTip: 'Chạm 2 phép tính rồi bấm Kiểm tra.',
+    equationsKeysTip: 'Bàn phím: phím 1-4, Enter.',
     recallPrompt: 'Ruộng này có bao nhiêu cây?',
     check: 'Kiểm tra',
     rotate: 'Xoay ruộng',
@@ -42,6 +44,8 @@ export const tf = defineStrings('field', {
     doneTitle: 'Cánh đồng đã hồi sinh!',
     doneScore: '{correct}/{total} luống trồng đúng',
     bonusLine: 'Thưởng lần đầu hoàn thành: +{xp} XP · +{coins} xu',
+    reasoningLine: 'Luống cuối là một câu đố của bác nông dân. Bạn giỏi rồi, thử sức nhé!',
+    reasoningTitle: 'Câu đố của bác nông dân',
   },
   en: {
     title: 'Math Meadow',
@@ -53,7 +57,8 @@ export const tf = defineStrings('field', {
     toolsKeysTip: 'Keyboard: R turns the plot, H shows a hint.',
     totalPrompt: 'How many plants are there in all?',
     equationsPrompt: 'Pick the 2 equations that match this plot',
-    equationsTip: 'Tap 2 equations, then Check (keys 1-4, Enter).',
+    equationsTip: 'Tap 2 equations, then Check.',
+    equationsKeysTip: 'Keyboard: keys 1-4, Enter.',
     recallPrompt: 'How many plants does this plot have?',
     check: 'Check',
     rotate: 'Turn the plot',
@@ -82,5 +87,12 @@ export const tf = defineStrings('field', {
     doneTitle: 'The field is back!',
     doneScore: '{correct}/{total} patches right',
     bonusLine: 'First-clear bonus: +{xp} XP · +{coins} coins',
+    reasoningLine: 'The last patch is the farmer’s puzzle. You know your tables, have a go!',
+    reasoningTitle: 'The farmer’s puzzle',
   },
 });
+
+/** A HUD tip plus its keyboard line; touch screens (coarse pointer) get no key hints. */
+export function tipWithKeys(tip: string, keys: 'keysTip' | 'toolsKeysTip' | 'equationsKeysTip') {
+  return isCoarsePointer() ? tip : `${tip} ${tf(keys)}`.trim();
+}

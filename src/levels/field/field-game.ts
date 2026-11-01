@@ -1,21 +1,23 @@
-// Field level round lifecycle: build/equations/recall rounds over the planned facts, answers and
-// hints through the pure round flow, rewards via learning.record (scoring.ts), one restored patch
-// per round, and the celebration that hands the completed run back to the host.
+// Field level round lifecycle: build/equations/recall rounds over the planned facts (the last one
+// may be the reasoning round), answers and hints through the pure round flow, rewards via
+// learning.record (scoring.ts), one restored patch per round, and the celebration.
 import type { LevelContext } from '../shared/level-types';
-import { type AnswerWidget, mountEquationChoices, mountNumberPad } from './field-answer-widgets';
+import type { AnswerWidget } from './field-answer-widgets';
 import type { FieldDiorama } from './field-diorama-builder';
 import { applyHintPlan, hintPlan } from './field-hints';
 import type { FieldHud } from './field-hud';
 import type { PlantingInput } from './field-planting-input';
 import type { ProjectedLabels } from './field-projected-labels';
+import { planFieldRun, startFieldReasoningRound } from './field-reasoning-round';
+import { mountRoundAnswer } from './field-round-answer';
 import { showFieldCelebration, showRoundResult } from './field-round-feedback';
 import * as flow from './field-round-flow';
 import { createRunTally } from './field-run-tally';
-import { tf } from './field-strings';
+import { tf, tipWithKeys } from './field-strings';
 import * as model from './planting-grid';
 import type { GridView } from './planting-grid-view';
 
-export type FieldPhase = 'planting' | 'answer' | 'solved' | 'done';
+export type FieldPhase = 'planting' | 'answer' | 'solved' | 'reasoning' | 'done';
 
 export interface FieldGameParts {
   ctx: LevelContext;
@@ -28,7 +30,8 @@ export interface FieldGameParts {
 
 export function createFieldGame({ ctx, view, hud, labels, diorama, planting }: FieldGameParts) {
   const { learning, audio, definition } = ctx;
-  const rounds = flow.planRunRounds(learning, definition);
+  const run = planFieldRun(learning, definition);
+  const rounds = run.rounds;
   if (rounds.length === 0) throw new Error('Field level: the planner returned no facts');
   const tally = createRunTally();
   let index = 0;
@@ -73,7 +76,7 @@ export function createFieldGame({ ctx, view, hud, labels, diorama, planting }: F
     dropWidget();
     clearFocus();
     view.setRowHighlight(false);
-    hud.resetRound(i, rounds.length);
+    hud.resetRound(i, run.total);
     const [a, b] = round.type === 'recall' ? round.shownOrder : [round.rows, round.cols];
     showGrid(model.createGrid(a, b, round.type !== 'build'));
     equationShown = round.type !== 'equations';
@@ -81,7 +84,7 @@ export function createFieldGame({ ctx, view, hud, labels, diorama, planting }: F
     if (round.type === 'build') {
       phase = 'planting';
       const title = tf('buildPrompt', { rows: round.rows, cols: round.cols });
-      hud.setPrompt(title, `${tf('buildTip')} ${tf('keysTip')}`);
+      hud.setPrompt(title, tipWithKeys(tf('buildTip'), 'keysTip'));
       hud.speak(i === 0 ? tf('intro') : title);
       hud.setTools({ rotate: false, hint: false });
       planting.enable();
@@ -99,19 +102,11 @@ export function createFieldGame({ ctx, view, hud, labels, diorama, planting }: F
     clearFocus();
     const round = state.round;
     hud.setTools({ rotate: true, hint: true });
-    if (round.type === 'equations') {
-      hud.setPrompt(tf('equationsPrompt'), tf('equationsTip'));
-      widget = mountEquationChoices(hud.body, round.options, (ids) =>
-        ids.length === 2
-          ? settle(flow.answerEquations(state, ids))
-          : hud.setFeedback(tf('pickTwo'), 'gentle'),
-      );
-      return;
-    }
-    const title = round.type === 'build' ? tf('totalPrompt') : tf('recallPrompt');
-    hud.setPrompt(title, tf('toolsKeysTip'));
-    equationLabel(' = ?');
-    widget = mountNumberPad(hud.body, (value) => settle(flow.answerTotal(state, value)));
+    if (round.type !== 'equations') equationLabel(' = ?');
+    widget = mountRoundAnswer(hud, round, {
+      equations: (ids) => settle(flow.answerEquations(state, ids)),
+      total: (value) => settle(flow.answerTotal(state, value)),
+    });
   }
 
   function settle(result: { state: flow.RoundState; verdict: flow.Verdict }): void {
@@ -139,16 +134,20 @@ export function createFieldGame({ ctx, view, hud, labels, diorama, planting }: F
     const line = rows === cols ? 'squareLine' : 'rotateLine';
     hud.speak(tf(line, { rows: grid.rows, cols: grid.cols, total }));
     const last = index === rounds.length - 1;
-    hud.setNext(tf(last ? 'finish' : 'next'), () => (last ? celebrate() : beginRound(index + 1)));
+    const next = () => (last ? celebrate() : beginRound(index + 1));
+    hud.setNext(tf(last && !run.reasoning ? 'finish' : 'next'), next);
     if (correct && rows !== cols) void rotate();
   }
 
+  /** After the plots: the reasoning round on the last patch when planned, then the celebration. */
   function celebrate(): void {
-    phase = 'done';
+    phase = run.reasoning && phase !== 'reasoning' ? 'reasoning' : 'done';
     serial += 1;
     dropWidget();
     labels.set([]);
-    for (let i = 0; i < rounds.length; i++) diorama.restorePatch(i, ctx.reducedMotion);
+    if (phase === 'reasoning' && run.reasoning)
+      return void startFieldReasoningRound(ctx, hud, run.reasoning, tally, celebrate);
+    for (let i = 0; i < run.total; i++) diorama.restorePatch(i, ctx.reducedMotion);
     showFieldCelebration(ctx, hud, tally);
   }
 

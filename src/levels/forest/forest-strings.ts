@@ -13,6 +13,8 @@ const define = (defineFn: typeof defineStrings) =>
       intro:
         'Cơn bão thổi rơi hết trái cây của các bạn thú rồi. Mình cùng giúp các bạn chia lại thật đều nhé!',
       round: 'Lượt {n}/{total}',
+      reasoningLine: 'Lượt cuối là câu đố của bác Gấu: chia quả mà còn thừa thì sao nhỉ?',
+      reasoningTitle: 'Câu đố chia quả của bác Gấu',
       sharePrompt: 'Có {total} quả. Chia đều cho {groups} bạn thì mỗi bạn được mấy quả?',
       packPrompt: 'Bác Gấu xếp {total} quả vào giỏ, mỗi giỏ {size} quả. Xếp được mấy giỏ?',
       familyPrompt: 'Ba số {a}, {b} và {p} là một gia đình phép tính. Điền số còn thiếu nhé!',
@@ -62,6 +64,8 @@ const define = (defineFn: typeof defineStrings) =>
       mulSign: '×',
       intro: 'The storm knocked down all the animals’ fruit. Let’s help them share it fairly!',
       round: 'Round {n}/{total}',
+      reasoningLine: 'The last round is Bear’s puzzle: what if some fruit is left over?',
+      reasoningTitle: 'Bear’s sharing puzzle',
       sharePrompt: '{total} fruit shared equally among {groups} friends. How many does each get?',
       packPrompt: 'Bear packs {total} fruit into baskets of {size}. How many baskets?',
       familyPrompt: '{a}, {b} and {p} are a fact family. Fill in the missing numbers!',

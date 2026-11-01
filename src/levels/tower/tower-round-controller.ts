@@ -9,6 +9,7 @@ import type { TowerQuestionCard } from './tower-question-card';
 import type { TowerQuestion } from './tower-question-formats';
 import type { StepAnswer, TowerRoundFlow } from './tower-round-flow';
 import type { TowerStrings } from './tower-strings';
+import { choiceGuide } from './tower-touch-text';
 
 export interface TowerRoundHooks {
   /** Floor `floor` (0-based) is finished: light it and climb to the next one. */
@@ -21,7 +22,7 @@ function floorTexts(ts: TowerStrings, q: TowerQuestion): { prompt: string; guide
   const eq = q.steps[0]?.eq;
   switch (q.format) {
     case 'choice':
-      return { prompt: ts('promptChoice'), guide: ts('guideChoice') };
+      return { prompt: ts('promptChoice'), guide: choiceGuide(ts) };
     case 'pad':
       return { prompt: ts('promptPad'), guide: ts('guidePad') };
     case 'missing':
@@ -35,7 +36,7 @@ function floorTexts(ts: TowerStrings, q: TowerQuestion): { prompt: string; guide
 
 export class TowerRoundController {
   private idle = 0;
-  private readonly tally = createLevelRunTally();
+  readonly tally = createLevelRunTally();
 
   constructor(
     private readonly ctx: LevelContext,
@@ -51,7 +52,7 @@ export class TowerRoundController {
     const step = this.flow.step;
     if (!question || !step) return;
     const texts = floorTexts(this.ts, question);
-    const total = this.flow.questions.length;
+    const total = this.flow.total;
     this.panel.showFloor(this.flow.index, total, question.format, texts.prompt, texts.guide);
     this.card.render(question);
     this.panel.showInput(step);

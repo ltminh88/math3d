@@ -7,18 +7,14 @@ import type { LevelContext, LevelModule, LevelSession } from '../shared/level-ty
 import { showTowerCelebration } from './tower-celebration';
 import { TowerClimbCamera } from './tower-climb-camera';
 import { buildTowerDiorama } from './tower-diorama-builder';
+import { planTowerRun, startTowerReasoningFloor } from './tower-expression-floor';
 import { TowerFloorView } from './tower-floor-view';
 import { listenTowerKeys } from './tower-keyboard';
 import { FLOOR_COUNT } from './tower-layout';
 import { TowerPanel } from './tower-panel';
 import { TowerQuestionCard } from './tower-question-card';
 import { TowerRoundController } from './tower-round-controller';
-import {
-  planTowerFacts,
-  planTowerQuestions,
-  TowerRoundFlow,
-  towerFactPool,
-} from './tower-round-flow';
+import { TowerRoundFlow } from './tower-round-flow';
 import { towerStrings } from './tower-strings';
 import { installTowerTestHook } from './tower-test-hook';
 import './tower-hud-and-answer-panel.css';
@@ -33,12 +29,9 @@ function start(ctx: LevelContext): LevelSession {
   const { sun } = buildTowerDiorama(scene);
   const floors = new TowerFloorView(scene, ctx.reducedMotion);
   const climb = new TowerClimbCamera(ctx.reducedMotion);
-  const stats = ctx.learning.stats();
-  const rounds = Math.min(ctx.definition.rounds, FLOOR_COUNT);
-  const planned = ctx.learning.planSession(towerFactPool(), rounds);
-  const facts = planTowerFacts(planned, stats, ctx.learning.rng, rounds);
-  const questions = planTowerQuestions(facts, stats, ctx.learning.rng);
-  const flow = new TowerRoundFlow(questions, () => performance.now());
+  const towerRun = planTowerRun(ctx.learning, Math.min(ctx.definition.rounds, FLOOR_COUNT));
+  const flow = new TowerRoundFlow(towerRun.questions, () => performance.now(), towerRun.total);
+  let reasoned = false;
   const controller: { current?: TowerRoundController } = {};
   const panel = new TowerPanel(ctx.ui, ts, {
     onPick: (index) => controller.current?.pick(index),
@@ -70,6 +63,24 @@ function start(ctx: LevelContext): LevelSession {
       climb.climbTo(floor + 1);
     },
     onLevelDone(earned, stars) {
+      const { reasoning } = towerRun;
+      if (reasoning && !reasoned) {
+        // The top floor: the expression stone, then this celebration with its outcome counted.
+        reasoned = true;
+        startTowerReasoningFloor(
+          ctx,
+          ts,
+          panel,
+          c,
+          { ...towerRun, reasoning },
+          {
+            onFloorDone: (floor) => this.onFloorDone(floor),
+            onNext: () => this.onLevelDone(c.tally.earned(), c.tally.stars()),
+          },
+        );
+        frame();
+        return;
+      }
       panel.hide();
       panel.say(ts('doneTitle'));
       floors.celebrate();

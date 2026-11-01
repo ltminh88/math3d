@@ -163,9 +163,12 @@ export class CityPanel {
     signal.addEventListener('abort', () => window.clearTimeout(timer), { once: true });
   }
 
+  /** Panel gone (reasoning round, celebration): the pad stops listening for keys too. */
   hide(): void {
     this.panel.hidden = true;
     this.progress.hidden = true;
+    this.pad?.destroy();
+    this.pad = undefined;
   }
 
   destroy(): void {
