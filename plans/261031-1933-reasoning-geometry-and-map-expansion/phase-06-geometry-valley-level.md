@@ -6,7 +6,7 @@
 - Verification report from 02 (terms, ranges, square-as-rectangle)
 
 ## Overview
-- Date 2026-10-31. Priority P1. Status pending. Review: not started. Depends on 01, 02, 03. Parallel with 04, 05, 07, 08.
+- Date 2026-10-31. Priority P1. Status done (2026-11-02, branch `feat/ch2-p06-valley`). Review: not started. Depends on 01, 02, 03. Parallel with 04, 05, 07, 08.
 - Story: the valley's shape stones were scattered by the wind. VLM and the child find midpoints, measure circles, test corners with a big ê ke, sort shapes and build boxes to rebuild the stone garden.
 
 ## Key Insights
@@ -50,13 +50,13 @@ tests/e2e/valley-level.spec.ts  valley-level-leak.spec.ts
 6. Screenshots `reports/valley-screens/` incl. rotated-corner round on phone + tablets.
 
 ## Todo list
-- [ ] round flow + ê ke fit + tests
-- [ ] hints + tests
-- [ ] views, diorama, labels
-- [ ] panel, input, rotate buttons
-- [ ] celebration
-- [ ] e2e 4 projects + leak
-- [ ] screenshots
+- [x] round flow + ê ke fit + tests
+- [x] hints + tests
+- [x] views, diorama, labels
+- [x] panel, input, rotate buttons
+- [x] celebration
+- [x] e2e 4 projects + leak
+- [x] screenshots
 
 ## Success Criteria
 - Unit + valley e2e green on desktop, phone, tablet portrait, tablet landscape; own chunk; ≤60 draw calls; no leaks; terms match the 02 verification report.
@@ -80,3 +80,14 @@ tests/e2e/valley-level.spec.ts  valley-level-leak.spec.ts
 
 ## Next steps
 - 09 merge.
+
+## Implementation notes (2026-11-02)
+- Files: `src/levels/valley/**` (plan, flow, layouts, views, panel, input, test hook, CSS); e2e `tests/e2e/valley-level.spec.ts`, `valley-level-leak.spec.ts`. Screenshots: `reports/p06-screens/` (ê-ke round turned one step, choose-all shapes, celebration; desktop, phone, tablet portrait + landscape).
+- Plan: planner pick leads, topped up weakest-first, the five kinds take turns (no kind twice in a row, all five in six rounds). **First run** (no `sk:geo-*` seen) uses only midpoint/circle/right-angle skills (reading of "tier 1 only a–c"); afterwards all nine skills. Tier per skill box.
+- Each round = one generator item + an optional opening tap: midpoint (5 marked stones at k/6 of the log, M hidden until found at tiers 1–2), centre O (ring points are wrong taps; circle row: any centre, then its diameter shows as two coloured radii), ê-ke (tap any corner of 4 angles or a single shape; logical vector check ±1°, ✓/✗ mark, the ê-ke mesh laid on the corner), lift (single block: faces coloured, turns slowly). Classify, shape count, multi-solid and "most right angles" rounds have no action; shapes/blocks on the board press the card's option (and mirror the card's toggles in gold).
+- Action and step misses share one hint ladder; the third miss reveals (outcome not correct). Hints: 1 encourage, 2 KNTT definition (target-specific for shapes; never "a square is a rectangle"; diameter = two radii), 3 visual aid (log halves, dashed diameter through O on a free direction, spare ê-ke, corner dots, coloured faces). Unit test: no rung ≥2 contains a numeric/letter answer (9 skills × 3 tiers × 300 seeds).
+- Touch: board targets are real `<button>`s ≥48 px projected over the figure; ⟲/⟳ live in the panel (not over the board); no key hints on coarse pointers; host leave button gets 44 px inside the valley only (`:has(.valley-panel)`). Keys: arrows walk targets + Enter, 1–4 card buttons, Enter = Xong, digits → pad, H, R (Shift+R back).
+- Draw calls: max 8 on all four projects (budget 60). Leak spec: 10 cycles back to the settled baseline.
+- Test seam: `window.__valleyPlan` (test builds only) fixes the six rounds so the e2e plays ê-ke, choose-all, circle parts, lift and a revealed round deterministically.
+- **Outside ownership:** `tests/e2e/chapter2-gates-and-regions.spec.ts` (`SHIPPED = ['valley']`: valley gate is 'open', not 'coming-soon'). `level-registry` untouched: `tables` is a placeholder like garden/cave.
+

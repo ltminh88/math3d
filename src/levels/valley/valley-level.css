@@ -1,0 +1,170 @@
+/* Valley level HUD: recovered tokens (--ink, --paper, --gold, fonts), glass panels, the valley
+   green (#b5cf8a, region pad) and ê-ke yellow (#f2c14e); board chips and >= 48 px tap targets. */
+.valley-guide {
+  position: absolute;
+  top: max(16px, env(safe-area-inset-top));
+  left: 50%;
+  transform: translate(-50%);
+  width: min(560px, calc(100% - 300px));
+  display: flex;
+  align-items: flex-start;
+  gap: 8px;
+  padding: 10px 16px;
+  border-radius: var(--radius);
+  font-size: 15px;
+  line-height: 1.45;
+}
+.valley-guide p {
+  margin: 0;
+  color: var(--ink-soft);
+  font-weight: 700;
+}
+.valley-guide__name {
+  font-family: var(--font-display);
+  color: var(--gold-deep);
+}
+.valley-guide__dot {
+  color: #7fa650;
+}
+.valley-progress {
+  position: absolute;
+  top: max(16px, env(safe-area-inset-top));
+  right: max(16px, env(safe-area-inset-right));
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 10px 14px;
+  border-radius: 14px;
+  font-size: 14px;
+  font-weight: 900;
+}
+.valley-stones {
+  display: flex;
+  gap: 4px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+.valley-stones li {
+  width: 12px;
+  height: 12px;
+  border-radius: 3px;
+  background: #e4e9d6;
+  transform: rotate(45deg);
+}
+.valley-stones li.done {
+  background: #f2c14e;
+}
+.valley-stones li.current {
+  background: #7fa650;
+  box-shadow: 0 0 0 2px #dfeacb;
+}
+.valley-panel {
+  position: absolute;
+  top: 76px;
+  right: max(16px, env(safe-area-inset-right));
+  width: 360px;
+  max-height: calc(100% - 92px);
+  overflow: auto;
+  padding: 16px 18px;
+  border-radius: var(--radius-lg);
+  background: var(--glass-strong);
+}
+.valley-panel .question-intro {
+  margin: 0 0 6px;
+  font-size: 15px;
+  color: var(--ink);
+  font-weight: 800;
+}
+.valley-story {
+  margin: 0 0 8px;
+  color: var(--ink-soft);
+  font-weight: 700;
+  line-height: 1.45;
+}
+.valley-story[hidden] {
+  display: none;
+}
+.valley-card .kit-step-card {
+  gap: 8px;
+  font-size: 16px;
+}
+.valley-card .kit-button {
+  min-height: 48px;
+  border: 2px solid #e3e8d6;
+  border-bottom-width: 5px;
+  border-radius: 14px;
+  background: #f2f3e6;
+  color: var(--ink);
+  font-family: var(--font-display);
+  font-weight: 800;
+}
+.valley-card .kit-multi__option {
+  flex: 1 1 calc(25% - 10px);
+  text-align: center;
+}
+.valley-card .kit-multi__option[aria-pressed="true"],
+.valley-card .kit-multi__done:not(:disabled) {
+  background: #ffe9a8;
+  border-color: #f2c14e;
+}
+.valley-card .kit-verdict .kit-button:not(.kit-button--accent) {
+  background: #dff0d2;
+}
+.valley-card .kit-pad__key {
+  min-height: 48px;
+  border: 2px solid #e3e8d6;
+  border-bottom-width: 5px;
+  border-radius: 14px;
+  background: #f2f3e6;
+  font-family: var(--font-display);
+  font-size: 22px;
+  font-weight: 800;
+}
+.valley-card .kit-pad__key--ok {
+  background: var(--ink);
+  border-color: #11392f;
+  color: #fffbea;
+}
+.valley-hint-button.offer {
+  color: var(--gold-deep);
+  text-decoration: underline;
+  animation: nudge 1.6s infinite ease-in-out;
+}
+.valley-hint[hidden],
+.valley-next[hidden] {
+  display: none;
+}
+.valley-next {
+  width: 100%;
+  margin-top: 10px;
+}
+.valley-keys {
+  margin: 10px 0 0;
+  font-size: 11px;
+  color: var(--muted-2);
+}
+.valley-panel .reward-pop {
+  top: 8px;
+}
+.valley-tools {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+}
+.valley-turns {
+  display: flex;
+  gap: 8px;
+}
+.valley-turn {
+  min-width: 48px;
+  min-height: 48px;
+  border: 0;
+  border-radius: 12px;
+  background: #f2f3e6;
+  font-size: 24px;
+  font-weight: 900;
+  color: var(--ink);
+  touch-action: manipulation;
+}
