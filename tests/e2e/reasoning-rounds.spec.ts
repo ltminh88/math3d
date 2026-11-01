@@ -189,7 +189,7 @@ test('bridge quiz: a mastered table gets a word problem on the 5th question', as
     .poll(() =>
       page.evaluate(() => window.__game?.snapshot()?.factStats['sk:wp-times-then-add']?.attempts),
     )
-    .toBe(1);
+    .toBe(2); // one wrong try, then the right one
 });
 
 test('field: the last patch is a reasoning round once tables 3-4 are known', async ({
