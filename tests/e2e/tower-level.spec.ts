@@ -173,8 +173,8 @@ test('the tower climbs seven floors and records × and : facts', async ({ page }
   expect(store.keys.some((k) => /^mul:\d+x\d+$/.test(k))).toBe(true);
   expect(store.keys.some((k) => /^div:\d+\/\d+$/.test(k))).toBe(true);
   for (const key of factKeys) expect(store.keys).toContain(key);
-  // All five stages done: the quest card shows the closing card.
-  await expect(page.locator('#quest-title')).toHaveText('Bạn đã qua cả năm chặng!');
+  // Chapter 1 done: the quest card opens chapter 2 at the garden.
+  await expect(page.locator('#quest-title')).toHaveText('Khu Vườn Quy Luật');
   expect(await page.evaluate(() => window.__tower)).toBeUndefined();
   expect(errors).toEqual([]);
 });

@@ -1,0 +1,24 @@
+/* Touch screens (coarse pointer) have no keyboard: hide the key badges of the interact button
+   ("E") and the minimap ("M"); the help dialog swaps its text too (book-help-touch-text.ts).
+   The bottom toolbar buttons (Bản đồ, Cửa hàng, Sổ cửu chương, help: 39 px tall on phones) take
+   taps over at least 44 x 44 px through an invisible ::after, like touch-hit-areas.css. The
+   recovered markup and stylesheets stay byte-equal; nothing here changes how a button looks. */
+@media (pointer: coarse) {
+  .interact kbd,
+  .minimap-key {
+    display: none;
+  }
+  .toolbar .tool-button,
+  .toolbar .icon-button {
+    position: relative;
+  }
+  .toolbar .tool-button::after,
+  .toolbar .icon-button::after {
+    content: "";
+    position: absolute;
+    top: min(0px, calc((100% - 44px) / 2));
+    bottom: min(0px, calc((100% - 44px) / 2));
+    left: min(0px, calc((100% - 44px) / 2));
+    right: min(0px, calc((100% - 44px) / 2));
+  }
+}

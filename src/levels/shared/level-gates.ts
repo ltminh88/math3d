@@ -9,6 +9,7 @@ import { gameState } from '../../ui/game-state';
 import { byId } from '../../ui/icons';
 import { connectedStore } from '../../ui/progress-sync';
 import { showToast } from '../../ui/toast-and-persist';
+import { buildExpansionWorld } from '../../world/expansion-world-builder';
 import type { WorldBuildContext } from '../../world/world-build-context';
 import type { WorldPublicApi } from '../../world/world-public-api';
 import { buildLevelGate, type LevelGateView } from './level-gate-builder';
@@ -39,6 +40,10 @@ const LEVEL_LOCK_KEYS = {
   field: ['lockReasonField', 'lockedField'],
   forest: ['lockReasonForest', 'lockedForest'],
   city: ['lockReasonCity', 'lockedCity'],
+  tower: ['lockReasonTower', 'lockedTower'],
+  garden: ['lockReasonGarden', 'lockedGarden'],
+  valley: ['lockReasonValley', 'lockedValley'],
+  workshop: ['lockReasonWorkshop', 'lockedWorkshop'],
 } as const satisfies Record<Requirement, readonly Parameters<typeof tl>[0][]>;
 
 export const gateName = (gate: LevelGate): string => gateNameOf(gate.levelId);
@@ -144,5 +149,7 @@ export function initLevelGates(world: WorldPublicApi & WorldBuildContext): void 
       onInteract: () => useGate(gate, world),
     });
   }
+  // Chapter 2 scenery at the same build point as the gates (UUID draws after the world's).
+  buildExpansionWorld(world);
   refreshLevelGates();
 }

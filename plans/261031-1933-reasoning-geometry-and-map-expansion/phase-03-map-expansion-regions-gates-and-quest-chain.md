@@ -6,7 +6,7 @@
 - `docs/recovery-notes.md` (preserved quirks, parity method)
 
 ## Overview
-- Date 2026-10-31. Priority P1. Status pending. Review: not started. No deps; parallel with 01/02.
+- Date 2026-10-31. Priority P1. Status done (branch `feat/ch2-p03-map-expansion`, 2026-11-01, not merged). Review: author review of map screenshots pending. No deps; parallel with 01/02.
 - Three new regions + roads inside current bounds without touching `REGIONS`/`ROADS`/`WALKABLE_BOUNDS`; gates for garden/valley/workshop/cave; map, minimap, HUD and EN names see both lists; 9-stage quest chain; every shell step reachable by touch.
 
 ## Key Insights
@@ -56,15 +56,15 @@ src/levels/shared/level-progression.ts (mod)  level-host-ports.ts (mod)  src/ui/
 9. Parity: run, check diffs are only scatter/scene/map/quiz-reshuffle/quest-card/help-on-mobile; re-baseline (attributed commit); determinism double run; goldens `--check`.
 
 ## Todo list
-- [ ] footprint probe + coords
-- [ ] lookups + tests
-- [ ] scatter clearing + tests
-- [ ] scenery + roads
-- [ ] map/minimap/HUD
-- [ ] 9-stage quest card (chapters)
-- [ ] gates + progression + labels + e2e
-- [ ] touch audit + tablet fixes
-- [ ] parity re-baseline + golden check
+- [x] footprint probe + coords
+- [x] lookups + tests
+- [x] scatter clearing + tests
+- [x] scenery + roads
+- [x] map/minimap/HUD
+- [x] 9-stage quest card (chapters)
+- [x] gates + progression + labels + e2e
+- [x] touch audit + tablet fixes
+- [x] parity re-baseline + golden check
 
 ## Success Criteria
 - Goldens byte-identical; `config.golden.test.ts` and map parity unit green; full e2e green on desktop, phone and both tablet projects (shell/world specs); no obstacle overlaps new gates; world draw calls within +6.
@@ -90,3 +90,16 @@ src/levels/shared/level-progression.ts (mod)  level-host-ports.ts (mod)  src/ui/
 
 ## Next steps
 - 05–08 register levels against these gates; 09 final re-baseline.
+
+## Implementation notes (2026-11-01)
+- North = top of the world map (−z). Final coords (footprint probe over the live scatter/obstacles):
+  valley centre [40, −37] size [22, 10]; workshop [45, 38] [18, 10]; cave [−32, 32] [14, 12].
+  Roads: (46,0)→(47.5,−34) valley; (46,0)→(46,36) workshop; (−36.5,6.5)→(−30,26.5) cave (from the gazebo road, east of the mound).
+  Gates: garden (21.8, −6) "2, 4, ?" (the 9-char "2, 4, 6, ?" overflowed the 256 px sign), valley (44, −36.5) "△ □", workshop (50.5, 37) "cm²", cave (−27, 30) "?".
+- Files: `src/config/expansion-{regions,roads,region-lookup,region-strings}.ts`; `src/world/expansion-{scatter-clearing,road-builder,world-builder}.ts`, `src/world/regions/{geometry-valley,measurement-workshop,puzzle-cave}-builder.ts` + `expansion-region-group.ts`; `src/map/{map-render-expansion-layer,map-area-hit-test,area-display-text}.ts`; `src/ui/{pointer-kind,book-help-touch-text}.ts`, `book-help-touch.css`.
+- Scenery is built in `initLevelGates` right after the gates and baked into 3 meshes (ground, scenery, unlit glow). Gate frames and padlocks are baked too: world draw calls at the start view 420 → 416 with 8 gates + scenery.
+- Map expansion pass runs only when `MapDrawState.expansion` is set; `map-render.parity.test.ts` (original draw) unchanged and green.
+- Quest card: one chapter row + `#quest-chapter` label (created on the first chain card only, so bridge-stage DOM is unchanged); chapter 2 stages say "Sắp ra mắt" until `levelDefinition(id)` exists; VLM line via `chainGuideLine`.
+- Touch: help dialog text by `(pointer: coarse)` (desktop text byte-identical), the "Nhấn M" completion note has a tap variant, E/M key badges hidden on coarse pointers, bottom toolbar buttons get a 44 px hit area.
+- Edited outside the listed ownership (small, needed): `levels/shared/level-types.ts` (regionId → `AnyRegionId`), `levels/shared/level-gates.ts`, `level-gate-builder.ts`, `level-host-strings.ts`, `ui/guide-dialog.ts` (1 line), `ui/world-frame-hook.ts` (1 line), `ui/map-overlay.ts`, `ui/world-labels.ts`; e2e `tower-level`, `save-code-full-progress`, `shop-purchase` (camera snap before draw-call samples: fixes the tablet-portrait 221 > 220 flake from reports/tablet-baseline.md).
+- Parity re-baseline attributed in `reports/parity-rebaseline-p03.md`; screenshots in `reports/p03-screens/`.

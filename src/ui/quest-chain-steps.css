@@ -1,13 +1,23 @@
 /*
- * Quest chain step row (5 cells: bridge, field, forest, city, tower). The recovered `.quest-steps`
- * rules were sized for the 6 numbered bridge cells; region names like "Thành Phố" wrapped onto two
- * lines there. Keep each name on one line: slightly smaller type, tighter tracking, and checked
- * cells give their width to the named ones. The recovered stylesheets stay byte-identical.
+ * Quest chain step row: one chapter at a time (chapter 1: bridge, field, forest, city, tower;
+ * chapter 2: garden, valley, workshop, cave), so at most 5 named cells. The recovered
+ * `.quest-steps` rules were sized for the 6 numbered bridge cells; region names like "Thành Phố"
+ * wrapped onto two lines there. Keep each name on one line: slightly smaller type, tighter
+ * tracking, and checked cells give their width to the named ones. The recovered stylesheets stay
+ * byte-identical; `.chain-row` and the chapter label exist only on chain cards.
  */
-.quest-steps:has(> span:nth-child(5):last-child) {
+.quest-chapter {
+  display: block;
+  margin: -4px 0 6px;
+  font-size: 11px;
+  font-weight: 800;
+  letter-spacing: 0.02em;
+  color: var(--muted-2);
+}
+.quest-steps.chain-row {
   gap: 4px;
 }
-.quest-steps:has(> span:nth-child(5):last-child) > span {
+.quest-steps.chain-row > span {
   flex: 1 1 auto;
   min-width: 0;
   padding: 0 3px;
@@ -16,11 +26,11 @@
   font-size: 11px;
   letter-spacing: -0.01em;
 }
-.quest-steps:has(> span:nth-child(5):last-child) > span.done {
+.quest-steps.chain-row > span.done {
   flex: 0.6 1 auto;
 }
 @media (max-width: 700px) {
-  .quest-steps:has(> span:nth-child(5):last-child) > span {
+  .quest-steps.chain-row > span {
     font-size: 9.5px;
     padding: 0 2px;
   }

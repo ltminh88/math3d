@@ -1,15 +1,13 @@
 // Talking to VLM (E key or interact button when he is the nearest interactable, his label, or
 // clicking him): quest intro, the way to the next open gate, or a practice offer.
 import { BRIDGE_SEGMENTS } from '../config/world-constants';
-import { gateNameOf } from '../levels/shared/level-host-strings';
 import { openDialog } from './dialog';
 import { gameState, getWorld } from './game-state';
 import { refreshHud } from './hud';
 import { byId, icon } from './icons';
 import { interactWithNearest } from './interact-target';
 import { saveQuestAccepted } from './progress-sync';
-import { CHAIN_TEXT_KEYS, currentQuestStage } from './quest-chain';
-import { tq } from './quest-chain-strings';
+import { chainGuideLine, currentQuestStage } from './quest-chain';
 import { openQuiz } from './quiz-dialog';
 import { showToast } from './toast-and-persist';
 
@@ -19,7 +17,7 @@ function afterQuestLine(): string {
   if (stage === 'bridge' || stage === 'done') {
     return 'Bạn muốn cùng mình luyện thêm phép nhân không?';
   }
-  return tq(CHAIN_TEXT_KEYS[stage][4], { gate: gateNameOf(stage) });
+  return chainGuideLine(stage);
 }
 
 function miloBodyHtml(bridgeDone: boolean): string {

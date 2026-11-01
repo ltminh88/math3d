@@ -1,9 +1,10 @@
 // DOM labels pinned to world points (VLM, bridge, level gates, regions) and the current-area
 // badge/toast.
 import { Vector3 } from 'three';
+import { areaAt, isAreaUnlocked } from '../config/expansion-region-lookup';
 import { LEVEL_GATES } from '../config/level-gate-config';
-import { isRegionUnlocked, regionAtPoint } from '../config/regions';
-import { getLegacyLanguage, translateText } from '../i18n/legacy-translator';
+import { getLegacyLanguage } from '../i18n/legacy-translator';
+import { areaText } from '../map/area-display-text';
 import { LABELED_REGIONS } from './dom-template';
 import { gameState, getWorld } from './game-state';
 import { byId } from './icons';
@@ -55,13 +56,13 @@ export function projectWorldLabels(): void {
 export function updateCurrentArea(): void {
   const world = getWorld();
   const position = world.player.position;
-  const region = regionAtPoint(position.x, position.z);
+  const region = areaAt(position.x, position.z);
   if (region.id === gameState.currentRegionId) return;
   const firstCheck = gameState.currentRegionId === '';
   gameState.currentRegionId = region.id;
   byId('area-icon').textContent = region.icon;
-  byId('area-name').textContent = translateText(region.name);
-  byId('area-sub').textContent = translateText(region.subtitle);
+  byId('area-name').textContent = areaText(region, 'name');
+  byId('area-sub').textContent = areaText(region, 'subtitle');
   const badge = byId('area-label');
   badge.classList.remove('arrive');
   void badge.offsetWidth;
@@ -71,12 +72,12 @@ export function updateCurrentArea(): void {
     world.active &&
     region.id !== 'village' &&
     region.id !== 'garden' &&
-    isRegionUnlocked(region, gameState.progress.questComplete)
+    isAreaUnlocked(region, gameState.progress.questComplete)
   ) {
     showToast(
       getLegacyLanguage() === 'vi'
         ? `Chào mừng đến ${region.name}!`
-        : `Welcome to ${translateText(region.name)}!`,
+        : `Welcome to ${areaText(region, 'name')}!`,
     );
   }
 }

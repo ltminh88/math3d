@@ -3,8 +3,8 @@
 // scene code, so each level is its own chunk and the main bundle only carries the definitions.
 import type { Camera, Scene, WebGLRenderer } from 'three';
 import type { SynthAudio } from '../../audio/synth-audio';
+import type { AnyRegionId } from '../../config/expansion-regions';
 import type { GateRequirement, LevelGate } from '../../config/level-gate-config';
-import type { RegionId } from '../../config/regions';
 import type { InteractionController } from '../../core/input/interaction-controller';
 import type { SceneDisposer } from '../../core/scene-disposer';
 import type { defineStrings } from '../../i18n/i18n';
@@ -18,7 +18,7 @@ export type { GateRequirement as LevelRequirement } from '../../config/level-gat
 export interface LevelDefinition {
   /** Folder name under `src/levels/` and the store's `LevelProgress.levelId`. */
   readonly id: LevelGate['levelId'];
-  readonly regionId: RegionId;
+  readonly regionId: AnyRegionId;
   /** Multiplication tables the level drills (fluency order is applied by the planner). */
   readonly tables: readonly number[];
   /** Rounds per run. */

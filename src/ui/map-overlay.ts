@@ -1,15 +1,18 @@
 // Minimap and full-screen world map overlay: drawing, region list/detail panel, open/close.
+
+import { allRegions, anyRegionById, isAreaUnlocked } from '../config/expansion-region-lookup';
+import { expansionRegionText } from '../config/expansion-region-strings';
+import { type AnyRegion, isExpansionRegion } from '../config/expansion-regions';
 import { LEVEL_GATES } from '../config/level-gate-config';
-import { isRegionUnlocked, REGIONS, type Region } from '../config/regions';
 import { translateDomTree, translateLongText, translateText } from '../i18n/legacy-translator';
 import { currentGateStatus, gateStateText, isLevelRunning } from '../levels/shared/level-gates';
 import { tl } from '../levels/shared/level-host-strings';
+import { areaAtMapPoint } from '../map/map-area-hit-test';
 import { drawMap, type MapDrawState } from '../map/map-render';
 import {
   fitWorldMapView,
   type MapView,
   prepareMapCanvas,
-  regionAtMapPoint,
   screenToWorld,
 } from '../map/map-view-transform';
 import { gameState, getWorld } from './game-state';
@@ -27,6 +30,7 @@ function mapDrawState(labels: boolean, withSelection = labels): MapDrawState {
     labels,
     translate: translateText,
     time: performance.now() / 1000,
+    expansion: { name: (region) => expansionRegionText(region, 'name') },
   };
 }
 
@@ -58,13 +62,18 @@ function drawOverlayFrame(): void {
   requestAnimationFrame(drawOverlayFrame);
 }
 
-function regionButtonHtml(region: Region): string {
-  const unlocked = isRegionUnlocked(region, gameState.progress.questComplete);
-  return `<button class="map-region${unlocked ? '' : ' locked'}" data-region="${region.id}" aria-pressed="${gameState.selectedRegionId === region.id}"><span class="map-region-icon" style="--tint:${region.color}">${unlocked ? region.icon : '🔒'}</span><span><strong>${region.name}</strong><small>${region.subtitle}</small></span>${gameState.currentRegionId === region.id ? '<em>Bạn ở đây</em>' : ''}</button>`;
+/** Panel text: original regions stay Vietnamese here (the legacy translator runs on the whole
+ * panel, as before); chapter 2 regions come already in the current language. */
+const panelText = (region: AnyRegion, field: 'name' | 'subtitle' | 'blurb'): string =>
+  isExpansionRegion(region) ? expansionRegionText(region, field) : region[field];
+
+function regionButtonHtml(region: AnyRegion): string {
+  const unlocked = isAreaUnlocked(region, gameState.progress.questComplete);
+  return `<button class="map-region${unlocked ? '' : ' locked'}" data-region="${region.id}" aria-pressed="${gameState.selectedRegionId === region.id}"><span class="map-region-icon" style="--tint:${region.color}">${unlocked ? region.icon : '🔒'}</span><span><strong>${panelText(region, 'name')}</strong><small>${panelText(region, 'subtitle')}</small></span>${gameState.currentRegionId === region.id ? '<em>Bạn ở đây</em>' : ''}</button>`;
 }
 
 /** Region detail line about levels: the gate state for regions with a level gate. */
-function regionLevelHtml(region: Region): string {
+function regionLevelHtml(region: AnyRegion): string {
   const gate = LEVEL_GATES.find((g) => g.regionId === region.id);
   if (!gate) return '';
   const state = gateStateText(gate.levelId, currentGateStatus(gate));
@@ -72,11 +81,11 @@ function regionLevelHtml(region: Region): string {
 }
 
 function renderMapPanel(): void {
-  byId('map-regions').innerHTML = translateLongText(REGIONS.map(regionButtonHtml).join(''));
-  const selected = REGIONS.find((r) => r.id === gameState.selectedRegionId);
+  byId('map-regions').innerHTML = translateLongText(allRegions().map(regionButtonHtml).join(''));
+  const selected = anyRegionById(gameState.selectedRegionId);
   byId('map-detail').innerHTML = selected
     ? translateLongText(
-        `<strong>${selected.icon} ${selected.name}</strong><p>${selected.blurb}</p>${isRegionUnlocked(selected, gameState.progress.questComplete) ? '' : `<p class="map-locked">${icon('lock')} Mở khóa khi hoàn thành Cây cầu tình bạn</p>`}${regionLevelHtml(selected)}`,
+        `<strong>${selected.icon} ${panelText(selected, 'name')}</strong><p>${panelText(selected, 'blurb')}</p>${isAreaUnlocked(selected, gameState.progress.questComplete) ? '' : `<p class="map-locked">${icon('lock')} Mở khóa khi hoàn thành Cây cầu tình bạn</p>`}${regionLevelHtml(selected)}`,
       )
     : '';
   for (const button of document.querySelectorAll<HTMLElement>('[data-region]')) {
@@ -127,7 +136,7 @@ export function wireMapOverlay(): void {
       event.clientX - rect.left,
       event.clientY - rect.top,
     );
-    gameState.selectedRegionId = regionAtMapPoint(point.x, point.z)?.id;
+    gameState.selectedRegionId = areaAtMapPoint(point.x, point.z)?.id;
     renderMapPanel();
   });
 }

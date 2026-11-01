@@ -1,16 +1,27 @@
 // The quest card's content for every quest in the chain: the bridge quest (recovered copy, kept
-// byte-identical), then the field, forest, city and tower gates and a closing card. The stage comes from
-// the same state the level gates read, so the card follows a level commit and a reload.
+// byte-identical), then chapter 1 (field, forest, city, tower) and chapter 2 (garden, valley,
+// workshop, cave) gates and a closing card. The row shows the current chapter only (≤5 cells) with
+// a "Chương n · k/m" label. A gate whose level is not shipped yet says "Sắp ra mắt". The stage comes
+// from the same state the level gates read, so the card follows a level commit and a reload.
 import { BRIDGE_SEGMENTS } from '../config/world-constants';
 import { tc } from '../i18n/common-strings';
 import { gateNameOf } from '../levels/shared/level-host-strings';
 import { progressionState } from '../levels/shared/level-progression';
+import { levelDefinition } from '../levels/shared/level-registry';
 import { LEVEL_COMPLETE_BONUS } from '../levels/shared/level-run-result';
 import { tshop } from '../shop/shop-strings';
 import { gameState } from './game-state';
 import { byId, icon } from './icons';
+import { isCoarsePointer } from './pointer-kind';
 import { connectedStore } from './progress-sync';
-import { CHAIN_LEVELS, type ChainLevel, type QuestStage, questStage } from './quest-chain-stage';
+import {
+  CHAIN_LEVELS,
+  type ChainLevel,
+  type ChainStage,
+  type QuestStage,
+  questChapter,
+  questStage,
+} from './quest-chain-stage';
 import { tq } from './quest-chain-strings';
 import { setMarkup } from './set-markup-if-changed';
 import './quest-chain-steps.css';
@@ -56,22 +67,57 @@ export const CHAIN_TEXT_KEYS = {
   forest: ['titleForest', 'copyForest', 'progressForest', 'stepForest', 'guideForest'],
   city: ['titleCity', 'copyCity', 'progressCity', 'stepCity', 'guideCity'],
   tower: ['titleTower', 'copyTower', 'progressTower', 'stepTower', 'guideTower'],
+  garden: ['titleGarden', 'copyGarden', 'progressGarden', 'stepGarden', 'guideGarden'],
+  valley: ['titleValley', 'copyValley', 'progressValley', 'stepValley', 'guideValley'],
+  workshop: ['titleWorkshop', 'copyWorkshop', 'progressWorkshop', 'stepWorkshop', 'guideWorkshop'],
+  cave: ['titleCave', 'copyCave', 'progressCave', 'stepCave', 'guideCave'],
 } as const satisfies Record<ChainLevel, readonly QuestKey[]>;
 
-const CHAIN_STEPS: readonly QuestKey[] = [
-  'stepBridge',
-  ...CHAIN_LEVELS.map((levelId) => CHAIN_TEXT_KEYS[levelId][3]),
-];
 const STAGES: readonly QuestStage[] = ['bridge', ...CHAIN_LEVELS, 'done'];
+const stepKey = (stage: ChainStage): QuestKey =>
+  stage === 'bridge' ? 'stepBridge' : CHAIN_TEXT_KEYS[stage][3];
 
-/** One cell per quest of the chain: a check once done, else its short name. */
+/** One cell per quest of the current chapter: a check once done, else its short name. */
 function chainStepsHtml(stage: QuestStage): string {
-  return CHAIN_STEPS.map((key, i) => {
-    const done = i < STAGES.indexOf(stage);
-    const name = tq(key);
-    const label = tq(done ? 'stepDone' : 'stepTodo', { n: i + 1, name });
-    return `<span class="${done ? 'done' : ''}" aria-label="${label}">${done ? icon('check') : name}</span>`;
-  }).join('');
+  const { stages, done: doneCells } = questChapter(stage);
+  return stages
+    .map((cell, i) => {
+      const done = i < doneCells;
+      const name = tq(stepKey(cell));
+      const label = tq(done ? 'stepDone' : 'stepTodo', { n: STAGES.indexOf(cell) + 1, name });
+      return `<span class="${done ? 'done' : ''}" aria-label="${label}">${done ? icon('check') : name}</span>`;
+    })
+    .join('');
+}
+
+/** "Chương n · k/m" above the row; created on the first chain card, removed on the bridge card. */
+function renderChapterLabel(stage: QuestStage | undefined): void {
+  let label = document.getElementById('quest-chapter');
+  byId('quest-steps').classList.toggle('chain-row', stage !== undefined);
+  if (stage === undefined) {
+    label?.remove();
+    return;
+  }
+  if (!label) {
+    label = document.createElement('small');
+    label.id = 'quest-chapter';
+    label.className = 'quest-chapter';
+    byId('quest-steps').before(label);
+  }
+  const { chapter, stages, done } = questChapter(stage);
+  const text = tq('chapterLabel', { n: chapter, k: done, m: stages.length });
+  if (label.textContent !== text) label.textContent = text;
+}
+
+/** An open gate whose level folder has not shipped yet (chapter 2 until phases 05-08). */
+const comingSoon = (stage: ChainLevel): boolean => levelDefinition(stage) === undefined;
+
+/** VLM's pointer line for a chain stage (the "sắp ra mắt" variant while the level is missing). */
+export function chainGuideLine(stage: ChainLevel): string {
+  const gate = gateNameOf(stage);
+  return comingSoon(stage)
+    ? tq('guideComingSoon', { gate })
+    : tq(CHAIN_TEXT_KEYS[stage][4], { gate });
 }
 
 /**
@@ -101,9 +147,12 @@ function chainCopy(stage: Exclude<QuestStage, 'bridge'>): CardCopy {
   if (stage !== 'done') {
     const [title, copy, progress] = CHAIN_TEXT_KEYS[stage];
     const gate = gateNameOf(stage);
+    if (comingSoon(stage)) {
+      const soon = tq('copyComingSoon', { gate, guide: tc('guideName') });
+      return { ...next, title: tq(title), copy: soon, progress: tq('progressComingSoon') };
+    }
     // Touch screens have no E key: name only the Enter button there (QA p-7).
-    const coarse = globalThis.matchMedia?.('(pointer: coarse)').matches ?? false;
-    const enter = tq(coarse ? 'enterTap' : 'enterKeyOrTap');
+    const enter = tq(isCoarsePointer() ? 'enterTap' : 'enterKeyOrTap');
     return { ...next, title: tq(title), copy: tq(copy, { gate, enter }), progress: tq(progress) };
   }
   return {
@@ -125,6 +174,7 @@ export function renderQuestCard(): void {
     byId('quest-title').textContent = 'Một cây cầu, ngàn niềm vui';
     byId('quest-progress').textContent = bridgeProgress();
     setMarkup('quest-steps', bridgeStepsHtml());
+    renderChapterLabel(undefined);
     return;
   }
   const card = chainCopy(stage);
@@ -134,4 +184,5 @@ export function renderQuestCard(): void {
   byId('quest-title').textContent = card.title;
   byId('quest-progress').textContent = card.progress;
   setMarkup('quest-steps', chainStepsHtml(stage));
+  renderChapterLabel(stage);
 }

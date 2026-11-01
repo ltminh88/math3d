@@ -1,4 +1,5 @@
 // Inputs of one map draw (original `rc()` object in the UI) and the shared rounded-rect helper.
+import type { ExpansionRegion } from '../config/expansion-regions';
 import type { Region } from '../config/regions';
 
 export type RegionUnlockPredicate = (region: Region, questComplete: boolean) => boolean;
@@ -18,6 +19,8 @@ export interface MapDrawState {
   readonly time: number;
   /** Lock rule; defaults to `isRegionUnlocked` (phase 13 injects the new progression rule). */
   readonly isUnlocked?: RegionUnlockPredicate | undefined;
+  /** Draws the chapter 2 regions and roads too (absent: the original draw, call for call). */
+  readonly expansion?: { readonly name: (region: ExpansionRegion) => string } | undefined;
 }
 
 /** Begins a new path holding one rounded rect from (x0, y0) to (x1, y1) (original `vi`). */

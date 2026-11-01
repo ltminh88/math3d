@@ -24,9 +24,9 @@ Quest chain: bridge → field → forest → city → tower → **garden → val
 ## Phases
 | # | Phase | Effort | Depends | Status |
 |---|---|---|---|---|
-| 01 | [Skill keys, reasoning generators, tiers, M3D3, step kit, tablet e2e project](phase-01-skill-keys-reasoning-generators-and-save-code-m3d3.md) | 18h | – | Pending |
+| 01 | [Skill keys, reasoning generators, tiers, M3D3, step kit, tablet e2e project](phase-01-skill-keys-reasoning-generators-and-save-code-m3d3.md) | 18h | – | Done (branch, not merged) |
 | 02 | [Geometry + measurement generators (pure), KNTT verification](phase-02-geometry-and-measurement-generators.md) | 10h | 01 catalog commit | Pending |
-| 03 | [Map expansion: regions, roads, gates, scenery, map/HUD, quest chain, shell touch audit](phase-03-map-expansion-regions-gates-and-quest-chain.md) | 18h | – | Pending |
+| 03 | [Map expansion: regions, roads, gates, scenery, map/HUD, quest chain, shell touch audit](phase-03-map-expansion-regions-gates-and-quest-chain.md) | 18h | – | Done (branch, not merged) |
 | 04 | [Reasoning rounds in bridge quiz + field/forest/city/tower; touch fixes there](phase-04-reasoning-rounds-in-bridge-quiz-and-levels.md) | 14h | 01 | Pending |
 | 05 | [Garden level "Khu Vườn Quy Luật"](phase-05-garden-level.md) | 12h | 01, 03 | Pending |
 | 06 | [Geometry valley level "Thung Lũng Hình Học"](phase-06-geometry-valley-level.md) | 15h | 01, 02, 03 | Pending |

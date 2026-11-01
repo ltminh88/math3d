@@ -71,7 +71,15 @@ async function setWorn(page: Page, id: string, worn: boolean): Promise<void> {
 
 /** Median of a few `renderer.info.render.calls` samples (dialog closed, camera settled). */
 async function drawCalls(page: Page): Promise<number> {
-  await page.evaluate(() => window.__game?.teleport(-6, 0.5));
+  // Snap the camera onto the player: on slow, large canvases (tablet portrait at dpr 2) the
+  // eased follow had not settled after 2.5 s, so each sample saw a different frustum.
+  await page.evaluate(() => {
+    window.__game?.teleport(-6, 0.5);
+    const world = window.__parity as unknown as {
+      target: { set(x: number, y: number, z: number): void };
+    };
+    world.target.set(-6, 0, 0.5);
+  });
   await page.waitForTimeout(2500);
   const samples: number[] = [];
   for (let i = 0; i < 5; i++) {

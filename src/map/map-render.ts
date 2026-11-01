@@ -1,6 +1,7 @@
 // Draws the minimap or the full world map onto a prepared 2D context (original `Ql`).
 import { isRegionUnlocked } from '../config/regions';
 import type { MapDrawState } from './map-draw-state';
+import { drawExpansionWorldLayer } from './map-render-expansion-layer';
 import { drawMapScreenLayer } from './map-render-screen-layer';
 import { drawMapWorldLayer } from './map-render-world-layer';
 import type { MapView } from './map-view-transform';
@@ -35,6 +36,7 @@ export function drawMap(
   ctx.scale(scale, scale);
   ctx.translate(-view.cx, -view.cz);
   drawMapWorldLayer(ctx, state, isUnlocked);
+  if (state.expansion) drawExpansionWorldLayer(ctx, state);
   ctx.restore();
   drawMapScreenLayer(ctx, width, height, view, state, isUnlocked);
 }

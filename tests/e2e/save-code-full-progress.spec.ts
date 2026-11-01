@@ -40,8 +40,8 @@ const gateStatuses = (page: Page) =>
 
 async function expectFullProgress(page: Page): Promise<void> {
   await expect.poll(() => gateStatuses(page)).toEqual(Array(4).fill('completed'));
-  await expect(page.locator('#quest-title')).toHaveText('Bạn đã qua cả năm chặng!');
-  await expect(page.locator('#quest-progress')).toHaveText('✓ Hoàn thành');
+  await expect(page.locator('#quest-title')).toHaveText('Khu Vườn Quy Luật');
+  await expect(page.locator('#quest-progress')).toHaveText('Sắp ra mắt');
   const snap = await page.evaluate(() => window.__game?.snapshot());
   for (const id of LEVELS) expect(snap?.levelProgress[id]?.completedAt, id).toBeGreaterThan(0);
   expect(snap?.levelProgress.bridge?.progress).toBe(6);
