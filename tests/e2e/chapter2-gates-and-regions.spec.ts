@@ -17,7 +17,7 @@ const NAMES = {
   cave: 'Cổng Hang Đố Vui',
 } as const;
 /** Chapter 2 levels whose folder has shipped: their gate opens instead of "Sắp ra mắt". */
-const SHIPPED: readonly string[] = ['valley'];
+const SHIPPED: readonly string[] = ['valley', 'workshop'];
 const AREAS = {
   garden: 'Khu Vườn Bên Sông',
   valley: 'Thung Lũng Hình Học',
