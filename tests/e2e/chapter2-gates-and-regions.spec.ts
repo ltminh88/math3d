@@ -67,11 +67,14 @@ test('chapter 2 gates open one by one after the tower; "Sắp ra mắt" until a 
   await expect(page.locator('#toast')).toHaveText('Hoàn thành Tháp Toán Học để mở cổng này nhé!');
 
   await page.evaluate(() => window.__game?.seedProgress({ completedLevels: ['tower'] }));
-  expect(await statuses(page)).toEqual(['coming-soon', 'locked', 'locked', 'locked']);
+  // The garden level has shipped (phase 05): its gate opens and enters the level.
+  expect(await statuses(page)).toEqual(['open', 'locked', 'locked', 'locked']);
   await useGate(page, 'garden', touch);
-  await expect(page.locator('#interact')).toContainText(`${NAMES.garden} · Sắp ra mắt`);
-  await expect(page.locator('#toast')).toHaveText('Màn chơi này sắp ra mắt. Hẹn bạn quay lại nhé!');
-  expect(await page.evaluate(() => window.__game?.levelRunning())).toBe(false);
+  await expect(page.locator('.garden-panel')).toBeVisible();
+  expect(await page.evaluate(() => window.__game?.levelRunning())).toBe(true);
+  if (touch) await page.locator('.level-leave').tap();
+  else await page.locator('.level-leave').click();
+  await expect.poll(() => page.evaluate(() => window.__game?.levelRunning())).toBe(false);
 
   const previous = { valley: 'garden', workshop: 'valley', cave: 'workshop' } as const;
   const reason = {
