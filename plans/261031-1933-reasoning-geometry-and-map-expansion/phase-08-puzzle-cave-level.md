@@ -5,7 +5,7 @@
 - Reference: `src/levels/tower/**` (multi-step floors, verdict + fix, climb camera, rung rules from the review fixes)
 
 ## Overview
-- Date 2026-10-31. Priority P1. Status pending. Review: not started. Depends on 01, 02, 03. Parallel with 04–07.
+- Date 2026-10-31. Priority P1. Status done (branch `feat/ch2-p08-cave`, not merged). Review: not started. Depends on 01, 02, 03. Parallel with 04–07.
 - Story: a cave of riddles. Each solved riddle lights a crystal and opens the next chamber; at the end a treasure chest of light. Final challenge of chapter 2: mixed reasoning across all skills, weakest first.
 
 ## Key Insights
@@ -43,13 +43,13 @@ tests/e2e/cave-level.spec.ts  cave-level-leak.spec.ts
 6. Screenshots `reports/cave-screens/` (4 projects, incl. multi-select and explain step).
 
 ## Todo list
-- [ ] chamber formats + round flow + tests
-- [ ] hints sweep
-- [ ] diorama, crystals, camera
-- [ ] panel, input
-- [ ] celebration
-- [ ] e2e 4 projects + leak
-- [ ] screenshots
+- [x] chamber formats + round flow + tests
+- [x] hints sweep
+- [x] diorama, crystals, camera
+- [x] panel, input
+- [x] celebration
+- [x] e2e 4 projects + leak
+- [x] screenshots
 
 ## Success Criteria
 - Unit + cave e2e green on desktop, phone, tablet portrait, tablet landscape; own chunk; ≤60 draw calls; no leaks; closing card shown.
@@ -73,3 +73,12 @@ tests/e2e/cave-level.spec.ts  cave-level-leak.spec.ts
 
 ## Next steps
 - 09 merge.
+
+## Implementation notes (2026-11-02)
+- Pool = the Requirements list (17 skills); seen `sk:` ids from other levels (unknown/pattern/other geo/meas) are not added: they have no cave format.
+- Planning: planner picks → seen skills weakest first → fresh; one of each required format (word, remainder, choose-all, tf-explain, geo-meas), top-up ≤2 per format, sorted weakest box first, then reordered only where needed so no format repeats (feasibility-checked greedy).
+- Chambers use the kit step card with the family's renderer (reasoning/geometry/measurement); the round flow re-checks every answer with `isStepAnswerCorrect`, so verdict + fix and choose-all (all and only) are one recorded question. Expression = generator's own steps (choice of value / first part + pad by tier).
+- Hints: 3 taught rungs (button spent after rung 3); rung 3 works the first calculation from the story/statement numbers with "?" (circle: "r + r", "nửa của d" so no literal 2 leaks); choose-all names one false sentence. Sweep test: every skill × tier × 25 seeds × step × rung.
+- Draw calls: rock (1) + glow (1) + crystals (1) + chest (2) — measured max 3 (desktop), 5 (phone) of the 60 budget.
+- Shared file touched: `tests/e2e/chapter2-gates-and-regions.spec.ts` (`SHIPPED` list: a shipped level's gate is `open`, not "Sắp ra mắt"). Phases 05–07 add their ids there.
+- Screenshots: `reports/p08-screens/` (chamber 1, multi-select, explain fix step, celebration, closing card per project).
