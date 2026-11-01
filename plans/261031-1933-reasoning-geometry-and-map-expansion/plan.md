@@ -27,11 +27,11 @@ Quest chain: bridge → field → forest → city → tower → **garden → val
 | 01 | [Skill keys, reasoning generators, tiers, M3D3, step kit, tablet e2e project](phase-01-skill-keys-reasoning-generators-and-save-code-m3d3.md) | 18h | – | Done (merged) |
 | 02 | [Geometry + measurement generators (pure), KNTT verification](phase-02-geometry-and-measurement-generators.md) | 10h | 01 catalog commit | Done (merged) |
 | 03 | [Map expansion: regions, roads, gates, scenery, map/HUD, quest chain, shell touch audit](phase-03-map-expansion-regions-gates-and-quest-chain.md) | 18h | – | Done (merged) |
-| 04 | [Reasoning rounds in bridge quiz + field/forest/city/tower; touch fixes there](phase-04-reasoning-rounds-in-bridge-quiz-and-levels.md) | 14h | 01 | Pending |
-| 05 | [Garden level "Khu Vườn Quy Luật"](phase-05-garden-level.md) | 12h | 01, 03 | Pending |
-| 06 | [Geometry valley level "Thung Lũng Hình Học"](phase-06-geometry-valley-level.md) | 15h | 01, 02, 03 | Pending |
-| 07 | [Measurement workshop level "Xưởng Đo Đạc"](phase-07-measurement-workshop-level.md) | 15h | 01, 02, 03 | Pending |
-| 08 | [Puzzle cave level "Hang Đố Vui"](phase-08-puzzle-cave-level.md) | 12h | 01, 02, 03 | Pending |
+| 04 | [Reasoning rounds in bridge quiz + field/forest/city/tower; touch fixes there](phase-04-reasoning-rounds-in-bridge-quiz-and-levels.md) | 14h | 01 | Done (merged) |
+| 05 | [Garden level "Khu Vườn Quy Luật"](phase-05-garden-level.md) | 12h | 01, 03 | Done (merged) |
+| 06 | [Geometry valley level "Thung Lũng Hình Học"](phase-06-geometry-valley-level.md) | 15h | 01, 02, 03 | Done (merged) |
+| 07 | [Measurement workshop level "Xưởng Đo Đạc"](phase-07-measurement-workshop-level.md) | 15h | 01, 02, 03 | Done (merged) |
+| 08 | [Puzzle cave level "Hang Đố Vui"](phase-08-puzzle-cave-level.md) | 12h | 01, 02, 03 | Done (merged) |
 | 09 | [Merge, 9-stage e2e, parity, real-input playthrough, deploy, author review](phase-09-merge-e2e-parity-deploy-and-author-review.md) | 12h | all | Pending |
 
 ## Dependencies and parallel groups (ownership by folder)
