@@ -16,6 +16,8 @@ const NAMES = {
   workshop: 'Cổng Xưởng Đo Đạc',
   cave: 'Cổng Hang Đố Vui',
 } as const;
+/** Chapter 2 levels whose folder has shipped: their gate opens instead of "Sắp ra mắt". */
+const SHIPPED: readonly string[] = ['valley'];
 const AREAS = {
   garden: 'Khu Vườn Bên Sông',
   valley: 'Thung Lũng Hình Học',
@@ -87,8 +89,11 @@ test('chapter 2 gates open one by one after the tower; "Sắp ra mắt" until a 
       (done) => window.__game?.seedProgress({ completedLevels: [done] }),
       previous[id],
     );
-    expect(await page.evaluate((gate) => window.__game?.gateStatus(gate), id)).toBe('coming-soon');
-    await expect(page.locator(`#gate-${id}-label small`)).toHaveText('Sắp ra mắt');
+    const shipped = SHIPPED.includes(id);
+    expect(await page.evaluate((gate) => window.__game?.gateStatus(gate), id)).toBe(
+      shipped ? 'open' : 'coming-soon',
+    );
+    if (!shipped) await expect(page.locator(`#gate-${id}-label small`)).toHaveText('Sắp ra mắt');
   }
   expect(errors).toEqual([]);
 });
