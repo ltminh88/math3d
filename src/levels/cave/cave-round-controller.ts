@@ -85,6 +85,9 @@ export class CaveRoundController {
       });
     }
     if (!result.outcome) {
+      // A new step: its own hints from rung 1 (the last step's hint no longer applies).
+      this.panel.clearHint();
+      this.panel.hint.disabled = false;
       this.panel.setFeedback(this.cs('correctStep'), 'success');
       this.ctx.audio.tone(698, 0.12);
       return;
@@ -114,7 +117,7 @@ export class CaveRoundController {
     const text = caveHintText(this.cs, rung, chamber, this.flow.stepIndex);
     this.panel.showHint(rung, text);
     this.panel.offerHint(false);
-    // The last taught rung is shown: the button is spent until the next chamber.
+    // The last taught rung is shown: the button is spent until the next step.
     this.panel.hint.disabled = rung >= CAVE_LAST_RUNG;
     this.ctx.audio.hint();
     this.ctx.announce(text);
