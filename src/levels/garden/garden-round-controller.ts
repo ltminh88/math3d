@@ -53,6 +53,7 @@ export class GardenRoundController {
       onAnswer: (event) => this.answer(event),
       onComplete: () => {},
       render: this.render,
+      signal: this.ctx.disposer.signal,
     });
     this.panel.mountCard(this.card.element);
     this.refreshPots();

@@ -117,6 +117,7 @@ export class ValleyRoundController {
     this.card = createStepCard(round.item, {
       render: renderGeometryPrompt,
       onAnswer: (event) => this.onAnswer(event),
+      signal: this.ctx.disposer.signal,
       onComplete: () => this.finishRound(),
     });
     this.panel.cardHost.replaceChildren(this.card.element);

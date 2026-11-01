@@ -57,6 +57,7 @@ export class CaveRoundController {
       onAnswer: (event) => this.answer(event),
       onComplete: () => {},
       render,
+      signal: this.ctx.disposer.signal,
     });
     this.panel.cardHost.replaceChildren(this.card.element);
     this.idle = 0;

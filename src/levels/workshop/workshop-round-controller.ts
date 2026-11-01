@@ -53,6 +53,7 @@ export class WorkshopRoundController {
     this.card = createStepCard(round.item, {
       render: renderMeasurementPrompt,
       onAnswer: (event) => this.onAnswer(round, event),
+      signal: this.ctx.disposer.signal,
       onComplete: () => this.finishRound(),
     });
     this.panel.boardHost.replaceChildren(this.board.element);

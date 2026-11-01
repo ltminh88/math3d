@@ -48,6 +48,8 @@ export interface NumberPadOptions {
   activeInput?: boolean;
   onSubmit: (value: number) => void;
   onChange?: (digits: string) => void;
+  /** The owner's lifetime (e.g. the level's disposer signal): stops listening for keys on abort. */
+  signal?: AbortSignal;
 }
 
 export interface NumberPad {
@@ -102,7 +104,13 @@ export function createNumberPad(options: NumberPadOptions, doc: Document = docum
     element.appendChild(button);
   }
 
+  // Its own controller (destroy) plus the owner's signal: a pad left behind never keeps the keys.
   const abort = new AbortController();
+  options.signal?.addEventListener('abort', () => abort.abort(), {
+    once: true,
+    signal: abort.signal,
+  });
+  if (options.signal?.aborted) abort.abort();
   doc.addEventListener(
     'keydown',
     (event) => {
