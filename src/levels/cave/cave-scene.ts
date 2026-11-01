@@ -17,6 +17,7 @@ import { CaveRoundFlow } from './cave-round-flow';
 import { caveStrings } from './cave-strings';
 import { installCaveTestHook } from './cave-test-hook';
 import './cave-level.css';
+import './cave-celebration-and-responsive.css';
 
 const TRACK_DRAW_CALLS = import.meta.env.MODE === 'test';
 
