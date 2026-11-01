@@ -1,0 +1,73 @@
+/* Valley board DOM: letter and size chips and the >= 48 px tap targets projected over the
+   canvas (corners, stones, centres, shapes, blocks); ê-ke results show as ✓ / ✗ on corners. */
+/* Board DOM: chips and tap targets over the canvas (only the buttons take pointers). */
+.level-layer > .valley-board-dom {
+  position: absolute;
+  inset: 0;
+  overflow: hidden;
+  pointer-events: none;
+}
+.valley-chip,
+.valley-target {
+  position: absolute;
+  left: 0;
+  top: 0;
+  will-change: transform;
+}
+.valley-chip {
+  padding: 1px 7px;
+  border-radius: 9px;
+  background: rgb(255 251 234 / 0.92);
+  color: var(--ink);
+  font-family: var(--font-display);
+  font-size: 15px;
+  font-weight: 800;
+  white-space: nowrap;
+}
+.valley-chip--size {
+  font-size: 13px;
+  background: rgb(255 255 255 / 0.85);
+}
+.valley-chip[hidden] {
+  display: none;
+}
+.valley-target {
+  width: 48px;
+  height: 48px;
+  padding: 0;
+  border: 3px dashed rgb(55 71 79 / 0.55);
+  border-radius: 50%;
+  background: rgb(255 255 255 / 0.12);
+  color: var(--ink);
+  font-size: 22px;
+  font-weight: 900;
+  pointer-events: auto;
+  touch-action: manipulation;
+}
+.valley-target--shape,
+.valley-target--block {
+  width: 64px;
+  height: 64px;
+}
+.valley-target:focus-visible {
+  outline: 4px solid var(--gold);
+  outline-offset: 2px;
+}
+.valley-target.is-picked,
+.valley-target.is-selected {
+  border: 4px solid #f2c14e;
+  background: rgb(255 215 116 / 0.35);
+}
+.valley-target.is-fit {
+  border: 4px solid #4f9d5d;
+  background: rgb(218 239 209 / 0.85);
+  color: #31764c;
+}
+.valley-target.is-miss {
+  border: 4px solid #e1ad82;
+  background: rgb(255 236 220 / 0.85);
+  color: #a27350;
+}
+.valley-target:disabled {
+  opacity: 0.6;
+}

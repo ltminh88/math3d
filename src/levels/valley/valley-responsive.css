@@ -1,0 +1,90 @@
+/* Valley level: the celebration card and the narrow-screen layout (phones; the panel moves to
+   the bottom, the view buttons sit just above it). Tablets keep the side panel in landscape. */
+.valley-done {
+  position: absolute;
+  top: 76px;
+  right: max(16px, env(safe-area-inset-right));
+  width: 360px;
+  max-height: calc(100% - 92px);
+  overflow: auto;
+  padding: 22px 24px;
+  border-radius: var(--radius-lg);
+  background: var(--paper);
+  text-align: center;
+  animation: pop 0.5s;
+}
+.valley-done h2 {
+  margin: 0 0 6px;
+  font-family: var(--font-display);
+  font-size: 28px;
+}
+.valley-stars {
+  margin: 0;
+  color: var(--gold);
+  font-size: 30px;
+  letter-spacing: 6px;
+}
+.valley-done__line {
+  color: var(--muted);
+  line-height: 1.6;
+}
+.valley-done .primary {
+  width: 100%;
+  margin-top: 14px;
+}
+@media (max-width: 760px), (max-height: 520px) and (max-width: 1000px) {
+  .valley-guide {
+    top: 70px;
+    width: calc(100% - 32px);
+    font-size: 13px;
+    padding: 8px 12px;
+  }
+  .valley-progress {
+    top: auto;
+    right: 12px;
+    bottom: calc(50% + 14px);
+    padding: 6px 10px;
+  }
+  .valley-turns {
+    left: 12px;
+    bottom: calc(50% + 10px);
+    padding: 4px;
+  }
+  .valley-panel {
+    top: auto;
+    left: 12px;
+    right: 12px;
+    bottom: max(12px, env(safe-area-inset-bottom));
+    width: auto;
+    max-height: 50%;
+    padding: 12px 14px;
+  }
+  .valley-card .kit-step-card {
+    font-size: 15px;
+  }
+  .valley-card .kit-step-card .kit-pad {
+    grid-template-columns: repeat(6, minmax(44px, 1fr));
+    max-width: none;
+  }
+  .valley-card .kit-pad__display {
+    grid-column: 1 / -1;
+    min-height: 44px;
+  }
+  .valley-keys {
+    display: none;
+  }
+  .valley-done {
+    top: auto;
+    left: 12px;
+    right: 12px;
+    bottom: max(12px, env(safe-area-inset-bottom));
+    width: auto;
+    max-height: 60%;
+    padding: 16px 18px;
+  }
+}
+@media (pointer: coarse) {
+  .valley-keys {
+    display: none;
+  }
+}
