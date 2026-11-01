@@ -72,7 +72,7 @@ export class ForestRoundController {
       total <= CONCRETE_MAX_FRUIT,
     );
     const texts = roundTexts(this.ts, round);
-    this.panel.showRound(round, this.flow.index, this.flow.rounds.length, texts);
+    this.panel.showRound(round, this.flow.index, this.flow.total, texts);
     this.card.render(round);
     this.idle = 0;
     this.autoDeal = -1;
