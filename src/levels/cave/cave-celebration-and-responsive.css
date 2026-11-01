@@ -38,6 +38,15 @@
     display: none;
   }
 }
+/* Tablet portrait: the speech card moves under the leave button, beside the riddle panel. */
+@media (min-width: 761px) and (max-width: 1100px) {
+  .cave-guide {
+    top: 76px;
+    left: max(16px, env(safe-area-inset-left));
+    transform: none;
+    width: calc(100% - 464px);
+  }
+}
 @media (max-width: 760px), (max-height: 520px) and (max-width: 1000px) {
   .cave-guide {
     top: 70px;

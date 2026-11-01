@@ -99,7 +99,7 @@ function bakedMesh(build: (ctx: WorldBuildContext, root: Object3D) => void, lit:
 /** Builds the cave, its background colour, fog and the soft cave lights into `scene`. */
 export function buildCaveDiorama(scene: Scene): void {
   scene.background = new Color(C.background);
-  scene.fog = new Fog(C.background, 14, 34);
+  scene.fog = new Fog(C.background, 18, 60);
   scene.add(bakedMesh(buildRock, true), bakedMesh(buildGlow, false));
   scene.add(new HemisphereLight(0x9fb4d8, 0x2a2420, 1.1));
   const key = new DirectionalLight(0xffe2b0, 1.2);
