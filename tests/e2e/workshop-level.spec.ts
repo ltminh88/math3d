@@ -184,6 +184,7 @@ test('the workshop fills six orders and records the measurement skills', async (
   );
   await shot(page, 'done', project);
   const maxCalls = Number(await page.locator('.level-layer').getAttribute('data-max-draw-calls'));
+  info.annotations.push({ type: 'max-draw-calls', description: String(maxCalls) });
   expect(maxCalls).toBeGreaterThan(0);
   expect(maxCalls).toBeLessThanOrEqual(DRAW_CALL_BUDGET);
 
