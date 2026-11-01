@@ -40,15 +40,8 @@
     padding: 8px 12px;
   }
   .valley-progress {
-    top: auto;
     right: 12px;
-    bottom: calc(50% + 14px);
     padding: 6px 10px;
-  }
-  .valley-turns {
-    left: 12px;
-    bottom: calc(50% + 10px);
-    padding: 4px;
   }
   .valley-panel {
     top: auto;
@@ -86,5 +79,11 @@
 @media (pointer: coarse) {
   .valley-keys {
     display: none;
+  }
+}
+/* The host's leave button is 39 px tall on phones; in the valley it takes 44 px taps. */
+@media (pointer: coarse) {
+  .level-layer:has(.valley-panel) .level-leave {
+    min-height: 44px;
   }
 }

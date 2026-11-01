@@ -37,7 +37,7 @@ export class ValleyPanel {
   readonly hintArea = el('div', 'hint-area valley-hint');
   readonly hint: HTMLButtonElement;
   readonly next: HTMLButtonElement;
-  readonly turns = el('div', 'valley-turns glass');
+  readonly turns = el('div', 'valley-turns');
   private readonly guideText = el('p');
   private readonly roundText = el('span');
   private readonly stones = el('ol', 'valley-stones');
@@ -64,18 +64,21 @@ export class ValleyPanel {
     );
     this.turns.children[0]?.setAttribute('aria-label', vs('rotateLeft'));
     this.turns.children[1]?.setAttribute('aria-label', vs('rotateRight'));
+    // The view buttons live in the panel, never over the board's tap targets.
+    const tools = el('div', 'valley-tools');
+    tools.append(this.hint, this.turns);
     this.panel.append(
       this.prompt,
       this.story,
       this.cardHost,
       this.feedback,
-      this.hint,
+      tools,
       this.hintArea,
       this.next,
     );
     // Key hints only where there is a keyboard (no "phím" on touch screens).
     if (!isCoarsePointer()) this.panel.append(el('p', 'valley-keys', vs('keysHelp')));
-    root.append(this.guide, this.progress, this.panel, this.turns);
+    root.append(this.guide, this.progress, this.panel);
   }
 
   /** Resets the panel for round `index` (data attributes are read by the e2e specs). */
@@ -151,6 +154,6 @@ export class ValleyPanel {
   }
 
   destroy(): void {
-    for (const node of [this.guide, this.progress, this.panel, this.turns]) node.remove();
+    for (const node of [this.guide, this.progress, this.panel]) node.remove();
   }
 }
