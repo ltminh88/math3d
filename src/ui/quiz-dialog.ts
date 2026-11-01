@@ -10,7 +10,7 @@ import { nextQuizQuestion } from './progress-sync';
 import { answerQuestion, renderHint } from './quiz-answer';
 import { showToast } from './toast-and-persist';
 
-function quizBodyHtml(question: Question): string {
+export function quizBodyHtml(question: Question): string {
   const bridgeMode = gameState.quizMode === 'bridge';
   return `<div class="dialog-eyebrow">${bridgeMode ? `ĐOẠN CẦU ${gameState.progress.bridge + 1} / ${BRIDGE_SEGMENTS}` : question.review ? 'ÔN LẠI PHÉP NHÂN' : 'LUYỆN TẬP CÙNG VLM'}</div><p class="question-intro">${bridgeMode ? `Mình cần <strong>${question.answer} viên đá</strong>. Phép nhân nào đúng?` : 'Bạn tìm được kết quả không?'}</p><div class="equation">${bridgeMode ? `<span class="stone-symbol">◆</span> ${question.answer} <small>viên đá</small>` : `${question.a} <span>×</span> ${question.b} <span>=</span> ?`}</div><div class="answers">${question.options.map((option, index) => `<button class="answer" data-value="${option.value}"><kbd>${index + 1}</kbd><span>${option.label}</span></button>`).join('')}</div><div id="feedback" class="feedback" aria-live="polite"></div><div id="hint-area" class="hint-area" hidden></div><div class="quiz-footer"><button id="hint" class="text-button">${icon('help')} Gợi ý cho mình</button><span>Không giới hạn thời gian</span></div><button id="next-question" class="primary wide" hidden>Tiếp tục ${icon('arrow')}</button>`;
 }
