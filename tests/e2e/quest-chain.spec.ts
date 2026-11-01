@@ -143,7 +143,8 @@ test('the field leads to the forest, city and tower gates, then the closing card
   await page.locator('#close-dialog').click();
 
   await page.evaluate(() => window.__game?.seedProgress({ completedLevels: ['garden', 'valley'] }));
-  await expectCard(page, 'NHIỆM VỤ TIẾP THEO', 'Xưởng Đo Đạc', 'Sắp ra mắt');
+  // The workshop level has shipped (phase 07): its card points at the open gate.
+  await expectCard(page, 'NHIỆM VỤ TIẾP THEO', 'Xưởng Đo Đạc', 'Đến Cổng Xưởng Đo Đạc');
   await expect(page.locator('#quest-chapter')).toHaveText('Chương 2 · 2/4');
   await expect(page.locator('#quest-steps .done')).toHaveCount(2);
 
