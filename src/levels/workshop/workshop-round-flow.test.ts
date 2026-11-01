@@ -87,6 +87,8 @@ describe('workshop round plan', () => {
       const rounds = planWorkshopRounds(planWorkshopSkills({}, rng, 6), {}, rng);
       const area = rounds[2];
       expect(area?.tiling).toBe(true);
+      // The fence round walks the same rectangle; only tiling rounds tile.
+      expect(rounds[1]?.tiling).toBe(false);
       const rect = rectOf(area?.item) as [number, number];
       expect(rect[0] * rect[1]).toBeLessThanOrEqual(20);
     }

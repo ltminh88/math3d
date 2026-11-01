@@ -57,13 +57,14 @@ export function planWorkshopRounds(
         return !!r && r[0] === same[0] && r[1] === same[1];
       });
     } else item = measurementItemForSkill(skillId, rng, tier);
+    const station = STATION_OF[skillId] as WorkshopStation;
     return {
       skillId,
       factKey: skillKey(skillId),
       tier,
-      station: STATION_OF[skillId] as WorkshopStation,
+      station,
       item,
-      tiling: tileTargets(item.scene, tier) !== null,
+      tiling: station === 'tiles' && tileTargets(item.scene, tier) !== null,
     };
   });
 }
