@@ -1,6 +1,6 @@
 // Quiz answer handling: rewards (+10 XP, +5 coins, bridge segment; frozen, see quiz-rewards.ts),
 // combo, feedback, the hint ladder (0..3; a wrong answer also climbs one rung) and the floating
-// reward pop. Each finished question goes to the Leitner recorder (progress-sync.ts).
+// reward pop. Word problems (phase 04) earn the same frozen reward and plank, with their own text. Each finished question goes to the Leitner recorder (progress-sync.ts).
 import { Vector3 } from 'three';
 import { BRIDGE_SEGMENTS } from '../config/world-constants';
 import { levelForXp } from '../game/xp-levels';
@@ -17,14 +17,21 @@ import { gameState, getWorld } from './game-state';
 import { refreshHud } from './hud';
 import { byId, icon } from './icons';
 import { flushProgress, recordQuizQuestion } from './progress-sync';
+import { wordProblemCorrect, wordProblemHint, wordProblemWrong } from './quiz-word-problem-strings';
 import { bump, showToast } from './toast-and-persist';
 
-/** Shows the hint text for the current rung plus the a×b stone groups. */
+/** Shows the hint text for the current rung plus the a×b stone groups (word problems: text). */
 export function renderHint(): void {
   const question = gameState.question;
   if (!question) return;
   const area = byId('hint-area');
   area.hidden = false;
+  if (question.word) {
+    const p = document.createElement('p');
+    p.textContent = wordProblemHint(question, gameState.hintLevel);
+    area.replaceChildren(p);
+    return;
+  }
   area.innerHTML = translateLongText(
     `<p>${hintText(question, gameState.hintLevel)}</p><div class="stone-groups" aria-label="${question.a} nhóm, mỗi nhóm có ${question.b} viên đá">${Array.from(
       { length: question.a },
@@ -65,9 +72,12 @@ function onCorrect(question: Question, button: HTMLButtonElement): void {
   button.classList.add('correct');
   showRewardPop(button);
   byId('feedback').className = 'feedback success';
-  byId('feedback').textContent = translateLongText(
-    `✓ Chính xác! ${question.a} × ${question.b} = ${question.answer}. +10 XP · +5 xu${progress.combo >= COMBO_SHOWN_FROM ? ` · Combo ${progress.combo}!` : ''}`,
-  );
+  const comboTail = progress.combo >= COMBO_SHOWN_FROM ? ` · Combo ${progress.combo}!` : '';
+  byId('feedback').textContent = question.word
+    ? wordProblemCorrect(question, comboTail)
+    : translateLongText(
+        `✓ Chính xác! ${question.a} × ${question.b} = ${question.answer}. +10 XP · +5 xu${comboTail}`,
+      );
   byId('next-question').hidden = false;
   byId('next-question').innerHTML = translateLongText(`${nextButtonLabel()} ${icon('arrow')}`);
   byId('hint').hidden = true;
@@ -82,12 +92,14 @@ function onCorrect(question: Question, button: HTMLButtonElement): void {
   byId('next-question').focus();
 }
 
-function onWrong(button: HTMLButtonElement): void {
+function onWrong(question: Question, button: HTMLButtonElement): void {
   gameState.hintLevel = Math.min(3, gameState.hintLevel + 1);
   button.classList.add('incorrect');
   button.disabled = true;
   byId('feedback').className = 'feedback gentle';
-  byId('feedback').textContent = translateText('↻ Chưa đúng rồi. Mình cùng đếm lại nhé!');
+  byId('feedback').textContent = question.word
+    ? wordProblemWrong()
+    : translateText('↻ Chưa đúng rồi. Mình cùng đếm lại nhé!');
   renderHint();
   gameState.audio.hint();
 }
@@ -105,7 +117,7 @@ export function answerQuestion(value: number, button: HTMLButtonElement): void {
     recordQuizQuestion(questionOutcome(question, true), CORRECT_ANSWER_REWARD);
   } else {
     gameState.wrongAnswers.push(value);
-    onWrong(button);
+    onWrong(question, button);
   }
   refreshHud();
 }

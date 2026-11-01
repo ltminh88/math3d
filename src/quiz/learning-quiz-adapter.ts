@@ -11,6 +11,8 @@ import type { FactStat } from '../learning/learning-types';
 import { pick, type Rng } from '../learning/seeded-rng';
 import { planSession } from '../learning/session-planner';
 import type { AnswerOption, Question, QuizMode } from './question-types';
+import { chooseWordProblemSkill, wordProblemDue } from './quiz-reasoning-slot';
+import { buildWordProblemQuestion, WORD_PROBLEM_SKILLS } from './quiz-word-problem-question';
 
 /** Facts drilled for a table filter (0 = all tables, the original 90 directed facts pooled). */
 export function quizFactPool(table: number): { pool: FactKey[]; tables: number[] } {
@@ -91,12 +93,21 @@ export interface QuizPlanner {
   next(ctx: PlannerContext, lastKey?: string): Question;
 }
 
-/** Walks Leitner session plans (10 facts each), replanning when exhausted or the table changes. */
+/**
+ * Walks Leitner session plans (10 facts each), replanning when exhausted or the table changes.
+ * Every 5th question is a word problem once the table is mastered (quiz-reasoning-slot.ts).
+ */
 export function createQuizPlanner(rng: Rng): QuizPlanner {
   let plan: FactKey[] = [];
   let planTable = -1;
+  let asked = 0;
   return {
     next(ctx, lastKey = '') {
+      asked += 1;
+      if (wordProblemDue(asked, ctx.stats, quizFactPool(ctx.table).pool)) {
+        const skill = chooseWordProblemSkill(ctx.stats, WORD_PROBLEM_SKILLS);
+        return buildWordProblemQuestion(skill, ctx.table, ctx.stats, rng);
+      }
       const replan = (): void => {
         const { pool, tables } = quizFactPool(ctx.table);
         plan = planSession({ stats: ctx.stats, pool, tables, sessionNo: ctx.sessionNo, rng });
