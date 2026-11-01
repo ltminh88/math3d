@@ -6,7 +6,7 @@
 - Round planners: `levels/field/field-round-flow.ts`, `forest/forest-round-flow.ts`, `city/city-round-flow.ts`, `tower/tower-question-formats.ts` (`TowerStep`)
 
 ## Overview
-- Date 2026-10-31. Priority P1. Status pending. Review: not started. Depends on 01. Parallel with 05–08.
+- Date 2026-10-31. Priority P1. Status **done** (branch `feat/ch2-p04-reasoning-rounds`, not merged). Review: not started. Depends on 01. Parallel with 05–08.
 - Each existing activity gains one reasoning round kind that appears once the child has mastered its tables, getting harder with the skill's box. Gameplay, rewards and round counts unchanged. Also fixes tablet/touch gaps in these four levels.
 
 ## Key Insights
@@ -49,13 +49,13 @@ tests/e2e/reasoning-rounds.spec.ts
 7. Parity run: expect no diff from this phase (fresh profiles); if any, explain or fix.
 
 ## Todo list
-- [ ] quiz template snapshot + split
-- [ ] slot rule + tests
-- [ ] 4 level rounds + tests
-- [ ] bridge word problem + hints
-- [ ] UI + touch controls + tablet fixes
-- [ ] e2e on 4 projects
-- [ ] parity check
+- [x] quiz template snapshot + split
+- [x] slot rule + tests
+- [x] 4 level rounds + tests
+- [x] bridge word problem + hints
+- [x] UI + touch controls + tablet fixes
+- [x] e2e on 4 projects
+- [x] parity check
 
 ## Success Criteria
 - Unit + e2e green on desktop, phone, tablet portrait/landscape; quiz mul template byte-identical; rewards/goldens unchanged; parity unchanged.
@@ -76,6 +76,12 @@ tests/e2e/reasoning-rounds.spec.ts
 
 ## Security Considerations
 - Prompt params are numbers/ids from generators; strings rendered via text nodes / escaped templates (no user input in HTML).
+
+## Implementation notes (2026-11-02)
+- Quiz: `quizBodyHtml` moved to `src/ui/quiz-dialog-templates.ts`; the multiplication body is snapshot-locked (`quiz-dialog-templates.test.ts`, taken before the split). Word problems (`wp-times-then-add`, `wp-times-compare` on the chosen table, 3 numeric options from `numberOptions`, tier 1 one misconception + near miss, tier 2+ two misconceptions) come every 5th question of the planner when the table's pool averages box ≥3 — in **both** bridge and practice mode (a child who masters the tables has usually finished the bridge). Same frozen reward/plank; own hint ladder (re-read, sơ đồ đoạn thẳng, worked) and feedback (`quiz-word-problem-strings.ts`). `<kbd>` badges of the quiz answers are hidden on `(pointer: coarse)` (CSS only).
+- Levels: shared `levels/shared/reasoning-round-{slot,flow,strings,panel,test-hook}.ts` + `reasoning-round.css`. Slot: ≥3 run facts in box ≥3 or a level skill seen; skill seen least goes next; rng untouched when no slot. The round takes the last slot (run length unchanged), recorded once under `sk:<id>`, counted in the level tally (stars/XP). All four levels render it with the step kit (tower included — deviation: not via `TowerStep`, the kit covers verdict + fix).
+- Touch: field key tips / equation `kbd`, tower guide + "(phím n)" card names, forest/city/tower key-help rows and `kbd` badges hidden on coarse pointers; level pads are destroyed when the reasoning panel takes over (they listened on `document`).
+- Parity: fresh profiles never reach a reasoning round or word problem, rng consumption unchanged → no expected diff on desktop. The coarse-pointer CSS (quiz `kbd`, level key rows) could change a coarse-pointer parity capture if one exists; re-baseline belongs to phase 09.
 
 ## Next steps
 - 09 merge and full-chain e2e.
