@@ -10,8 +10,6 @@ test.describe.configure({ timeout: SLOW_TEST_MS });
 
 const CHAPTER1 = ['field', 'forest', 'city', 'tower'];
 const CHAPTER2 = ['garden', 'valley', 'workshop', 'cave'] as const;
-/** Chapter 2 levels whose folder has shipped: their gate opens instead of "Sắp ra mắt". */
-const SHIPPED: readonly string[] = ['cave'];
 const NAMES = {
   garden: 'Cổng Khu Vườn Quy Luật',
   valley: 'Cổng Thung Lũng Hình Học',
@@ -19,7 +17,7 @@ const NAMES = {
   cave: 'Cổng Hang Đố Vui',
 } as const;
 /** Chapter 2 levels whose folder has shipped: their gate opens instead of "Sắp ra mắt". */
-const SHIPPED: readonly string[] = ['valley'];
+const SHIPPED: readonly string[] = ['valley', 'cave'];
 const AREAS = {
   garden: 'Khu Vườn Bên Sông',
   valley: 'Thung Lũng Hình Học',
