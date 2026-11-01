@@ -151,7 +151,10 @@
   display: grid;
   grid-template-columns: repeat(var(--cols), 44px);
   gap: 3px;
-  justify-content: center;
+  /* Never overflow to the left where the panel cannot scroll (TILE_MAX_COLS keeps it narrow). */
+  justify-content: safe center;
+  max-width: 100%;
+  overflow-x: auto;
   margin: 4px 0;
 }
 .workshop-grid__title {
