@@ -1,0 +1,191 @@
+/* Workshop HUD: recovered tokens (--ink, --paper, --gold, fonts), glass panels and the workshop
+   shed colour (#d99a6c, region palette) for the order counter. Phones and short screens put the
+   panel at the bottom; key help is hidden on touch screens. */
+.workshop-guide {
+  position: absolute;
+  top: max(16px, env(safe-area-inset-top));
+  left: 50%;
+  transform: translate(-50%);
+  width: min(560px, calc(100% - 340px));
+  display: flex;
+  align-items: flex-start;
+  gap: 8px;
+  padding: 10px 16px;
+  border-radius: var(--radius);
+  font-size: 15px;
+  line-height: 1.45;
+}
+.workshop-guide p {
+  margin: 0;
+  color: var(--ink-soft);
+  font-weight: 700;
+}
+.workshop-guide__name {
+  font-family: var(--font-display);
+  color: var(--gold-deep);
+}
+.workshop-guide__dot {
+  color: #d99a6c;
+}
+.workshop-progress {
+  position: absolute;
+  top: max(16px, env(safe-area-inset-top));
+  right: max(16px, env(safe-area-inset-right));
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 10px 14px;
+  border-radius: 14px;
+  font-size: 14px;
+  font-weight: 900;
+}
+.workshop-dots {
+  display: flex;
+  gap: 4px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+.workshop-dots li {
+  width: 12px;
+  height: 12px;
+  border-radius: 4px;
+  background: #eadfcf;
+}
+.workshop-dots li.done {
+  background: var(--gold);
+}
+.workshop-dots li.current {
+  background: #d99a6c;
+  box-shadow: 0 0 0 2px #f6e3d4;
+}
+.workshop-panel {
+  position: absolute;
+  top: 76px;
+  right: max(16px, env(safe-area-inset-right));
+  width: 400px;
+  max-height: calc(100% - 92px);
+  overflow: auto;
+  padding: 14px 18px 16px;
+  border-radius: var(--radius-lg);
+  background: var(--glass-strong);
+}
+.workshop-station {
+  margin: 0 0 6px;
+  font-family: var(--font-display);
+  font-size: 22px;
+  color: #9c5a3c;
+}
+.workshop-card-host {
+  margin-top: 10px;
+}
+.workshop-panel .kit-step-card {
+  font-size: 16px;
+  color: var(--ink);
+}
+.workshop-panel .kit-step-card button {
+  border: 1px solid #d8e2cc;
+  border-radius: 14px;
+  background: #e9eedc;
+  color: var(--ink);
+  font-weight: 900;
+}
+.workshop-panel .kit-step-card .kit-pad__key--ok {
+  background: var(--ink);
+  color: #fffbea;
+}
+.workshop-panel .kit-step-card .kit-pad__display {
+  border-radius: 12px;
+  background: var(--paper);
+  font-weight: 900;
+  line-height: 48px;
+}
+.workshop-actions {
+  display: flex;
+  gap: 10px;
+  margin-top: 10px;
+}
+.workshop-hint-button {
+  min-height: 44px;
+}
+.workshop-next {
+  flex: 1;
+  min-height: 48px;
+}
+.workshop-keys {
+  margin: 10px 0 0;
+  font-size: 11px;
+  color: var(--muted-2);
+}
+.workshop-panel .reward-pop {
+  top: 8px;
+}
+.workshop-done {
+  position: absolute;
+  top: 76px;
+  right: max(16px, env(safe-area-inset-right));
+  width: 360px;
+  max-height: calc(100% - 92px);
+  overflow: auto;
+  padding: 22px 24px;
+  border-radius: var(--radius-lg);
+  background: var(--paper);
+  text-align: center;
+  animation: pop 0.5s;
+}
+.workshop-done h2 {
+  margin: 0 0 6px;
+  font-family: var(--font-display);
+  font-size: 28px;
+}
+.workshop-stars {
+  margin: 0;
+  color: var(--gold);
+  font-size: 30px;
+  letter-spacing: 6px;
+}
+.workshop-done__line {
+  color: var(--muted);
+  line-height: 1.6;
+}
+.workshop-done .primary {
+  width: 100%;
+  margin-top: 14px;
+}
+@media (pointer: coarse) {
+  .workshop-keys {
+    display: none;
+  }
+}
+@media (max-width: 760px), (max-height: 520px) and (max-width: 1000px) {
+  .workshop-guide {
+    top: 70px;
+    width: calc(100% - 32px);
+    font-size: 13px;
+  }
+  .workshop-progress {
+    top: auto;
+    bottom: calc(62% + 20px);
+    padding: 6px 10px;
+  }
+  .workshop-panel,
+  .workshop-done {
+    top: auto;
+    left: 12px;
+    right: 12px;
+    bottom: max(12px, env(safe-area-inset-bottom));
+    width: auto;
+    max-height: 62%;
+    padding: 12px 14px;
+  }
+  .workshop-panel .kit-step-card .kit-pad {
+    grid-template-columns: repeat(6, 1fr);
+    max-width: none;
+  }
+  .workshop-panel .kit-step-card .kit-pad__display {
+    grid-column: 1 / -1;
+  }
+  .workshop-keys {
+    display: none;
+  }
+}

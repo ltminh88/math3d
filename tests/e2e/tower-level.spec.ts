@@ -103,11 +103,12 @@ async function playFloor(page: Page, index: number, tap: boolean): Promise<void>
     s = await towerState(page);
   }
   if (s.step !== 'number') {
-    // Answer cards are named by their value, not just their key hint.
-    await expect(page.locator('.tower-answers .answer').first()).toHaveAttribute(
-      'aria-label',
-      /\(phím 1\)$/,
-    );
+    // Answer cards are named by their value, plus their key hint where there is a keyboard
+    // (touch screens get no "(phím 1)", phase 04).
+    const coarse = await page.evaluate(() => matchMedia('(pointer: coarse)').matches);
+    const name = await page.locator('.tower-answers .answer').first().getAttribute('aria-label');
+    if (coarse) expect(name).not.toMatch(/phím/);
+    else expect(name).toMatch(/\(phím 1\)$/);
   }
   while (s.step !== null) {
     await give(page, s, s.expected as number | boolean, tap);

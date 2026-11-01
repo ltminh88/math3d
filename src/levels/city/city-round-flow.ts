@@ -2,7 +2,6 @@
 // "7 × 8" to the house numbered 56, (b) light a building of floors x windows and give the total,
 // (c) reverse delivery (Leitner box 3+): a house shows 56, pick the right parcel. Every answer is
 // a number (house number, window total, parcel value) walked along the shared hint ladder.
-import { mulFactsForTables } from '../../learning/curriculum-tables';
 import { pickDistractors, placeAnswer } from '../../learning/distractor-picker';
 import { expressionChoice } from '../../learning/expression-choice';
 import { type FactKey, parseFactKey } from '../../learning/fact-key';
@@ -17,7 +16,6 @@ import {
 } from '../../learning/hint-ladder';
 import type { Rng } from '../../learning/seeded-rng';
 import type { QuestionOutcome } from '../../learning/session-recorder';
-import type { LevelDefinition, LevelLearning } from '../shared/level-types';
 
 export type CityRoundKind = 'deliver' | 'windows' | 'reverse';
 
@@ -95,17 +93,6 @@ export function planCityRounds({ facts, boxOf, errorsOf, rng }: PlanCityInput): 
   });
 }
 
-/** The run's rounds: the host planner picks the facts over the level's tables (6-9). */
-export function planRunRounds(learning: LevelLearning, definition: LevelDefinition): CityRound[] {
-  const stats = learning.stats();
-  return planCityRounds({
-    facts: learning.planSession(mulFactsForTables(definition.tables), definition.rounds),
-    boxOf: (key) => stats[key]?.box ?? 1,
-    errorsOf: (key) => stats[key]?.errs ?? [],
-    rng: learning.rng,
-  });
-}
-
 export interface SubmitResult {
   verdict: 'correct' | 'wrong' | 'revealed' | 'ignored';
   /** Set when the round just ended: record it with `learning.record`. */
@@ -123,6 +110,8 @@ export class CityRoundFlow {
   constructor(
     readonly rounds: readonly CityRound[],
     private readonly now: () => number,
+    /** Rounds shown to the child (a reasoning round may follow these). */
+    readonly total = rounds.length,
   ) {
     this.startedAt = now();
   }

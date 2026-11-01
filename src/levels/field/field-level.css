@@ -265,3 +265,10 @@
     animation: none;
   }
 }
+
+/* Touch screens have no keyboard: no 1-4 key badges on the equation cards (phase 04). */
+@media (pointer: coarse) {
+  .field-answers kbd {
+    display: none;
+  }
+}

@@ -101,6 +101,8 @@ export class TowerRoundFlow {
   constructor(
     readonly questions: readonly TowerQuestion[],
     private readonly now: () => number,
+    /** Floors shown to the child (a reasoning floor may follow these). */
+    readonly total = questions.length,
   ) {
     this.startedAt = now();
   }

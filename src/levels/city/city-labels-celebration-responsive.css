@@ -161,3 +161,11 @@
     padding: 12px 16px;
   }
 }
+
+/* Touch screens (coarse pointer) have no keyboard: no key help row or key badges (phase 04). */
+@media (pointer: coarse) {
+  .city-keys,
+  .city-panel kbd {
+    display: none;
+  }
+}

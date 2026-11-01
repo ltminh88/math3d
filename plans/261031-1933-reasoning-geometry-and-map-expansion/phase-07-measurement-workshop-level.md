@@ -5,7 +5,7 @@
 - Reference: `src/levels/city/city-building-view.ts` (instanced tiles/windows), `src/levels/field/planting-grid*.ts` (grid by tap)
 
 ## Overview
-- Date 2026-10-31. Priority P1. Status pending. Review: not started. Depends on 01, 02, 03. Parallel with 04–06, 08.
+- Date 2026-10-31. Priority P1. Status done (branch feat/ch2-p07-workshop). Review: not started. Depends on 01, 02, 03. Parallel with 04–06, 08.
 - Story: the workshop's carpenter must finish orders — fences for gardens, tiled floors, packages to weigh, juice to pour, a thermometer to read. The child measures and computes with VLM.
 
 ## Key Insights
@@ -48,13 +48,13 @@ tests/e2e/workshop-level.spec.ts  workshop-level-leak.spec.ts
 6. Screenshots `reports/workshop-screens/` (4 projects).
 
 ## Todo list
-- [ ] round flow + grid model + tests
-- [ ] hints + tests
-- [ ] views, instruments, diorama
-- [ ] panel, input
-- [ ] celebration
-- [ ] e2e 4 projects + leak
-- [ ] screenshots
+- [x] round flow + grid model + tests
+- [x] hints + tests
+- [x] views, instruments, diorama
+- [x] panel, input
+- [x] celebration
+- [x] e2e 4 projects + leak
+- [x] screenshots
 
 ## Success Criteria
 - Unit + workshop e2e green on desktop, phone, tablet portrait, tablet landscape; own chunk; ≤60 draw calls; no leaks; ranges match 02 report.
@@ -78,3 +78,12 @@ tests/e2e/workshop-level.spec.ts  workshop-level-leak.spec.ts
 
 ## Next steps
 - 09 merge.
+
+## Implementation notes (2026-11-02)
+- Folder `src/levels/workshop/` (own chunk `workshop-scene-*.js`). Pure: `workshop-stations.ts` (skill → station, six-slot story plan, weakest skill first by box then last seen), `workshop-round-plan.ts` (items via `measurementItemForSkill` at the box tier; the fence round redraws `meas-perimeter-rect` until it matches the `meas-area-rect` floor, tier-1 floors drawn ≤ 20 cells so they can be tiled; bounded 4000 draws), `workshop-round-flow.ts` (misses, 3 hint rungs, reveal after 3 misses, `sk:` outcome), `workshop-tile-grid.ts`, `workshop-fence-walk.ts`, `workshop-hints.ts` + `workshop-hint-strings.ts`.
+- Run order: ruler → fence (chu vi) → tiles of the **same rectangle** (diện tích) → one more fence/tiles order → two of balance/jug/thermometer (in that order). All 12 `meas-*` skills reachable.
+- Answers go through the kit step card (`render: renderMeasurementPrompt`); the board above it is DOM/SVG (ruler with mm ticks from tier 2, fence sides as buttons + "Đi tiếp", tiling grid of 44 px buttons + "Đặt một hàng", formula floor with faint grid and cut corner, balance, jug, thermometers zoomed 0–50 °C). The 3D shed is one baked mesh plus instanced ruler ticks, instanced tiles mirroring the child's taps, jug water, thermometer column and a station ring: **max 9 draw calls** (budget 60).
+- Hints: rung 1 encourages, rung 2 the rule in words ("đi một vòng quanh viền", "đếm ô vuông phủ kín"), rung 3 an expression from numbers already visible; unit test checks over 1000+ items that no rung ≥ 2 writes `= answer` or a number the child cannot see. Wrong choices that mix chu vi/diện tích get a note naming the right concept.
+- Keys (optional, desktop): digits + Enter (pad), 1–4 choices, → walk, Space lay a row, H hint, Enter next order; key help hidden on `(pointer: coarse)` and narrow layouts.
+- e2e: `workshop-level.spec.ts` (keys on desktop, taps on phone + both tablets; wrong answer + 3 hint rungs, a reveal after 3 misses, fence walk, tiling, same rectangle, bonus, `sk:` keys stored, cave gate unlocked), `workshop-level-leak.spec.ts` (10 cycles, settled baseline). Screenshots `reports/p07-screens/` (env `WORKSHOP_SCREENS`).
+- Outside ownership (tests only): `tests/e2e/chapter2-gates-and-regions.spec.ts` (`SHIPPED` += workshop, merged with valley's list), `tests/e2e/quest-chain.spec.ts` (workshop card now "Đến Cổng Xưởng Đo Đạc").

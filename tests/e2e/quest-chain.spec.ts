@@ -127,23 +127,17 @@ test('the field leads to the forest, city and tower gates, then the closing card
   );
   await page.locator('#close-dialog').click();
 
-  // Chapter 2 opens after the tower; its levels ship in later phases ("Sắp ra mắt" until then).
+  // Chapter 2 opens after the tower; the garden level has shipped (phase 05).
   await page.evaluate(() => window.__game?.seedProgress({ completedLevels: ['tower'] }));
-  await expectCard(page, 'NHIỆM VỤ TIẾP THEO', 'Khu Vườn Quy Luật', 'Sắp ra mắt');
-  await expect(page.locator('#quest-copy')).toHaveText(
-    'Cổng Khu Vườn Quy Luật sắp ra mắt. Trong lúc chờ, bạn luyện thêm cùng VLM nhé!',
-  );
+  await expectCard(page, 'NHIỆM VỤ TIẾP THEO', 'Khu Vườn Quy Luật', 'Đến Cổng Khu Vườn');
+  await expect(page.locator('#quest-copy')).toContainText('✨ Cổng Khu Vườn Quy Luật');
   await expect(page.locator('#quest-chapter')).toHaveText('Chương 2 · 0/4');
   await expect(steps).toHaveText(['Khu Vườn', 'Thung Lũng', 'Xưởng', 'Hang']);
   await expect(page.locator('#quest-steps .done')).toHaveCount(0);
-  await talkToVlm(page);
-  await expect(page.locator('#dialog .dialog-copy')).toContainText(
-    'Cổng Khu Vườn Quy Luật sắp ra mắt đấy!',
-  );
-  await page.locator('#close-dialog').click();
 
   await page.evaluate(() => window.__game?.seedProgress({ completedLevels: ['garden', 'valley'] }));
-  await expectCard(page, 'NHIỆM VỤ TIẾP THEO', 'Xưởng Đo Đạc', 'Sắp ra mắt');
+  // The workshop level has shipped (phase 07): its card points at the open gate.
+  await expectCard(page, 'NHIỆM VỤ TIẾP THEO', 'Xưởng Đo Đạc', 'Đến Cổng Xưởng Đo Đạc');
   await expect(page.locator('#quest-chapter')).toHaveText('Chương 2 · 2/4');
   await expect(page.locator('#quest-steps .done')).toHaveCount(2);
 
