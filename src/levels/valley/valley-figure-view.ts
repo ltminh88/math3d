@@ -134,6 +134,10 @@ export class ValleyFigureView {
     }
   }
 
+  hide(): void {
+    this.mesh.visible = false;
+  }
+
   dispose(): void {
     this.mesh.geometry.dispose();
   }

@@ -79,7 +79,7 @@ function start(ctx: LevelContext): LevelSession {
     onLevelDone(earned, stars) {
       panel.hide();
       panel.say(vs('doneTitle'));
-      board.labels.clear();
+      board.clear();
       camera.frame(9, 5.5);
       ctx.audio.celebrate();
       ctx.announce(vs('doneTitle'));

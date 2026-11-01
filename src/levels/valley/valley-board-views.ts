@@ -115,6 +115,16 @@ export class ValleyBoardViews {
     });
   }
 
+  /** The garden is rebuilt: the board is swept clean for the celebration. */
+  clear(): void {
+    this.round = undefined;
+    this.figure.hide();
+    this.solids.clear();
+    this.eke.place(null);
+    this.eke.showSpare(null);
+    this.labels.clear();
+  }
+
   update(dt: number): void {
     this.camera.update(dt);
     this.solids.frame(dt);

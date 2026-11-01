@@ -87,7 +87,7 @@ export class ValleySolidsView {
     }
   }
 
-  private clear(): void {
+  clear(): void {
     for (const block of this.blocks) {
       block.mesh.removeFromParent();
       block.mesh.geometry.dispose();

@@ -136,7 +136,8 @@ async function playRound(page: Page, index: number, touch: boolean, project: str
         else await page.keyboard.press('r');
         await expect.poll(async () => (await state(page)).turnSteps).toBe(1);
         if (SHOTS) {
-          await page.waitForTimeout(600);
+          // Let the eased turn settle so the canvas and the DOM targets show the same frame.
+          await page.waitForTimeout(2500);
           await page.screenshot({ path: `${SHOTS}/valley-eke-${project}.png` });
         }
       }

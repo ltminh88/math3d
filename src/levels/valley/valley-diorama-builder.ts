@@ -40,7 +40,7 @@ function scratchContext(scene: Scene): WorldBuildContext {
 }
 
 function buildValleyFloor(ctx: WorldBuildContext, root: Group): void {
-  addBox(ctx, root, 0, -0.1, -2, 44, 0.2, 34, C.ground);
+  addBox(ctx, root, 0, -0.1, 0, 90, 0.2, 90, C.ground);
   // The stone board: a raised sandy slab with a darker rim.
   addBox(ctx, root, 0, 0.04, 0, BOARD.width + 0.8, 0.1, BOARD.depth + 0.8, C.rim);
   addBox(ctx, root, 0, 0.08, 0, BOARD.width, 0.1, BOARD.depth, C.board);
