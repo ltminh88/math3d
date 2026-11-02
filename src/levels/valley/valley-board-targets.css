@@ -7,6 +7,16 @@
   overflow: hidden;
   pointer-events: none;
 }
+/* Letter chips paint above the tap targets so a tried corner's ✓ / ✗ never hides its letter
+   (the chips take no pointers: taps still reach the target underneath). */
+.valley-chips,
+.valley-targets {
+  position: absolute;
+  inset: 0;
+}
+.valley-chips {
+  z-index: 1;
+}
 .valley-chip,
 .valley-target {
   position: absolute;
