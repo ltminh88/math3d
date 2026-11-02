@@ -11,6 +11,7 @@ import { roundTexts, wrongFeedbackKey } from './forest-round-texts';
 import type { ForestStrings } from './forest-strings';
 import { type ForestTableView, zoneSpot } from './forest-table-view';
 import {
+  autoDealStep,
   checkSharing,
   createSharing,
   dealStep,
@@ -191,9 +192,7 @@ export class ForestRoundController {
     if (this.autoDeal < 0) return;
     this.autoDeal -= dt;
     if (this.autoDeal > 0) return;
-    const reduced = this.ctx.reducedMotion;
-    do this.sharing = dealStep(this.sharing);
-    while (reduced && pileCount(this.sharing) > 0);
+    this.sharing = autoDealStep(this.sharing, this.ctx.reducedMotion);
     this.autoDeal = pileCount(this.sharing) > 0 ? AUTO_DEAL_STEP : -1;
     this.changed();
   }
