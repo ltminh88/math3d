@@ -1,5 +1,5 @@
-import { describe, expect, it } from 'vitest';
-import { defineStrings } from '../../i18n/i18n';
+import { afterEach, describe, expect, it } from 'vitest';
+import { defineStrings, setLanguage } from '../../i18n/i18n';
 import { mulberry32 } from '../../learning/seeded-rng';
 import type { SkillTier } from '../../learning/skill-tiers';
 import type { ReasoningStep } from '../../reasoning/reasoning-types';
@@ -86,5 +86,24 @@ describe('cave hints', () => {
     expect(text).toContain(
       renderOf('reasoning')((wp as CaveChamber).steps[0]?.prompt ?? { key: '' }),
     );
+  });
+
+  afterEach(() => setLanguage('vi'));
+
+  it('the circle hints say "two radii" (KNTT B17), never "twice"/"half", in vi and en', () => {
+    const circle = Array.from({ length: 40 }, (_, seed) => chambersFor(2, seed))
+      .flat()
+      .find((c) => c.item.story.key === 'circleD');
+    if (!circle) throw new Error('no circleD chamber');
+    const texts = (lang: 'vi' | 'en') => {
+      setLanguage(lang);
+      return [2, 3].map((rung) => caveHintText(cs, rung, circle, 0)).join(' ');
+    };
+    const vi = texts('vi');
+    expect(vi).toContain('hai bán kính');
+    expect(vi).not.toMatch(/gấp đôi|nửa/);
+    const en = texts('en');
+    expect(en).toContain('two radii');
+    expect(en).not.toMatch(/twice|half|nửa/);
   });
 });
