@@ -1,5 +1,23 @@
 # Project changelog
 
+## 2026-11-02 — Chapter 2: reasoning, geometry, measurement, map expansion (tag `chapter2-reviewed`)
+
+Plan: `plans/261031-1933-reasoning-geometry-and-map-expansion/`. Content follows SGK Toán 3 Kết nối tri thức; every number a child sees is ≤100.
+
+### Added
+- Skill keys `sk:<id>` from an append-only catalog of 39 skills (`learning/skill-catalog.ts`); tiers from the Leitner box (1–2 → 1, 3–4 → 2, 5 → 3).
+- Pure seeded generators: `reasoning/` (two-step word problems, remainders, unknowns, patterns, expressions with brackets, choose-all, true/false + fix), `geometry/` (right angles, midpoint, circle parts, shapes, solids) and `measurement/` (ruler, balance, jug, thermometer, perimeter, area in cm²; cm↔mm only).
+- Save code `M3D3` (adds skill stats and the four chapter-2 levels); `M3D1`/`M3D2` decode unchanged.
+- Step kit in `ui/kit/` (step card, multi-select, Đúng/Sai buttons; tap-only, ≥44 px).
+- Map: three new regions (Thung Lũng Hình Học, Xưởng Đo Đạc, Hang Đố Vui) plus a garden gate, added after the scatter; quest card in two chapters with "Chương n · k/m".
+- Levels: garden, valley, workshop, cave; the chain is now 9 stages ending on "Bạn đã qua cả chín chặng!".
+- Reasoning rounds in the bridge quiz (word problem every 5th question once a table is mastered) and as the last round of field, forest, city and tower (only after mastery).
+- Playwright projects `tablet-portrait` and `tablet-landscape`; the full-chain e2e walks all 9 stages on all four projects.
+
+### Fixed
+- Touch: no key hints on coarse pointers (map, book help, field, tower, quiz badges); 44 px leave button in every level; quest cell names no longer clipped on tablets.
+- Review (`reports/reviewer-chapter2.md`, table in phase 09): H1 tier-1 reasoning hints no longer give the step answer; H2 the reasoning-round number pad is freed when a level closes; M3 cave hint resets per step; M4 KNTT "two radii" wording; M5 valley tier-3 midpoint not pre-solved; M6 workshop tile grid fits phones; M7 quiz word-problem rung 3 shows the operation with "?".
+
 ## 2026-10-26 — QA fixes (tag `qa-fixes`)
 
 Fixes for the full QA playthrough (`plans/261024-1515-city-and-tower-levels/reports/qa-full-playthrough.md`),

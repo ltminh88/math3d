@@ -98,7 +98,14 @@ export function mountReasoningRound(o: ReasoningRoundPanelOptions): ReasoningRou
         say(trr('wrong'), 'gentle');
         hintButton.classList.toggle('offer', flow.canHint);
         o.audio.hint();
-      } else if (result.outcome) finish(result.outcome, result.verdict === 'correct');
+      } else if (result.outcome) finish(result.outcome, result.outcome.correct);
+      else if (result.verdict === 'revealed') {
+        // Third miss on this step: its answer is shown, the next step gets three fresh tries.
+        card.reveal();
+        say(trr('revealed'), 'gentle');
+        hintButton.classList.remove('offer');
+        o.audio.hint();
+      }
     },
     onComplete: () => {},
     signal: o.signal,

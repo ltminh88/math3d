@@ -28,7 +28,7 @@ export const measGram: GeoGenerator = (rng, tier) => {
       'meas-gram',
       tier,
       ref('balanceRead', { item }),
-      [numberStep(ref('askItemG'), grams)],
+      [numberStep(ref('askItemG', { item }), grams)],
       s,
       'g',
     );

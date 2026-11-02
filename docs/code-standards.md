@@ -13,12 +13,16 @@ One engine only: the recovered world. Folders under `src/`:
 - `world/` Three.js world (renderer setup, builders, scatter, characters, player, camera, frame loop); `map/` minimap and world-map canvas rendering.
 - `ui/` DOM shell, HUD, dialogs and bootstrap; `ui/kit/` keeps number-pad, choice-buttons, aria-announcer and the step kit (step-card, multi-select, verdict buttons) for levels; every kit control is tap-usable, ≥44 px, keys optional.
 - `webmcp/` WebMCP tools exposed by the page.
-- `learning/`, `reasoning/` (seeded reasoning generators, chapter 2) and `store/` are pure logic: no `three`, no DOM imports. They must run under Vitest's node environment.
+- `learning/`, `reasoning/` (seeded reasoning generators, chapter 2), `geometry/` and `measurement/` (seeded KNTT grade-3 item generators with plain-data scene descriptors) and `store/` are pure logic: no `three`, no DOM imports. They must run under Vitest's node environment.
 - Progress has one source of truth, the game store (IndexedDB); the UI keeps an optimistic view (`gameState.progress`) and writes every change through `src/ui/progress-sync.ts`. Settings (language, sound, music, quest card) have one source too: `src/store/app-settings.ts`. Never write the legacy `aigame3d_*` keys.
 - `core/` holds only reusable pieces kept for later levels (input controllers, speech narrator, audio gesture unlock, quality tiers, context-loss, WebGL check, tweens, asset cache/disposer). It is not a second engine.
 - `dev/` dev-only probes (`?debug=fps` frame-time overlay), never in the production bundle.
 - `levels/shared/` the level host (one renderer: the world loop is suspended while a level runs), level gates, progression and the test-build hook `window.__game`. Each level lives in `levels/<id>/`; its `index.ts` default-exports only a `LevelDefinition` (self-registered via `import.meta.glob`) and loads its scene with a dynamic `import()` so the level stays its own chunk.
-- Shipped levels: `levels/field/` (meadow, multiplication as a planting grid), `levels/forest/` (division as fair sharing and fact families), `levels/city/` (tables 6–9: parcel delivery by house number and lighting windows) and `levels/tower/` (the final climb, × and : over tables 2–9). Each gate opens once the previous level is completed: field → forest → city → tower.
+- Shipped levels, one 9-stage chain in two chapters (each gate opens once the previous level is completed):
+  - Chapter 1: `levels/field/` (meadow, multiplication as a planting grid), `levels/forest/` (division as fair sharing and fact families), `levels/city/` (tables 6–9: parcel delivery by house number and lighting windows), `levels/tower/` (the final climb, × and : over tables 2–9). Once a child shows mastery, each ends its run with one reasoning round on the step kit (`levels/shared/reasoning-round-*`).
+  - Chapter 2 (opens after the tower): `levels/garden/` (Khu Vườn Quy Luật: patterns, unknowns, brackets), `levels/valley/` (Thung Lũng Hình Học: geometry), `levels/workshop/` (Xưởng Đo Đạc: measurement, perimeter, area), `levels/cave/` (Hang Đố Vui: mixed reasoning, the last stage).
+  - Chapter-2 regions, roads and gates live in `config/expansion-*` and are added after the scatter; `REGIONS`, `ROADS` and `WALKABLE_BOUNDS` stay byte-equal (golden traces).
+- Content rules (author): every number a child sees — prompt, intermediate, answer, hint — is ≤100; no kg↔g, l↔ml or m↔mm conversions (cm↔mm only); no hint rung from 2 up shows the answer; tiers come from the skill's Leitner box and raise reasoning, not number size.
 - `shop/` cosmetics (catalog, purchase flow, village stall, shop panel, equipped items on VLM): visual only, never imported by `learning/`, `quiz/` or `levels/`. Coins are spent through the store; the panel opens through `ui/dialog.ts`, so it stays closed while a level runs.
 - Interactables (VLM, level gates, the phase 19 shop stall) register with `world.registerInteractable`; the interact button and E key use the nearest one in reach.
 - Planned: `sync/**` Supabase.
@@ -35,7 +39,7 @@ Parallel work is split by folder (see the plan's "Parallel groups"). Levels self
 
 ## Tests
 - Unit tests co-located as `*.test.ts` next to the code; run with `npm test`.
-- E2E tests in `tests/e2e/*.spec.ts`; assert state (DOM, store) rather than pixels.
+- E2E tests in `tests/e2e/*.spec.ts`; assert state (DOM, store) rather than pixels. Four Playwright projects: `desktop-chromium`, `mobile-pixel`, `tablet-portrait`, `tablet-landscape` (iPad Pro 11 viewport, touch). Touch projects use `tap()` only; every step must be playable without a keyboard, targets ≥44 px, no key hints on `(pointer: coarse)`.
 - A test must protect real behavior or a credible regression; no tests for trivia.
 
 ## Env and secrets
