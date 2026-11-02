@@ -83,9 +83,8 @@ export class ValleyFigureView {
   ): void {
     if (d.kind === 'log') {
       if (state.aid) {
-        const mid: XZ = [(d.a[0] + d.b[0]) / 2, (d.a[1] + d.b[1]) / 2];
-        addStroke(ctx, root, d.a, mid, C.halfA, 0.7, 0.04);
-        addStroke(ctx, root, mid, d.b, C.halfB, 0.7, 0.04);
+        addStroke(ctx, root, d.a, d.split, C.halfA, 0.7, 0.04);
+        addStroke(ctx, root, d.split, d.b, C.halfB, 0.7, 0.04);
       }
       addStroke(ctx, root, d.a, d.b, C.log, 0.42, 0.22);
       for (const t of d.ticks) {

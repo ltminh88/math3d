@@ -39,8 +39,15 @@ export interface ValleyChip {
 }
 
 export type ValleyDraw =
-  /** The wooden log AB with cm ticks (fractions of its length). */
-  | { readonly kind: 'log'; readonly a: XZ; readonly b: XZ; readonly ticks: readonly number[] }
+  /** The wooden log AB with cm ticks (fractions of its length); the hint aid colours A..split
+   *  and split..B, where split is M as drawn (so an off-centre M shows two unequal parts). */
+  | {
+      readonly kind: 'log';
+      readonly a: XZ;
+      readonly b: XZ;
+      readonly ticks: readonly number[];
+      readonly split: XZ;
+    }
   | { readonly kind: 'line'; readonly a: XZ; readonly b: XZ; readonly group: string }
   | { readonly kind: 'ring'; readonly c: XZ; readonly r: number; readonly group: string }
   | { readonly kind: 'poly'; readonly points: readonly XZ[]; readonly group: string }
