@@ -52,6 +52,8 @@ export class ValleyBoardViews {
     this.eke.place(null);
     this.eke.showSpare(null);
     this.labels.setRound(layout.chips, layout.targets);
+    // Flat figures are judged top-down (angles true on screen); blocks keep the 3/4 view.
+    this.camera.setFlat(round.kind !== 'solids');
     this.camera.frame(layout.halfWidth, layout.halfDepth);
   }
 

@@ -80,6 +80,8 @@ function start(ctx: LevelContext): LevelSession {
       panel.hide();
       panel.say(vs('doneTitle'));
       board.clear();
+      // The rebuilt garden is a scene to look at, not a figure to judge: back to the 3/4 view.
+      camera.setFlat(false);
       camera.frame(9, 5.5);
       ctx.audio.celebrate();
       ctx.announce(vs('doneTitle'));

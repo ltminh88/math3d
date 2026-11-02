@@ -100,6 +100,27 @@ async function answerStep(page: Page, s: ValleyState, touch: boolean): Promise<v
   }
 }
 
+/** Once the view settles, right angles drawn on the board are right angles on screen (±1°). */
+async function expectTrueAngles(page: Page): Promise<void> {
+  await expect.poll(async () => (await state(page)).viewSettled).toBe(true);
+  const angles = await page.evaluate(() =>
+    [0, 30, 45, 70].flatMap((deg) =>
+      (
+        [
+          [0, 0],
+          [-3.5, 2],
+          [3, -2],
+        ] as [number, number][]
+      ).map(([x, z]) => {
+        const r = (deg * Math.PI) / 180;
+        const arm = (t: number): [number, number] => [x + Math.cos(t), z - Math.sin(t)];
+        return window.__valley?.screenAngle([x, z], arm(r), arm(r + Math.PI / 2)) ?? 0;
+      }),
+    ),
+  );
+  for (const angle of angles) expect(Math.abs(angle - 90)).toBeLessThan(1);
+}
+
 async function wrongNumber(page: Page, value: number, touch: boolean): Promise<void> {
   await answerStep(page, { step: { kind: 'number', answer: value } } as ValleyState, touch);
 }
@@ -108,6 +129,8 @@ async function playRound(page: Page, index: number, touch: boolean, project: str
   await expect(page.locator(`.valley-panel[data-round="${index}"]`)).toBeVisible();
   let s = await state(page);
   expect(s.skillId).toBe(PLAN[index]?.skillId);
+  // Flat figures are judged top-down (solids keep their 3/4 view).
+  if (s.kind !== 'solids') await expectTrueAngles(page);
   if (s.phase === 'action') {
     if (index === 0) {
       // A wrong stone: gentle words, a hint offered and taken (rung 1).
@@ -135,6 +158,8 @@ async function playRound(page: Page, index: number, touch: boolean, project: str
         if (touch) await page.locator('.valley-turn').nth(1).tap();
         else await page.keyboard.press('r');
         await expect.poll(async () => (await state(page)).turnSteps).toBe(1);
+        // Turned top-down, the board spins in its own plane: angles stay true.
+        await expectTrueAngles(page);
         if (SHOTS) {
           // Let the eased turn settle so the canvas and the DOM targets show the same frame.
           await page.waitForTimeout(2500);
