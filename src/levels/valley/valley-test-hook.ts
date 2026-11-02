@@ -2,8 +2,10 @@
 // round (kind, action, targets, what the card step expects) and the board; `window.__valleyPlan`
 // set before entering fixes the rounds (skill + tier) so a spec can play chosen kinds. Installed
 // from the scene behind `import.meta.env.MODE === 'test'`, removed when the level exits.
+import { Vector3 } from 'three';
 import { renderGeometryPrompt } from '../../geometry/geometry-strings';
 import { playableSteps } from '../../reasoning/reasoning-step-answers';
+import { BOARD } from './valley-layout-constants';
 import type { ValleyRoundController } from './valley-round-controller';
 import type { ValleyRoundSpec } from './valley-round-plan';
 
@@ -32,8 +34,11 @@ export interface ValleyTestHook {
     selected: string[];
     aid: boolean;
     turnSteps: number;
+    viewSettled: boolean;
     gardenStones: number;
   };
+  /** On-screen angle (degrees, CSS px) at board point `o` between board points `a` and `b`. */
+  screenAngle(o: [number, number], a: [number, number], b: [number, number]): number;
   plan(): { skillId: string; tier: number; kind: string }[];
 }
 
@@ -90,8 +95,22 @@ export function installValleyTestHook(
         selected: [...controller.board.selected],
         aid: controller.board.aid,
         turnSteps: controller.board.camera.steps,
+        viewSettled: controller.board.camera.settled,
         gardenStones: gardenStones(),
       };
+    },
+    screenAngle: (o, a, b) => {
+      const camera = controller.board.camera.camera;
+      const box = document.querySelector('canvas')?.getBoundingClientRect();
+      const [w, h] = [box?.width ?? window.innerWidth, box?.height ?? window.innerHeight];
+      const screen = ([x, z]: [number, number]): [number, number] => {
+        const p = new Vector3(x, BOARD.top, z).project(camera);
+        return [((p.x + 1) / 2) * w, ((1 - p.y) / 2) * h];
+      };
+      const [so, sa, sb] = [screen(o), screen(a), screen(b)];
+      const turn = (p: [number, number]) => Math.atan2(p[1] - so[1], p[0] - so[0]);
+      const deg = Math.abs(((turn(sa) - turn(sb)) * 180) / Math.PI) % 360;
+      return deg > 180 ? 360 - deg : deg;
     },
     plan: () =>
       flow.rounds.map((r) => ({ skillId: r.item.skillId, tier: r.item.tier, kind: r.kind })),

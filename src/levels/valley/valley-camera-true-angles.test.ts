@@ -2,8 +2,8 @@
 // aspect ratio (the four e2e viewports, panel beside or below the board) and every view turn.
 import { Vector3 } from 'three';
 import { describe, expect, it } from 'vitest';
-import { BOARD } from './valley-layout-constants';
 import { type FreeArea, ValleyCamera } from './valley-camera';
+import { BOARD } from './valley-layout-constants';
 
 const AREAS: Record<string, FreeArea> = {
   desktop: { width: 1280, height: 720, coverTop: 90, coverRight: 440, coverBottom: 0 },
@@ -14,14 +14,13 @@ const AREAS: Record<string, FreeArea> = {
 
 /** On-screen angle (degrees) at board point `o` between `a` and `b`. */
 function screenAngle(view: ValleyCamera, area: FreeArea, pts: [number, number][]): number {
-  const [o, a, b] = pts.map(([x, z]) => {
+  const [o, a, b] = pts.map(([x, z]): [number, number] => {
     const p = new Vector3(x, BOARD.top, z).project(view.camera);
-    return [((p.x + 1) / 2) * area.width, ((1 - p.y) / 2) * area.height] as const;
-  }) as [readonly [number, number], readonly [number, number], readonly [number, number]];
-  const u = [a[0] - o[0], a[1] - o[1]];
-  const v = [b[0] - o[0], b[1] - o[1]];
-  const cos = (u[0] * v[0] + u[1] * v[1]) / (Math.hypot(u[0], u[1]) * Math.hypot(v[0], v[1]));
-  return (Math.acos(cos) * 180) / Math.PI;
+    return [((p.x + 1) / 2) * area.width, ((1 - p.y) / 2) * area.height];
+  }) as [[number, number], [number, number], [number, number]];
+  const turn = (p: [number, number]) => Math.atan2(p[1] - o[1], p[0] - o[0]);
+  const deg = Math.abs(((turn(a) - turn(b)) * 180) / Math.PI) % 360;
+  return deg > 180 ? 360 - deg : deg;
 }
 
 /** A 90° corner at `at`, its arms turned by `deg`, 1.5 units long. */
