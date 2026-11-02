@@ -75,5 +75,25 @@ docs/code-standards.md  docs/recovery-notes.md (mod)
 ## Security Considerations
 - Deploy only the built `.preview/deploy` folder; no `.env*` beyond the publishable key; confirm `dist/` has no test hooks (`__game`, `__garden`, …).
 
+## Review fixes
+Findings from `reports/reviewer-chapter2.md`, fixed on branch `fix/ch2-review` (from main f52909e). Every new regression test failed on the pre-fix code for the reason named.
+
+| Finding | Outcome |
+|---|---|
+| H2 number-pad keydown leaks when leaving mid reasoning round | Fixed: the reasoning panel destroys itself when the level's disposer signal aborts; `createNumberPad` / `createStepCard` take a caller `signal` (the pad keeps its own controller as fallback); garden, valley, workshop and cave cards pass the level signal too. New e2e `reasoning-round-leave-leak.spec.ts`: leave the field during its reasoning number step, enter the forest, typed digits reach the forest pad and three wrong tries record nothing under the field's `sk:` key (RED before: digits swallowed). |
+| H1 reasoning rung 3 states the step-1 answer | Fixed: `reasoning-round-hints.ts` builds rung 3 from the current step: the strategy plus that step's operation with "?" ("3 × 2 = ?", then "6 + 3 = ?"; "29 : 2 = ? (dư ?)"; "34 + 15 = ?", then "49 × 2 = ?"); choice steps get the strategy only. Unit sweep: 9 skills × 3 tiers × 300 seeds × every step × rungs 2-3, every number in a hint is already on screen and none is the current step's answer. |
+| M3 cave hint not reset per step | Fixed: the rung restarts on a step advance (hints taken still count), the hint area clears and the button re-enables, as in the garden. Unit test in `cave-round-flow.test.ts`. |
+| M6 workshop tile grid clipped | Fixed: tiled rectangles are capped at `TILE_MAX_COLS` = 6 columns of 44 px (282 px fits a phone panel), wider tier-1 floors are redrawn; grid uses `safe center` + `overflow-x: auto`. Unit: plan sweep width ≤ 6 and `tileTargets(10×2)` null; e2e `workshop-level.spec.ts` asserts every cell is inside the panel and ≥ 44 px on all four projects, and taps the last cell. |
+| M5 valley tier-3 midpoint pre-solved | Fixed: tier 3 opens with no stone tap (no targets, straight to the Đúng/Sai card); the rung-3 aid colours the log A..M and M..B as drawn (`split` on the log draw), so an off-centre M shows two unequal parts. Unit `valley-layout-segment-circle.test.ts`. Correct stone stays index 3 for tiers 1-2 (reviewer's "consider"; author call). |
+| M7 bridge word problem rung 3 shows the answer | Fixed (chapter-2 rule): rung 3 is "Đội Nam: a × n = ?. Cả hai đội: lấy số đó cộng thêm a." / "big : small = ?"; the worked answer stays in the right-answer feedback. Multiplication ladder untouched. Unit `quiz-word-problem-strings.test.ts` (levels 0, 2-5). |
+| M4 cave "gấp đôi bán kính" | Fixed: rung 2 "Đường kính dài bằng hai bán kính: bán kính + bán kính."; rung 3 for circleD "bán kính + bán kính = d, tìm bán kính" from the strings table, English "two radii". Unit test in vi and en. |
+| L11 cave `circleD` hardcoded vi | Fixed with M4 (no "nửa của" in code). |
+| L8 workshop sync reveal | Fixed: reveal runs in a microtask after the card's own handling (skipped if the card changed). No test (announcement order only). |
+| L9 valley dead hint pulse | Fixed: a miss offers the hint only while rung < 3. No test (cosmetic). |
+| L10 valley per-frame cost | Fixed: labels write transforms only when the camera matrices, size or round change; the camera reuses one direction vector. No test (perf, not behavior). |
+| L12 miss budget per step vs per round | Left as is: author question. |
+| L13 workshop single-weight rung 3 | Left: the weight is visible on the scale. |
+| L14 forest controller at 200 lines | Fixed: auto-deal tick moved to `sharing-model.ts` (`autoDealStep`); controller 199 lines. |
+
 ## Next steps
 - Supabase sync (SQL fact-key check must include the `sk:` branch).
