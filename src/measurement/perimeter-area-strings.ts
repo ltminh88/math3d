@@ -3,7 +3,7 @@
 export const PERIMETER_AREA_VI = {
   perimSum: 'Quan sát độ dài các cạnh của hình.',
   askPerim: 'Chu vi của hình là bao nhiêu xăng-ti-mét?',
-  perimMissing: 'Hình có chu vi {p} cm. Có một cạnh chưa biết độ dài.',
+  perimMissing: 'Hình có chu vi {p} cm. Một cạnh chưa biết dài bao nhiêu.',
   askMissing: 'Cạnh chưa biết dài bao nhiêu xăng-ti-mét?',
   rectPerim: 'Hình chữ nhật có chiều dài {a} cm, chiều rộng {b} cm.',
   askHalfPerim: 'Chiều dài cộng chiều rộng bằng bao nhiêu xăng-ti-mét?',
@@ -12,13 +12,13 @@ export const PERIMETER_AREA_VI = {
   askWidth: 'Chiều rộng là bao nhiêu xăng-ti-mét?',
   squarePerim: 'Hình vuông có cạnh {s} cm.',
   askPerimSquare: 'Chu vi hình vuông là bao nhiêu xăng-ti-mét?',
-  wireSquare: 'Uốn một sợi dây dài {p} cm thành một hình vuông, vừa hết dây.',
+  wireSquare: 'Một sợi dây dài {p} cm. Uốn cả sợi dây thành một hình vuông, vừa hết dây.',
   askSide: 'Cạnh hình vuông dài bao nhiêu xăng-ti-mét?',
   fence: 'Mảnh vườn hình chữ nhật dài {a} m, rộng {b} m. Bác Ba rào xung quanh vườn.',
   fenceGate:
     'Mảnh vườn hình chữ nhật dài {a} m, rộng {b} m. Bác Ba rào xung quanh vườn, chừa một cổng rộng {g} m.',
   fenceWall:
-    'Mảnh vườn hình chữ nhật dài {a} m, rộng {b} m. Một chiều dài sát tường nhà nên không cần rào.',
+    'Mảnh vườn hình chữ nhật dài {a} m, rộng {b} m. Một cạnh dài nằm sát tường nhà, không cần rào.',
   askPerimM: 'Chu vi mảnh vườn là bao nhiêu mét?',
   askFence: 'Hàng rào dài bao nhiêu mét?',
   areaCount: 'Hình được ghép từ các ô vuông 1 cm².',
@@ -30,15 +30,15 @@ export const PERIMETER_AREA_VI = {
   askAreaMore: 'Diện tích hình A lớn hơn hình B bao nhiêu xăng-ti-mét vuông?',
   rectArea: 'Hình chữ nhật có chiều dài {a} cm, chiều rộng {b} cm.',
   askAreaRect: 'Diện tích hình chữ nhật là bao nhiêu xăng-ti-mét vuông?',
-  askAreaRectNum: 'Số đo diện tích hình chữ nhật là:',
+  askAreaRectNum: 'Số đo diện tích hình chữ nhật là bao nhiêu?',
   rectCut:
-    'Tấm bìa hình chữ nhật dài {a} cm, rộng {b} cm. Cắt đi một hình vuông cạnh {c} cm ở một góc.',
+    'Tấm bìa hình chữ nhật dài {a} cm, rộng {b} cm. Bạn cắt đi một hình vuông cạnh {c} cm ở một góc.',
   askRectArea: 'Diện tích tấm bìa lúc đầu là bao nhiêu xăng-ti-mét vuông?',
   askCutArea: 'Diện tích hình vuông cắt đi là bao nhiêu xăng-ti-mét vuông?',
   askLeftArea: 'Diện tích phần còn lại là bao nhiêu xăng-ti-mét vuông?',
   squareArea: 'Hình vuông có cạnh {s} cm.',
   askAreaSquare: 'Diện tích hình vuông là bao nhiêu xăng-ti-mét vuông?',
-  askAreaSquareNum: 'Số đo diện tích hình vuông là:',
+  askAreaSquareNum: 'Số đo diện tích hình vuông là bao nhiêu?',
   squareFromRect:
     'Thẻ đỏ hình chữ nhật dài {b} cm, rộng {a} cm. Thẻ vàng hình vuông có diện tích gấp đôi thẻ đỏ.',
   askRedArea: 'Diện tích thẻ đỏ là bao nhiêu xăng-ti-mét vuông?',

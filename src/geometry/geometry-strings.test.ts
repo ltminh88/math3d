@@ -26,7 +26,7 @@ describe('geometry strings', () => {
   it('renders KNTT wording, units and translated part nouns', () => {
     expect(renderGeometryPrompt({ key: 'q_cm2', params: { n: 49 } })).toBe('49 cm²');
     expect(renderGeometryPrompt({ key: 'decor', params: { per: 3, part: 'i:vertex' } })).toBe(
-      'Bác Hà gắn 3 bông hoa ở mỗi đỉnh của một khối lập phương.',
+      'Bác Hà có một khối lập phương. Bác gắn 3 bông hoa ở mỗi đỉnh.',
     );
     setLanguage('en');
     expect(renderGeometryPrompt({ key: 'pickAll_square' })).toBe('Tap every square, then Done.');
