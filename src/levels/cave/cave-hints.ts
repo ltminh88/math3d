@@ -47,7 +47,6 @@ const FIRST_STEP: Readonly<Record<string, Build>> = {
   fenceWall: (p) => `${p.b} + ${p.b}`,
   circleR: (p) => `${p.r} + ${p.r}`,
   circleRow: (p) => `${p.r} + ${p.r}`,
-  circleD: (p) => `nửa của ${p.d}`,
   stmtRem: (p) => `${p.total} : ${p.per}`,
   stmtTimes: (p) => `${p.big} : ${p.small}`,
   stmtMore: (p) => `${p.big} − ${p.small}`,
@@ -101,6 +100,9 @@ export function caveHintText(
     const wrong = step.options.find((o) => !o.correct);
     return wrong ? cs('hint3Wrong', { label: render(wrong.label) }) : cs('hint3Each');
   }
+  // Radius from the diameter (KNTT B17: the diameter is two radii, never "half of").
+  const story = chamber.item.story;
+  if (story.key === 'circleD') return cs('hint3Radius', { d: story.params?.d ?? '', ask });
   const expr = firstStepExpression(chamber);
   return expr ? cs('hint3First', { expr, ask }) : cs('hint3Ask', { ask });
 }

@@ -1,6 +1,7 @@
 // Pure run logic of the cave: the answer and hint state of the current chamber. Rules: no timer,
 // no lives; a chamber is one recorded question (a verdict and its fix included); three misses in a
-// chamber reveal the worked answer (recorded not correct) and the cave goes on.
+// chamber reveal the worked answer (recorded not correct) and the cave goes on. The hint ladder
+// restarts at each new step (hints taken still count for the chamber), as in the garden.
 import {
   createHintState,
   type HintRung,
@@ -57,7 +58,10 @@ export class CaveRoundFlow {
     if (!chamber || !step || this.roundComplete) return { verdict: 'ignored' };
     if (isStepAnswerCorrect(step, value)) {
       this.stepIndex += 1;
-      if (this.stepIndex < chamber.steps.length) return { verdict: 'correct' };
+      if (this.stepIndex < chamber.steps.length) {
+        this.hint = { ...this.hint, rung: 0 };
+        return { verdict: 'correct' };
+      }
       return { verdict: 'correct', outcome: this.finish(chamber, true) };
     }
     if (typeof value === 'number') this.wrongAnswers.push(value);

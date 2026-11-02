@@ -87,4 +87,14 @@ describe('cave round flow', () => {
     expect(flow.index).toBe(1);
     expect(flow.done).toBe(false);
   });
+
+  it('restarts the hint ladder on each new step; hints taken still count for the chamber', () => {
+    const flow = new CaveRoundFlow([chamber('tf-explain', [verdictFalse, fixStep])], clock);
+    expect([flow.takeHint(), flow.takeHint(), flow.takeHint()]).toEqual([1, 2, 3]);
+    expect(flow.answer(false)).toEqual({ verdict: 'correct' });
+    expect(flow.hint.rung).toBe(0);
+    expect(flow.hintOffered(10_000)).toBe(true);
+    expect(flow.takeHint()).toBe(1);
+    expect(flow.answer(3).outcome).toMatchObject({ correct: true, usedHint: true });
+  });
 });

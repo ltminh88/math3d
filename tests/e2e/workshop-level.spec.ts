@@ -108,6 +108,16 @@ async function useBoard(page: Page, s: State, touch: boolean): Promise<void> {
     await expect(page.locator('.workshop-walk')).toContainText('Đã đi hết một vòng!');
   }
   if (s.tiling) {
+    // Every cell sits fully inside the panel (none clipped at the sides) and is a 44 px target.
+    const outside = await page.locator('.workshop-panel').evaluate((panel) => {
+      const box = panel.getBoundingClientRect();
+      return [...panel.querySelectorAll<HTMLElement>('.ws-cell')]
+        .map((c) => c.getBoundingClientRect())
+        .filter((r) => r.left < box.left || r.right > box.right || r.width < 44 || r.height < 44)
+        .map((r) => `${Math.round(r.left)}..${Math.round(r.right)} in ${box.left}..${box.right}`);
+    });
+    expect(outside).toEqual([]);
+    await press(page.locator('.ws-cell').last(), touch);
     await press(page.locator('.ws-cell').first(), touch);
     if (touch) await press(page.locator('.workshop-place-row'), true);
     else {

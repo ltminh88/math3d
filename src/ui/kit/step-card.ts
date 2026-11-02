@@ -26,6 +26,8 @@ export interface StepCardOptions {
   onComplete: () => void;
   /** Prompt text for the item's family (geometry/measurement pass their own); reasoning by default. */
   render?: (prompt: PromptRef) => string;
+  /** The owner's lifetime (the level's disposer signal), passed on to the number pad. */
+  signal?: AbortSignal;
 }
 
 export interface StepCard {
@@ -105,6 +107,7 @@ export function createStepCard(
       const pad = createNumberPad(
         {
           activeInput: true,
+          signal: options.signal,
           onSubmit: (value) => {
             submit(value);
             pad.clear();

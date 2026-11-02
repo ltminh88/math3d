@@ -21,9 +21,13 @@ const POND_RADIUS = 2.6;
 
 const logX = (at: number, length: number) => -LOG_HALF + (2 * LOG_HALF * at) / length;
 
-/** `find`: tiers 1-2 ask for the midpoint, so M stays hidden until the child finds it. */
+/**
+ * `find`: tiers 1-2 ask for the midpoint, so M stays hidden until the child finds it. Tier 3
+ * shows where M was put and asks if it is the midpoint: no stone tap first (it would settle it).
+ */
 export function layoutSegment(scene: SegmentScene, find: boolean): FigureLayout {
   const { length } = scene;
+  const m = scene.points.find((p) => p.label === 'M');
   const ticks = Array.from({ length: length + 1 }, (_, i) => i / length);
   const chips: ValleyChip[] = scene.points.map((p) => ({
     at: [logX(p.at, length), -0.75],
@@ -31,10 +35,11 @@ export function layoutSegment(scene: SegmentScene, find: boolean): FigureLayout 
     kind: 'point',
     afterAction: p.label === 'M' && find,
   }));
+  const split: readonly [number, number] = [m ? logX(m.at, length) : 0, 0];
   return {
-    action: 'midpoint',
-    draws: [{ kind: 'log', a: [-LOG_HALF, 0], b: [LOG_HALF, 0], ticks }],
-    targets: MIDPOINT_STONES.map((k) => ({
+    action: find ? 'midpoint' : null,
+    draws: [{ kind: 'log', a: [-LOG_HALF, 0], b: [LOG_HALF, 0], ticks, split }],
+    targets: (find ? MIDPOINT_STONES : []).map((k) => ({
       id: `stone:${k}`,
       kind: 'stone',
       at: [-LOG_HALF + (2 * LOG_HALF * k) / 6, 0],

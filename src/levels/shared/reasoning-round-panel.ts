@@ -101,6 +101,7 @@ export function mountReasoningRound(o: ReasoningRoundPanelOptions): ReasoningRou
       } else if (result.outcome) finish(result.outcome, result.verdict === 'correct');
     },
     onComplete: () => {},
+    signal: o.signal,
   });
   body.append(card.element);
 
@@ -130,14 +131,15 @@ export function mountReasoningRound(o: ReasoningRoundPanelOptions): ReasoningRou
   o.announce(
     `${o.title} ${card.element.querySelector('.kit-step-card__story')?.textContent ?? ''}`,
   );
-  return {
-    element: root,
-    flow,
-    hint,
-    destroy: () => {
-      removeHook?.();
-      card.destroy();
-      root.remove();
-    },
+  let destroyed = false;
+  const destroy = () => {
+    if (destroyed) return;
+    destroyed = true;
+    removeHook?.();
+    card.destroy();
+    root.remove();
   };
+  // Leaving the level mid-round takes the panel (and its pad's key listener) with it.
+  o.signal.addEventListener('abort', destroy, { once: true });
+  return { element: root, flow, hint, destroy };
 }

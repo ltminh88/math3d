@@ -123,3 +123,10 @@ export function checkSharing(state: SharingState): SharingCheck {
   const complete = pile === 0;
   return { complete, equal: complete && marks.every((m) => m === 'ok'), target: goal, marks, pile };
 }
+
+/** One tick of the rung 2 auto-deal; with `all` (reduced motion) the whole pile at once. */
+export function autoDealStep(state: SharingState, all: boolean): SharingState {
+  let next = dealStep(state);
+  while (all && pileCount(next) > 0) next = dealStep(next);
+  return next;
+}

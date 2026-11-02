@@ -1,5 +1,5 @@
 // Valley hint ladder (pure): 1 encourage, 2 the KNTT definition behind the item, 3 a visual aid on
-// the board (equal halves of the log, a dashed diameter through O, a spare ê-ke, corner dots,
+// the board (the log coloured A..M and M..B, a dashed diameter through O, a spare ê-ke, corner dots,
 // coloured faces). No rung names the answer; the third miss reveals it (valley-round-flow.ts).
 import type { GeoItem } from '../../geometry/geo-scene-types';
 import { VALLEY_KIND, type ValleyKind } from './valley-round-plan';

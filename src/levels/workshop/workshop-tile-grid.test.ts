@@ -57,6 +57,9 @@ describe('workshop tile grid model', () => {
     expect(TILE_LIMIT).toBe(20);
     expect(tileTargets(rect(5, 4), 1)).not.toBeNull();
     expect(tileTargets(rect(7, 3), 1)).toBeNull();
+    // At most 6 columns of 44 px cells: a 10 x 2 floor would not fit a phone panel.
+    expect(tileTargets(rect(10, 2), 1)).toBeNull();
+    expect(tileTargets(rect(6, 3), 1)).not.toBeNull();
     expect(tileTargets(rect(4, 3), 2)).toBeNull();
     expect(tileTargets(rect(4, 3, { cut: 1 } as Partial<GeoScene>), 1)).toBeNull();
     const cells = {

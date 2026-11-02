@@ -81,7 +81,7 @@ describe('workshop round plan', () => {
     }
   });
 
-  it('a tier-1 area round is small enough to tile (at most 20 cells)', () => {
+  it('a tier-1 area round is small enough to tile (at most 20 cells, 6 columns)', () => {
     for (let seed = 1; seed <= 200; seed++) {
       const rng = mulberry32(seed);
       const rounds = planWorkshopRounds(planWorkshopSkills({}, rng, 6), {}, rng);
@@ -91,6 +91,8 @@ describe('workshop round plan', () => {
       expect(rounds[1]?.tiling).toBe(false);
       const rect = rectOf(area?.item) as [number, number];
       expect(rect[0] * rect[1]).toBeLessThanOrEqual(20);
+      // 6 cells of 44 px fit a phone panel (~340 px); a wider floor clips its first columns.
+      expect(rect[0], `seed ${seed}`).toBeLessThanOrEqual(6);
     }
   });
 

@@ -1,10 +1,13 @@
 // Tiling model for diện tích rounds (pure): the child covers a shape with 1 cm² tiles by tapping
 // cells or "Đặt một hàng" (the next row that is not full); counting the tiles stays their job.
-// Only small shapes are tiled (<= TILE_LIMIT cells a shape); bigger ones use the formula.
+// Only small shapes are tiled (<= TILE_LIMIT cells, <= TILE_MAX_COLS columns); bigger ones use
+// the formula.
 import type { GeoScene, Point } from '../../geometry/geo-scene-types';
 import type { SkillTier } from '../../learning/skill-tiers';
 
 export const TILE_LIMIT = 20;
+/** Columns of 44 px cells (3 px gaps) that fit the panel on a phone (~340 px): 6 x 47 = 282 px. */
+export const TILE_MAX_COLS = 6;
 
 const key = (x: number, y: number) => `${x},${y}`;
 
@@ -55,7 +58,7 @@ export function tileTargets(scene: GeoScene, tier: SkillTier): Point[][] | null 
     return groups.every((g) => g.length <= TILE_LIMIT) ? groups : null;
   }
   if (scene.kind !== 'rect' || tier !== 1 || scene.cut || scene.unit !== 'cm') return null;
-  if (scene.width * scene.height > TILE_LIMIT) return null;
+  if (scene.width * scene.height > TILE_LIMIT || scene.width > TILE_MAX_COLS) return null;
   const cells: Point[] = [];
   for (let y = 0; y < scene.height; y++) for (let x = 0; x < scene.width; x++) cells.push([x, y]);
   return [cells];

@@ -53,6 +53,7 @@ export class WorkshopRoundController {
     this.card = createStepCard(round.item, {
       render: renderMeasurementPrompt,
       onAnswer: (event) => this.onAnswer(round, event),
+      signal: this.ctx.disposer.signal,
       onComplete: () => this.finishRound(),
     });
     this.panel.boardHost.replaceChildren(this.board.element);
@@ -75,11 +76,16 @@ export class WorkshopRoundController {
       return;
     }
     if (result === 'reveal') {
-      this.card?.reveal();
-      if (!this.flow.roundComplete) {
-        this.panel.clearHint();
-        this.panel.setFeedback(this.ws('revealed'), 'gentle');
-      }
+      // After the card has handled this try (its "try again" and pad reset), as in the garden.
+      const card = this.card;
+      queueMicrotask(() => {
+        if (!card || card !== this.card) return;
+        card.reveal();
+        if (!this.flow.roundComplete) {
+          this.panel.clearHint();
+          this.panel.setFeedback(this.ws('revealed'), 'gentle');
+        }
+      });
       return;
     }
     const chosen =

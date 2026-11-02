@@ -55,10 +55,10 @@ export class ValleyRoundController {
     this.ctx.announce(`${prompt} ${story}`);
   }
 
-  /** A wrong tap or answer: gentle words, a hint offered. */
+  /** A wrong tap or answer: gentle words, a hint offered while one is left. */
   private miss(text: string): void {
     this.panel.setFeedback(text, 'gentle');
-    this.panel.offerHint(true);
+    this.panel.offerHint(this.flow.hint.rung < VALLEY_HINT_RUNGS);
     this.ctx.audio.hint();
     this.ctx.announce(text);
   }
@@ -117,6 +117,7 @@ export class ValleyRoundController {
     this.card = createStepCard(round.item, {
       render: renderGeometryPrompt,
       onAnswer: (event) => this.onAnswer(event),
+      signal: this.ctx.disposer.signal,
       onComplete: () => this.finishRound(),
     });
     this.panel.cardHost.replaceChildren(this.card.element);

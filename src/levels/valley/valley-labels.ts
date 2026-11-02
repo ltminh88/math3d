@@ -2,7 +2,7 @@
 // no draw calls) and the tap targets, real <button>s of at least 48 px over each point, corner,
 // shape or block. Buttons give touch, mouse and keyboard (arrows + Enter) the same path, so no
 // step needs a drag or a precise tap on a small 3D point (WCAG 2.5.7, 2.5.8).
-import { type Camera, Vector3 } from 'three';
+import { type Camera, Matrix4, Vector3 } from 'three';
 import type { ValleyChip, ValleyTarget } from './valley-layout-types';
 
 const projected = new Vector3();
@@ -35,6 +35,10 @@ export class ValleyLabels {
   private targets: { target: ValleyTarget; el: HTMLButtonElement }[] = [];
   private width = 1;
   private height = 1;
+  /** The view the DOM was last placed for: a still camera writes nothing. */
+  private readonly lastWorld = new Matrix4();
+  private readonly lastProjection = new Matrix4();
+  private stale = true;
 
   constructor(
     parent: HTMLElement,
@@ -52,6 +56,7 @@ export class ValleyLabels {
   setSize(width: number, height: number): void {
     this.width = Math.max(1, width);
     this.height = Math.max(1, height);
+    this.stale = true;
   }
 
   setRound(chips: readonly ValleyChip[], targets: readonly ValleyTarget[]): void {
@@ -70,6 +75,7 @@ export class ValleyLabels {
       el.addEventListener('click', () => this.onTap(target.id));
       return { target, el };
     });
+    this.stale = true;
     this.chipLayer.replaceChildren(...this.chips.map((c) => c.el));
     this.targetLayer.replaceChildren(...this.targets.map((t) => t.el));
     this.placed = [
@@ -106,6 +112,13 @@ export class ValleyLabels {
   /** Positions chips and targets for `camera` (after the camera or the canvas changed). */
   place(camera: Camera): void {
     camera.updateMatrixWorld();
+    const still =
+      this.lastWorld.equals(camera.matrixWorld) &&
+      this.lastProjection.equals(camera.projectionMatrix);
+    if (still && !this.stale) return;
+    this.lastWorld.copy(camera.matrixWorld);
+    this.lastProjection.copy(camera.projectionMatrix);
+    this.stale = false;
     for (const p of this.placed) {
       projected.set(p.x, p.y, p.z).project(camera);
       const x = ((projected.x + 1) / 2) * this.width;
