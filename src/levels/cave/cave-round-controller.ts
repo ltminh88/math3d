@@ -77,22 +77,28 @@ export class CaveRoundController {
       this.ctx.announce(this.cs('wrong'));
       return;
     }
-    if (result.verdict === 'revealed') {
-      // After the card has handled this try: show every remaining step's answer.
+    const revealed = result.verdict === 'revealed';
+    if (revealed) {
+      // Third miss on this step: after the card has handled this try, show this step's answer.
       const card = this.card;
+      const stepIndex = event.stepIndex;
       queueMicrotask(() => {
-        while (card && card.currentStep() < chamber.steps.length) card.reveal();
+        if (card && card === this.card && card.currentStep() === stepIndex) card.reveal();
       });
     }
     if (!result.outcome) {
       // A new step: its own hints from rung 1 (the last step's hint no longer applies).
+      const text = this.cs(revealed ? 'revealed' : 'correctStep');
       this.panel.clearHint();
       this.panel.hint.disabled = false;
-      this.panel.setFeedback(this.cs('correctStep'), 'success');
-      this.ctx.audio.tone(698, 0.12);
+      this.panel.setFeedback(text, revealed ? 'gentle' : 'success');
+      if (revealed) {
+        this.ctx.audio.hint();
+        this.ctx.announce(text);
+      } else this.ctx.audio.tone(698, 0.12);
       return;
     }
-    this.finishChamber(result.verdict === 'correct', result.outcome);
+    this.finishChamber(result.outcome.correct, result.outcome);
   }
 
   private finishChamber(correct: boolean, outcome: QuestionOutcome): void {

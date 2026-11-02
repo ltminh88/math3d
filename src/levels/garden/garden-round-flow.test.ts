@@ -158,7 +158,7 @@ describe('garden round flow', () => {
     expect(outcomes.every((o) => o?.correct && o.firstTry && !o.usedHint)).toBe(true);
   });
 
-  it('three misses reveal the round (recorded as not correct); hints restart per step', () => {
+  it('three misses on a step show it, the round goes on (not correct); hints restart per step', () => {
     const bag = {
       kind: 'bag' as const,
       skillId: 'expr-order',
@@ -172,11 +172,11 @@ describe('garden round flow', () => {
     expect(flow.submit(rightAnswer(steps[0] as ReasoningStep)).verdict).toBe('correct');
     expect(flow.hint.rung).toBe(0);
     expect(flow.submit(-1).verdict).toBe('wrong');
-    expect(flow.hintOffered(0)).toBe(false);
-    expect(flow.submit(-2).verdict).toBe('wrong');
     expect(flow.hintOffered(0)).toBe(true);
-    const last = flow.submit(-3);
-    expect(last.verdict).toBe('revealed');
+    expect(flow.submit(-2).verdict).toBe('wrong');
+    expect(flow.submit(-3)).toEqual({ verdict: 'revealed' });
+    const last = flow.submit(rightAnswer(steps[2] as ReasoningStep));
+    expect(last.verdict).toBe('correct');
     expect(last.outcome).toMatchObject({
       correct: false,
       usedHint: true,
@@ -186,5 +186,59 @@ describe('garden round flow', () => {
     flow.next();
     expect(flow.index).toBe(1);
     expect(flow.hint.rung).toBe(0);
+  });
+
+  it('misses count per step: 2 + 2 do not reveal, 3 on one step show that step and go on', () => {
+    const bag = {
+      kind: 'bag' as const,
+      skillId: 'expr-order',
+      factKey: 'sk:expr-order',
+      item: buildGardenItem('expr-order', mulberry32(3), 1),
+    };
+    const flow = new GardenRoundFlow([bag], () => 0);
+    const steps = playableSteps(bag.item) as ReasoningStep[];
+    const wrongOf = (step: ReasoningStep) =>
+      step.kind === 'choice'
+        ? (step.options.find((o) => !o.correct)?.id as string)
+        : (rightAnswer(step) as number) + 1;
+    expect(flow.submit(wrongOf(steps[0] as ReasoningStep)).verdict).toBe('wrong');
+    expect(flow.submit(wrongOf(steps[0] as ReasoningStep)).verdict).toBe('wrong');
+    expect(flow.submit(rightAnswer(steps[0] as ReasoningStep)).verdict).toBe('correct');
+    expect(flow.submit(-1).verdict).toBe('wrong');
+    expect(flow.submit(-2).verdict).toBe('wrong');
+    expect(flow.submit(rightAnswer(steps[1] as ReasoningStep)).verdict).toBe('correct');
+    expect(flow.submit(-3).verdict).toBe('wrong');
+    expect(flow.submit(-4).verdict).toBe('wrong');
+    expect(flow.submit(-5)).toEqual({
+      verdict: 'revealed',
+      outcome: expect.objectContaining({
+        correct: false,
+        firstTry: false,
+        usedHint: true,
+        wrongAnswers: [-1, -2, -3, -4, -5],
+      }),
+    });
+    expect(flow.roundComplete).toBe(true);
+  });
+
+  it('a step shown after three misses moves on; the round ends not correct', () => {
+    const bag = {
+      kind: 'bag' as const,
+      skillId: 'expr-order',
+      factKey: 'sk:expr-order',
+      item: buildGardenItem('expr-order', mulberry32(3), 1),
+    };
+    const flow = new GardenRoundFlow([bag], () => 0);
+    const steps = playableSteps(bag.item) as ReasoningStep[];
+    expect(flow.submit(rightAnswer(steps[0] as ReasoningStep)).verdict).toBe('correct');
+    flow.submit(-1);
+    flow.submit(-2);
+    expect(flow.submit(-3)).toEqual({ verdict: 'revealed' });
+    expect(flow.stepIndex).toBe(2);
+    expect(flow.roundComplete).toBe(false);
+    expect(flow.hint.wrongAttempts).toBe(0);
+    const last = flow.submit(rightAnswer(steps[2] as ReasoningStep));
+    expect(last.verdict).toBe('correct');
+    expect(last.outcome).toMatchObject({ correct: false, firstTry: false, usedHint: true });
   });
 });

@@ -58,15 +58,16 @@ describe('cave round flow', () => {
     expect(flow.roundComplete).toBe(true);
   });
 
-  it('reveals after three misses across steps (recorded not correct)', () => {
+  it('three misses on the last step reveal it and end the chamber (recorded not correct)', () => {
     const flow = new CaveRoundFlow([chamber('tf-explain', [verdictFalse, fixStep])], clock);
     expect(flow.answer(true).verdict).toBe('wrong');
     expect(flow.answer(false).verdict).toBe('correct');
     expect(flow.answer(1).verdict).toBe('wrong');
-    const revealed = flow.answer(2);
+    expect(flow.answer(2).verdict).toBe('wrong');
+    const revealed = flow.answer(4);
     expect(revealed.verdict).toBe('revealed');
     expect(revealed.outcome).toMatchObject({ correct: false, usedHint: true });
-    expect(revealed.outcome?.wrongAnswers).toEqual([1, 2]);
+    expect(revealed.outcome?.wrongAnswers).toEqual([1, 2, 4]);
     expect(flow.answer(3).verdict).toBe('ignored');
   });
 
@@ -96,5 +97,30 @@ describe('cave round flow', () => {
     expect(flow.hintOffered(10_000)).toBe(true);
     expect(flow.takeHint()).toBe(1);
     expect(flow.answer(3).outcome).toMatchObject({ correct: true, usedHint: true });
+  });
+
+  it('misses count per step: 2 + 2 do not reveal, 3 on one step do', () => {
+    const flow = new CaveRoundFlow([chamber('tf-explain', [verdictFalse, fixStep])], clock);
+    expect(flow.answer(true).verdict).toBe('wrong');
+    expect(flow.answer(true).verdict).toBe('wrong');
+    expect(flow.answer(false)).toEqual({ verdict: 'correct' });
+    expect(flow.answer(1).verdict).toBe('wrong');
+    expect(flow.answer(2).verdict).toBe('wrong');
+    const solved = flow.answer(3);
+    expect(solved.verdict).toBe('correct');
+    expect(solved.outcome).toMatchObject({ correct: true, firstTry: false, usedHint: false });
+  });
+
+  it('three misses on the first step show it and go on; the chamber ends not correct', () => {
+    const flow = new CaveRoundFlow([chamber('tf-explain', [verdictFalse, fixStep])], clock);
+    flow.answer(true);
+    flow.answer(true);
+    expect(flow.answer(true)).toEqual({ verdict: 'revealed' });
+    expect(flow.stepIndex).toBe(1);
+    expect(flow.roundComplete).toBe(false);
+    expect(flow.hint.wrongAttempts).toBe(0);
+    const last = flow.answer(3);
+    expect(last.verdict).toBe('correct');
+    expect(last.outcome).toMatchObject({ correct: false, firstTry: false, usedHint: true });
   });
 });

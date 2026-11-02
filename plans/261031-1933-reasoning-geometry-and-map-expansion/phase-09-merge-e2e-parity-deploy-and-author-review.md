@@ -91,7 +91,7 @@ Findings from `reports/reviewer-chapter2.md`, fixed on branch `fix/ch2-review` (
 | L8 workshop sync reveal | Fixed: reveal runs in a microtask after the card's own handling (skipped if the card changed). No test (announcement order only). |
 | L9 valley dead hint pulse | Fixed: a miss offers the hint only while rung < 3. No test (cosmetic). |
 | L10 valley per-frame cost | Fixed: labels write transforms only when the camera matrices, size or round change; the camera reuses one direction vector. No test (perf, not behavior). |
-| L12 miss budget per step vs per round | Left as is: author question. |
+| L12 miss budget per step vs per round | Fixed per author (option b): every step (and the valley board action) has its own three tries in garden, valley, cave, workshop and the reasoning round; shared `StepMissBudget` in `src/levels/shared/step-miss-budget.ts`. |
 | L13 workshop single-weight rung 3 | Left: the weight is visible on the scale. |
 | L14 forest controller at 200 lines | Fixed: auto-deal tick moved to `sharing-model.ts` (`autoDealStep`); controller 199 lines. |
 

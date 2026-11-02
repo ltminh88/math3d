@@ -1,15 +1,8 @@
 // Pure run logic of the garden: the current round and step, answers checked against the item,
 // the hint ladder (it restarts at each new step; hints taken still count for the round) and one
-// recorded outcome per round. Rules: no timer, no lives; three misses reveal the round.
-import {
-  createHintState,
-  type HintRung,
-  type HintState,
-  recordWrong,
-  shouldOfferHint,
-  takeHint,
-  toQuestionResult,
-} from '../../learning/hint-ladder';
+// recorded outcome per round. Rules: no timer, no lives; three misses on a step show that step's
+// answer and the round goes on (recorded as not correct).
+import { type HintRung, type HintState, shouldOfferHint } from '../../learning/hint-ladder';
 import type { QuestionOutcome } from '../../learning/session-recorder';
 import {
   isStepAnswerCorrect,
@@ -17,6 +10,7 @@ import {
   type StepAnswer,
 } from '../../reasoning/reasoning-step-answers';
 import type { ReasoningStep } from '../../reasoning/reasoning-types';
+import { StepMissBudget } from '../shared/step-miss-budget';
 import type { GardenRound } from './garden-round-plan';
 
 export interface GardenSubmitResult {
@@ -36,8 +30,8 @@ function wrongValue(step: ReasoningStep, answer: StepAnswer): number | undefined
 export class GardenRoundFlow {
   index = 0;
   stepIndex = 0;
-  hint: HintState = createHintState();
   roundComplete = false;
+  private readonly budget = new StepMissBudget();
   private wrongAnswers: number[] = [];
   private startedAt: number;
 
@@ -46,6 +40,11 @@ export class GardenRoundFlow {
     private readonly now: () => number,
   ) {
     this.startedAt = now();
+  }
+
+  /** The live step's hint ladder (its misses and rungs). */
+  get hint(): HintState {
+    return this.budget.hint;
   }
 
   get round(): GardenRound | undefined {
@@ -69,19 +68,21 @@ export class GardenRoundFlow {
     const round = this.round;
     const step = this.step;
     if (!round || !step) return { verdict: 'ignored' };
-    if (isStepAnswerCorrect(step, answer)) {
-      this.stepIndex += 1;
-      if (this.stepIndex < this.steps.length) {
-        this.hint = { ...this.hint, rung: 0 };
-        return { verdict: 'correct' };
-      }
-      return { verdict: 'correct', outcome: this.finish(round, true) };
-    }
+    if (isStepAnswerCorrect(step, answer)) return this.advance(round, 'correct');
     const value = wrongValue(step, answer);
     if (value !== undefined) this.wrongAnswers.push(value);
-    this.hint = recordWrong(this.hint);
-    if (!this.hint.revealed) return { verdict: 'wrong' };
-    return { verdict: 'revealed', outcome: this.finish(round, false) };
+    if (!this.budget.miss()) return { verdict: 'wrong' };
+    return this.advance(round, 'revealed');
+  }
+
+  /** The live step is answered or shown: the next step, or the round's outcome after the last. */
+  private advance(round: GardenRound, verdict: 'correct' | 'revealed'): GardenSubmitResult {
+    this.stepIndex += 1;
+    if (this.stepIndex < this.steps.length) {
+      this.budget.nextStep();
+      return { verdict };
+    }
+    return { verdict, outcome: this.finish(round) };
   }
 
   hintOffered(idleMs: number): boolean {
@@ -89,8 +90,7 @@ export class GardenRoundFlow {
   }
 
   takeHint(): HintRung {
-    this.hint = takeHint(this.hint);
-    return this.hint.rung;
+    return this.budget.takeHint(4);
   }
 
   /** Moves on after a finished round. */
@@ -98,15 +98,15 @@ export class GardenRoundFlow {
     if (!this.roundComplete) return;
     this.index += 1;
     this.stepIndex = 0;
-    this.hint = createHintState();
+    this.budget.reset();
     this.roundComplete = false;
     this.wrongAnswers = [];
     this.startedAt = this.now();
   }
 
-  private finish(round: GardenRound, solved: boolean): QuestionOutcome {
+  private finish(round: GardenRound): QuestionOutcome {
     this.roundComplete = true;
-    const result = toQuestionResult(this.hint, solved);
+    const result = this.budget.result();
     return {
       factKey: round.factKey,
       ms: this.now() - this.startedAt,
