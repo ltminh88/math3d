@@ -1,5 +1,5 @@
 // Runs the garden: per round a kit step card for the item (number pad, seed packets, "which part
-// first?" choices), the flow's verdicts (three misses reveal the round), hints, rewards and the
+// first?" choices), the flow's verdicts (three misses on a step show its answer), hints, rewards and the
 // round's 3D reply (a flower grows, the balance levels, a sprout pushes out of its bag). Rules
 // live in garden-round-flow.ts, garden-round-plan.ts and garden-hints.ts.
 import { createStepCard, type StepAnswerEvent, type StepCard } from '../../ui/kit/step-card';
@@ -100,26 +100,28 @@ export class GardenRoundController {
       this.ctx.announce(this.gs('wrong'));
       return;
     }
-    if (result.verdict === 'revealed') {
-      // The card shows the remaining answers once its own handling of this try is over.
+    const revealed = result.verdict === 'revealed';
+    if (revealed) {
+      // Third miss on this step: the card shows its answer once its own handling of this try is over.
+      const card = this.card;
       queueMicrotask(() => {
-        const card = this.card;
-        while (card && card.currentStep() < this.flow.steps.length) card.reveal();
+        if (card && card === this.card && card.currentStep() === stepIndex) card.reveal();
       });
     }
-    const last = result.verdict === 'revealed' ? this.flow.steps.length - 1 : stepIndex;
-    for (let i = stepIndex; i <= last; i++) this.stepDone(round.kind, i);
+    this.stepDone(round.kind, stepIndex);
     if (!result.outcome) {
+      const text = this.gs(revealed ? 'revealed' : 'correctStep');
       this.panel.clearHint();
       this.panel.hint.disabled = false;
-      this.panel.setFeedback(this.gs('correctStep'), 'success');
-      this.ctx.audio.tone(698, 0.12);
-      this.ctx.announce(this.gs('correctStep'));
+      this.panel.setFeedback(text, revealed ? 'gentle' : 'success');
+      if (revealed) this.ctx.audio.hint();
+      else this.ctx.audio.tone(698, 0.12);
+      this.ctx.announce(text);
       return;
     }
     this.ctx.learning.record(result.outcome);
     const reward = this.tally.add(result.outcome);
-    const correct = result.verdict === 'correct';
+    const correct = result.outcome.correct;
     const text = this.gs(correct ? 'correct' : 'revealed');
     this.panel.setFeedback(text, correct ? 'success' : 'gentle');
     if (reward.xp > 0) {

@@ -4,7 +4,6 @@
 // to the celebration. Rules live in valley-round-flow.ts; the board look in valley-board-views.ts.
 import { renderGeometryPrompt } from '../../geometry/geometry-strings';
 import { shouldOfferHint } from '../../learning/hint-ladder';
-import { playableSteps } from '../../reasoning/reasoning-step-answers';
 import { createStepCard, type StepAnswerEvent, type StepCard } from '../../ui/kit/step-card';
 import { createLevelRunTally } from '../shared/level-run-tally';
 import type { LevelContext } from '../shared/level-types';
@@ -102,11 +101,12 @@ export class ValleyRoundController {
     if (round.layout.action === 'set-square') this.board.layEke(target);
     if (round.layout.action === 'lift') this.board.toggleLift(0);
     const text = foundText(this.vs, round, target);
-    this.panel.setFeedback(text, 'success');
-    this.ctx.audio.tone(698, 0.12);
+    // Shown after three misses: the steps still follow, each with three fresh tries.
+    this.panel.setFeedback(text, revealed ? 'gentle' : 'success');
+    if (revealed) this.ctx.audio.hint();
+    else this.ctx.audio.tone(698, 0.12);
     this.ctx.announce(text);
     this.mountCard();
-    if (revealed) queueMicrotask(() => this.revealAll());
   }
 
   private mountCard(): void {
@@ -128,18 +128,19 @@ export class ValleyRoundController {
     const verdict = this.flow.answer(event.correct, event.answer);
     if (verdict === 'wrong') this.miss(this.vs('wrong'));
     else if (verdict === 'revealed') {
-      // After the card's own handling of this try (it does not advance on a wrong answer).
-      queueMicrotask(() => this.revealAll());
+      // Third miss on this step: after the card's own handling of this try, show its answer.
+      const card = this.card;
+      queueMicrotask(() => {
+        if (card && card === this.card && card.currentStep() === event.stepIndex) card.reveal();
+        if (this.flow.phase !== 'complete') {
+          this.panel.setFeedback(this.vs('revealed'), 'gentle');
+          this.ctx.audio.hint();
+        }
+      });
     } else if (verdict === 'correct') {
       this.panel.setFeedback(this.vs('stepRight'), 'success');
       this.ctx.audio.tone(698, 0.12);
     }
-  }
-
-  /** Third miss: every remaining step shows its answer, the round ends as not correct. */
-  private revealAll(): void {
-    const steps = this.flow.round ? playableSteps(this.flow.round.item).length : 0;
-    for (let i = 0; i < steps && this.flow.phase !== 'complete'; i++) this.card?.reveal();
   }
 
   private finishRound(): void {
