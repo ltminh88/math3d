@@ -158,7 +158,7 @@ describe('garden round flow', () => {
     expect(outcomes.every((o) => o?.correct && o.firstTry && !o.usedHint)).toBe(true);
   });
 
-  it('three misses reveal the round (recorded as not correct); hints restart per step', () => {
+  it('three misses on a step show it, the round goes on (not correct); hints restart per step', () => {
     const bag = {
       kind: 'bag' as const,
       skillId: 'expr-order',
@@ -172,11 +172,11 @@ describe('garden round flow', () => {
     expect(flow.submit(rightAnswer(steps[0] as ReasoningStep)).verdict).toBe('correct');
     expect(flow.hint.rung).toBe(0);
     expect(flow.submit(-1).verdict).toBe('wrong');
-    expect(flow.hintOffered(0)).toBe(false);
-    expect(flow.submit(-2).verdict).toBe('wrong');
     expect(flow.hintOffered(0)).toBe(true);
-    const last = flow.submit(-3);
-    expect(last.verdict).toBe('revealed');
+    expect(flow.submit(-2).verdict).toBe('wrong');
+    expect(flow.submit(-3)).toEqual({ verdict: 'revealed' });
+    const last = flow.submit(rightAnswer(steps[2] as ReasoningStep));
+    expect(last.verdict).toBe('correct');
     expect(last.outcome).toMatchObject({
       correct: false,
       usedHint: true,

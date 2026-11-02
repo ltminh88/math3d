@@ -58,15 +58,16 @@ describe('cave round flow', () => {
     expect(flow.roundComplete).toBe(true);
   });
 
-  it('reveals after three misses across steps (recorded not correct)', () => {
+  it('three misses on the last step reveal it and end the chamber (recorded not correct)', () => {
     const flow = new CaveRoundFlow([chamber('tf-explain', [verdictFalse, fixStep])], clock);
     expect(flow.answer(true).verdict).toBe('wrong');
     expect(flow.answer(false).verdict).toBe('correct');
     expect(flow.answer(1).verdict).toBe('wrong');
-    const revealed = flow.answer(2);
+    expect(flow.answer(2).verdict).toBe('wrong');
+    const revealed = flow.answer(4);
     expect(revealed.verdict).toBe('revealed');
     expect(revealed.outcome).toMatchObject({ correct: false, usedHint: true });
-    expect(revealed.outcome?.wrongAnswers).toEqual([1, 2]);
+    expect(revealed.outcome?.wrongAnswers).toEqual([1, 2, 4]);
     expect(flow.answer(3).verdict).toBe('ignored');
   });
 

@@ -67,14 +67,15 @@ describe('valley round flow', () => {
     expect(flow.phase).toBe('complete');
   });
 
-  it('three misses reveal the round and record it as not correct', () => {
+  it('three misses on a step reveal it and record the round as not correct', () => {
     const flow = flowFor('geo-radius-diameter', 1);
     expect(flow.tap('pt:A')).toBe('wrong');
     expect(flow.tap('centre')).toBe('right');
     expect(flow.answer(false, 7)).toBe('wrong');
-    expect(flow.answer(false, 9)).toBe('revealed');
+    expect(flow.answer(false, 9)).toBe('wrong');
+    expect(flow.answer(false, 8)).toBe('revealed');
     const outcome = flow.completeSteps();
-    expect(outcome).toMatchObject({ correct: false, usedHint: true, wrongAnswers: [7, 9] });
+    expect(outcome).toMatchObject({ correct: false, usedHint: true, wrongAnswers: [7, 9, 8] });
   });
 
   it('any corner places the ê-ke; classify rounds have no action', () => {

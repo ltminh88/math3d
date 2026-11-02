@@ -1,19 +1,12 @@
 // Pure run logic of the cave: the answer and hint state of the current chamber. Rules: no timer,
-// no lives; a chamber is one recorded question (a verdict and its fix included); three misses in a
-// chamber reveal the worked answer (recorded not correct) and the cave goes on. The hint ladder
+// no lives; a chamber is one recorded question (a verdict and its fix included); three misses on
+// a step show that step's answer and the chamber goes on (recorded not correct). The hint ladder
 // restarts at each new step (hints taken still count for the chamber), as in the garden.
-import {
-  createHintState,
-  type HintRung,
-  type HintState,
-  recordWrong,
-  shouldOfferHint,
-  takeHint,
-  toQuestionResult,
-} from '../../learning/hint-ladder';
+import { type HintRung, type HintState, shouldOfferHint } from '../../learning/hint-ladder';
 import type { QuestionOutcome } from '../../learning/session-recorder';
 import { isStepAnswerCorrect, type StepAnswer } from '../../reasoning/reasoning-step-answers';
 import type { ReasoningStep } from '../../reasoning/reasoning-types';
+import { StepMissBudget } from '../shared/step-miss-budget';
 import type { CaveChamber } from './cave-chamber-formats';
 
 /** Rungs taught in the cave: encourage, line diagram / restate, first step worked with "?". */
@@ -28,8 +21,8 @@ export interface CaveAnswerResult {
 export class CaveRoundFlow {
   index = 0;
   stepIndex = 0;
-  hint: HintState = createHintState();
   roundComplete = false;
+  private readonly budget = new StepMissBudget();
   private wrongAnswers: number[] = [];
   private startedAt: number;
 
@@ -38,6 +31,11 @@ export class CaveRoundFlow {
     private readonly now: () => number,
   ) {
     this.startedAt = now();
+  }
+
+  /** The live step's hint ladder (its misses and rungs). */
+  get hint(): HintState {
+    return this.budget.hint;
   }
 
   get chamber(): CaveChamber | undefined {
@@ -56,19 +54,20 @@ export class CaveRoundFlow {
     const chamber = this.chamber;
     const step = this.step;
     if (!chamber || !step || this.roundComplete) return { verdict: 'ignored' };
-    if (isStepAnswerCorrect(step, value)) {
-      this.stepIndex += 1;
-      if (this.stepIndex < chamber.steps.length) {
-        this.hint = { ...this.hint, rung: 0 };
-        return { verdict: 'correct' };
-      }
-      return { verdict: 'correct', outcome: this.finish(chamber, true) };
-    }
+    if (isStepAnswerCorrect(step, value)) return this.advance(chamber, 'correct');
     if (typeof value === 'number') this.wrongAnswers.push(value);
-    this.hint = recordWrong(this.hint);
-    if (!this.hint.revealed) return { verdict: 'wrong' };
-    this.stepIndex = chamber.steps.length;
-    return { verdict: 'revealed', outcome: this.finish(chamber, false) };
+    if (!this.budget.miss()) return { verdict: 'wrong' };
+    return this.advance(chamber, 'revealed');
+  }
+
+  /** The live step is answered or shown: the next step, or the chamber's outcome after the last. */
+  private advance(chamber: CaveChamber, verdict: 'correct' | 'revealed'): CaveAnswerResult {
+    this.stepIndex += 1;
+    if (this.stepIndex < chamber.steps.length) {
+      this.budget.nextStep();
+      return { verdict };
+    }
+    return { verdict, outcome: this.finish(chamber) };
   }
 
   hintOffered(idleMs: number): boolean {
@@ -78,8 +77,7 @@ export class CaveRoundFlow {
   }
 
   takeHint(): HintRung {
-    if (this.hint.rung < CAVE_LAST_RUNG) this.hint = takeHint(this.hint);
-    return this.hint.rung;
+    return this.budget.takeHint(CAVE_LAST_RUNG);
   }
 
   /** Into the next chamber after a finished one. */
@@ -87,15 +85,15 @@ export class CaveRoundFlow {
     if (!this.roundComplete) return;
     this.index += 1;
     this.stepIndex = 0;
-    this.hint = createHintState();
+    this.budget.reset();
     this.roundComplete = false;
     this.wrongAnswers = [];
     this.startedAt = this.now();
   }
 
-  private finish(chamber: CaveChamber, solved: boolean): QuestionOutcome {
+  private finish(chamber: CaveChamber): QuestionOutcome {
     this.roundComplete = true;
-    const result = toQuestionResult(this.hint, solved);
+    const result = this.budget.result();
     return {
       factKey: `sk:${chamber.skillId}`,
       ms: this.now() - this.startedAt,
