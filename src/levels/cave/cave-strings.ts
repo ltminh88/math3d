@@ -29,7 +29,7 @@ const define = (defineFn: typeof defineStrings) =>
       correct: 'Đúng rồi! Viên pha lê sáng lên rồi!',
       correctStep: 'Đúng rồi! Làm tiếp bước sau nhé.',
       wrong: 'Chưa đúng, mình thử lại nhé!',
-      revealed: 'Mình cùng xem lời giải nhé. Viên pha lê vẫn sáng!',
+      revealed: 'Mình cùng xem lời giải nhé. Cố lên, mình đi tiếp nào!',
       lit: 'Phòng {n} sáng rồi!',
       hint1: 'Đọc lại câu đố thật chậm nhé. Bạn làm được mà!',
       hint2Word:
@@ -80,7 +80,7 @@ const define = (defineFn: typeof defineStrings) =>
       correct: 'Right! The crystal lights up!',
       correctStep: 'Right! Now the next step.',
       wrong: 'Not yet, let us try again!',
-      revealed: 'Let us look at the answer together. The crystal still lights up!',
+      revealed: 'Let us look at the answer together. Keep going!',
       lit: 'Chamber {n} is lit!',
       hint1: 'Read the riddle again slowly. You can do it!',
       hint2Word:
