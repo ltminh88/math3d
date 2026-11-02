@@ -73,4 +73,43 @@ describe('ReasoningRoundFlow', () => {
     expect(last?.outcome?.usedHint).toBe(true);
     expect(last?.outcome?.correct).toBe(true);
   });
+
+  it('misses count per step: 2 + 2 do not reveal, 3 on one step show it and go on', () => {
+    const p = plan('pattern-add');
+    const steps = playableSteps(p.item).length;
+    expect(steps).toBeGreaterThanOrEqual(2);
+    const flow = new ReasoningRoundFlow(p, () => 0);
+    const miss = (stepIndex: number, answer: number) =>
+      flow.answer({ stepIndex, correct: false, answer }).verdict;
+    expect([miss(0, 1), miss(0, 2)]).toEqual(['wrong', 'wrong']);
+    expect(flow.answer({ stepIndex: 0, correct: true, answer: 0 }).verdict).toBe('step');
+    expect([miss(1, 3), miss(1, 4)]).toEqual(['wrong', 'wrong']);
+    const third = flow.answer({ stepIndex: 1, correct: false, answer: 5 });
+    expect(third.verdict).toBe('revealed');
+    if (steps > 2) {
+      expect(third.outcome).toBeUndefined();
+      expect(flow.done).toBe(false);
+      for (let i = 2; i < steps; i++) flow.answer({ stepIndex: i, correct: true, answer: 0 });
+    }
+    expect(flow.done).toBe(true);
+  });
+
+  it('a step shown mid-round moves on; the round is recorded once, not correct', () => {
+    const p = plan('pattern-add');
+    const steps = playableSteps(p.item).length;
+    const flow = new ReasoningRoundFlow(p, () => 0);
+    for (const a of [1, 2]) flow.answer({ stepIndex: 0, correct: false, answer: a });
+    expect(flow.answer({ stepIndex: 0, correct: false, answer: 3 })).toEqual({
+      verdict: 'revealed',
+    });
+    let last = flow.answer({ stepIndex: 1, correct: true, answer: 0 });
+    for (let i = 2; i < steps; i++) last = flow.answer({ stepIndex: i, correct: true, answer: 0 });
+    expect(last.verdict).toBe('correct');
+    expect(last.outcome).toMatchObject({
+      correct: false,
+      firstTry: false,
+      usedHint: true,
+      wrongAnswers: [1, 2, 3],
+    });
+  });
 });

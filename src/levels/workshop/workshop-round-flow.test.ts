@@ -162,4 +162,22 @@ describe('workshop round flow', () => {
     expect(flow.done).toBe(true);
     expect(flow.round).toBeNull();
   });
+
+  it('misses count per step: 2 + 2 do not reveal, 3 on one step do', () => {
+    const flow = new WorkshopRoundFlow(rounds(), () => 0);
+    while (flow.stepCount < 2 && !flow.done) {
+      while (!flow.roundComplete) flow.answer(true);
+      flow.next();
+    }
+    expect(flow.stepCount).toBeGreaterThanOrEqual(2);
+    expect([flow.answer(false, 1), flow.answer(false, 2), flow.answer(true)]).toEqual([
+      'wrong',
+      'wrong',
+      'correct',
+    ]);
+    expect([flow.answer(false, 3), flow.answer(false, 4)]).toEqual(['wrong', 'wrong']);
+    expect(flow.answer(false, 5)).toBe('reveal');
+    while (!flow.roundComplete) flow.answer(true);
+    expect(flow.finishRound()).toMatchObject({ correct: false, wrongAnswers: [1, 2, 3, 4, 5] });
+  });
 });

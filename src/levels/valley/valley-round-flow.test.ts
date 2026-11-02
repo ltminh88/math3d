@@ -114,4 +114,43 @@ describe('valley round flow', () => {
     flow.next();
     expect(flow.done).toBe(true);
   });
+
+  it('the board action has its own three tries, then each step has three', () => {
+    const flow = flowFor('geo-midpoint', 1);
+    expect(flow.tap('stone:1')).toBe('wrong');
+    expect(flow.tap('stone:2')).toBe('wrong');
+    expect(flow.tap('stone:3')).toBe('right');
+    expect(flow.answer(false, 1)).toBe('wrong');
+    expect(flow.answer(false, 2)).toBe('wrong');
+    expect(flow.answer(true, 3)).toBe('correct');
+    expect(flow.completeSteps()).toMatchObject({ correct: true, firstTry: false, usedHint: false });
+  });
+
+  it('2 + 2 misses over two steps do not reveal; 3 on one step do (not correct)', () => {
+    const flow = flowFor('geo-solid-parts', 3);
+    expect(flow.tap('block')).toBe('right');
+    expect(flow.answer(false, 1)).toBe('wrong');
+    expect(flow.answer(false, 2)).toBe('wrong');
+    expect(flow.answer(true, 3)).toBe('correct');
+    expect(flow.answer(false, 4)).toBe('wrong');
+    expect(flow.answer(false, 5)).toBe('wrong');
+    expect(flow.answer(false, 6)).toBe('revealed');
+    expect(flow.completeSteps()).toMatchObject({
+      correct: false,
+      usedHint: true,
+      wrongAnswers: [1, 2, 4, 5, 6],
+    });
+  });
+
+  it('three misses on the action show the right target; the steps start a fresh budget', () => {
+    const flow = flowFor('geo-midpoint', 1);
+    expect(flow.tap('stone:1')).toBe('wrong');
+    expect(flow.tap('stone:2')).toBe('wrong');
+    expect(flow.tap('stone:4')).toBe('revealed');
+    expect(flow.phase).toBe('steps');
+    expect(flow.answer(false, 1)).toBe('wrong');
+    expect(flow.answer(false, 2)).toBe('wrong');
+    expect(flow.answer(true, 3)).toBe('correct');
+    expect(flow.completeSteps()).toMatchObject({ correct: false, firstTry: false });
+  });
 });
