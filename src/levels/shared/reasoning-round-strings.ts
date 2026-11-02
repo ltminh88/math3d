@@ -18,7 +18,8 @@ export const trr = defineStrings('reasoningRound', {
     opDivRem: '{total} : {per} = ? (dư ?)',
     lookWp:
       'Vẽ sơ đồ đoạn thẳng nhé. Mỗi bạn (hay mỗi rổ) là một đoạn. Gấp mấy lần thì vẽ bấy nhiêu đoạn bằng nhau.',
-    planTimesAdd: 'Tìm số của bạn thứ hai trước, bằng phép nhân. Sau đó cộng thêm số của bạn thứ nhất.',
+    planTimesAdd:
+      'Tìm số của bạn thứ hai trước, bằng phép nhân. Sau đó cộng thêm số của bạn thứ nhất.',
     planTimesCompare: 'Hỏi “gấp mấy lần” thì lấy số lớn chia cho số bé, không làm phép trừ.',
     lookPattern: 'Mỗi số hơn số đứng trước bao nhiêu? Đó là bước đếm.',
     planPattern: 'Lấy số đứng trước cộng thêm bước đếm là ra số tiếp theo.',

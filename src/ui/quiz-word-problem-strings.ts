@@ -13,7 +13,8 @@ const tw = defineStrings('quizWord', {
     addAsk: 'Hỏi cả hai đội chở được bao nhiêu viên đá?',
     cmpStory: 'Bờ bên này có {big} viên đá. Bờ bên kia có {small} viên đá.',
     cmpAsk: 'Số đá ở bờ bên này gấp mấy lần bờ bên kia?',
-    addHint1: 'Đọc lại đề nhé. Trước hết, đội Nam chở được bao nhiêu viên? Sau đó mới tính cả hai đội.',
+    addHint1:
+      'Đọc lại đề nhé. Trước hết, đội Nam chở được bao nhiêu viên? Sau đó mới tính cả hai đội.',
     addHint2: 'Vẽ sơ đồ đoạn thẳng: đội Mai là 1 đoạn {a} viên. Đội Nam có {n} đoạn như thế.',
     addHint3: 'Đội Nam chở: {a} × {n} = ? Cả hai đội: lấy số vừa tìm cộng thêm {a}.',
     cmpHint1: 'Hỏi “gấp mấy lần” thì mình làm phép chia, không làm phép trừ nhé!',

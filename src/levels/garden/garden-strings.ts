@@ -33,7 +33,8 @@ const define = (defineFn: typeof defineStrings) =>
       hintRuleSub: 'Quy luật: mỗi chậu bớt {d}.',
       hintWork: 'Làm thử nhé: {calc}',
       hintCount: 'Đếm từng bước: {sequence}',
-      hintCheck: 'So hai chậu đầu: {b} và {a} cách nhau {d}. Chậu nào cũng cách chậu đứng trước {d}.',
+      hintCheck:
+        'So hai chậu đầu: {b} và {a} cách nhau {d}. Chậu nào cũng cách chậu đứng trước {d}.',
       hintFindAddend: 'Muốn tìm số hạng, lấy tổng trừ đi số hạng kia.',
       hintFindMinuend: 'Muốn tìm số bị trừ, lấy hiệu cộng với số trừ.',
       hintFindSubtrahend: 'Muốn tìm số trừ, lấy số bị trừ trừ đi hiệu.',
@@ -49,7 +50,8 @@ const define = (defineFn: typeof defineStrings) =>
       hintThenLeftRight: 'Cộng, trừ còn lại thì làm từ trái sang phải.',
       hintAfterPart: 'Đã tính {part} = {value}. Còn lại: {calc}',
       hintStoryRead: 'Đọc lại đề nhé. Lúc đầu có tất cả bao nhiêu? Sau đó chuyện gì xảy ra?',
-      hintStoryEat: 'Có {n} túi, mỗi túi {p}. Tìm xem có tất cả bao nhiêu trước, rồi bớt đi số đã dùng.',
+      hintStoryEat:
+        'Có {n} túi, mỗi túi {p}. Tìm xem có tất cả bao nhiêu trước, rồi bớt đi số đã dùng.',
       hintStoryShare: 'Gộp số của hai lớp lại trước (viết trong ngoặc), rồi chia đều cho {n} tổ.',
       hintLeftOverRule: 'Còn lại = có tất cả − đã dùng.',
       hintEachRule: 'Chia đều thì làm phép chia nhé.',
