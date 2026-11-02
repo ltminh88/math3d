@@ -9,6 +9,8 @@ const FOV = 40;
 /** Elevation of the view: steep, so angles keep their look. */
 const UP = 2.4;
 const MIN_DISTANCE = 9;
+/** Reused by `apply` (it runs while turning and every few frames). */
+const scratchDirection = new Vector3();
 const TURN_STEP = Math.PI / 4;
 const TURN_RATE = 6;
 
@@ -75,7 +77,9 @@ export class ValleyCamera {
     const fitWidth = halfX / (tanHalf * camera.aspect * (freeW / w));
     const fitHeight = halfY / (tanHalf * (freeH / h));
     const distance = Math.max(MIN_DISTANCE, fitWidth, fitHeight) + 1.5;
-    const direction = new Vector3(Math.sin(this.turn), UP, Math.cos(this.turn)).normalize();
+    const direction = scratchDirection
+      .set(Math.sin(this.turn), UP, Math.cos(this.turn))
+      .normalize();
     camera.position.copy(this.target).addScaledVector(direction, distance);
     camera.lookAt(this.target);
     const top = Math.min(coverTop, h - freeH);
