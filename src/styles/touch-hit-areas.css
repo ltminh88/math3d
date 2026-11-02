@@ -18,4 +18,26 @@
   .quest-head::after {
     inset: -9px 0;
   }
+  /* Dialog close: 34 px circle (already absolute), -5 px each side gives 44 px. */
+  .dialog-close::after {
+    content: "";
+    position: absolute;
+    inset: -5px;
+  }
+  /* Title-screen text buttons: 30 px tall under 700 px, 10 px apart. Each grows 14 px, split
+     9 + 5 so the two hit areas meet in the gap instead of overlapping. */
+  .welcome > .text-button {
+    position: relative;
+  }
+  .welcome > .text-button::after {
+    content: "";
+    position: absolute;
+    inset: -5px 0;
+  }
+  #learn-welcome::after {
+    top: -9px;
+  }
+  #import-save-code::after {
+    bottom: -9px;
+  }
 }
