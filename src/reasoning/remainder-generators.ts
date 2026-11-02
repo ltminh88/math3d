@@ -40,9 +40,10 @@ const qrLabel = ({ q, r }: { q: number; r: number }): PromptRef => ({
 /** "Xếp được nhiều nhất mấy hộp, còn thừa mấy cái?": q and r. */
 export const divRemFloor: ReasoningGenerator = (rng, tier) => {
   const s = split(rng, tier);
-  const story = ref('divRemFloor', { total: s.total, per: s.per, item: pickNoun(rng) });
+  const item = pickNoun(rng);
+  const story = ref('divRemFloor', { total: s.total, per: s.per, item });
   const askQ = numberStep(ref('askBoxes'), s.q);
-  const askR = numberStep(ref('askLeft'), s.r);
+  const askR = numberStep(ref('askLeft', { item }), s.r);
   let steps: ReasoningStep[];
   if (tier === 2) {
     const candidates = [
@@ -55,7 +56,7 @@ export const divRemFloor: ReasoningGenerator = (rng, tier) => {
     steps = [{ kind: 'choice', prompt: ref('pickBoxesLeft'), options }];
   } else {
     // Tier 3 adds the check "số dư phải bé hơn số chia" as a prompt on the remainder step.
-    steps = [askQ, tier === 3 ? numberStep(ref('askLeftCheck', { per: s.per }), s.r) : askR];
+    steps = [askQ, tier === 3 ? numberStep(ref('askLeftCheck', { per: s.per, item }), s.r) : askR];
   }
   return reasoningItem('div-rem-floor', tier, story, steps, [s.q * s.per, s.r]);
 };
@@ -67,7 +68,7 @@ export const divRemCeil: ReasoningGenerator = (rng, tier) => {
   const need = ref('askNeed');
   const steps: ReasoningStep[] =
     tier === 1
-      ? [numberStep(ref('askFull'), s.q), numberStep(need, s.q + 1)]
+      ? [numberStep(ref('askFull', { per: s.per }), s.q), numberStep(need, s.q + 1)]
       : tier === 2
         ? [numberStep(need, s.q + 1)]
         : [

@@ -35,8 +35,10 @@ describe('quiz dialog templates', () => {
     const view = { bridgeMode: true, bridge: 2, segments: BRIDGE_SEGMENTS };
     const html = quizBodyHtml(q, view);
     expect(html).toContain('ĐOẠN CẦU 3 / 6');
-    expect(html).toContain(`Đội Mai chở được 6 viên đá. Đội Nam chở được gấp ${q.b} lần đội Mai.`);
-    expect(html).toContain('Cả hai đội chở được bao nhiêu viên đá?');
+    expect(html).toContain(
+      `Đội Mai chở được 6 viên đá. Đội Nam chở được nhiều gấp ${q.b} lần đội Mai.`,
+    );
+    expect(html).toContain('Hỏi cả hai đội chở được bao nhiêu viên đá?');
     expect(html.match(/class="answer"/g)).toHaveLength(3);
     for (const o of q.options) expect(html).toContain(`data-value="${o.value}"`);
     expect(html).not.toContain('class="equation"');

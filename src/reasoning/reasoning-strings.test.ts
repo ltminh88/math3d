@@ -35,7 +35,7 @@ describe('reasoning strings', () => {
 
   it('translates item nouns', () => {
     const story = { key: 'divRemFloor', params: { total: 29, per: 4, item: 'i:candy' } };
-    expect(renderPrompt(story)).toBe('Có 29 cái kẹo, xếp đều vào các hộp, mỗi hộp 4 cái kẹo.');
+    expect(renderPrompt(story)).toBe('Có 29 cái kẹo. Mình xếp vào các hộp, mỗi hộp 4 cái kẹo.');
     setLanguage('en');
     expect(renderPrompt(story)).toBe('There are 29 sweets, packed 4 to a box.');
   });

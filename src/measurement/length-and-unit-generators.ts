@@ -18,7 +18,7 @@ export const measRulerRead: GeoGenerator = (rng, tier) => {
   const item = pick(rng, LONG_NOUNS);
   if (tier === 1) {
     const cm = randInt(rng, 2, RULER_MAX_CM);
-    const steps = [numberStep(ref('askLenCm'), cm)];
+    const steps = [numberStep(ref('askLenCm', { item }), cm)];
     return geoItem(
       'meas-ruler-read',
       tier,
@@ -33,14 +33,14 @@ export const measRulerRead: GeoGenerator = (rng, tier) => {
       rng,
       Array.from({ length: MAX_MM - 10 }, (_, i) => i + 11).filter((n) => n % 10 !== 0),
     );
-    const steps = [numberStep(ref('askLenMm'), mm)];
+    const steps = [numberStep(ref('askLenMm', { item }), mm)];
     return geoItem('meas-ruler-read', tier, ref('rulerMm', { item }), steps, ruler(0, mm), 'mm');
   }
   // Tier 3: the object starts at a later mark; reading only its end is the trap.
   const from = 10 * randInt(rng, 1, 4);
   const len = randInt(rng, 5, MAX_MM - from);
   const to = from + len;
-  const step = qtyChoiceStep(rng, ref('askLenMm'), len, 'mm', [
+  const step = qtyChoiceStep(rng, ref('askLenMm', { item }), len, 'mm', [
     { value: to, misconception: 'read-end-not-length' },
     { value: from, misconception: 'wrong-step' },
   ]);
