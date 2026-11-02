@@ -116,10 +116,19 @@ async function playChamber(page: Page, index: number, tap: boolean, project: str
     await expect(page.locator('.cave-hint-button')).toBeDisabled();
   }
   if (index === 1) {
-    // Three misses reveal the worked answer; the crystal still lights.
+    // Three misses on one step show its answer; any later step is played, the crystal still
+    // lights and the chamber is recorded as not correct.
+    const step = (await caveState(page)).stepIndex;
     for (let miss = 0; miss < 3; miss++) {
       s = await caveState(page);
+      expect(s.stepIndex).toBe(step);
       await give(page, s.expected as Expected, false, tap);
+    }
+    await expect.poll(async () => (await caveState(page)).stepIndex).not.toBe(step);
+    s = await caveState(page);
+    while (s.expected !== null) {
+      await give(page, s.expected, true, tap);
+      s = await caveState(page);
     }
     await expect(page.locator('.cave-panel .feedback')).toContainText('Mình cùng xem lời giải');
     return;
