@@ -26,6 +26,13 @@
   left: max(16px, env(safe-area-inset-left));
 }
 
+/* The recovered tool button is 39 px tall on phones: touch screens get a 44 px leave target. */
+@media (pointer: coarse) {
+  .level-leave {
+    min-height: 44px;
+  }
+}
+
 .gate-label .gate-state {
   display: block;
 }

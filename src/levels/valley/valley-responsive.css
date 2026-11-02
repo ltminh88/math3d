@@ -81,9 +81,3 @@
     display: none;
   }
 }
-/* The host's leave button is 39 px tall on phones; in the valley it takes 44 px taps. */
-@media (pointer: coarse) {
-  .level-layer:has(.valley-panel) .level-leave {
-    min-height: 44px;
-  }
-}

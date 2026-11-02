@@ -1,6 +1,9 @@
 // The watering-can balance of a find-the-unknown round, in three meshes: the stand, the beam
 // (it tips while the hidden can is unknown) and the two pans with their cans (one instanced
 // mesh, kept level under the beam ends). It levels out once the child finds the number.
+// Intended: the beam stays tipped while the equation is unsolved (the prompt states the condition
+// for balance, not that it balances now) and swings level over ~0.2 s after the right answer; a
+// screenshot taken right after answering (p05 balance.png) can catch it mid-swing.
 import {
   BoxGeometry,
   DynamicDrawUsage,

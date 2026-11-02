@@ -29,6 +29,13 @@
 .quest-steps.chain-row > span.done {
   flex: 0.6 1 auto;
 }
+/* 701-1100 px wide (tablet portrait): the HUD column is 270 px, too narrow for 11 px names. */
+@media (max-width: 1100px) {
+  .quest-steps.chain-row > span {
+    font-size: 10px;
+    padding: 0 2px;
+  }
+}
 @media (max-width: 700px) {
   .quest-steps.chain-row > span {
     font-size: 9.5px;
