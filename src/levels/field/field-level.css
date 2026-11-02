@@ -271,4 +271,8 @@
   .field-answers kbd {
     display: none;
   }
+  /* Hint / turn buttons: 41 px with the portrait padding; keep them 44 px finger targets. */
+  .field-tool {
+    min-height: 44px;
+  }
 }
