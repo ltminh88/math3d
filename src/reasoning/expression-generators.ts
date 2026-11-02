@@ -123,21 +123,23 @@ export const exprFromStory: ReasoningGenerator = (rng, tier) => {
     const total = n * randInt(rng, 3, Math.floor(MAX_NUMBER / n));
     const a = randInt(rng, 1, total - 1);
     const b = total - a;
-    const story = ref('exprStoryShare', { a, b, n, item: pickNoun(rng) });
+    const item = pickNoun(rng);
+    const story = ref('exprStoryShare', { a, b, n, item });
     const steps = [
       expressionChoiceStep(rng, pickExpr, `(${a} + ${b}) : ${n}`, [
         { value: `${a} + ${b} : ${n}`, misconception: 'ignore-brackets' },
         { value: `(${a} + ${b}) × ${n}`, misconception: 'wrong-inverse' },
         { value: `${a} + ${b} − ${n}`, misconception: 'minus-instead-of-divide' },
       ]),
-      numberStep(ref('askEach'), total / n),
+      numberStep(ref('askEach', { item }), total / n),
     ];
     return reasoningItem('expr-from-story', tier, story, steps, [total, total / n]);
   }
   const [n, p] = product(rng, 90);
   const e = randInt(rng, 1, n * p - 1);
-  const story = ref('exprStoryEat', { n, p, e, item: pickNoun(rng) });
-  const left = numberStep(ref('askLeftOver'), n * p - e);
+  const item = pickNoun(rng);
+  const story = ref('exprStoryEat', { n, p, e, item });
+  const left = numberStep(ref('askLeftOver', { item }), n * p - e);
   const steps =
     tier === 1
       ? [numberStep(ref('askPart', { text: `${n} × ${p}` }), n * p), left]
