@@ -46,8 +46,8 @@ docs/code-standards.md  docs/recovery-notes.md (mod)
 - [ ] merge 04–08
 - [ ] full-chain e2e 4 projects
 - [ ] review + fixes
-- [ ] parity re-baseline + golden
-- [ ] production playthrough desktop/phone/tablet
+- [x] parity re-baseline + golden (`reports/parity-rebaseline-chapter2.md`)
+- [x] production playthrough desktop/phone/tablet (`reports/chapter2-playthrough/README.md`)
 - [ ] Vercel deploy + smoke
 - [ ] docs + tags
 - [ ] author review
