@@ -17,8 +17,8 @@ const BRIDGE_LABEL_AT = new Vector3(7, 0.8, 0);
 /** Gate labels float just above the gate sign. */
 const GATE_LABEL_HEIGHT = 4.6;
 const SIGNPOST_POSITION = EXPANSION_SIGNPOSTS.find((p) => p.id === LABELED_SIGNPOST_ID)?.position;
-/** The signpost label floats over the pole cap (3.3). */
-const SIGNPOST_LABEL_AT = new Vector3(SIGNPOST_POSITION?.[0], 4, SIGNPOST_POSITION?.[1]);
+/** The signpost label floats over the pole cap (4.9). */
+const SIGNPOST_LABEL_AT = new Vector3(SIGNPOST_POSITION?.[0], 5.6, SIGNPOST_POSITION?.[1]);
 
 let signpostLabel: HTMLElement | undefined;
 

@@ -19,11 +19,14 @@ export interface Signpost {
   readonly boards: readonly SignBoard[];
 }
 
+/** How far a board (plank + arrow tip) reaches from its pole, along its heading. */
+export const SIGN_BOARD_REACH = 4.3;
+
 export const EXPANSION_SIGNPOSTS: readonly Signpost[] = [
-  // East bank, where the valley and workshop roads leave the trunk road.
+  // East bank, north-west of where the valley and workshop roads leave the trunk road.
   {
     id: 'east-junction',
-    position: [42.5, 4.3],
+    position: [41.5, -6],
     boards: [
       { target: 'cave', heading: [-1, 0] },
       { target: 'valley', heading: [0.05, -1] },
@@ -33,7 +36,7 @@ export const EXPANSION_SIGNPOSTS: readonly Signpost[] = [
   // West bank, where the bridge road arrives: to the cave west, back over the bridge east.
   {
     id: 'west-bridgehead',
-    position: [1, 4],
+    position: [-1, 5.5],
     boards: [
       { target: 'cave', heading: [-1, 0.45] },
       { target: 'workshop', heading: [1, 0.45] },
@@ -43,7 +46,7 @@ export const EXPANSION_SIGNPOSTS: readonly Signpost[] = [
   // West bank, at the fork past the village (the floating label hangs over this one).
   {
     id: 'west-junction',
-    position: [-30.5, 2.6],
+    position: [-30.5, 3.2],
     boards: [
       { target: 'cave', heading: [-0.2, 1] },
       { target: 'workshop', heading: [1, 0.22] },

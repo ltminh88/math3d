@@ -5,7 +5,11 @@
 import { CylinderGeometry, Group, Matrix4, type Mesh, type Object3D } from 'three';
 import { expansionRegionText } from '../config/expansion-region-strings';
 import { EXPANSION_REGIONS } from '../config/expansion-regions';
-import { EXPANSION_SIGNPOSTS, type SignBoard } from '../config/expansion-signposts';
+import {
+  EXPANSION_SIGNPOSTS,
+  SIGN_BOARD_REACH,
+  type SignBoard,
+} from '../config/expansion-signposts';
 import { buildSignpostText, FACE_HEIGHT, FACE_WIDTH, type SignFace } from './signpost-text-atlas';
 import type { WorldBuildContext } from './world-build-context';
 import { addBox, addCylinder, addMesh } from './world-primitives';
@@ -13,15 +17,18 @@ import { addBox, addCylinder, addMesh } from './world-primitives';
 const POLE_COLOR = 0x7a5232;
 const CAP_COLOR = 0x5c3b22;
 const BOARD_COLOR = 0xc98f55;
-const POLE_HEIGHT = 3.1;
-const TOP_BOARD_Y = 2.65;
-const BOARD_STEP = 0.74;
-/** Plank behind the face: starts 0.4 behind the pole, ends at SHAFT_END, then the tip. */
-const SHAFT_START = -0.4;
-const SHAFT_END = 1.85;
+/** Big enough to read from the follow camera: the face text is ~0.6 units tall. */
+const POLE_HEIGHT = 4.6;
+const POLE_RADIUS = 0.2;
+const TOP_BOARD_Y = 4.05;
+const BOARD_STEP = 1.1;
+/** Plank behind the face: starts 0.5 behind the pole, ends at SHAFT_END, then the tip. */
+const SHAFT_START = -0.5;
+const SHAFT_END = 3.25;
 const BOARD_HEIGHT = FACE_HEIGHT + 0.1;
-const BOARD_DEPTH = 0.1;
-const TIP_RADIUS = 0.42;
+const BOARD_DEPTH = 0.14;
+const TIP_RADIUS = 0.66;
+const TIP_REACH = SHAFT_END + 1.5 * TIP_RADIUS - 0.02;
 
 /**
  * Y rotation that turns a board's local +x (its pointing end) onto the ground `heading`:
@@ -77,8 +84,18 @@ export function buildExpansionSignposts(ctx: WorldBuildContext, root: Group): Me
   const faces: SignFace[] = [];
   for (const post of EXPANSION_SIGNPOSTS) {
     const [x, z] = post.position;
-    addCylinder(ctx, root, x, POLE_HEIGHT / 2, z, 0.12, 0.14, POLE_HEIGHT, POLE_COLOR);
-    addCylinder(ctx, root, x, POLE_HEIGHT + 0.12, z, 0, 0.2, 0.24, CAP_COLOR);
+    addCylinder(
+      ctx,
+      root,
+      x,
+      POLE_HEIGHT / 2,
+      z,
+      POLE_RADIUS,
+      POLE_RADIUS + 0.03,
+      POLE_HEIGHT,
+      POLE_COLOR,
+    );
+    addCylinder(ctx, root, x, POLE_HEIGHT + 0.16, z, 0, POLE_RADIUS + 0.12, 0.32, CAP_COLOR);
     post.boards.forEach((spec, i) => {
       const board = new Group();
       board.position.set(x, TOP_BOARD_Y - i * BOARD_STEP, z);
@@ -88,6 +105,8 @@ export function buildExpansionSignposts(ctx: WorldBuildContext, root: Group): Me
       faces.push(...facesOf(board, nameOf(spec)));
     });
   }
-  if (FACE_WIDTH > SHAFT_END - SHAFT_START) throw new Error('signpost face wider than its plank');
+  if (FACE_WIDTH > SHAFT_END - SHAFT_START || TIP_REACH > SIGN_BOARD_REACH) {
+    throw new Error('signpost board layout out of bounds');
+  }
   return buildSignpostText(faces);
 }

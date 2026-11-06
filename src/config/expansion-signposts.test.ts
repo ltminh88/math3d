@@ -2,7 +2,7 @@ import { describe, expect, it } from 'vitest';
 import { nearRoad } from '../world/world-scatter-exclusion';
 import { nearExpansionRoad } from './expansion-region-lookup';
 import { EXPANSION_REGIONS } from './expansion-regions';
-import { EXPANSION_SIGNPOSTS } from './expansion-signposts';
+import { EXPANSION_SIGNPOSTS, SIGN_BOARD_REACH } from './expansion-signposts';
 import { LEVEL_GATES } from './level-gate-config';
 import { RIVER, WALKABLE_BOUNDS } from './world-constants';
 
@@ -52,7 +52,7 @@ describe('expansion signposts', () => {
     for (const post of EXPANSION_SIGNPOSTS) {
       const [x, z] = post.position;
       expect(nearAnyRoad(x, z, 2.5), `${post.id} off the road`).toBe(false);
-      expect(nearAnyRoad(x, z, 4.5), `${post.id} beside a road`).toBe(true);
+      expect(nearAnyRoad(x, z, 6.5), `${post.id} beside a road`).toBe(true);
       const bank = x < RIVER.riverMin ? WALKABLE_BOUNDS.west : WALKABLE_BOUNDS.east;
       expect(x > bank.minX && x < bank.maxX - 0.5, `${post.id} on a bank`).toBe(true);
       for (const gate of LEVEL_GATES) {
@@ -65,7 +65,7 @@ describe('expansion signposts', () => {
     for (const post of EXPANSION_SIGNPOSTS) {
       for (const board of post.boards) {
         const length = Math.hypot(board.heading[0], board.heading[1]);
-        for (let s = 0; s <= 2.5; s += 0.05) {
+        for (let s = 0; s <= SIGN_BOARD_REACH; s += 0.05) {
           const x = post.position[0] + (board.heading[0] / length) * s;
           const z = post.position[1] + (board.heading[1] / length) * s;
           expect(nearAnyRoad(x, z, 1.55), `${post.id} → ${board.target} at ${s}`).toBe(false);

@@ -20,11 +20,11 @@ export interface ScatterMeshes {
 }
 
 /** Same clearances the scatter uses against the original regions and roads; signposts keep their
- *  boards' reach (2.5) plus a crown clear of trees. */
+ *  boards' reach (4.3) plus a crown clear of trees. */
 const inTreeZone = (x: number, z: number) =>
-  !!expansionRegionAt(x, z, 1.4) || nearExpansionRoad(x, z, 2.4) || nearSignpost(x, z, 3.6);
+  !!expansionRegionAt(x, z, 1.4) || nearExpansionRoad(x, z, 2.4) || nearSignpost(x, z, 5.4);
 const inRockZone = (x: number, z: number) =>
-  !!expansionRegionAt(x, z, 0.8) || nearExpansionRoad(x, z, 1.8) || nearSignpost(x, z, 1.4);
+  !!expansionRegionAt(x, z, 0.8) || nearExpansionRoad(x, z, 1.8) || nearSignpost(x, z, 1.6);
 const inFlowerZone = (x: number, z: number) =>
   !!expansionRegionAt(x, z) || nearExpansionRoad(x, z, 1.7) || nearSignpost(x, z, 0.8);
 

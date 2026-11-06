@@ -13,9 +13,9 @@ import { mergeGeometries } from 'three/addons/utils/BufferGeometryUtils.js';
 import { WORLD_LIGHTING } from './world-lighting-tuning';
 
 /** Face size on the board, in world units; the atlas rows share its aspect. */
-export const FACE_WIDTH = 2.1;
-export const FACE_HEIGHT = 0.5;
-const ROW_WIDTH = 768;
+export const FACE_WIDTH = 3.6;
+export const FACE_HEIGHT = 0.86;
+const ROW_WIDTH = 1024;
 const ROW_HEIGHT = Math.round((ROW_WIDTH * FACE_HEIGHT) / FACE_WIDTH);
 const BACKGROUND = '#fff4d6';
 const INK = '#194f42';
