@@ -74,8 +74,8 @@ const textLines = (page: Page, selector: string) =>
   }, selector);
 
 // Chapter-2 playthrough on phones (m-5): the math3d logo button and the floating "Nói chuyện với
-// VLM" label are 40 px tall, and the player card's "Nhà thám hiểm" wraps onto two lines once the
-// level badge sits beside it and the wallet holds 3-digit coins.
+// VLM" label are 40 px tall, and the player card's "Nhà thám hiểm" wraps onto two lines (phones
+// and tablet portrait) once the level badge sits beside it and the wallet holds 3-digit coins.
 test('logo and VLM label have 44 px touch targets; the explorer name stays on one line', async ({
   page,
 }) => {
@@ -107,10 +107,14 @@ test('logo and VLM label have 44 px touch targets; the explorer name stays on on
     (document.querySelector('#level') as HTMLElement).textContent = '5';
     (document.querySelector('#coins') as HTMLElement).textContent = '999';
   });
-  // Phones only: the tablet card (701-1100 px) is narrower still and wraps it too (not this fix).
-  if (await page.evaluate(() => innerWidth <= 700)) {
-    expect(await textLines(page, '#player-name'), 'player card name').toBe(1);
-  }
+  expect(await textLines(page, '#player-name'), 'player card name').toBe(1);
+  // On one line without running into the wallet.
+  const gap = await page.evaluate(
+    () =>
+      (document.querySelector('#wallet') as HTMLElement).getBoundingClientRect().left -
+      (document.querySelector('.level-badge') as HTMLElement).getBoundingClientRect().right,
+  );
+  expect(gap, 'level badge clear of the wallet').toBeGreaterThanOrEqual(0);
   for (const selector of ['.brand', '#milo-label']) {
     expect(await hitsAround(page, selector, 0.5), selector).toEqual([true, true, true, true]);
   }

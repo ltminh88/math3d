@@ -57,11 +57,3 @@
     inset: -2px 0;
   }
 }
-/* Phone player card: with the level badge and 3-digit coins the 12 px "Nhà thám hiểm" was
-   1-2 px too wide and wrapped; keep it on one line, a hair tighter. */
-@media (max-width: 700px) {
-  #player-name {
-    white-space: nowrap;
-    letter-spacing: -0.2px;
-  }
-}
