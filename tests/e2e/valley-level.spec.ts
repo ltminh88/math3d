@@ -153,6 +153,13 @@ async function playRound(page: Page, index: number, touch: boolean, project: str
       await expect(page.locator(`[data-target="${target}"]`)).toHaveClass(
         corner?.fits ? /is-fit/ : /is-miss/,
       );
+      // The ✓ / ✗ on a tried corner never covers its letter: letter chips paint above targets.
+      const chipsAbove = await page.evaluate(() => {
+        const z = (sel: string) =>
+          Number(getComputedStyle(document.querySelector(sel) as Element).zIndex) || 0;
+        return z('.valley-chips') > z('.valley-targets');
+      });
+      expect(chipsAbove).toBe(true);
       if (index === 1) {
         // Turn the view: tap ⟳ (R on desktop).
         if (touch) await page.locator('.valley-turn').nth(1).tap();
@@ -222,6 +229,14 @@ test('the valley plays six geometry rounds by taps or keys and records sk:geo-* 
   await press(interact, touch);
   await expect(page.locator('.valley-panel')).toBeVisible();
   await expect(page.locator('.level-layer')).toHaveAttribute('data-draw-calls', /\d+/);
+  if (info.project.name === 'tablet-portrait') {
+    // Portrait tablet: the panel runs along the bottom (as on phones), not as a narrow right
+    // column that pushes the board into a small area on the left.
+    const vp = page.viewportSize() ?? { width: 0, height: 0 };
+    const box = await page.locator('.valley-panel').boundingBox();
+    expect(box?.width ?? 0).toBeGreaterThan(vp.width * 0.8);
+    expect(box?.y ?? 0).toBeGreaterThan(vp.height / 2);
+  }
 
   const coarse = await page.evaluate(() => matchMedia('(pointer: coarse)').matches);
   await expect(page.locator('.valley-keys')).toBeVisible({ visible: !coarse });

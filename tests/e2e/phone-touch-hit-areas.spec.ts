@@ -38,3 +38,29 @@ test('top-bar buttons and the quest toggle have 44 px touch targets', async ({ p
     expect(await hitsAround(page, selector, 0.5), selector).toEqual([true, true, true, true]);
   }
 });
+
+// Chapter-2 playthrough: the title screen's "Khám phá bảng cửu chương" / "Nhập mã lưu" text
+// buttons are 30 px tall on phones, and every dialog's round close button is 34 px.
+test('title text buttons and the dialog close button have 44 px touch targets', async ({
+  page,
+}) => {
+  await page.goto('/');
+  await waitForStoreBoot(page);
+  test.skip(!(await page.evaluate(() => matchMedia('(pointer: coarse)').matches)), 'touch only');
+  // Stacked 10 px apart: their hit areas meet in the gap, so count the rows each one takes.
+  for (const selector of ['#learn-welcome', '#import-save-code']) {
+    const rows = await page.evaluate((s) => {
+      const el = document.querySelector(s) as HTMLElement;
+      const r = el.getBoundingClientRect();
+      let n = 0;
+      for (let y = Math.floor(r.top) - 30; y <= r.bottom + 30; y++) {
+        if (document.elementFromPoint(r.left + r.width / 2, y)?.closest(s) === el) n++;
+      }
+      return n;
+    }, selector);
+    expect(rows, selector).toBeGreaterThanOrEqual(44);
+  }
+  await page.locator('#learn-welcome').tap();
+  await expect(page.locator('#close-dialog')).toBeVisible();
+  expect(await hitsAround(page, '#close-dialog', 0.5)).toEqual([true, true, true, true]);
+});

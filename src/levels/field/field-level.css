@@ -15,7 +15,7 @@
   position: absolute;
   top: max(16px, env(safe-area-inset-top));
   left: 50%;
-  transform: translateX(-50%);
+  translate: -50% 0;
   width: min(520px, calc(100% - 420px));
   display: flex;
   align-items: flex-start;
@@ -270,5 +270,9 @@
 @media (pointer: coarse) {
   .field-answers kbd {
     display: none;
+  }
+  /* Hint / turn buttons: 41 px with the portrait padding; keep them 44 px finger targets. */
+  .field-tool {
+    min-height: 44px;
   }
 }

@@ -50,4 +50,10 @@ test('planting cells are finger-sized on a phone and the label stays off the plo
   expect(first.y - down / 2).toBeGreaterThanOrEqual(speech.y + speech.height);
   expect(basket.y).toBeLessThan(panel.y);
   expect(basket.x).toBeGreaterThan(0);
+  // Chapter-2 playthrough: the hint / turn buttons were 41 px tall on portrait touch screens.
+  const tools = await page
+    .locator('.field-tool')
+    .evaluateAll((all) => all.map((b) => Math.round(b.getBoundingClientRect().height)));
+  expect(tools.length).toBeGreaterThan(0);
+  for (const h of tools) expect(h).toBeGreaterThanOrEqual(44);
 });
