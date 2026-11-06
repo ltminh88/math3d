@@ -64,3 +64,54 @@ test('title text buttons and the dialog close button have 44 px touch targets', 
   await expect(page.locator('#close-dialog')).toBeVisible();
   expect(await hitsAround(page, '#close-dialog', 0.5)).toEqual([true, true, true, true]);
 });
+
+/** Lines the text of `selector` (one text node) wraps onto. */
+const textLines = (page: Page, selector: string) =>
+  page.evaluate((s) => {
+    const range = document.createRange();
+    range.selectNodeContents(document.querySelector(s) as HTMLElement);
+    return new Set([...range.getClientRects()].map((rect) => Math.round(rect.top))).size;
+  }, selector);
+
+// Chapter-2 playthrough on phones (m-5): the math3d logo button and the floating "Nói chuyện với
+// VLM" label are 40 px tall, and the player card's "Nhà thám hiểm" wraps onto two lines once the
+// level badge sits beside it and the wallet holds 3-digit coins.
+test('logo and VLM label have 44 px touch targets; the explorer name stays on one line', async ({
+  page,
+}) => {
+  await page.goto('/');
+  await waitForStoreBoot(page);
+  test.skip(!(await page.evaluate(() => matchMedia('(pointer: coarse)').matches)), 'touch only');
+  await page.locator('#play').click();
+  await expect(page.locator('body')).toHaveClass(/playing/);
+  // The label follows the camera, which glides after Play and passes the label under the quest
+  // card; until the first projected frame it sits at the top-left corner. Stand south of VLM
+  // (label mid-screen) and wait for it to be placed below the top bar and stop moving.
+  await page.waitForFunction(() => '__game' in window);
+  await page.evaluate(() => window.__game?.teleport(-3, 6));
+  await expect(page.locator('#milo-label')).toBeVisible();
+  const labelBox = () =>
+    page.evaluate(() => {
+      const r = document.querySelector('#milo-label')?.getBoundingClientRect();
+      return r && r.top > 100 ? `${r.left},${r.top}` : 'unplaced';
+    });
+  await expect
+    .poll(async () => {
+      const before = await labelBox();
+      await page.waitForTimeout(500);
+      return before !== 'unplaced' && before === (await labelBox());
+    })
+    .toBe(true);
+  // The widest card the playthrough saw: level 5, 3-digit coins.
+  await page.evaluate(() => {
+    (document.querySelector('#level') as HTMLElement).textContent = '5';
+    (document.querySelector('#coins') as HTMLElement).textContent = '999';
+  });
+  // Phones only: the tablet card (701-1100 px) is narrower still and wraps it too (not this fix).
+  if (await page.evaluate(() => innerWidth <= 700)) {
+    expect(await textLines(page, '#player-name'), 'player card name').toBe(1);
+  }
+  for (const selector of ['.brand', '#milo-label']) {
+    expect(await hitsAround(page, selector, 0.5), selector).toEqual([true, true, true, true]);
+  }
+});
