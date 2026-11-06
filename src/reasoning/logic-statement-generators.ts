@@ -49,13 +49,13 @@ function compareStatement(
   if (kind === 'times') {
     const fix = { prompt: ref('fixTimes', { big, small }), answer: n };
     const shown = truth ? n : big - small;
-    const label = ref('stmtTimes', { big, small, n: shown });
+    const label = ref('stmtTimes', { big, small, op: truth ? ':' : '−', n: shown });
     return truth
       ? { label, truth, fix }
       : { label, truth, misconception: 'difference-not-quotient', fix };
   }
   const fix = { prompt: ref('fixMore', { big, small }), answer: big - small };
-  const label = ref('stmtMore', { big, small, d: truth ? big - small : n });
+  const label = ref('stmtMore', { big, small, op: truth ? '−' : ':', d: truth ? big - small : n });
   return truth
     ? { label, truth, fix }
     : { label, truth, misconception: 'quotient-not-difference', fix };
