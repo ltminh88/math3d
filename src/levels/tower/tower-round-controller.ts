@@ -92,7 +92,8 @@ export class TowerRoundController {
     }
     const right = step.kind === 'choice' ? step.choices.indexOf(step.answer) : step.answer ? 0 : 1;
     if (step.kind !== 'number') this.panel.answers.mark(right, true);
-    if (result.verdict === 'revealed') this.card.revealFrom(question, stepIndex);
+    const revealed = result.verdict === 'revealed';
+    if (revealed) this.card.revealStep(question, stepIndex);
     else if (typeof value === 'number') this.card.fill(stepIndex, value);
     else this.card.judged(question);
     const next = this.flow.step;
@@ -106,13 +107,16 @@ export class TowerRoundController {
       this.panel.showInput(next);
       this.panel.clearHint();
       this.panel.hint.disabled = false;
-      const text = this.ts(confirming ? 'claimTrue' : fixing ? 'claimCaught' : 'correctStep');
-      this.panel.setFeedback(text, 'success');
-      this.ctx.audio.tone(698, 0.12);
+      // Third miss on this step: its answer is shown and the next step starts with fresh tries.
+      const key = confirming ? 'claimTrue' : fixing ? 'claimCaught' : 'correctStep';
+      const text = this.ts(revealed ? 'revealedStep' : key);
+      this.panel.setFeedback(text, revealed ? 'gentle' : 'success');
+      if (revealed) this.ctx.audio.hint();
+      else this.ctx.audio.tone(698, 0.12);
       this.ctx.announce(`${text} ${spokenEquation(this.ts, next.eq)}`);
       return;
     }
-    if (result.outcome) this.finishFloor(question, result.verdict === 'correct', result.outcome);
+    if (result.outcome) this.finishFloor(question, result.outcome.correct, result.outcome);
   }
 
   private finishFloor(

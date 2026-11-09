@@ -147,6 +147,24 @@ describe('forest round flow', () => {
     expect(flow.done).toBe(true);
   });
 
+  it('every fact-family blank has its own three tries; a shown blank fails the round once', () => {
+    const flow = new ForestRoundFlow([round('family', 12, 3)], () => 0);
+    flow.submit(1);
+    flow.submit(2);
+    expect(flow.submit(12)).toEqual({ verdict: 'correct' });
+    // Two misses on blank 1 do not count against blank 2.
+    expect(flow.submit(5)).toEqual({ verdict: 'wrong' });
+    flow.submit(6);
+    expect(flow.submit(7)).toEqual({ verdict: 'revealed' });
+    expect(flow.blank).toBe(2);
+    expect(flow.roundComplete).toBe(false);
+    flow.submit(4);
+    const last = flow.submit(3);
+    expect(last.verdict).toBe('correct');
+    expect(last.outcome).toMatchObject({ correct: false, firstTry: false, usedHint: true });
+    expect(last.outcome?.wrongAnswers).toEqual([1, 2, 5, 6, 7]);
+  });
+
   it('ignores answers once the round is complete', () => {
     const flow = new ForestRoundFlow([round('share', 4, 2)], () => 0);
     flow.submit(2);

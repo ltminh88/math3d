@@ -1,20 +1,14 @@
 // Pure run logic of the tower: which facts the seven floors ask (weak facts first, both
-// operations), and the answer/hint state of the current floor. Rules: no timer, no lives; three
-// misses reveal the worked answer and the climb goes on.
+// operations), and the answer/hint state of the current floor. Rules: no timer, no lives; every
+// step of a floor has its own three tries: the third miss shows that step's answer and the floor
+// goes on (recorded once, not correct).
 import { divFactsForTables, mulFactsForTables } from '../../learning/curriculum-tables';
 import { divKey, type FactKey, mulKey } from '../../learning/fact-key';
-import {
-  createHintState,
-  type HintRung,
-  type HintState,
-  recordWrong,
-  shouldOfferHint,
-  takeHint,
-  toQuestionResult,
-} from '../../learning/hint-ladder';
+import { type HintRung, type HintState, shouldOfferHint } from '../../learning/hint-ladder';
 import type { FactStat } from '../../learning/learning-types';
 import { type Rng, shuffle } from '../../learning/seeded-rng';
 import type { QuestionOutcome } from '../../learning/session-recorder';
+import { StepMissBudget } from '../shared/step-miss-budget';
 import {
   assignFormats,
   buildQuestion,
@@ -24,6 +18,8 @@ import {
 } from './tower-question-formats';
 
 export const TOWER_TABLES = [2, 3, 4, 5, 6, 7, 8, 9] as const;
+/** Last taught rung of a step (rung 5 is only reached by three misses). */
+const TOWER_LAST_RUNG = 4;
 
 type Stats = Readonly<Record<FactKey, FactStat | undefined>>;
 
@@ -93,8 +89,8 @@ export interface SubmitResult {
 export class TowerRoundFlow {
   index = 0;
   stepIndex = 0;
-  hint: HintState = createHintState();
   roundComplete = false;
+  private readonly budget = new StepMissBudget();
   private wrongAnswers: number[] = [];
   private startedAt: number;
 
@@ -105,6 +101,11 @@ export class TowerRoundFlow {
     readonly total = questions.length,
   ) {
     this.startedAt = now();
+  }
+
+  /** The live step's hint ladder (its misses and rungs). */
+  get hint(): HintState {
+    return this.budget.hint;
   }
 
   get question(): TowerQuestion | undefined {
@@ -128,22 +129,22 @@ export class TowerRoundFlow {
     const step = this.step;
     if (!question || !step || this.roundComplete) return { verdict: 'ignored' };
     if (typeof value !== typeof step.answer) return { verdict: 'ignored' };
-    if (value === step.answer) {
-      this.stepIndex += 1;
-      // A new step starts its hints from rung 1 (hints taken still count for the question).
-      if (this.stepIndex < question.steps.length) {
-        this.hint = { ...this.hint, rung: 0 };
-        return { verdict: 'correct' };
-      }
-      return { verdict: 'correct', outcome: this.finish(question, true) };
-    }
+    if (value === step.answer) return this.advance(question, 'correct');
     // A false claim judged true means the child believed its number: that is the slip to bank.
     if (typeof value === 'number') this.wrongAnswers.push(value);
     else if (value) this.wrongAnswers.push(step.eq.z);
-    this.hint = recordWrong(this.hint);
-    if (!this.hint.revealed) return { verdict: 'wrong' };
-    this.stepIndex = question.steps.length;
-    return { verdict: 'revealed', outcome: this.finish(question, false) };
+    if (!this.budget.miss()) return { verdict: 'wrong' };
+    return this.advance(question, 'revealed');
+  }
+
+  /** The step is answered or shown: the next step (fresh tries, hints from rung 1) or the end. */
+  private advance(question: TowerQuestion, verdict: 'correct' | 'revealed'): SubmitResult {
+    this.stepIndex += 1;
+    if (this.stepIndex < question.steps.length) {
+      this.budget.nextStep();
+      return { verdict };
+    }
+    return { verdict, outcome: this.finish(question) };
   }
 
   hintOffered(idleMs: number): boolean {
@@ -151,8 +152,7 @@ export class TowerRoundFlow {
   }
 
   takeHint(): HintRung {
-    this.hint = takeHint(this.hint);
-    return this.hint.rung;
+    return this.budget.takeHint(TOWER_LAST_RUNG);
   }
 
   /** Moves up after a finished floor. */
@@ -160,15 +160,15 @@ export class TowerRoundFlow {
     if (!this.roundComplete) return;
     this.index += 1;
     this.stepIndex = 0;
-    this.hint = createHintState();
+    this.budget.reset();
     this.roundComplete = false;
     this.wrongAnswers = [];
     this.startedAt = this.now();
   }
 
-  private finish(question: TowerQuestion, solved: boolean): QuestionOutcome {
+  private finish(question: TowerQuestion): QuestionOutcome {
     this.roundComplete = true;
-    const result = toQuestionResult(this.hint, solved);
+    const result = this.budget.result();
     return {
       factKey: question.factKey,
       ms: this.now() - this.startedAt,

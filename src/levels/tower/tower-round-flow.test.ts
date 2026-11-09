@@ -124,6 +124,32 @@ describe('tower round flow', () => {
     });
   });
 
+  it('every step has its own three tries: the third miss shows only that step', () => {
+    const flow = new TowerRoundFlow([family], () => 0);
+    const wrongOf = () => (flow.expected() as number) + 1;
+    flow.submit(wrongOf());
+    flow.submit(wrongOf());
+    expect(flow.submit(flow.expected() as number)).toEqual({ verdict: 'correct' });
+    // Two misses on step 1 + one on step 2 must not show step 2.
+    expect(flow.submit(wrongOf())).toEqual({ verdict: 'wrong' });
+    flow.submit(wrongOf());
+    expect(flow.submit(wrongOf())).toEqual({ verdict: 'revealed' });
+    expect(flow.stepIndex).toBe(2);
+    expect(flow.hint.wrongAttempts).toBe(0);
+    let result = flow.submit(flow.expected() as number);
+    while (!result.outcome) result = flow.submit(flow.expected() as number);
+    expect(result.outcome).toMatchObject({ correct: false, firstTry: false, usedHint: true });
+  });
+
+  it('a claim shown after three misses still asks for its result', () => {
+    const flow = new TowerRoundFlow([claim(false)], () => 0);
+    flow.submit(true);
+    flow.submit(true);
+    expect(flow.submit(true)).toEqual({ verdict: 'revealed' });
+    expect(flow.step).toMatchObject({ kind: 'number', answer: 42 });
+    expect(flow.submit(42).outcome).toMatchObject({ correct: false, firstTry: false });
+  });
+
   it('three misses reveal the answer and never fail the run', () => {
     const flow = new TowerRoundFlow([choice, choice], () => 0);
     expect(flow.submit(1).verdict).toBe('wrong');
