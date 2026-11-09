@@ -7,7 +7,7 @@
 
 ### Changed
 - Word problems rewritten in natural language for 7–9-year-olds; kept in practice mode too.
-- Misses count per step in the garden, valley, cave and the shared reasoning round (`levels/shared/step-miss-budget.ts`); chapter-1 levels still count per round.
+- Misses count per step in the garden, valley, cave, the shared reasoning round, the tower (family and true/false floors) and the forest fact-family card (`levels/shared/step-miss-budget.ts`). The city has only single-step rounds and is unchanged.
 - Valley board uses a top-down camera so angles never look skewed.
 - True/false "times"/"more than" statements now show the reasoning ("Vì 75 : 25 = 3 nên …") instead of "75 gấp 3 lần 25".
 - HUD: logo and VLM label hit areas ≥44 px on phones; player name on one line on phones and tablet portrait (HUD column 300 px at 701–1100 px).
