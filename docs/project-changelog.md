@@ -12,6 +12,9 @@
 - True/false "times"/"more than" statements now show the reasoning ("Vì 75 : 25 = 3 nên …") instead of "75 gấp 3 lần 25".
 - HUD: logo and VLM label hit areas ≥44 px on phones; player name on one line on phones and tablet portrait (HUD column 300 px at 701–1100 px).
 
+### Fixed
+- A tab left open across a deploy could not enter a level ("Chưa mở được màn chơi"): its hashed level chunk was gone. A failed dynamic import now reloads onto the new build once per minute (`core/stale-build-reload.ts`, e2e `stale-build-reload.spec.ts`).
+
 ### Testing
 - Parity re-baselined (attributed in `parity-rebaseline-chapter2.md`), 20/20; golden byte-identical; unit 720/720; e2e on 4 Playwright projects.
 - Deployed to https://math3d-game.vercel.app (dpl_5pZwDPaCiBhFc8UwB8J1B5EV2eZX), smoke test on desktop, Pixel 7 and iPad Pro 11 with 0 errors.
