@@ -2,7 +2,7 @@ import { describe, expect, it } from 'vitest';
 import { nearRoad } from '../world/world-scatter-exclusion';
 import { nearExpansionRoad } from './expansion-region-lookup';
 import { EXPANSION_REGIONS } from './expansion-regions';
-import { EXPANSION_SIGNPOSTS, SIGN_BOARD_REACH } from './expansion-signposts';
+import { EXPANSION_SIGNPOSTS, LABELED_SIGNPOST_ID, SIGN_BOARD_REACH } from './expansion-signposts';
 import { LEVEL_GATES } from './level-gate-config';
 import { RIVER, WALKABLE_BOUNDS } from './world-constants';
 
@@ -24,6 +24,7 @@ const nearAnyRoad = (x: number, z: number, d: number) =>
 describe('expansion signposts', () => {
   it('cover the west bridgehead, the west-bank cave road and the east junction', () => {
     const ids = EXPANSION_SIGNPOSTS.map((post) => post.id);
+    expect(ids).toContain(LABELED_SIGNPOST_ID);
     expect(ids).toEqual(
       expect.arrayContaining(['west-bridgehead', 'west-junction', 'cave-branch', 'east-junction']),
     );
