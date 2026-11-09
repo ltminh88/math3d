@@ -3,7 +3,8 @@
 // `Math.random` for every object UUID, so building earlier would shift the clouds/mountains and
 // every seeded draw after them. Builders write into scratch groups with their own materials; the
 // groups are baked into 3 meshes (ground, solid scenery, unlit glow), i.e. +4 world draw calls
-// with the solid mesh's shadow pass. Collision circles are appended to the obstacle list.
+// with the solid mesh's shadow pass, plus the signpost text faces (one atlas mesh, no shadow:
+// +1). Collision circles are appended to the obstacle list (signposts add none).
 import {
   type BufferGeometry,
   Group,
@@ -14,6 +15,7 @@ import {
 } from 'three';
 import { bakeVertexColoredGeometry } from '../levels/shared/bake-vertex-colored-geometry';
 import { buildExpansionGround } from './expansion-road-builder';
+import { buildExpansionSignposts } from './expansion-signpost-builder';
 import { buildGeometryValley } from './regions/geometry-valley-builder';
 import { buildMeasurementWorkshop } from './regions/measurement-workshop-builder';
 import { buildPuzzleCave } from './regions/puzzle-cave-builder';
@@ -24,6 +26,7 @@ export interface ExpansionWorldView {
   readonly ground: Mesh;
   readonly scenery: Mesh;
   readonly glow: Mesh;
+  readonly signText: Mesh;
 }
 
 function bakedMesh(name: string, root: Group, material: Material): Mesh {
@@ -51,14 +54,15 @@ export function buildExpansionWorld(world: WorldBuildContext): ExpansionWorldVie
   buildGeometryValley(scratch, solidRoot);
   buildMeasurementWorkshop(scratch, solidRoot);
   buildPuzzleCave(scratch, solidRoot, glowRoot);
+  const signText = buildExpansionSignposts(scratch, solidRoot);
   const ground = bakedMesh('expansion-ground', groundRoot, litMaterial());
   ground.receiveShadow = true;
   const scenery = bakedMesh('expansion-scenery', solidRoot, litMaterial());
   scenery.castShadow = true;
   scenery.receiveShadow = true;
   const glow = bakedMesh('expansion-glow', glowRoot, new MeshBasicMaterial({ vertexColors: true }));
-  world.scene.add(ground, scenery, glow);
-  return { ground, scenery, glow };
+  world.scene.add(ground, scenery, glow, signText);
+  return { ground, scenery, glow, signText };
 }
 
 function pickContext(world: WorldBuildContext): WorldBuildContext {

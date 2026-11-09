@@ -40,4 +40,20 @@
   #import-save-code::after {
     bottom: -9px;
   }
+  /* math3d logo: its 40 px mark under 700 px, -2 px each side gives 44 px. */
+  .brand {
+    position: relative;
+  }
+  .brand::after {
+    content: "";
+    position: absolute;
+    inset: -2px;
+  }
+  /* "Nói chuyện với VLM" label: 40 px tall under 700 px (already absolute; its ::after is the
+     pointer arrow, so the hit area is the ::before). */
+  #milo-label::before {
+    content: "";
+    position: absolute;
+    inset: -2px 0;
+  }
 }

@@ -1,7 +1,9 @@
-// DOM labels pinned to world points (VLM, bridge, level gates, regions) and the current-area
-// badge/toast.
+// DOM labels pinned to world points (VLM, bridge, level gates, regions, the west-bank signpost)
+// and the current-area badge/toast.
 import { Vector3 } from 'three';
 import { areaAt, isAreaUnlocked } from '../config/expansion-region-lookup';
+import { tx } from '../config/expansion-region-strings';
+import { EXPANSION_SIGNPOSTS, LABELED_SIGNPOST_ID } from '../config/expansion-signposts';
 import { LEVEL_GATES } from '../config/level-gate-config';
 import { getLegacyLanguage } from '../i18n/legacy-translator';
 import { areaText } from '../map/area-display-text';
@@ -14,6 +16,35 @@ const VLM_LABEL_AT = new Vector3(-3, 3.5, 1.5);
 const BRIDGE_LABEL_AT = new Vector3(7, 0.8, 0);
 /** Gate labels float just above the gate sign. */
 const GATE_LABEL_HEIGHT = 4.6;
+const SIGNPOST_POSITION = EXPANSION_SIGNPOSTS.find((p) => p.id === LABELED_SIGNPOST_ID)?.position;
+/** The signpost label floats over the pole cap (4.9). */
+const SIGNPOST_LABEL_AT = new Vector3(SIGNPOST_POSITION?.[0], 5.6, SIGNPOST_POSITION?.[1]);
+
+let signpostLabel: HTMLElement | undefined;
+
+/**
+ * The floating "Hang Đố Vui" label over the west-bank signpost (created on first use, after the
+ * bridge label: the recovered shell template stays verbatim). Locked look until the bridge quest.
+ */
+function signpostLabelElement(): HTMLElement {
+  if (!signpostLabel) {
+    signpostLabel = document.createElement('div');
+    signpostLabel.id = 'signpost-label';
+    signpostLabel.className = 'world-label landmark region-label';
+    signpostLabel.innerHTML = '<span class="region-icon"></span><strong></strong><small></small>';
+    (signpostLabel.querySelector('strong') as HTMLElement).textContent = tx('caveName');
+    (signpostLabel.querySelector('small') as HTMLElement).textContent = tx('signpostHint');
+    byId('bridge-label').after(signpostLabel);
+  }
+  const locked = !gameState.progress.questComplete;
+  if (signpostLabel.classList.contains('locked') !== locked || !signpostLabel.dataset.icon) {
+    signpostLabel.classList.toggle('locked', locked);
+    signpostLabel.dataset.icon = locked ? '🔒' : '🧩';
+    (signpostLabel.querySelector('.region-icon') as HTMLElement).textContent =
+      signpostLabel.dataset.icon;
+  }
+  return signpostLabel;
+}
 
 /** Places `label` over world point `at`, fading it out between 70 and 140 units away. */
 function projectLabel(label: HTMLElement, at: Vector3, offset: string, hide: boolean): void {
@@ -47,6 +78,7 @@ export function projectWorldLabels(): void {
       paused,
     );
   }
+  projectLabel(signpostLabelElement(), SIGNPOST_LABEL_AT, 'translate(-50%,-100%)', paused);
 }
 
 /**

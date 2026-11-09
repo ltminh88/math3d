@@ -15,6 +15,7 @@ export const tx = defineStrings('expansion-regions', {
     caveName: 'Hang Đố Vui',
     caveSubtitle: 'THẾ GIỚI 09',
     caveBlurb: 'Hang đá bên bờ tây, nơi những câu đố vui đang chờ.',
+    signpostHint: 'Đi theo biển chỉ đường',
   },
   en: {
     valleyName: 'Geometry Valley',
@@ -26,6 +27,7 @@ export const tx = defineStrings('expansion-regions', {
     caveName: 'Puzzle Cave',
     caveSubtitle: 'WORLD 09',
     caveBlurb: 'A rocky cave on the west bank where fun puzzles wait.',
+    signpostHint: 'Follow the signposts',
   },
 });
 

@@ -177,3 +177,19 @@ test('touch screens show no key hints: Enter button, minimap and help name the t
   }, selectors);
   expect(hits).toEqual(Object.fromEntries(selectors.map((s) => [s, true])));
 });
+
+// Playthrough: the long walk from the workshop to the cave had no floating label on the west
+// bank. A signpost label hangs over the fork past the village (locked look until the bridge).
+test('the west-bank signpost label points the way to the cave', async ({ page }) => {
+  await startPlaying(page);
+  await page.evaluate(() => window.__game?.teleport(-24, 1));
+  const label = page.locator('#signpost-label');
+  await expect(label).toBeVisible();
+  await expect(label.locator('strong')).toHaveText('Hang Đố Vui');
+  await expect(label).toHaveClass(/locked/);
+  await page.evaluate(() =>
+    window.__game?.seedProgress({ bridgeComplete: true, completedLevels: [] }),
+  );
+  await expect(label).not.toHaveClass(/locked/);
+  await expect(label.locator('.region-icon')).toHaveText('🧩');
+});

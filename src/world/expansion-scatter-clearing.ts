@@ -5,6 +5,7 @@
 // creates no three object (no UUID draw from `Math.random`).
 import { Color, type InstancedMesh, Matrix4, type Scene } from 'three';
 import { expansionRegionAt, nearExpansionRoad } from '../config/expansion-region-lookup';
+import { nearSignpost } from '../config/expansion-signposts';
 import type { ObstacleCircle } from './world-build-context';
 
 /** The instanced meshes `scatterWorld` adds, in its add order. */
@@ -18,13 +19,14 @@ export interface ScatterMeshes {
   readonly tufts: InstancedMesh;
 }
 
-/** Same clearances the scatter uses against the original regions and roads. */
+/** Same clearances the scatter uses against the original regions and roads; signposts keep their
+ *  boards' reach (4.3) plus a crown clear of trees. */
 const inTreeZone = (x: number, z: number) =>
-  !!expansionRegionAt(x, z, 1.4) || nearExpansionRoad(x, z, 2.4);
+  !!expansionRegionAt(x, z, 1.4) || nearExpansionRoad(x, z, 2.4) || nearSignpost(x, z, 5.4);
 const inRockZone = (x: number, z: number) =>
-  !!expansionRegionAt(x, z, 0.8) || nearExpansionRoad(x, z, 1.8);
+  !!expansionRegionAt(x, z, 0.8) || nearExpansionRoad(x, z, 1.8) || nearSignpost(x, z, 1.6);
 const inFlowerZone = (x: number, z: number) =>
-  !!expansionRegionAt(x, z) || nearExpansionRoad(x, z, 1.7);
+  !!expansionRegionAt(x, z) || nearExpansionRoad(x, z, 1.7) || nearSignpost(x, z, 0.8);
 
 /** The 7 instanced meshes added to `scene` from child `fromIndex` on (throws on a mismatch). */
 export function scatterMeshesFrom(scene: Scene, fromIndex: number): ScatterMeshes {
