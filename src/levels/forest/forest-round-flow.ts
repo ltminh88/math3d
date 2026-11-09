@@ -1,18 +1,13 @@
 // Pure round logic of the forest: which division facts to practise, which story each round tells
-// (share among friends, pack baskets, fact family) and the answer/hint state of the round.
+// (share among friends, pack baskets, fact family) and the answer/hint state of the round. Every
+// blank has its own three tries: the third miss shows that blank and the next one starts afresh;
+// the round is recorded once (not correct when a blank was shown). One hint ladder per round.
 import { divFactsForTables } from '../../learning/curriculum-tables';
 import { type FactKey, mulKey, parseFactKey } from '../../learning/fact-key';
-import {
-  createHintState,
-  type HintRung,
-  type HintState,
-  recordWrong,
-  shouldOfferHint,
-  takeHint,
-  toQuestionResult,
-} from '../../learning/hint-ladder';
+import { type HintRung, type HintState, shouldOfferHint } from '../../learning/hint-ladder';
 import type { FactStat } from '../../learning/learning-types';
 import type { QuestionOutcome } from '../../learning/session-recorder';
+import { StepMissBudget } from '../shared/step-miss-budget';
 
 export type RoundKind = 'share' | 'pack' | 'family';
 
@@ -36,6 +31,8 @@ export const CONCRETE_MAX_FRUIT = 20;
 /** Facts at this Leitner box or higher skip the objects (fact family only). */
 export const SYMBOLIC_BOX = 3;
 const FOREST_TABLES = [2, 3, 4, 5] as const;
+/** Last taught rung (rung 5 is only reached by three misses). */
+const FOREST_LAST_RUNG = 4;
 const MIN_KNOWN_FACTS = 3;
 const ROUND_KINDS: readonly RoundKind[] = ['share', 'pack', 'family', 'share', 'pack'];
 
@@ -99,8 +96,9 @@ export class ForestRoundFlow {
   index = 0;
   /** Blank being filled (fact family has up to four, the stories one). */
   blank = 0;
-  hint: HintState = createHintState();
   roundComplete = false;
+  /** The rung carries over from blank to blank: the round keeps one hint ladder. */
+  private readonly budget = new StepMissBudget(true);
   private wrongAnswers: number[] = [];
   private startedAt: number;
 
@@ -111,6 +109,11 @@ export class ForestRoundFlow {
     readonly total = rounds.length,
   ) {
     this.startedAt = now();
+  }
+
+  /** The live blank's hint ladder (its misses and rungs). */
+  get hint(): HintState {
+    return this.budget.hint;
   }
 
   get round(): ForestRound | undefined {
@@ -137,16 +140,20 @@ export class ForestRoundFlow {
   submit(value: number): SubmitResult {
     const round = this.round;
     if (!round || this.roundComplete) return { verdict: 'ignored' };
-    if (value === this.expected()) {
-      this.blank += 1;
-      if (this.blank < this.answers().length) return { verdict: 'correct' };
-      return { verdict: 'correct', outcome: this.finish(round, true) };
-    }
+    if (value === this.expected()) return this.advance(round, 'correct');
     this.wrongAnswers.push(value);
-    this.hint = recordWrong(this.hint);
-    if (!this.hint.revealed) return { verdict: 'wrong' };
-    this.blank = this.answers().length;
-    return { verdict: 'revealed', outcome: this.finish(round, false) };
+    if (!this.budget.miss()) return { verdict: 'wrong' };
+    return this.advance(round, 'revealed');
+  }
+
+  /** The blank is filled or shown: the next blank (fresh tries) or the round's outcome. */
+  private advance(round: ForestRound, verdict: 'correct' | 'revealed'): SubmitResult {
+    this.blank += 1;
+    if (this.blank < this.answers().length) {
+      this.budget.nextStep();
+      return { verdict };
+    }
+    return { verdict, outcome: this.finish(round) };
   }
 
   hintOffered(idleMs: number): boolean {
@@ -154,8 +161,7 @@ export class ForestRoundFlow {
   }
 
   takeHint(): HintRung {
-    this.hint = takeHint(this.hint);
-    return this.hint.rung;
+    return this.budget.takeHint(FOREST_LAST_RUNG);
   }
 
   /** Moves on after a completed round. */
@@ -163,15 +169,15 @@ export class ForestRoundFlow {
     if (!this.roundComplete) return;
     this.index += 1;
     this.blank = 0;
-    this.hint = createHintState();
+    this.budget.reset();
     this.roundComplete = false;
     this.wrongAnswers = [];
     this.startedAt = this.now();
   }
 
-  private finish(round: ForestRound, solved: boolean): QuestionOutcome {
+  private finish(round: ForestRound): QuestionOutcome {
     this.roundComplete = true;
-    const result = toQuestionResult(this.hint, solved);
+    const result = this.budget.result();
     return {
       factKey: round.factKey,
       ms: this.now() - this.startedAt,

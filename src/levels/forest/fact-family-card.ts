@@ -86,11 +86,6 @@ export class FactFamilyCard {
     blank.classList.remove('active');
   }
 
-  /** Fills every blank from `from` on with its answer (worked answer after three misses). */
-  revealFrom(from: number, answers: readonly number[]): void {
-    for (let i = from; i < answers.length; i++) this.fill(i, answers[i] as number, true);
-  }
-
   shake(): void {
     const blank = this.blanks[this.active];
     if (!blank) return;

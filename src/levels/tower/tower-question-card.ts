@@ -102,12 +102,11 @@ export class TowerQuestionCard {
     blank.classList.remove('active');
   }
 
-  /** Worked answer after three misses: every remaining step is shown (the fix row too). */
-  revealFrom(question: TowerQuestion, from: number): void {
-    if (question.format === 'truefalse' && from === 0) this.judged(question);
-    question.steps.forEach((step, i) => {
-      if (i >= from && step.kind !== 'verdict') this.fill(i, step.answer, true);
-    });
+  /** Three misses on step `index`: its answer is shown (a claim is judged, a blank is filled). */
+  revealStep(question: TowerQuestion, index: number): void {
+    const step = question.steps[index];
+    if (step?.kind === 'verdict') this.judged(question);
+    else if (step) this.fill(index, step.answer, true);
   }
 
   shake(): void {

@@ -1,5 +1,5 @@
 // Runs the forest rounds: story setup, dealing/moving fruit, checking, answers, hints, rewards
-// and the hand-over to the celebration. Rules live in sharing-model.ts and forest-round-flow.ts.
+// and the hand-over to the celebration. Rules (per-blank tries too) live in forest-round-flow.ts.
 import { questionReward } from '../../learning/scoring';
 import type { LevelContext } from '../shared/level-types';
 import type { FactFamilyCard } from './fact-family-card';
@@ -20,8 +20,7 @@ import {
   type SharingState,
 } from './sharing-model';
 
-/** Seconds between automatic deal steps of the rung 2 model. */
-const AUTO_DEAL_STEP = 0.45;
+const AUTO_DEAL_STEP = 0.45; // seconds between automatic deal steps of the rung 2 model
 
 export interface ForestRoundHooks {
   /** Table layout changed (new round, fruit moved): refresh pickables, zones, chips, camera. */
@@ -152,20 +151,21 @@ export class ForestRoundController {
       this.ctx.announce(text);
       return;
     }
-    if (result.verdict === 'correct') this.card.fill(blank, value);
-    else this.card.revealFrom(blank, this.flow.answers());
+    const revealed = result.verdict === 'revealed';
+    this.card.fill(blank, expected ?? value, revealed);
     if (!result.outcome) {
       this.card.setActive(this.flow.blank);
-      this.panel.setFeedback(this.ts('correctBlank'), 'success');
-      this.ctx.audio.tone(698, 0.12);
+      const text = this.ts(revealed ? 'revealedStep' : 'correctBlank');
+      this.panel.setFeedback(text, revealed ? 'gentle' : 'success');
+      if (revealed) this.ctx.audio.hint();
+      else this.ctx.audio.tone(698, 0.12);
       return;
     }
     this.ctx.learning.record(result.outcome);
     const reward = questionReward(result.outcome);
-    this.earned.xp += reward.xp;
-    this.earned.coins += reward.coins;
+    this.earned = { xp: this.earned.xp + reward.xp, coins: this.earned.coins + reward.coins };
     const equation = this.card.equationText(this.card.storyEquation(round));
-    const correct = result.verdict === 'correct';
+    const { correct } = result.outcome;
     const text = this.ts(correct ? 'correct' : 'revealed', { equation });
     this.panel.setFeedback(text, correct ? 'success' : 'gentle');
     if (reward.xp > 0)
