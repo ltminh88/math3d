@@ -32,7 +32,7 @@ Quest chain: bridge → field → forest → city → tower → **garden → val
 | 06 | [Geometry valley level "Thung Lũng Hình Học"](phase-06-geometry-valley-level.md) | 15h | 01, 02, 03 | Done (merged) |
 | 07 | [Measurement workshop level "Xưởng Đo Đạc"](phase-07-measurement-workshop-level.md) | 15h | 01, 02, 03 | Done (merged) |
 | 08 | [Puzzle cave level "Hang Đố Vui"](phase-08-puzzle-cave-level.md) | 12h | 01, 02, 03 | Done (merged) |
-| 09 | [Merge, 9-stage e2e, parity, real-input playthrough, deploy, author review](phase-09-merge-e2e-parity-deploy-and-author-review.md) | 12h | all | Pending |
+| 09 | [Merge, 9-stage e2e, parity, real-input playthrough, deploy, author review](phase-09-merge-e2e-parity-deploy-and-author-review.md) | 12h | all | Done (author review open) |
 
 ## Dependencies and parallel groups (ownership by folder)
 - Group A (parallel): 01 → `src/learning/**`, `src/reasoning/**`, `src/store/**`, `src/ui/kit/**`, `levels/shared/test-debug-hook.ts`, `playwright.config.ts`, `package.json`. 03 → `src/config/expansion-*`, `level-gate-config.ts`, `src/world/**`, `src/map/**`, `src/ui/quest-chain*`, HUD area label, `levels/shared/level-progression.ts` + `level-host-ports.ts`, `src/ui/book-help-*`. 02 starts once 01 lands `src/learning/skill-catalog.ts` → owns `src/geometry/**`, `src/measurement/**`.

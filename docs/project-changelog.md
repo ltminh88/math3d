@@ -1,5 +1,21 @@
 # Project changelog
 
+## 2026-11-09 — Chapter 2 follow-ups from the author review (tag `chapter2`)
+
+### Added
+- Signposts (`config/expansion-signposts.ts`, `world/expansion-signpost-builder.ts`): five wooden posts at the bridge junctions and along the west-bank cave road; arrow boards name each chapter-2 place and point within 30° of it. A floating "Hang Đố Vui · Đi theo biển chỉ đường" label over the west junction (locked look until the bridge quest). +1 draw call (one merged text mesh).
+
+### Changed
+- Word problems rewritten in natural language for 7–9-year-olds; kept in practice mode too.
+- Misses count per step in the garden, valley, cave and the shared reasoning round (`levels/shared/step-miss-budget.ts`); chapter-1 levels still count per round.
+- Valley board uses a top-down camera so angles never look skewed.
+- True/false "times"/"more than" statements now show the reasoning ("Vì 75 : 25 = 3 nên …") instead of "75 gấp 3 lần 25".
+- HUD: logo and VLM label hit areas ≥44 px on phones; player name on one line on phones and tablet portrait (HUD column 300 px at 701–1100 px).
+
+### Testing
+- Parity re-baselined (attributed in `parity-rebaseline-chapter2.md`), 20/20; golden byte-identical; unit 720/720; e2e on 4 Playwright projects.
+- Deployed to https://math3d-game.vercel.app (dpl_5pZwDPaCiBhFc8UwB8J1B5EV2eZX), smoke test on desktop, Pixel 7 and iPad Pro 11 with 0 errors.
+
 ## 2026-11-02 — Chapter 2: reasoning, geometry, measurement, map expansion (tag `chapter2-reviewed`)
 
 Plan: `plans/261031-1933-reasoning-geometry-and-map-expansion/`. Content follows SGK Toán 3 Kết nối tri thức; every number a child sees is ≤100.

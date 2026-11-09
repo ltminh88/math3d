@@ -43,13 +43,13 @@ docs/code-standards.md  docs/recovery-notes.md (mod)
 7. Docs; tags `chapter2`, `chapter2-reviewed`; author review session.
 
 ## Todo list
-- [ ] merge 04–08
-- [ ] full-chain e2e 4 projects
-- [ ] review + fixes
+- [x] merge 04–08
+- [x] full-chain e2e 4 projects
+- [x] review + fixes (`reports/reviewer-chapter2.md`)
 - [x] parity re-baseline + golden (`reports/parity-rebaseline-chapter2.md`)
 - [x] production playthrough desktop/phone/tablet (`reports/chapter2-playthrough/README.md`)
-- [ ] Vercel deploy + smoke
-- [ ] docs + tags
+- [x] Vercel deploy + smoke (dpl_5pZwDPaCiBhFc8UwB8J1B5EV2eZX)
+- [x] docs + tags
 - [ ] author review
 
 ## Success Criteria
