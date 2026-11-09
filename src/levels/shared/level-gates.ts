@@ -4,6 +4,7 @@
 // its level is not shipped yet, or enters the level through the level host.
 import { LEVEL_GATES, type LevelGate } from '../../config/level-gate-config';
 import { BRIDGE_SEGMENTS } from '../../config/world-constants';
+import { reloadForNewBuild } from '../../core/stale-build-reload';
 import { tc } from '../../i18n/common-strings';
 import { gameState } from '../../ui/game-state';
 import { byId } from '../../ui/icons';
@@ -91,7 +92,10 @@ async function enterGate(gate: LevelGate): Promise<void> {
     return;
   }
   gameState.audio.unlock();
-  if ((await host.enter(definition)) === 'failed') showToast(tl('loadFailed'));
+  const outcome = await host.enter(definition);
+  // A tab older than the last deploy: reload onto the new build (progress is already saved).
+  if (outcome === 'stale' && reloadForNewBuild()) showToast(tl('reloadingNewBuild'));
+  else if (outcome === 'stale' || outcome === 'failed') showToast(tl('loadFailed'));
 }
 
 function lockedToast(gate: LevelGate): string {

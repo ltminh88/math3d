@@ -156,6 +156,16 @@ describe('level host', () => {
     expect(host.running).toBe(false);
   });
 
+  it('a level chunk gone after a deploy reports a stale build (the page reloads)', async () => {
+    vi.spyOn(console, 'error').mockImplementation(() => {});
+    const f = fakePorts();
+    const host = new LevelHost(f.ports);
+    const gone = new TypeError('Failed to fetch dynamically imported module: /assets/garden-x.js');
+    expect(await host.enter(definition(() => Promise.reject(gone)))).toBe('stale');
+    expect(f.events).toEqual([]);
+    expect(host.running).toBe(false);
+  });
+
   it('a level whose start throws gives the world back', async () => {
     vi.spyOn(console, 'error').mockImplementation(() => {});
     const f = fakePorts();

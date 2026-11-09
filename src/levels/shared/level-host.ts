@@ -5,6 +5,7 @@
 import type { Camera, Scene, Texture } from 'three';
 import { SceneDisposer } from '../../core/scene-disposer';
 import { isShared } from '../../core/shared-asset-cache';
+import { isStaleChunkError } from '../../core/stale-build-reload';
 import type { LevelContext, LevelDefinition, LevelResult, LevelSession } from './level-types';
 
 /** Largest simulated level step, same as the world's (a hitch never jumps the simulation). */
@@ -37,7 +38,8 @@ export interface LevelHostPorts {
   ): LevelRun;
 }
 
-export type EnterOutcome = 'entered' | 'busy' | 'failed';
+/** 'stale': the level chunk is gone from the server (the tab runs a build older than a deploy). */
+export type EnterOutcome = 'entered' | 'busy' | 'failed' | 'stale';
 
 interface ActiveRun {
   session: LevelSession | undefined;
@@ -66,7 +68,7 @@ export class LevelHost {
     } catch (error) {
       console.error(`Level "${definition.id}" failed to load`, error);
       this.busy = false;
-      return 'failed';
+      return isStaleChunkError(error) ? 'stale' : 'failed';
     }
     const { ports } = this;
     ports.world.suspend();
