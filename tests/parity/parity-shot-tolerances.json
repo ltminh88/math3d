@@ -9,7 +9,8 @@
     "localVsLocalPhase12": "phase 12 (IndexedDB store, learning quiz, save-code buttons): npm run parity:baselines, then npm run test:parity: canvas PNGs, shot JSON, traces and scene dumps exact; one new DOM-noise shot (mobile milo-dialog, 2 px)",
     "localVsLocalPhase19": "phases 14/15/19 merge (field, forest, shop): npm run parity:baselines, then npm run test:parity: canvas PNGs, shot JSON, traces and scene dumps exact; one new DOM-noise shot (mobile quiz-hint-1, 221 px, two-state raster)",
     "localVsLocalP03": "chapter 2 map expansion (phase 03): npm run parity:baselines, then npm run test:parity x3 + menus/playthrough repeats, 2026-11-01: canvas PNGs, shot JSON, traces and scene dumps exact; new DOM noise on desktop quest-complete (third off-edge label, structural ceiling 0.009), desktop map-region-forest 3 px, mobile book-table-7 155 px + map-open 2 px (two-state)",
-    "localVsLocalP09": "chapter 2 phase 09 (merged main + touch hit areas): npm run parity:baselines, then npm run test:parity x2, 2026-11-02: canvas PNGs, shot JSON, traces and scene dumps exact; DOM noise: the four p03 shots re-observed (kept), mobile language-en book/play/settings 6-12 px (two-state, also seen in the pre-rebaseline run), mobile after-quest region-badge layer 3.6% once (structural ceiling 0.035 -> 0.073)"
+    "localVsLocalP09": "chapter 2 phase 09 (merged main + touch hit areas): npm run parity:baselines, then npm run test:parity x2, 2026-11-02: canvas PNGs, shot JSON, traces and scene dumps exact; DOM noise: the four p03 shots re-observed (kept), mobile language-en book/play/settings 6-12 px (two-state, also seen in the pre-rebaseline run), mobile after-quest region-badge layer 3.6% once (structural ceiling 0.035 -> 0.073)",
+    "localVsLocalSignposts": "world signposts + HUD touch fixes: npm run parity:baselines, then capture-live-baselines.mjs --origin local x2 (0 differ) and npm run test:parity, 2026-11-09: canvas PNGs, shot JSON, traces and scene dumps exact; DOM noise: desktop menus--play-settled 3 px (new listing) and tap-to-milo--walk-0_5s 155 px (off-edge label, tolerance 1e-4 -> 4e-4); test:parity runs 2-3 on a loaded machine (load ~9, other sessions): desktop welcome t0/t2s/t6s/t12s 27 px (the p09 two-state, now listed at 1e-4) and mobile top-left top-bar glass 59 px (off-by-one blur values, x 1-97 y 21-93) on tap-to-milo, walk-to-bridge and bridge-0/3/6 shots (tolerance 4e-4); JSON byte-exact in every case"
   },
   "policy": {
     "canvasPng": 0,
@@ -90,6 +91,13 @@
         },
         "structuralCeiling": 0.009
       },
+      "menus--play-settled.dom.png": {
+        "localVsLocalSignposts": {
+          "diffPixels": 3,
+          "ratio": 3.3e-6
+        },
+        "tolerance": 0.0001
+      },
       "menus--map-region-forest.dom.png": {
         "localVsLocalP03": {
           "diffPixels": 3,
@@ -139,7 +147,11 @@
           "diffPixels": 20,
           "ratio": 2.2e-5
         },
-        "tolerance": 0.0001,
+        "localVsLocalSignposts": {
+          "diffPixels": 155,
+          "ratio": 0.000168
+        },
+        "tolerance": 0.0004,
         "note": "off-edge world label, same 20 px as bridge-6 (live --verify 2026-10-19)"
       },
       "tap-to-milo--walk-1s.dom.png": {
@@ -157,6 +169,34 @@
         },
         "tolerance": 0.0001,
         "note": "off-edge world label, same 20 px as bridge-6 (live --verify 2026-10-19)"
+      },
+      "welcome--t0.dom.png": {
+        "localVsLocalSignposts": {
+          "diffPixels": 27,
+          "ratio": 2.93e-5
+        },
+        "tolerance": 0.0001
+      },
+      "welcome--t2s.dom.png": {
+        "localVsLocalSignposts": {
+          "diffPixels": 27,
+          "ratio": 2.93e-5
+        },
+        "tolerance": 0.0001
+      },
+      "welcome--t6s.dom.png": {
+        "localVsLocalSignposts": {
+          "diffPixels": 27,
+          "ratio": 2.93e-5
+        },
+        "tolerance": 0.0001
+      },
+      "welcome--t12s.dom.png": {
+        "localVsLocalSignposts": {
+          "diffPixels": 27,
+          "ratio": 2.93e-5
+        },
+        "tolerance": 0.0001
       }
     },
     "mobile-pixel": {
@@ -267,6 +307,83 @@
           "ratio": 3.47e-5
         },
         "tolerance": 0.0001
+      },
+      "tap-to-milo--arrived.dom.png": {
+        "localVsLocalSignposts": {
+          "diffPixels": 59,
+          "ratio": 0.000171
+        },
+        "tolerance": 0.0004
+      },
+      "tap-to-milo--tap.dom.png": {
+        "localVsLocalSignposts": {
+          "diffPixels": 59,
+          "ratio": 0.000171
+        },
+        "tolerance": 0.0004
+      },
+      "tap-to-milo--walk-0_5s.dom.png": {
+        "localVsLocalSignposts": {
+          "diffPixels": 59,
+          "ratio": 0.000171
+        },
+        "tolerance": 0.0004
+      },
+      "tap-to-milo--walk-1s.dom.png": {
+        "localVsLocalSignposts": {
+          "diffPixels": 59,
+          "ratio": 0.000171
+        },
+        "tolerance": 0.0004
+      },
+      "walk-to-bridge--settled.dom.png": {
+        "localVsLocalSignposts": {
+          "diffPixels": 59,
+          "ratio": 0.000171
+        },
+        "tolerance": 0.0004
+      },
+      "walk-to-bridge--start.dom.png": {
+        "localVsLocalSignposts": {
+          "diffPixels": 59,
+          "ratio": 0.000171
+        },
+        "tolerance": 0.0004
+      },
+      "walk-to-bridge--walk-1s.dom.png": {
+        "localVsLocalSignposts": {
+          "diffPixels": 59,
+          "ratio": 0.000171
+        },
+        "tolerance": 0.0004
+      },
+      "walk-to-bridge--walk-2s.dom.png": {
+        "localVsLocalSignposts": {
+          "diffPixels": 59,
+          "ratio": 0.000171
+        },
+        "tolerance": 0.0004
+      },
+      "bridge-0--play.dom.png": {
+        "localVsLocalSignposts": {
+          "diffPixels": 59,
+          "ratio": 0.000171
+        },
+        "tolerance": 0.0004
+      },
+      "bridge-3--play.dom.png": {
+        "localVsLocalSignposts": {
+          "diffPixels": 59,
+          "ratio": 0.000171
+        },
+        "tolerance": 0.0004
+      },
+      "bridge-6--play.dom.png": {
+        "localVsLocalSignposts": {
+          "diffPixels": 59,
+          "ratio": 0.000171
+        },
+        "tolerance": 0.0004
       }
     }
   },
