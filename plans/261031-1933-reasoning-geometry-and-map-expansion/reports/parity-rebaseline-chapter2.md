@@ -50,3 +50,18 @@ None can be removed or tightened on this evidence.
 
 - Final `npm run test:parity` (third full run, with the updated tolerances): **20 passed**; DOM noise only on listed shots, all within their tolerance/ceiling.
 - Goldens: `node tools/recovery/golden/generate-golden-traces.mjs --check` byte-identical.
+
+## Re-baseline: world signposts + HUD touch fixes (2026-11-09)
+
+Branch `feat/world-signposts` (from main fc0dd57). One `npm run parity:baselines` after all code commits (b17c227, 871bf28 signposts; 1bbcaf1, 3538aa9 HUD fixes), committed in cd816da. 92 shot JSON + 76 canvas/DOM PNG pairs + 26 scene dumps changed; traces unchanged.
+
+| Change | Files | Cause (commit) |
+|---|---|---|
+| shot JSON `gl.calls` +1 in every world shot (first view: desktop `menus--first-frame` 408 → 409, mobile 341 → 342; `menus--play-settled` 268 → 269 / 202 → 203) | 92 JSON | signpost board faces: one text-atlas mesh, no shadow pass (b17c227). The wood is baked into the existing expansion scenery mesh (0 calls). A few mobile quiz/bridge shots move by −1…+3 because the seeded content and camera state differ (below) |
+| quiz content, triangles, canvas PNGs, scene dumps | 46 canvas + 26 scene per project pair | new world objects draw `Math.random` for their three.js UUIDs before the quiz is seeded, so the seeded stream shifts (first quiz: "12 viên đá" → "18 viên đá"); the scatter is cleared around the posts (no RNG, but fewer tree instances) |
+| shot JSON `html` (76 playing shots) | — | the floating `#signpost-label` ("Hang Đố Vui · Đi theo biển chỉ đường") is appended after `#bridge-label` (b17c227) |
+| shot JSON `cssHash` (all 92) | — | `.brand::after` and `#milo-label::before` touch hit areas (1bbcaf1), `#player-name` nowrap + letter-spacing and the 701-1100 px HUD width (3538aa9) |
+
+Determinism: two `capture-live-baselines.mjs --origin local` runs right after the re-baseline: 0 differ in both (1-8 DOM shots within their existing tolerances). `npm run test:parity` on a loaded machine (load ~9 from other sessions) then showed DOM-only raster noise with byte-exact JSON, recorded as `localVsLocalSignposts` (b588f28): desktop `menus--play-settled` 3 px, `welcome--t0/t2s/t6s/t12s` 27 px (the p09 two-state), `tap-to-milo--walk-0_5s` 155 px; mobile top-left top-bar glass 59 px (off-by-one blur values, x 1-97 y 21-93) on `tap-to-milo--*`, `walk-to-bridge--*` and `bridge-0/3/6--play`.
+
+Result: final `npm run test:parity` **20 passed**; goldens `generate-golden-traces.mjs --check` byte-identical; REGIONS/ROADS/WALKABLE_BOUNDS untouched. E2E chapter2-gates-and-regions, full-chain, shop-purchase, boot-smoke, phone-touch-hit-areas on the 4 projects: 56 passed, 4 skipped (touch-only specs on desktop).
