@@ -41,6 +41,8 @@ export type PlannedStep =
 export interface TestGameHook {
   /** Commits stats for × / : facts and `sk:` skills (e.g. box 3+ to reach higher tiers). */
   seedFactStats(stats: SeedFactStats): Promise<void>;
+  /** Commits stage stars for one level (stage 1's stars also set the level's stars). */
+  seedStageProgress(levelId: string, stageStars: readonly number[]): Promise<void>;
   /** Shows a step card for a seeded reasoning item over the page; returns the right answers. */
   mountStepCard(skillId: string, seed: number, tier: SkillTier): PlannedStep[];
   /** Commits `seed` to the store and re-renders the world/HUD from it. */
@@ -76,6 +78,25 @@ async function seedProgress(seed: SeedProgress): Promise<void> {
     v: 1,
     facts: {},
     levels,
+    xp: 0,
+    coins: 0,
+  });
+  gameState.progress = progressViewFromSnapshot(store.getSnapshot());
+  renderProgress();
+  refreshLevelGates();
+}
+
+async function seedStageProgress(levelId: string, stageStars: readonly number[]): Promise<void> {
+  const store = connectedStore();
+  if (!store) throw new Error('store not connected');
+  await flushProgress();
+  await store.commitSession({
+    batchId: newId(),
+    profileId: store.getSnapshot().profile.id,
+    clientTs: Date.now(),
+    v: 1,
+    facts: {},
+    levels: { [levelId]: { stars: stageStars[0] ?? 0, bestScore: 0, stageStars } },
     xp: 0,
     coins: 0,
   });
@@ -139,6 +160,7 @@ export function installTestDebugHook(): void {
   window.__game = {
     seedProgress,
     seedFactStats,
+    seedStageProgress,
     mountStepCard,
     teleport,
     teleportToGate(levelId) {

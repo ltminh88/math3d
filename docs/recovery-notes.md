@@ -132,13 +132,18 @@ the head tooling and requires them to be equal. PR label `parity-change` skips i
 - Settings: one source, `math3d.settings` (`src/store/app-settings.ts`); until it is first
   written, language / quest card / sound / music come from the legacy keys.
 - Save codes (`save-code-codec.ts`): `M3D<v>-` + base64url(compact JSON) + `-` + CRC32 (8 hex)
-  of the payload; max 16384 chars. Export writes **M3D3** (chapter 2, `save-code-v3-payload.ts`):
-  every M3D2 field below, levels for bridge + field/forest/city/tower/garden/valley/workshop/cave
+  of the payload; max 16384 chars. Export writes **M3D4** (phase 01, `save-code-v4-payload.ts`):
+  every M3D3 field below, levels for bridge + field/forest/city/tower/garden/valley/workshop/cave
   (frozen list; a test fails when a new gate is not in it), plus `k` skill tuples
   `[id, attempts, correct, totalMs, box, lastSeenSession, lastSeenSec, streak?, fluent?]` (`id` =
-  catalog id without `sk:`, errs not carried). An unknown skill id, a `sk:` key inside `f` or an
-  unknown level -> `payload`. A full save (every × / : fact of tables 1-10, 39 skills, 9 levels, 12 items) stays under
-  the cap. A new skill id or level gate needs **M3D4** (the catalog is append-only).
+  catalog id without `sk:`, errs not carried), plus `t` per-level stage stars
+  `{levelId: [s1, s2, …]}` (only levels with a non-zero stage beyond stage 1) and `d`
+  `[lastDailyDay, dailyStreak]` (phase 11 owns the semantics). An unknown skill id, a `sk:` key
+  inside `f`, an unknown level, a `t` array that disagrees with the level's stars, or a
+  malformed `d` -> `payload`. A full save (every × / : fact of tables 1-10, 39 skills, 9 levels,
+  12 items, all stages maxed) stays under the cap. A new skill id or level gate needs **M3D5**
+  (the catalog is append-only). M3D2/M3D3 carry no stage stars: on import, stage 1 inherits
+  the level's stars (`decodeLevels` + `migrateLevelProgress`).
   **M3D2** (`save-code-v2-payload.ts`, still decoded exactly as shipped, frozen fixture test): the whole
   store snapshot — `x` xp, `c` coins, `a` avatar, `g` [table, combo, started], `s` [sound, music],
   `n` session count, `l` {levelId: [stars, bestScore, completedSec, progress, acceptedSec]} for

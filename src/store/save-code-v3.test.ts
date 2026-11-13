@@ -12,7 +12,6 @@ import {
   encodeSaveCodeV3,
   importOfDecodedSaveCode,
   MAX_SAVE_CODE_CHARS,
-  SAVE_CODE_VERSION,
   SaveCodeError,
 } from './save-code-codec';
 import { SHIPPED_M3D2_CODE, SHIPPED_M3D2_IMPORT } from './save-code-shipped-m3d2-fixture';
@@ -67,8 +66,7 @@ const code = (version: number, payload: unknown): string => {
 };
 
 describe('M3D3 save code', () => {
-  it('is the version export writes', () => {
-    expect(SAVE_CODE_VERSION).toBe(3);
+  it('still encodes M3D3 (kept for tests and fixtures; export writes M3D4)', () => {
     expect(encodeSaveCodeV3(snapshot(), audio)).toMatch(/^M3D3-[A-Za-z0-9_-]+-[0-9a-f]{8}$/);
   });
 

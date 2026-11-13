@@ -6,9 +6,11 @@ import type { GameDb } from './idb-database';
 import type { NumberStoneDb } from './save-migrations';
 import { migrateLevelProgress } from './save-migrations';
 import {
+  type DailyProgress,
   DEFAULT_GAME_META,
   type GameMeta,
   type LevelProgress,
+  metaDailyKey,
   metaGameKey,
   metaSessionCountKey,
   type Profile,
@@ -35,6 +37,8 @@ export interface GameSnapshot {
   /** Committed sessions so far; the next session is `sessionCount + 1`. */
   sessionCount: number;
   gameMeta: GameMeta;
+  /** Daily-practice progress; absent when no daily run was ever counted. */
+  daily?: DailyProgress;
 }
 
 /** Keeps only correctly typed fields of a stored game meta record. */
@@ -47,6 +51,22 @@ export function sanitizeGameMeta(raw: unknown): GameMeta {
     combo: int(r.combo, DEFAULT_GAME_META.combo),
     started: typeof r.started === 'boolean' ? r.started : DEFAULT_GAME_META.started,
   };
+}
+
+/** Keeps only correctly typed fields of a stored daily record. */
+export function sanitizeDaily(raw: unknown): DailyProgress | undefined {
+  if (typeof raw !== 'object' || raw === null) return undefined;
+  const r = raw as Record<string, unknown>;
+  const day =
+    typeof r.lastDailyDay === 'number' && Number.isInteger(r.lastDailyDay) && r.lastDailyDay >= 0
+      ? r.lastDailyDay
+      : 0;
+  const streak =
+    typeof r.dailyStreak === 'number' && Number.isInteger(r.dailyStreak) && r.dailyStreak >= 0
+      ? r.dailyStreak
+      : 0;
+  if (day === 0 && streak === 0) return undefined;
+  return { lastDailyDay: day, dailyStreak: streak };
 }
 
 export function newLevelProgress(profileId: string, levelId: string): LevelProgress {
@@ -65,13 +85,14 @@ export function newLevelProgress(profileId: string, levelId: string): LevelProgr
 export async function loadSnapshot(db: GameDb, profile: Profile): Promise<GameSnapshot> {
   const id = profile.id;
   const tx = db.transaction(ALL_STORES, 'readonly');
-  const [facts, levels, wallet, owned, count, game] = await Promise.all([
+  const [facts, levels, wallet, owned, count, game, daily] = await Promise.all([
     tx.objectStore('factStats').index('byProfile').getAll(id),
     tx.objectStore('levelProgress').index('byProfile').getAll(id),
     tx.objectStore('wallet').get(id),
     tx.objectStore('ownedCosmetics').index('byProfile').getAll(id),
     tx.objectStore('meta').get(metaSessionCountKey(id)),
     tx.objectStore('meta').get(metaGameKey(id)),
+    tx.objectStore('meta').get(metaDailyKey(id)),
     tx.done,
   ]);
   const factStats: Record<FactKey, FactStat> = {};
@@ -89,6 +110,7 @@ export async function loadSnapshot(db: GameDb, profile: Profile): Promise<GameSn
     ownedCosmetics: owned.map((o) => o.cosmeticId),
     sessionCount: typeof count?.value === 'number' ? count.value : 0,
     gameMeta: sanitizeGameMeta(game?.value),
+    daily: sanitizeDaily(daily?.value),
   };
 }
 

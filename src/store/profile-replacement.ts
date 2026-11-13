@@ -3,12 +3,14 @@ import type { FactStat } from '../learning/learning-types';
 import { newLevelProgress, type WriteTx } from './progress-repository';
 import { migrateLevelProgress } from './save-migrations';
 import {
+  type DailyProgress,
   DEFAULT_GAME_META,
   type GameMeta,
   type LegacyImportMarker,
   type LevelProgress,
   META_ACTIVE_PROFILE,
   META_LEGACY_IMPORT,
+  metaDailyKey,
   metaGameKey,
   metaSessionCountKey,
   newProfile,
@@ -26,6 +28,8 @@ export interface ProgressRecords {
   cosmetics?: { owned: string[]; equipped: Record<string, string> };
   /** Committed session counter (keeps `lastSeenSession` spacing meaningful); absent = 0. */
   sessionCount?: number;
+  /** Daily-practice progress (M3D4 `d` field); absent = no daily run counted yet. */
+  daily?: DailyProgress;
 }
 
 export const emptyProgressRecords = (): ProgressRecords => ({
@@ -82,6 +86,7 @@ export async function writeReplacementProfile(
   }
   const meta = tx.objectStore('meta');
   await meta.put({ key: metaGameKey(profileId), value: { ...records.gameMeta } });
+  if (records.daily) await meta.put({ key: metaDailyKey(profileId), value: { ...records.daily } });
   if (records.sessionCount)
     await meta.put({ key: metaSessionCountKey(profileId), value: records.sessionCount });
   await meta.put({ key: META_ACTIVE_PROFILE, value: profileId });
