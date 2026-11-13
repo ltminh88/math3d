@@ -79,7 +79,7 @@ test('export after all levels and a purchase -> fresh context import restores ev
   await page.locator('#settings').click();
   await page.locator('#export-save-code').click();
   const code = await page.locator('#save-code-output').inputValue();
-  expect(code).toMatch(/^M3D3-[A-Za-z0-9_-]+-[0-9a-f]{8}$/);
+  expect(code).toMatch(/^M3D4-[A-Za-z0-9_-]+-[0-9a-f]{8}$/);
   await first.close();
 
   const fresh = await browser.newContext({ locale: 'vi-VN' });
