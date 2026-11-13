@@ -38,6 +38,9 @@ export interface LevelProgress {
   progress: number;
   /** When the level's quest was accepted (0 = not yet). */
   acceptedAt: number;
+  /** Best stars per stage (index 0 = stage 1); missing entries count as 0. Sparse: a
+   * record written before stages existed has none and is migrated on read. */
+  stageStars: readonly number[];
 }
 
 export interface Wallet {

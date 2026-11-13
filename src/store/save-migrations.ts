@@ -66,6 +66,20 @@ export function latestVersion(migrations: readonly Migration[]): number {
   return migrations.reduce((max, m) => Math.max(max, m.version), 0);
 }
 
+/**
+ * Record migration for stages (phase 01, not an IndexedDB schema step — the store holds
+ * whole objects, so a new optional field needs no version bump). A record written before
+ * stages existed has no `stageStars`: stage 1 inherits the level's stars, stages 2+
+ * open at 0. A record with `stars = 0` becomes all zeros.
+ */
+export function migrateLevelProgress<T extends { stars: number; stageStars?: readonly number[] }>(
+  record: T,
+): T & { stageStars: readonly number[] } {
+  const raw = record.stageStars;
+  if (Array.isArray(raw) && raw.length > 0) return { ...record, stageStars: raw };
+  return { ...record, stageStars: record.stars > 0 ? [record.stars] : [] };
+}
+
 /** Runs every step in (oldVersion, newVersion], in version order. Throws (aborting the upgrade) on gaps. */
 export async function runMigrations(
   db: IDBPDatabase<NumberStoneDb>,

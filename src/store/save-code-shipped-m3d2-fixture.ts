@@ -1,5 +1,7 @@
 // A shipped M3D2 code (written by the M3D2 exporter before M3D3 existed) and what it imports.
 // Frozen: M3D2 decoding must keep returning exactly this, whatever later versions add.
+// (Phase 01 added the derived `stageStars: [stars]` per level: M3D2 carries no stage
+// stars, so stage 1 inherits the level's stars on import. The code string is unchanged.)
 export const SHIPPED_M3D2_CODE = [
   'M3D2-eyJ4IjoxMjMwLCJjIjo0MTUsImEiOiJnaXJsIiwiZyI6WzcsNCwxXSwicyI6WzAsMV0sIm4iOjEyLCJsIjp7I',
   'mJyaWRnZSI6WzEsMTAwLDE3OTI0ODUwMTUsNiwxNzkyNDg1MDE1XSwiZmllbGQiOlsyLDIwMCwxNzkyNDg1MDE1LDA',
@@ -20,6 +22,7 @@ export const SHIPPED_M3D2_IMPORT = {
     levels: {
       bridge: {
         stars: 1,
+        stageStars: [1],
         bestScore: 100,
         completedAt: 1792485015000,
         progress: 6,
@@ -27,6 +30,7 @@ export const SHIPPED_M3D2_IMPORT = {
       },
       field: {
         stars: 2,
+        stageStars: [2],
         bestScore: 200,
         completedAt: 1792485015000,
         progress: 0,
@@ -34,6 +38,7 @@ export const SHIPPED_M3D2_IMPORT = {
       },
       forest: {
         stars: 1,
+        stageStars: [1],
         bestScore: 100,
         completedAt: 1792485015000,
         progress: 0,
@@ -41,6 +46,7 @@ export const SHIPPED_M3D2_IMPORT = {
       },
       city: {
         stars: 3,
+        stageStars: [3],
         bestScore: 300,
         completedAt: 1792485015000,
         progress: 0,
@@ -48,6 +54,7 @@ export const SHIPPED_M3D2_IMPORT = {
       },
       tower: {
         stars: 1,
+        stageStars: [1],
         bestScore: 100,
         completedAt: 1792485015000,
         progress: 0,

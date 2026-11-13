@@ -9,6 +9,7 @@ const valleyLevel: LevelDefinition = {
   // Skills, not tables, drive the valley; the tables only satisfy the shared contract.
   tables: [2, 3, 4, 5, 6, 7, 8, 9],
   rounds: 6,
+  stages: 1,
   requires: 'garden',
   load: () => import('./valley-scene'),
 };

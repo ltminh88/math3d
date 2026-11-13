@@ -31,6 +31,7 @@ const level = (levelId: string) => ({
   completedAt: AT,
   progress: 0,
   acceptedAt: AT,
+  stageStars: [2],
 });
 
 function snapshot(): GameSnapshot {

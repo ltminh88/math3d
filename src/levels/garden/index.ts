@@ -10,6 +10,7 @@ const gardenLevel: LevelDefinition = {
   // itself draws from the garden's skill pool, not from table facts.
   tables: [2, 3, 4, 5, 6, 7, 8, 9],
   rounds: 6,
+  stages: 1,
   requires: 'tower',
   load: () => import('./garden-scene'),
 };

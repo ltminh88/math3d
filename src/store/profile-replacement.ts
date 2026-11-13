@@ -1,6 +1,7 @@
 import type { FactKey } from '../learning/fact-key';
 import type { FactStat } from '../learning/learning-types';
 import { newLevelProgress, type WriteTx } from './progress-repository';
+import { migrateLevelProgress } from './save-migrations';
 import {
   DEFAULT_GAME_META,
   type GameMeta,
@@ -64,9 +65,14 @@ export async function writeReplacementProfile(
   await tx.objectStore('profiles').put(profile);
   await tx.objectStore('wallet').put({ profileId, ...records.wallet });
   for (const [levelId, level] of Object.entries(records.levels)) {
-    await tx
-      .objectStore('levelProgress')
-      .put({ ...newLevelProgress(profileId, levelId), ...level, profileId, levelId });
+    await tx.objectStore('levelProgress').put(
+      migrateLevelProgress({
+        ...newLevelProgress(profileId, levelId),
+        ...level,
+        profileId,
+        levelId,
+      }),
+    );
   }
   for (const [key, stat] of Object.entries(records.facts)) {
     await tx.objectStore('factStats').put({ ...stat, profileId, key });

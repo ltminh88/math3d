@@ -41,6 +41,9 @@ export interface DeltaLevel {
   bestScore: number;
   /** Level progress counter reached (e.g. bridge segments); merged with max. */
   progress?: number;
+  /** Best stars per stage to merge (max wins per stage); stages 2+ are committed by
+   * level phases, the test hook seeds them. */
+  stageStars?: readonly number[];
 }
 
 /** Session summary; also the outbox payload sent to `sync_batch`. */

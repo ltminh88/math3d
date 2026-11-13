@@ -16,7 +16,7 @@ const imported = (): ProgressRecords => ({
   avatarId: 'girl',
   wallet: { coins: 40, xp: 110 },
   levels: {
-    bridge: { stars: 1, bestScore: 0, completedAt: 5, progress: 6, acceptedAt: 5 },
+    bridge: { stars: 1, bestScore: 0, completedAt: 5, progress: 6, acceptedAt: 5, stageStars: [1] },
   },
   facts: { 'mul:2x8': { ...newFactStat(), attempts: 3, correct: 2, totalMs: 48, box: 2 } },
   gameMeta: { table: 4, combo: 5, started: true },
@@ -95,7 +95,14 @@ describe.each(backends)('profile state on %s', (_label, open) => {
       ...imported(),
       levels: {
         ...imported().levels,
-        tower: { stars: 2, bestScore: 9, completedAt: 6, progress: 0, acceptedAt: 6 },
+        tower: {
+          stars: 2,
+          bestScore: 9,
+          completedAt: 6,
+          progress: 0,
+          acceptedAt: 6,
+          stageStars: [2],
+        },
       },
       cosmetics: {
         owned: ['avatar-gold-crown', 'decor-fountain'],

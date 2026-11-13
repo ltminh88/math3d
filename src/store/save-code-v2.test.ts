@@ -22,6 +22,7 @@ const AT_SEC_MS = Math.floor(AT / 1000) * 1000;
 
 const level = (levelId: string, stars: number, progress = 0) => ({
   profileId: 'p1',
+  stageStars: stars > 0 ? [stars] : [],
   levelId,
   stars,
   bestScore: stars * 100,

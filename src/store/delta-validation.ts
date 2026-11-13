@@ -40,7 +40,12 @@ export function validateDelta(delta: SessionDelta, activeProfileId: string): voi
       l.stars < 0 ||
       l.stars > 3 ||
       !isNonNegInt(l.bestScore) ||
-      (l.progress !== undefined && (!isNonNegInt(l.progress) || l.progress > MAX_LEVEL_PROGRESS))
+      (l.progress !== undefined && (!isNonNegInt(l.progress) || l.progress > MAX_LEVEL_PROGRESS)) ||
+      (l.stageStars !== undefined &&
+        (!Array.isArray(l.stageStars) ||
+          // Plan max is 6 stages, plus the 7th-stage contingency (phase 00) — 8 leaves room.
+          l.stageStars.length > 8 ||
+          l.stageStars.some((s) => !Number.isInteger(s) || s < 0 || s > 3)))
     ) {
       fail(`level ${id}`);
     }

@@ -9,6 +9,7 @@ const caveLevel: LevelDefinition = {
   // Skills, not tables, drive the cave; the tables only group × / : facts for the planner.
   tables: [2, 3, 4, 5, 6, 7, 8, 9],
   rounds: 7,
+  stages: 1,
   requires: 'workshop',
   load: () => import('./cave-scene'),
 };

@@ -7,6 +7,7 @@ const forestLevel: LevelDefinition = {
   regionId: 'forest',
   tables: [2, 3, 4, 5],
   rounds: 5,
+  stages: 1,
   requires: 'field',
   load: () => import('./forest-scene'),
 };

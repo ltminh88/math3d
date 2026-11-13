@@ -23,6 +23,8 @@ export interface LevelDefinition {
   readonly tables: readonly number[];
   /** Rounds per run. */
   readonly rounds: number;
+  /** Stages inside the level (phase 01: every level has 1; phases 03–10 raise it). */
+  readonly stages: number;
   /** Must equal the gate's requirement in `LEVEL_GATES` (checked at registration). */
   readonly requires: GateRequirement;
   /** Loads the scene code (keep it a dynamic `import()` so the level stays code-split). */
@@ -57,6 +59,8 @@ export interface LevelInput {
 
 export interface LevelContext {
   readonly definition: LevelDefinition;
+  /** Stage of this run (1-based): the next uncompleted stage when the run opened. */
+  readonly stage: number;
   /**
    * The world's renderer (one WebGL context); the host renders `session.scene` with it. Leave its
    * global state alone (clear colour, tone mapping, exposure, shadowMap, pixel ratio, autoClear,

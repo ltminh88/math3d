@@ -4,6 +4,7 @@ import type { FactLocalState, FactStat, SessionDelta } from '../learning/learnin
 import { newFactStat } from '../learning/leitner-box';
 import type { GameDb } from './idb-database';
 import type { NumberStoneDb } from './save-migrations';
+import { migrateLevelProgress } from './save-migrations';
 import {
   DEFAULT_GAME_META,
   type GameMeta,
@@ -49,7 +50,16 @@ export function sanitizeGameMeta(raw: unknown): GameMeta {
 }
 
 export function newLevelProgress(profileId: string, levelId: string): LevelProgress {
-  return { profileId, levelId, stars: 0, bestScore: 0, completedAt: 0, progress: 0, acceptedAt: 0 };
+  return {
+    profileId,
+    levelId,
+    stars: 0,
+    bestScore: 0,
+    completedAt: 0,
+    progress: 0,
+    acceptedAt: 0,
+    stageStars: [],
+  };
 }
 
 export async function loadSnapshot(db: GameDb, profile: Profile): Promise<GameSnapshot> {
@@ -70,7 +80,10 @@ export async function loadSnapshot(db: GameDb, profile: Profile): Promise<GameSn
     profile,
     factStats,
     levelProgress: Object.fromEntries(
-      levels.map((l) => [l.levelId, { ...newLevelProgress(id, l.levelId), ...l }]),
+      levels.map((l) => [
+        l.levelId,
+        migrateLevelProgress({ ...newLevelProgress(id, l.levelId), ...l }),
+      ]),
     ),
     wallet: { coins: wallet?.coins ?? 0, xp: wallet?.xp ?? 0 },
     ownedCosmetics: owned.map((o) => o.cosmeticId),
@@ -122,16 +135,22 @@ export async function applyDelta(
 
   const levels = tx.objectStore('levelProgress');
   for (const [levelId, l] of Object.entries(delta.levels)) {
-    const prev = {
+    const prev = migrateLevelProgress({
       ...newLevelProgress(profileId, levelId),
       ...(await levels.get([profileId, levelId])),
-    };
+    });
+    const nextStars = l.stageStars ?? [];
+    const stageStars = Array.from(
+      { length: Math.max(prev.stageStars.length, nextStars.length) },
+      (_, i) => Math.max(prev.stageStars[i] ?? 0, nextStars[i] ?? 0),
+    );
     await levels.put({
       ...prev,
       stars: Math.max(prev.stars, l.stars),
       bestScore: Math.max(prev.bestScore, l.bestScore),
       completedAt: l.stars >= 1 ? prev.completedAt || ctx.now : prev.completedAt,
       progress: Math.max(prev.progress, l.progress ?? 0),
+      stageStars,
     });
   }
 

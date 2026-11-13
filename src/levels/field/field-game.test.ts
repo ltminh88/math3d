@@ -84,7 +84,8 @@ function setup(facts: string[], firstCompletion = true) {
   const labels = { set: noop, place: noop, hide: (h: boolean) => hidden.push(h) };
   const audio = new Proxy({}, { get: () => noop });
   const ctx = {
-    definition: { tables: [3, 4], rounds: facts.length },
+    definition: { tables: [3, 4], rounds: facts.length, stages: 1 },
+    stage: 1,
     learning: {
       stats: () => ({}),
       sessionNo: 1,
