@@ -1,4 +1,4 @@
-# Phase 06: Sticker book (mastery goals)
+# Phase 12: Sticker book (mastery goals)
 
 ## Context links
 - [plan.md](plan.md), [phase-00-design.md](phase-00-design.md) (sticker
@@ -17,8 +17,9 @@
 
 ## Overview
 - Priority P1. Status **not started**. Depends on 01 (derivation rule
-  frozen: no sticker storage). Parallel with 03/04/05 (this phase owns
-  `ui/sticker-book.*` + the derivation module only).
+  frozen: no sticker storage). Parallel with 03–11 (this phase owns
+  `ui/sticker-book.*` + the derivation module only). Effort **10 h**
+  (branch `muse/sticker-book`, one PR).
 - A sticker book: one page per topic, one sticker per mastery unit,
   earned when the unit reaches Leitner box 4+. Replaying has a visible
   purpose; nothing is gated by stickers and nothing is bought with them.
@@ -111,6 +112,14 @@ change.
    once per unit per session and never blocks play).
 4. E2E on 4 projects with seeded stats.
 5. Lint, typecheck, unit, build, golden `--check` (dialog-only change).
+   Deploy a preview of this branch (no `--prod`) and put its URL in the
+   pull request, so the author can open the book early.
+
+## Visible changes in the world outside the levels
+- Quest card: "Sổ dán hình" button.
+- VLM guide dialog: sticker earning line ("Con vừa dán được hình …!").
+- Nothing else in the world changes. The parity reviewer re-shoots the
+  quest card and the VLM dialog; these are intentional changes.
 
 ## Todo list
 - [ ] sticker derivation (pure, unit-tested)
@@ -118,6 +127,7 @@ change.
 - [ ] quest-card + VLM entry
 - [ ] earning line (once per unit per session)
 - [ ] e2e, 4 projects
+- [ ] preview deploy + URL in PR
 
 ## Success Criteria
 - 47 stickers, 6 pages, all derived — no sticker field in the store, the

@@ -1,11 +1,10 @@
-# Phase 07: Quest card / HUD / migration / docs
+# Phase 13: Quest card / HUD copy / migration / docs
 
 ## Context links
 - [plan.md](plan.md), [phase-00-design.md](phase-00-design.md),
-  [phase-03-stages-chapter-1-field-forest-city-tower.md](phase-03-stages-chapter-1-field-forest-city-tower.md),
-  [phase-04-stages-chapter-2-garden-valley-workshop-cave.md](phase-04-stages-chapter-2-garden-valley-workshop-cave.md),
-  [phase-05-daily-practice-with-vlm.md](phase-05-daily-practice-with-vlm.md),
-  [phase-06-sticker-book-mastery.md](phase-06-sticker-book-mastery.md)
+  phases 03–10 (one per level),
+  [phase-11-daily-practice-with-vlm.md](phase-11-daily-practice-with-vlm.md),
+  [phase-12-sticker-book-mastery.md](phase-12-sticker-book-mastery.md)
 - `src/ui/quest-chain.ts`, `quest-chain-stage.ts`
   (`QUEST_CHAPTERS`: 2 chapters, ≤ 5 cells per chapter, "Chương n · k/m"),
   `quest-chain-strings.ts`
@@ -16,12 +15,13 @@
   (both must describe the new stages + daily practice when this phase lands)
 
 ## Overview
-- Priority P1. Status **not started**. Depends on 03–06 (it integrates
+- Priority P1. Status **not started**. Depends on 03–12 (it integrates
   what they built; it builds no stage, daily or sticker behaviour itself).
-- One integration phase: the quest card learns about stages, the HUD
-  stays uncluttered, existing saves are verified end to end, and the docs
-  describe the new world. Small by design — if it grows past ~800 lines,
-  it splits by surface (quest card first, docs last).
+  Effort **7 h** (branch `muse/quest-hud-docs`, one PR).
+- One integration phase: the quest card learns about stages, existing
+  saves are verified end to end, and the docs describe the new world.
+  Small by design — if it grows past ~800 lines, it splits by surface
+  (quest card first, docs last).
 
 ## Key Insights
 - The quest chain's unit is still the *level*, not the stage: the chain
@@ -37,7 +37,7 @@
   `coming-soon` / `open` / `completed`); what changes is the *copy* for
   `completed` (it now names the next stage) and a new `stage` field on
   the gate's pop-panel data.
-- Docs are a deliverable of this phase, not an afterthought in phase 08:
+- Docs are a deliverable of this phase, not an afterthought in phase 14:
   `code-standards.md` must describe the stage model, the daily planner
   and the sticker derivation (so the next agent does not re-invent them),
   and `project-changelog.md` must record the behaviour change for
@@ -47,18 +47,17 @@
 - **Quest card**: the current level's card gains a sub-line "Chặng {n}/{m}
   · {stars} sao" (from `stageStars`) and, once all stages of a level are
   done, "Đã qua hết các chặng!". The chapter row ("Chương n · k/m") and
-  its ≤ 5 cells are unchanged. The daily reminder line (phase 05) and the
-  sticker-book button (phase 06) are finalised here for copy and
-  placement — one line each, no new HUD chrome.
+  its ≤ 5 cells are unchanged. The daily reminder line (phase 11) and the
+  sticker-book button (phase 12) are finalised here for copy and
+  placement — one line each.
 - **Gate pop-panel**: shows the next stage ("Chặng 2/6 — Vào chơi") and,
   for a fully completed level, "Chơi lại chặng…" (replay picker for
   completed stages, tap list, ≥ 44 px rows). Replaying a stage never
   re-locks anything and never re-pays the first-completion bonus.
-- **HUD**: no new permanent HUD element. Daily + stickers live behind
-  the quest card / VLM, per phases 05/06. If the author asked in the
-  design review for a HUD daily button, *that* is built here (one
-  button, ≥ 44 px, hidden while a level runs) — otherwise explicitly not
-  built. Record the decision in this phase file's Implementation notes.
+- **HUD**: the daily button was already decided and built in phase 11
+  (author decision 7, PR #1 review). This phase only finalises its copy
+  ("Luyện tập hôm nay") and checks it against the quest-card copy — no
+  new HUD element is added here.
 - **Migration verification (end to end, not just unit)**: a scripted
   check (e2e) that imports a shipped M3D3 code for a profile that
   finished the cave, then asserts: every level shows stage 1 complete
@@ -83,7 +82,8 @@ src/ui/quest-chain.ts (mod: stage sub-line)
 src/ui/quest-chain-stage.ts (mod: stage-aware helpers, pure)
 src/ui/quest-chain-strings.ts (mod: stage lines vi/en)
 src/levels/shared/level-gates.ts (mod: pop-panel stage data — verify file)
-src/ui/hud.ts (mod ONLY if the author asked for a HUD daily button)
+src/ui/hud.ts (mod: finalise the daily button copy only — the button
+  itself was built in phase 11)
 docs/code-standards.md (mod)
 docs/project-changelog.md (mod)
 tests/e2e/quest-chain-stages.spec.ts (new)
@@ -100,19 +100,31 @@ this phase.
 ## Implementation Steps
 1. Quest-card stage sub-line + gate pop-panel stage text (strings vi/en);
    replay picker for completed stages.
-2. HUD decision (build the button only if the design review asked for it;
-   record the decision either way).
+2. HUD copy finalisation (daily button copy, built in phase 11 — no new
+   HUD element here).
 3. Migration e2e checks (M3D3 import → stages; fresh profile → daily
    locked).
 4. Docs (`code-standards.md`, `project-changelog.md`).
 5. Lint, typecheck, unit, build, golden `--check`, e2e on 4 projects.
+   Deploy a preview of this branch (no `--prod`) and put its URL in the
+   pull request.
+
+## Visible changes in the world outside the levels
+- Quest card: stage sub-line for the current level ("Chặng {n}/{m} ·
+  {sao} sao" / "Đã qua hết các chặng!").
+- Gate pop-panel: next-stage line + replay picker for completed stages.
+- HUD: no new element here (the daily button came from phase 11); only
+  its copy is finalised.
+- The parity reviewer re-shoots the quest card and the gate pop-panel;
+  these are intentional changes.
 
 ## Todo list
 - [ ] quest-card stage sub-line
 - [ ] gate pop-panel + replay picker
-- [ ] HUD daily button decision (build or record "not built")
+- [ ] HUD daily button copy finalisation
 - [ ] migration e2e (M3D3 import + fresh profile)
 - [ ] docs
+- [ ] preview deploy + URL in PR
 
 ## Success Criteria
 - A returning player (finished cave, M3D3 code) loses nothing and sees
@@ -120,11 +132,12 @@ this phase.
 - Quest card still fits a 412 px phone; chain row still ≤ 5 cells.
 - Docs describe the stage model, daily and stickers well enough that a
   new agent could extend them without re-reading the code.
-- No HUD clutter added without an explicit author decision.
+- No new HUD element added here (the daily button came from phase 11).
+- The phase's pull request carries a preview-deploy URL (no `--prod`).
 
 ## Scope Contract
-- Changed: quest card, gate pop-panel, docs, two e2e specs (+ HUD button
-  only on author request).
+- Changed: quest card, gate pop-panel, docs, two e2e specs (+ HUD copy
+  finalisation only).
 - Impacted: every surface that names a level's completion.
 - Will verify: e2e (4 projects), migration e2e, golden check.
 - Deliberately skipped: any stage/daily/sticker behaviour change (those
@@ -143,4 +156,4 @@ this phase.
   never a real player's code.
 
 ## Next steps
-- 08 (merge, full e2e, parity, staging, author review).
+- 14 (merge, full e2e, parity, staging, author review).

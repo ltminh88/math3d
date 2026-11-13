@@ -21,11 +21,13 @@
 
 ## Overview
 - Priority P1. Status **not started**. No deps; unblocks every later phase.
+  Effort **12 h** (branch `muse/measure-stage-model-m3d4`, one PR).
 - Foundation in three parts: (a) measure what exists — distinct-prompt
-  counts per skill/tier and the in-level median seconds per round;
-  (b) land the stage data model (`stages` on the definition, `stageStars`
-  on progress) with the migration rule; (c) land save code M3D4 carrying
-  the new fields, with M3D1/2/3 decoding byte-for-byte as before.
+  counts per skill/tier; (b) land the stage data model (`stages` on the
+  definition, `stageStars` on progress) with the migration rule; (c) land
+  save code M3D4 carrying the new fields, with M3D1/2/3 decoding
+  byte-for-byte as before. Play time is **not** measured here (see the
+  "Play-time estimate" requirement below).
 - This phase writes **no level content and no UI**. Its outputs are the
   numbers every later phase is judged against.
 
@@ -41,11 +43,11 @@
   stages pay only their per-question rewards, or the bonus would be farmed
   44 times.
 - `lastSeenAt` (epoch ms) already exists on every fact/skill stat, so the
-  daily planner (phase 05) needs no new per-fact storage — only the two
+  daily planner (phase 11) needs no new per-fact storage — only the two
   daily fields in M3D4.
 - Stickers are derived from boxes, so they need no storage at all. If a
   sticker ever needed its own field, that decision belongs here, before
-  M3D4 freezes — not in phase 06.
+  M3D4 freezes — not in phase 12.
 - The skill catalog is append-only and M3D3 decodes only listed ids. This
   phase must answer, per skill, "can this pool be widened without a new
   id?" — a "yes, needs a new id" answer after M3D4 lands would mean M3D5.
@@ -63,17 +65,15 @@
   committed report,
   `plans/261113-1951-more-practice-content-for-muse/reports/pool-counts-before.md`,
   with a before/after table phase 02 fills in.
-- **Play-time measurement protocol**: instrument round start/end
-  timestamps on the level test hooks (`window.__game` / per-level hooks;
-  test builds only) and record them in the full-chain e2e run. Report the
-  median in-level seconds per round *by round kind* (tables recall,
-  multi-step reasoning, geometry, measurement) and overall. Playwright
-  wall time is **not** the child time: report the e2e median alongside
-  the calibration implied by the author's 1-hour observation (~55–60 s
-  in-level, see phase 00). If the measured median is < 58 s, the design's
-  contingency triggers: add a 7th stage to city + tower (design change
-  recorded here, before phase 03 starts). Re-estimate the total effort
-  after this measurement.
+- **Play-time estimate: no e2e measurement.** The estimate stays calibrated
+  on the author's real observation (~1 hour for 47 rounds → ~55–60 s
+  in-level per round; see phase 00). E2e robots click many times faster
+  than a child, so an e2e-derived median is unusable, and **no timing is
+  attached to any test hook** (PR #1 review, point 4). The contingency
+  (7th stage for city + tower) is triggered by the author's timed
+  playthrough of the staging previews (phase 14), never by a test run.
+  This phase re-estimates the total effort after the pool counts are
+  known — it does not re-measure play time.
 - **Stage model**:
   - `LevelDefinition.stages: number` (registry: positive integer; a level
     with `stages: 1` behaves exactly as today — this is what lets the
@@ -105,7 +105,7 @@
     fixture and a new shipped M3D3 fixture taken before this change).
   - New compact fields only: `s` = per-level stage stars (only levels
     with a non-zero stage beyond stage 1, to keep codes short), `d` =
-    `[lastDailyDay, dailyStreak]` (phase 05 owns the semantics; the field
+    `[lastDailyDay, dailyStreak]` (phase 11 owns the semantics; the field
     exists here so its shape is frozen). No other new fields.
   - Strict decode: unknown level/skill id → `payload` error, as M3D3
     does; full-save encoded length stays < 16384 chars (test with a
@@ -119,7 +119,7 @@
 ## Architecture
 ```
 tools/practice/pool-counter.ts (new, node-only; imports pure generators)
-src/learning/daily-intervals.ts (new: BOX -> days, shared by phase 05; pure)
+src/learning/daily-intervals.ts (new: BOX -> days, shared by phase 11; pure)
 src/levels/shared/level-stages.ts (new, pure)
 src/levels/shared/level-types.ts (mod: stages, ctx.stage)
 src/levels/shared/level-registry.ts (mod: validate stages)
@@ -154,20 +154,28 @@ Co-located `*.test.ts` for each pure module. All files < 200 lines.
 4. RED: M3D4 round-trip (stages + daily fields); M3D1/2/3 fixtures decode
    identical; unknown level/skill → `payload`; maxed-out save < 16384
    chars; GREEN.
-5. Run the play-time measurement on the full-chain e2e; write the
-   measured median + the go/no-go on the city+tower 7th stage into this
-   phase file's Implementation notes and update phase 00's estimate table
-   if the number moves. Re-estimate total effort.
-6. Lint, typecheck, unit, build, golden `--check` (must be byte-identical:
-   this phase touches no world code).
+5. Lint, typecheck, unit, build, golden `--check` (must be byte-identical:
+   this phase touches no world code). Deploy a preview of this branch
+   (`npx vite build --outDir .preview/deploy --emptyOutDir`, then
+   `npx vercel@65.9.0 deploy .preview/deploy --yes --project mathgame`,
+   **no `--prod`**) and put its URL in the pull request, so the author can
+   check the migration behaviour early (PR #1 review, point 1; every PR
+   with code ships a preview).
+6. Re-estimate the total effort after the pool counts are known and record
+   it in this phase file's Implementation notes.
+
+## Visible changes in the world outside the levels
+None. This phase changes the stage model, the progress record and the save
+code; it adds no gate text, no quest-card line, no button and no dialog.
+(The stage seeder in the test hook is test-build only and never visible.)
 
 ## Todo list
 - [ ] pool counter + before-report
-- [ ] play-time measurement + contingency decision
 - [ ] `level-stages.ts` + registry + host `stage`
 - [ ] `stageStars` + migration (+ e2e)
 - [ ] M3D4 (+ frozen fixtures, size test, docs)
 - [ ] catalog freeze decision (new ids or none)
+- [ ] preview deploy + URL in PR
 - [ ] re-estimate total effort
 
 ## Success Criteria
@@ -176,8 +184,9 @@ Co-located `*.test.ts` for each pure module. All files < 200 lines.
   no existing save loses progress in unit tests or e2e.
 - M3D1/2/3 fixtures decode identically; M3D4 round-trips; goldens
   byte-identical; lint/typecheck/unit/build clean.
-- The play-time estimate is a measured number with a stated protocol, and
-  the 7th-stage contingency has a yes/no answer recorded here.
+- The phase's pull request carries a preview-deploy URL (no `--prod`).
+- No timing is attached to any test hook; no e2e play-time number is
+  reported from this phase.
 
 ## Scope Contract
 - Changed: stage model, progress record, save-code version, test hooks,
@@ -195,7 +204,6 @@ Co-located `*.test.ts` for each pure module. All files < 200 lines.
 | M3D4 accidentally changes M3D3 decoding | L | H | Frozen fixtures for M3D1/2/3; strict-decode tests |
 | Stage-1 inheritance misreads an old record | M | H | Migration unit tests + e2e on a shipped code |
 | Pool counter's "signature" misses a visible repeat (e.g. same numbers, different template) | M | M | Signature = template + numbers + scene params; spot-check 20 sampled items by eye in the report |
-| e2e median misleads (Playwright overhead) | H | M | Report e2e median *and* the 1-hour calibration; the contingency uses the calibrated number, not raw wall time |
 | A skill needs a new id after M3D4 freezes | M | M | Freeze decision is an explicit deliverable of this phase, before any stage work |
 
 ## Security Considerations
@@ -204,5 +212,5 @@ Co-located `*.test.ts` for each pure module. All files < 200 lines.
   ids whitelisted by catalog.
 
 ## Next steps
-- 02 after the counter + catalog freeze; 03–06 consume the stage model
+- 02 after the counter + catalog freeze; 03–13 consume the stage model
   and M3D4.

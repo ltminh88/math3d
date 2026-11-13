@@ -20,6 +20,7 @@
 - Priority P1. Status **not started**. Depends on 01 (counter + catalog
   freeze). Parallel with 03 (different folders; 03 consumes the widened
   generators but its stage *formats* do not depend on the new contexts).
+  Effort **12 h** (branch `muse/wider-item-pools`, one PR).
 - Widen the pools *inside* the existing generators — more story contexts,
   shapes and scene variants — so no child sees the same visible prompt
   twice within three runs of a level. No new skill ids (phase 01 froze
@@ -54,7 +55,7 @@
   (3 runs × ~6 rounds, skill share ≤ 1/3 of rounds). Any skill that
   cannot reach its target after widening is listed in the after-report
   with the reason (e.g. a genuinely finite KNTT set) and the stage plans
-  in phases 03/04 are adjusted to use it less often — the shortfall is
+  in phases 03–10 are adjusted to use it less often — the shortfall is
   reported, not hidden.
 - **Word problems** (`src/reasoning/word-problem-generators.ts`): +3–5
   story contexts per skill (6 `wp-*` skills), from KNTT grade-3 contexts
@@ -81,7 +82,7 @@
   repeat is the place name), perimeter/area (new side sets within
   `SIDE_RANGE` / `AREA_SIDE_MAX`, new fence stories).
 - **Tables (mul/div)**: no new facts exist to add (tables 2–9 are finite)
-  — widening here is *format* variety, which belongs to phases 03/04
+  — widening here is *format* variety, which belongs to phases 03–10
   (stage formats), not this phase. This phase only verifies the fact-pool
   counts per level from `curriculum-tables.ts` and reports them.
 - **Tests**: the existing oracle tests (1000 seeds × 3 tiers × skill:
@@ -125,11 +126,21 @@ stays free of `three` and DOM.
 3. KNTT check: each new context cites its SGK lesson (same format as the
    catalog's `lesson` field); a context with no lesson cite does not land.
 4. Re-run the counter; fill in the after-report; list any skill below
-   target with reason + the phase 03/04 adjustment it needs.
+   target with reason + the phase 03–10 adjustment it needs.
 5. Lint, typecheck, unit, build, golden `--check` (pure-logic change:
    goldens must be byte-identical; if a generator change reshuffles a
    seeded quiz order, that is a *finding* to report, not a baseline to
-   regenerate silently).
+   regenerate silently). Deploy a preview of this branch
+   (`npx vite build --outDir .preview/deploy --emptyOutDir`, then
+   `npx vercel@65.9.0 deploy .preview/deploy --yes --project mathgame`,
+   **no `--prod`**) and put its URL in the pull request, so the author
+   can read the new word-problem wordings in the game early.
+
+## Visible changes in the world outside the levels
+None as new chrome: no new gate text, quest-card line, button or dialog.
+The new story contexts appear inside existing prompts (bridge quiz dialog
+and level rounds) — same surfaces, new wording. The parity reviewer
+re-shoots the quiz/level prompt screenshots, not the world.
 
 ## Todo list
 - [ ] word-problem contexts (+3–5 per `wp-*` skill)
@@ -138,10 +149,11 @@ stays free of `three` and DOM.
 - [ ] measurement combination variants
 - [ ] oracle + vi/en tests green
 - [ ] after-report with before/after counts; shortfall list
+- [ ] preview deploy + URL in PR
 
 ## Success Criteria
 - Every skill × tier meets its target, or is on the shortfall list with a
-  reason and a phase 03/04 adjustment.
+  reason and a phase 03–10 adjustment.
 - Oracle tests green (1000 seeds × 3 tiers × every skill); all prompts
   render in vi/en; no number above 100 in any seed.
 - No visual change: goldens byte-identical; no parity re-baseline.
@@ -155,14 +167,14 @@ stays free of `three` and DOM.
 - Will verify: unit oracles, vi/en render tests, counter re-run, golden
   check.
 - Deliberately skipped: new skill ids, new generator kinds, new round
-  formats (phases 03/04), any UI or scene change.
+  formats (phases 03–10), any UI or scene change.
 
 ## Risk Assessment
 | Risk | L | I | Countermove |
 |---|---|---|---|
 | New context breaks a hint rung (shows the answer) | M | H | Hint tests per skill re-run; rung ≥ 2 never shows the answer (code-standards rule, tested in chapter 2) |
 | A context's numbers exceed 100 at tier 3 | M | H | Oracle over 1000 seeds per tier; ranges file is the single source of truth |
-| KNTT wording drifts (new contexts sound "made up") | M | M | Lesson cite per context; author review in phase 08 checks wording, not just counts |
+| KNTT wording drifts (new contexts sound "made up") | M | M | Lesson cite per context; author review in phase 14 checks wording, not just counts |
 | Widening reshuffles seeded quiz order → golden diff | L | M | Golden `--check` in this phase; any diff is reported, never silently re-baselined |
 
 ## Security Considerations
@@ -170,4 +182,4 @@ stays free of `three` and DOM.
   parsed, no save-code change in this phase.
 
 ## Next steps
-- 04 consumes the widened pools; 03 uses the verified fact-pool counts.
+- 07–10 consume the widened pools; 03–06 use the verified fact-pool counts.
