@@ -164,19 +164,61 @@ Co-located `*.test.ts` for each pure module. All files < 200 lines.
 6. Re-estimate the total effort after the pool counts are known and record
    it in this phase file's Implementation notes.
 
+## Implementation notes (done 2026-11-13, branch `muse/measure-stage-model-m3d4`)
+
+- **Measured pool sizes (correcting the design's numbers)** — field **17**
+  (design said 18), forest **36 div-only** (design said 72 — that was
+  mul+div), city **30** (design said 36), tower **116 = mul 44 + div 72**
+  (design said 144; `mulKey` dedupes commutative pairs). Every `wp-*`
+  skill has exactly 1 story context, except `wp-more-less-then-total`
+  with 2. Smallest skill pools: geo-midpoint t1 = 6, meas-ml t2 = 7,
+  meas-temperature t1 = 8, meas-area-square 9/9/7, geo-radius-diameter
+  t1 = 10. Report:
+  `plans/261113-1951-more-practice-content-for-muse/reports/pool-counts-before.md`.
+- **Catalog freeze: NO new skill ids.** M3D4's catalog is M3D3's 39 ids;
+  all small pools widen parametrically in phase 02.
+- **Deviation — `t`, not `s`, for stage stars.** The phase file said
+  `s`, but `s` is already the audio `[sound, music]` pair in M3D2/M3D3,
+  so M3D4 uses `t` (per-level stage stars, only for levels with a
+  non-zero stage beyond stage 1, trailing zeros trimmed) and `d`
+  (`[lastDailyDay, dailyStreak]`, only when non-zero). Strict decode:
+  `t[0]` must equal the level's `stars`; `t` length 1–8, entries 0–3;
+  `d` caps day ≤ 100000, streak ≤ 10000. A `t`/`d` inside a v3 code is
+  rejected as `payload`.
+- **Gates (2026-11-13):** lint green (9 pre-existing CSS warnings, same
+  as main), typecheck green, unit **759 passed / 128 files** (baseline
+  727), build green, golden traces byte-identical.
+- **E2E:** migration spec `tests/e2e/stage-migration.spec.ts` **8/8 on
+  all 4 projects** (importing a shipped M3D3 code keeps the cave
+  complete with stageStars `[2]`; `seedStageProgress` commits through
+  the store). The first full-suite run (`--workers=2`) showed 7
+  failing specs, all desktop-chromium timeouts / reads before the first
+  SwiftShader frame rendered; re-running those specs with `--workers=1`
+  passed them all except the field leak test, which fails identically
+  on main (`Expected: > 296, Received: 296` — the field's geometries
+  have not uploaded yet when the one-shot read runs). That test is a
+  pre-existing environment flake in this VM, not a phase-01 regression;
+  no code of this phase touches rendering or geometry disposal.
+- **Re-estimate: total stays ~138 h.** The counts move no phase's
+  effort: phase 02 stays 12 h (story contexts + range widening for the
+  small geo/meas pools fits it), phases 03–10 are unchanged (their
+  stage tables now use the corrected pool numbers), and the freeze
+  removes the M3D5 risk the design had priced in. Play-time estimate
+  is unchanged (257 rounds × 55–60 s + run overhead ≈ 4.9–5.3 h).
+
 ## Visible changes in the world outside the levels
 None. This phase changes the stage model, the progress record and the save
 code; it adds no gate text, no quest-card line, no button and no dialog.
 (The stage seeder in the test hook is test-build only and never visible.)
 
 ## Todo list
-- [ ] pool counter + before-report
-- [ ] `level-stages.ts` + registry + host `stage`
-- [ ] `stageStars` + migration (+ e2e)
-- [ ] M3D4 (+ frozen fixtures, size test, docs)
-- [ ] catalog freeze decision (new ids or none)
+- [x] pool counter + before-report
+- [x] `level-stages.ts` + registry + host `stage`
+- [x] `stageStars` + migration (+ e2e)
+- [x] M3D4 (+ frozen fixtures, size test, docs)
+- [x] catalog freeze decision (new ids or none)
 - [ ] preview deploy + URL in PR
-- [ ] re-estimate total effort
+- [x] re-estimate total effort
 
 ## Success Criteria
 - Pool counts are committed numbers, not estimates, per skill × tier.
