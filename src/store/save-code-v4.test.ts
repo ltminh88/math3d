@@ -106,14 +106,22 @@ describe('M3D4 save code', () => {
     for (const gate of LEVEL_GATES) expect(M3D3_LEVELS, gate.levelId).toContain(gate.levelId);
   });
 
-  it('rejects unknown levels, mismatched stage stars and malformed daily fields', () => {
+  it('repairs a drifted stage-1 entry to the level stars on import', () => {
+    const base = { l: { field: [2, 0, 0, 0, 0] } };
+    const { records } = importOfDecodedSaveCode(
+      decodeSaveCode(code(4, { ...base, t: { field: [1, 1] } })),
+      AT,
+    );
+    expect(records.levels.field?.stageStars).toEqual([2, 1]);
+  });
+
+  it('rejects unknown levels and malformed daily fields', () => {
     const base = { l: { field: [2, 0, 0, 0, 0] } };
     expect(reason(() => decodeSaveCode(code(4, { ...base, t: { field: [2, 1] } })))).toBe(
       'no error',
     );
     for (const payload of [
       { ...base, t: { castle: [1] } },
-      { ...base, t: { field: [1, 1] } }, // stage 1 disagrees with l.stars (2)
       { ...base, t: { field: [2, 4] } }, // star out of range
       { ...base, t: { field: [] } },
       { ...base, t: { field: [2, 1, 1, 1, 1, 1, 1, 1, 1] } }, // longer than the cap

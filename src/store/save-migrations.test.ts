@@ -91,4 +91,11 @@ describe('stage migration (phase 01)', () => {
     const rec = { stars: 3, stageStars: [3, 1, 0] };
     expect(migrateLevelProgress(rec)).toMatchObject({ stageStars: [3, 1, 0] });
   });
+
+  it('a drifted record (stageStars[0] below stars) is repaired to the invariant on read', () => {
+    expect(migrateLevelProgress({ stars: 3, stageStars: [1, 2] })).toMatchObject({
+      stars: 3,
+      stageStars: [3, 2],
+    });
+  });
 });

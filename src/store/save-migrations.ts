@@ -71,12 +71,19 @@ export function latestVersion(migrations: readonly Migration[]): number {
  * whole objects, so a new optional field needs no version bump). A record written before
  * stages existed has no `stageStars`: stage 1 inherits the level's stars, stages 2+
  * open at 0. A record with `stars = 0` becomes all zeros.
+ *
+ * Invariant: `stageStars[0] === stars`. A record written before the invariant was enforced
+ * can drift (stage 1 replayed better without sending `stageStars`); reading it repairs
+ * stage 1 to `stars` and keeps stages 2+ as written.
  */
 export function migrateLevelProgress<T extends { stars: number; stageStars?: readonly number[] }>(
   record: T,
 ): T & { stageStars: readonly number[] } {
   const raw = record.stageStars;
-  if (Array.isArray(raw) && raw.length > 0) return { ...record, stageStars: raw };
+  if (Array.isArray(raw) && raw.length > 0) {
+    if (raw[0] !== record.stars) return { ...record, stageStars: [record.stars, ...raw.slice(1)] };
+    return { ...record, stageStars: raw };
+  }
   return { ...record, stageStars: record.stars > 0 ? [record.stars] : [] };
 }
 

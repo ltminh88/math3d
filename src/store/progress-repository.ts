@@ -129,6 +129,10 @@ export interface ApplyContext {
 /**
  * Applies a delta inside the caller's transaction: counters add, box follows the newest `seenAt`,
  * level stars/score keep the best, wallet adds (and never goes negative).
+ *
+ * Invariant: `stageStars[0] === stars`. `stars` is the single source of truth for stage 1
+ * (normal play never sends `stageStars`); `stageStars[0]` is a derived copy, forced to the
+ * merged stars on every write, so an exported code always round-trips.
  */
 export async function applyDelta(
   tx: WriteTx,
@@ -162,13 +166,15 @@ export async function applyDelta(
       ...(await levels.get([profileId, levelId])),
     });
     const nextStars = l.stageStars ?? [];
-    const stageStars = Array.from(
+    const merged = Array.from(
       { length: Math.max(prev.stageStars.length, nextStars.length) },
       (_, i) => Math.max(prev.stageStars[i] ?? 0, nextStars[i] ?? 0),
     );
+    const stars = Math.max(prev.stars, l.stars);
+    const stageStars = stars > 0 ? [stars, ...merged.slice(1)] : [];
     await levels.put({
       ...prev,
-      stars: Math.max(prev.stars, l.stars),
+      stars,
       bestScore: Math.max(prev.bestScore, l.bestScore),
       completedAt: l.stars >= 1 ? prev.completedAt || ctx.now : prev.completedAt,
       progress: Math.max(prev.progress, l.progress ?? 0),

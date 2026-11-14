@@ -6,8 +6,11 @@
 //     so its shape is frozen)
 // The phase-01 design said `s` for stage stars, but `s` is already the audio
 // [sound, music] pair in M3D2/M3D3, so M3D4 uses `t` (stages) instead. Decoding is
-// strict, like M3D3: an unknown level/skill id, a stage array that disagrees with the
-// level's stars, or a malformed `d` rejects the code.
+// strict, like M3D3: an unknown level/skill id or a malformed `d` rejects the code.
+// One exception: `t[0]` is redundant with the level's `stars`, and a code written
+// before the stageStars[0] === stars invariant was enforced can drift — importing
+// such a code repairs stage 1 to `stars` (keeping stages 2+ as written) instead of
+// rejecting the child's save.
 
 import type { GameSnapshot } from './progress-repository';
 import { isIntIn } from './save-code-v2-facts';
@@ -64,9 +67,9 @@ function decodeStageStars(raw: unknown, levels: LevelRecords): boolean {
       !stars.every((s) => isIntIn(s, 0, 3))
     )
       return false;
-    // Stage 1 in `t` must agree with the level's stars (export writes it that way).
-    if (stars[0] !== level.stars) return false;
-    level.stageStars = [...(stars as number[])];
+    // `t[0]` is redundant with the level's stars (the authoritative value): a drifted
+    // code repairs stage 1 to `stars` on import instead of being rejected.
+    level.stageStars = [level.stars, ...(stars as number[]).slice(1)];
   }
   return true;
 }

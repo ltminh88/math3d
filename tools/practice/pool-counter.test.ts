@@ -8,7 +8,7 @@ import {
   countSkill,
   countStoryContexts,
   FACT_POOLS,
-} from './pool-counter';
+} from './pool-counting';
 
 describe('pool counter', () => {
   it('counts a trivial two-item pool exactly', () => {
