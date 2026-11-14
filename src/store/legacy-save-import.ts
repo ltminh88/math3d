@@ -92,6 +92,7 @@ export function mapSaveV1ToProgress(
             completedAt: save.questComplete ? now : 0,
             progress: save.bridge,
             acceptedAt: save.questAccepted ? now : 0,
+            stageStars: [],
           },
         }
       : {},

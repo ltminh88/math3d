@@ -31,6 +31,9 @@ export function collectLevelDefinitions(
     if (!Number.isInteger(definition.rounds) || (definition.rounds ?? 0) < 1) {
       throw new Error(`Level "${definition.id}": rounds must be a positive integer`);
     }
+    if (!Number.isInteger(definition.stages) || (definition.stages ?? 0) < 1) {
+      throw new Error(`Level "${definition.id}": stages must be a positive integer`);
+    }
     if (!Array.isArray(definition.tables) || definition.tables.length === 0) {
       throw new Error(`Level "${definition.id}": tables must not be empty`);
     }

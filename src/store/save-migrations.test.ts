@@ -1,7 +1,7 @@
 import 'fake-indexeddb/auto';
 import { describe, expect, it } from 'vitest';
 import { openGameDb } from './idb-database';
-import { MIGRATIONS, type Migration } from './save-migrations';
+import { MIGRATIONS, type Migration, migrateLevelProgress } from './save-migrations';
 
 let n = 0;
 const name = () => `mig-db-${++n}`;
@@ -65,5 +65,37 @@ describe('save migrations', () => {
     const dbName = name();
     const gap: Migration = { version: 3, up: () => undefined };
     await expect(openGameDb({ name: dbName, migrations: [...MIGRATIONS, gap] })).rejects.toThrow();
+  });
+});
+
+describe('stage migration (phase 01)', () => {
+  it('a finished pre-stage record keeps its stars on stage 1', () => {
+    expect(
+      migrateLevelProgress({
+        stars: 2,
+        bestScore: 100,
+        completedAt: 1,
+        progress: 0,
+        acceptedAt: 0,
+      }),
+    ).toMatchObject({ stars: 2, stageStars: [2] });
+  });
+
+  it('an unfinished pre-stage record becomes all zeros', () => {
+    expect(
+      migrateLevelProgress({ stars: 0, bestScore: 0, completedAt: 0, progress: 0, acceptedAt: 0 }),
+    ).toMatchObject({ stars: 0, stageStars: [] });
+  });
+
+  it('a record that already has stage stars is untouched', () => {
+    const rec = { stars: 3, stageStars: [3, 1, 0] };
+    expect(migrateLevelProgress(rec)).toMatchObject({ stageStars: [3, 1, 0] });
+  });
+
+  it('a drifted record (stageStars[0] below stars) is repaired to the invariant on read', () => {
+    expect(migrateLevelProgress({ stars: 3, stageStars: [1, 2] })).toMatchObject({
+      stars: 3,
+      stageStars: [3, 2],
+    });
   });
 });

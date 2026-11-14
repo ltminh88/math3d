@@ -111,7 +111,16 @@ function decodeLevels(
     )
       return null;
     const completedAt = doneSec * 1000;
-    levels[id] = { stars, bestScore, completedAt, progress, acceptedAt: acceptedSec * 1000 };
+    // M3D2/M3D3 carry no stage stars: stage 1 inherits the level's stars (phase 01
+    // migration), so an imported finished level still shows stage 1 complete.
+    levels[id] = {
+      stars,
+      bestScore,
+      completedAt,
+      progress,
+      acceptedAt: acceptedSec * 1000,
+      stageStars: stars > 0 ? [stars] : [],
+    };
   }
   return levels;
 }

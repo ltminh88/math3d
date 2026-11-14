@@ -38,6 +38,9 @@ export interface LevelProgress {
   progress: number;
   /** When the level's quest was accepted (0 = not yet). */
   acceptedAt: number;
+  /** Best stars per stage (index 0 = stage 1); missing entries count as 0. Sparse: a
+   * record written before stages existed has none and is migrated on read. */
+  stageStars: readonly number[];
 }
 
 export interface Wallet {
@@ -74,7 +77,7 @@ export interface LegacyImportMarker {
 
 export interface MetaRecord {
   key: string;
-  value: string | number | GameMeta | LegacyImportMarker;
+  value: string | number | GameMeta | LegacyImportMarker | DailyProgress;
 }
 
 /** Pending sync item; `payload` is exactly what `sync_batch` receives. */
@@ -91,6 +94,17 @@ export const META_ACTIVE_PROFILE = 'activeProfileId';
 export const META_LEGACY_IMPORT = 'legacyImport';
 export const metaSessionCountKey = (profileId: string): string => `sessionCount:${profileId}`;
 export const metaGameKey = (profileId: string): string => `game:${profileId}`;
+export const metaDailyKey = (profileId: string): string => `daily:${profileId}`;
+
+/** Daily-practice progress (phase 01: shape frozen for M3D4; phase 11 owns the semantics). */
+export interface DailyProgress {
+  /** Day number (see daily-intervals.ts dayNumber) of the last counted daily run. */
+  lastDailyDay: number;
+  /** Consecutive days with a counted daily run. */
+  dailyStreak: number;
+}
+
+export const DEFAULT_DAILY: Readonly<DailyProgress> = { lastDailyDay: 0, dailyStreak: 0 };
 
 export function newProfile(id: string, kind: Profile['kind'] = 'guest'): Profile {
   return {

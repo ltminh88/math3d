@@ -8,6 +8,7 @@ const towerLevel: LevelDefinition = {
   regionId: 'tower',
   tables: [2, 3, 4, 5, 6, 7, 8, 9],
   rounds: 7,
+  stages: 1,
   requires: 'city',
   load: () => import('./tower-scene'),
 };

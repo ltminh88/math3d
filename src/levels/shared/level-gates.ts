@@ -19,6 +19,7 @@ import { createLevelHostPorts } from './level-host-ports';
 import { gateNameOf, tl } from './level-host-strings';
 import { type GateStatus, gateStatus, progressionState } from './level-progression';
 import { levelDefinition } from './level-registry';
+import { nextStage, stagesCompleted } from './level-stages';
 import './level-host.css';
 
 /** Reach of a gate from its centre (the player stands ~1.9 in front of the portal). */
@@ -62,9 +63,24 @@ function lockReason(levelId: string): string {
 export function gateStateText(levelId: string, status: GateStatus): string {
   if (status === 'locked') return lockReason(levelId);
   if (status === 'coming-soon') return tl('comingSoon');
-  if (status === 'open') return tl('stateOpen');
+  if (status === 'open') return withStageLine(levelId, tl('stateOpen'));
   const stars = connectedStore()?.getSnapshot().levelProgress[levelId]?.stars ?? 0;
-  return tl('stateCompleted', { stars: starsText(stars) });
+  return withStageLine(levelId, tl('stateCompleted', { stars: starsText(stars) }));
+}
+
+/**
+ * Appends "Chặng {next}/{stages}" for a level with more than one stage — the next
+ * uncompleted stage. A one-stage level shows nothing extra, so phase 01 changes no
+ * visible gate text (every level has stages: 1 until phases 03–10).
+ */
+function withStageLine(levelId: string, base: string): string {
+  const definition = levelDefinition(levelId);
+  if (!definition || definition.stages <= 1) return base;
+  const progress = connectedStore()?.getSnapshot().levelProgress[levelId];
+  const stageStars = progress?.stageStars ?? [];
+  if (stagesCompleted({ stages: definition.stages, stageStars }) >= definition.stages) return base;
+  const next = nextStage({ stages: definition.stages, stageStars });
+  return `${base} · ${tl('stageLine', { n: next, m: definition.stages })}`;
 }
 
 /** Current status of `gate` (bridge from the progress view, levels from the store). */

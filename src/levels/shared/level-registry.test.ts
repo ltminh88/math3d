@@ -7,6 +7,7 @@ const definition = (patch: Partial<LevelDefinition> = {}): LevelDefinition => ({
   regionId: 'meadow',
   tables: [3, 4],
   rounds: 5,
+  stages: 1,
   requires: 'bridge',
   load: () => Promise.reject(new Error('not loaded in tests')),
   ...patch,
@@ -45,6 +46,24 @@ describe('level registry', () => {
     expect(() =>
       collectLevelDefinitions({ '/src/levels/field/index.ts': definition({ tables: [] }) }),
     ).toThrow(/tables/);
+  });
+
+  it('refuses invalid stages and accepts stages: 1 (today’s behaviour)', () => {
+    expect(() =>
+      collectLevelDefinitions({ '/src/levels/field/index.ts': definition({ stages: 0 }) }),
+    ).toThrow(/stages/);
+    expect(() =>
+      collectLevelDefinitions({
+        '/src/levels/field/index.ts': definition({ stages: 1.5 }),
+      }),
+    ).toThrow(/stages/);
+    expect(() =>
+      collectLevelDefinitions({
+        '/src/levels/field/index.ts': definition({ stages: undefined as unknown as number }),
+      }),
+    ).toThrow(/stages/);
+    const registry = collectLevelDefinitions({ '/src/levels/field/index.ts': definition() });
+    expect(registry.get('field')?.stages).toBe(1);
   });
 
   it('names the folder of an index.ts without a default export or without a load function', () => {

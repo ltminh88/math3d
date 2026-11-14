@@ -94,6 +94,8 @@ describe('mapSaveV1ToProgress', () => {
       completedAt: AT,
       progress: 6,
       acceptedAt: AT,
+      // v1 has no stage info; the import migration fills stage 1 from stars.
+      stageStars: [],
     });
     expect(records.gameMeta).toEqual({ table: 7, combo: 4, started: true });
     expect(mapSaveV1ToProgress(defaultSave(), AT).levels).toEqual({});

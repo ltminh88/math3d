@@ -49,6 +49,7 @@ function snapshot(): GameSnapshot {
         completedAt: AT,
         progress: 6,
         acceptedAt: AT,
+        stageStars: [1],
       },
     },
     wallet: { xp: 1230, coins: 415 },

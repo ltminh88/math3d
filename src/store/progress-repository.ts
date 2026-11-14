@@ -4,10 +4,13 @@ import type { FactLocalState, FactStat, SessionDelta } from '../learning/learnin
 import { newFactStat } from '../learning/leitner-box';
 import type { GameDb } from './idb-database';
 import type { NumberStoneDb } from './save-migrations';
+import { migrateLevelProgress } from './save-migrations';
 import {
+  type DailyProgress,
   DEFAULT_GAME_META,
   type GameMeta,
   type LevelProgress,
+  metaDailyKey,
   metaGameKey,
   metaSessionCountKey,
   type Profile,
@@ -34,6 +37,8 @@ export interface GameSnapshot {
   /** Committed sessions so far; the next session is `sessionCount + 1`. */
   sessionCount: number;
   gameMeta: GameMeta;
+  /** Daily-practice progress; absent when no daily run was ever counted. */
+  daily?: DailyProgress;
 }
 
 /** Keeps only correctly typed fields of a stored game meta record. */
@@ -48,20 +53,46 @@ export function sanitizeGameMeta(raw: unknown): GameMeta {
   };
 }
 
+/** Keeps only correctly typed fields of a stored daily record. */
+export function sanitizeDaily(raw: unknown): DailyProgress | undefined {
+  if (typeof raw !== 'object' || raw === null) return undefined;
+  const r = raw as Record<string, unknown>;
+  const day =
+    typeof r.lastDailyDay === 'number' && Number.isInteger(r.lastDailyDay) && r.lastDailyDay >= 0
+      ? r.lastDailyDay
+      : 0;
+  const streak =
+    typeof r.dailyStreak === 'number' && Number.isInteger(r.dailyStreak) && r.dailyStreak >= 0
+      ? r.dailyStreak
+      : 0;
+  if (day === 0 && streak === 0) return undefined;
+  return { lastDailyDay: day, dailyStreak: streak };
+}
+
 export function newLevelProgress(profileId: string, levelId: string): LevelProgress {
-  return { profileId, levelId, stars: 0, bestScore: 0, completedAt: 0, progress: 0, acceptedAt: 0 };
+  return {
+    profileId,
+    levelId,
+    stars: 0,
+    bestScore: 0,
+    completedAt: 0,
+    progress: 0,
+    acceptedAt: 0,
+    stageStars: [],
+  };
 }
 
 export async function loadSnapshot(db: GameDb, profile: Profile): Promise<GameSnapshot> {
   const id = profile.id;
   const tx = db.transaction(ALL_STORES, 'readonly');
-  const [facts, levels, wallet, owned, count, game] = await Promise.all([
+  const [facts, levels, wallet, owned, count, game, daily] = await Promise.all([
     tx.objectStore('factStats').index('byProfile').getAll(id),
     tx.objectStore('levelProgress').index('byProfile').getAll(id),
     tx.objectStore('wallet').get(id),
     tx.objectStore('ownedCosmetics').index('byProfile').getAll(id),
     tx.objectStore('meta').get(metaSessionCountKey(id)),
     tx.objectStore('meta').get(metaGameKey(id)),
+    tx.objectStore('meta').get(metaDailyKey(id)),
     tx.done,
   ]);
   const factStats: Record<FactKey, FactStat> = {};
@@ -70,12 +101,16 @@ export async function loadSnapshot(db: GameDb, profile: Profile): Promise<GameSn
     profile,
     factStats,
     levelProgress: Object.fromEntries(
-      levels.map((l) => [l.levelId, { ...newLevelProgress(id, l.levelId), ...l }]),
+      levels.map((l) => [
+        l.levelId,
+        migrateLevelProgress({ ...newLevelProgress(id, l.levelId), ...l }),
+      ]),
     ),
     wallet: { coins: wallet?.coins ?? 0, xp: wallet?.xp ?? 0 },
     ownedCosmetics: owned.map((o) => o.cosmeticId),
     sessionCount: typeof count?.value === 'number' ? count.value : 0,
     gameMeta: sanitizeGameMeta(game?.value),
+    daily: sanitizeDaily(daily?.value),
   };
 }
 
@@ -94,6 +129,10 @@ export interface ApplyContext {
 /**
  * Applies a delta inside the caller's transaction: counters add, box follows the newest `seenAt`,
  * level stars/score keep the best, wallet adds (and never goes negative).
+ *
+ * Invariant: `stageStars[0] === stars`. `stars` is the single source of truth for stage 1
+ * (normal play never sends `stageStars`); `stageStars[0]` is a derived copy, forced to the
+ * merged stars on every write, so an exported code always round-trips.
  */
 export async function applyDelta(
   tx: WriteTx,
@@ -122,16 +161,24 @@ export async function applyDelta(
 
   const levels = tx.objectStore('levelProgress');
   for (const [levelId, l] of Object.entries(delta.levels)) {
-    const prev = {
+    const prev = migrateLevelProgress({
       ...newLevelProgress(profileId, levelId),
       ...(await levels.get([profileId, levelId])),
-    };
+    });
+    const nextStars = l.stageStars ?? [];
+    const merged = Array.from(
+      { length: Math.max(prev.stageStars.length, nextStars.length) },
+      (_, i) => Math.max(prev.stageStars[i] ?? 0, nextStars[i] ?? 0),
+    );
+    const stars = Math.max(prev.stars, l.stars);
+    const stageStars = stars > 0 ? [stars, ...merged.slice(1)] : [];
     await levels.put({
       ...prev,
-      stars: Math.max(prev.stars, l.stars),
+      stars,
       bestScore: Math.max(prev.bestScore, l.bestScore),
       completedAt: l.stars >= 1 ? prev.completedAt || ctx.now : prev.completedAt,
       progress: Math.max(prev.progress, l.progress ?? 0),
+      stageStars,
     });
   }
 

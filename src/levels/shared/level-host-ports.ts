@@ -19,6 +19,7 @@ import type { LevelHostPorts, LevelRun } from './level-host';
 import { gateNameOf, tl } from './level-host-strings';
 import { firstCompletionBonus, levelRunToCommit } from './level-run-result';
 import { mountLevelRunUi } from './level-run-ui';
+import { nextStage } from './level-stages';
 import type { LevelDefinition, LevelResult } from './level-types';
 import { saveRendererState } from './renderer-state-snapshot';
 
@@ -56,8 +57,14 @@ function openLevelRun(
   });
   const ui = mountLevelRunUi(gateNameOf(definition.id), () => exit({ completed: false }));
   let closed = false;
+  const progress = store.getSnapshot().levelProgress[definition.id];
+  const stage = nextStage({
+    stages: definition.stages,
+    stageStars: progress?.stageStars ?? [],
+  });
   return {
     context: {
+      stage,
       renderer: world.renderer,
       canvas,
       ui: ui.root,
