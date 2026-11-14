@@ -206,6 +206,30 @@ Co-located `*.test.ts` for each pure module. All files < 200 lines.
   removes the M3D5 risk the design had priced in. Play-time estimate
   is unchanged (257 rounds × 55–60 s + run overhead ≈ 4.9–5.3 h).
 
+## Review fixes (2026-11-14, author review on PR #2, commit `cfc4042`)
+
+- **stageStars[0] drift (bug):** replaying stage 1 better kept the
+  migrated `[1]` while `stars` rose to 3, so export wrote `t = [1, …]`
+  and strict decode rejected the just-exported code. Fixed by the
+  invariant `stageStars[0] === stars`, documented in code: `stars` is
+  the single source of truth for stage 1, `stageStars[0]` is a derived
+  copy forced to the merged stars on every `applyDelta` write;
+  `migrateLevelProgress` repairs a drifted record on read; M3D4 decode
+  repairs `t[0]` to `stars` on import (keeping stages 2+) instead of
+  rejecting the child's save. Tests written failing-first: replay then
+  round-trip (incl. a stage-2 star), drift repair on read, drift repair
+  on import.
+- **Stale e2e expectation (bug):** `tests/e2e/legacy-save-code.spec.ts`
+  still expected `M3D3-…` from export; now expects M3D4. (This was the
+  one real e2e failure in the first full-suite run, not an environment
+  timeout.)
+- **Small:** `tools/practice/pool-counter.ts` was 205 lines — the
+  counting library moved to `pool-counting.ts` (141 lines); the CLI
+  stays in `pool-counter.ts` (75 lines). Counts verified identical via
+  `--json` (field 17, forest 36, city 30, tower 116).
+- Full e2e re-run after the fixes: see the PR comment for the
+  per-spec results.
+
 ## Visible changes in the world outside the levels
 None. This phase changes the stage model, the progress record and the save
 code; it adds no gate text, no quest-card line, no button and no dialog.
