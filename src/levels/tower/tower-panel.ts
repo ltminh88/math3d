@@ -49,7 +49,9 @@ export class TowerPanel {
     this.guide.append(el('span', 'tower-guide__dot', '✦'), name, this.guideText);
     this.progress.append(this.floorText, this.floors);
     for (const button of [this.hint, this.next]) button.type = 'button';
-    this.hint.textContent = `💡 ${ts('hint')}`;
+    // The 💡 gets its own span so the offer nudge can animate it without moving the
+    // button's box (a transform on the button makes Playwright's tap wait forever).
+    this.hint.append(el('span', 'hint-nudge', '💡'), ` ${ts('hint')}`);
     this.hint.addEventListener('click', handlers.onHint);
     this.next.addEventListener('click', handlers.onNext);
     this.next.hidden = true;

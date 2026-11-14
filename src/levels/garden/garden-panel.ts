@@ -43,7 +43,9 @@ export class GardenPanel {
     this.guide.append(el('span', 'garden-guide__dot', '✿'), name, this.guideText);
     this.progress.append(this.roundText, this.dots);
     for (const button of [this.hint, this.next]) button.type = 'button';
-    this.hint.textContent = `💡 ${gs('hint')}`;
+    // The 💡 gets its own span so the offer nudge can animate it without moving the
+    // button's box (a transform on the button makes Playwright's tap wait forever).
+    this.hint.append(el('span', 'hint-nudge', '💡'), ` ${gs('hint')}`);
     this.hint.addEventListener('click', handlers.onHint);
     this.next.addEventListener('click', handlers.onNext);
     this.next.hidden = true;

@@ -2,7 +2,7 @@
 // gate (E on desktop, a tap on the Enter button on touch), play six rounds whose kinds rotate
 // (desktop by keys; phone and both tablet projects by taps only), come back with the level
 // completed, the valley gate no longer locked and `sk:` skills stored. Uses `window.__garden`.
-import { type Page, test } from '@playwright/test';
+import { type Page, type TestInfo, test } from '@playwright/test';
 import { expect, SLOW_TEST_MS, waitForStoreBoot } from './legacy-live-save-fixtures';
 
 test.use({ locale: 'vi-VN' });
@@ -151,7 +151,7 @@ test('the garden plays six rotating rounds and records sk: skills', async ({ pag
     if (s.kind === 'bag') expect(s.sprouted).toBe(s.steps);
     if (s.kind && !shot.has(s.kind)) {
       shot.add(s.kind);
-      await page.screenshot({ path: `${shotDir(info.project.name)}/${s.kind}.png` });
+      await page.screenshot({ path: `${shotDir(info)}/${s.kind}.png` });
     }
     if (touch) await page.locator('.garden-next').tap();
     else await page.keyboard.press('Enter');
@@ -163,7 +163,7 @@ test('the garden plays six rotating rounds and records sk: skills', async ({ pag
   await expect(done.locator('.garden-bonus')).toHaveText(
     'Thưởng lần đầu hoàn thành: +50 XP · +10 xu',
   );
-  await page.screenshot({ path: `${shotDir(info.project.name)}/done.png` });
+  await page.screenshot({ path: `${shotDir(info)}/done.png` });
   const maxCalls = Number(await page.locator('.level-layer').getAttribute('data-max-draw-calls'));
   expect(maxCalls).toBeGreaterThan(0);
   expect(maxCalls).toBeLessThanOrEqual(DRAW_CALL_BUDGET);
@@ -194,5 +194,10 @@ test('the garden plays six rotating rounds and records sk: skills', async ({ pag
   expect(errors).toEqual([]);
 });
 
-const shotDir = (project: string) =>
-  `plans/261031-1933-reasoning-geometry-and-map-expansion/reports/p05-screens/${project}`;
+// Screenshots default to Playwright's per-test output dir (test-results/, untracked),
+// so a plain `npx playwright test` leaves `git status` clean. Set GARDEN_SCREENS to a
+// directory (e.g. the p05 report folder) to keep the report screenshots there instead.
+const shotDir = (info: TestInfo): string =>
+  process.env.GARDEN_SCREENS
+    ? `${process.env.GARDEN_SCREENS}/${info.project.name}`
+    : info.outputPath('screens');

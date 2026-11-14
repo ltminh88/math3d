@@ -57,7 +57,10 @@ export class ForestPanel {
     this.progress.append(this.roundText, this.dots);
     this.deal = button('secondary forest-deal', ts('dealShare'), handlers.onDeal);
     this.check = button('secondary forest-check', ts('check'), handlers.onCheck);
-    this.hint = button('text-button forest-hint-button', `💡 ${ts('hint')}`, handlers.onHint);
+    this.hint = button('text-button forest-hint-button', '', handlers.onHint);
+    // The 💡 gets its own span so the offer nudge can animate it without moving the
+    // button's box (a transform on the button makes Playwright's tap wait forever).
+    this.hint.append(el('span', 'hint-nudge', '💡'), ` ${ts('hint')}`);
     this.next = button('primary forest-next', ts('next'), handlers.onNext);
     this.next.hidden = true;
     const actions = el('div', 'forest-actions');

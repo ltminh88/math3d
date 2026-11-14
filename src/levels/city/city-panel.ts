@@ -59,7 +59,10 @@ export class CityPanel {
     this.progress.append(this.roundText, this.dots);
     this.choices = new CityChoiceCards(ts('title'), handlers.onChoice);
     this.light = button('secondary city-light', ts('lightFloor'), handlers.onLight);
-    this.hint = button('text-button city-hint-button', `💡 ${ts('hint')}`, handlers.onHint);
+    this.hint = button('text-button city-hint-button', '', handlers.onHint);
+    // The 💡 gets its own span so the offer nudge can animate it without moving the
+    // button's box (a transform on the button makes Playwright's tap wait forever).
+    this.hint.append(el('span', 'hint-nudge', '💡'), ` ${ts('hint')}`);
     this.next = button('primary city-next', ts('next'), handlers.onNext);
     this.next.hidden = true;
     this.count.setAttribute('aria-live', 'off');
