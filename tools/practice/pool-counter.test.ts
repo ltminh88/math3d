@@ -2,6 +2,7 @@
 // size is known exactly — if it miscounts here, no number in the report can be trusted.
 import { describe, expect, it } from 'vitest';
 import { mulberry32, pick } from '../../src/learning/seeded-rng';
+import type { SkillTier } from '../../src/learning/skill-tiers';
 import {
   countFactPool,
   countSignatures,
@@ -29,11 +30,49 @@ describe('pool counter', () => {
     expect(a).toEqual(b);
   });
 
-  it('meas-temperature tier 1 has exactly 8 distinct prompts', () => {
-    // TEMP_RANGE is [5, 40]; tier 1 reads a multiple of 5: 5, 10, …, 40 — 8 values,
-    // one story key, one step, so 8 visible prompts.
+  it('meas-temperature tier 1 has 24 distinct prompts (phase 02)', () => {
+    // TEMP_RANGE is [5, 40]; tier 1 reads a multiple of 5: 5, 10, …, 40 — 8 values —
+    // and the thermometer is labelled A, B or C (phase 02): 8 values × 3 labels.
     const r = countSkill('meas-temperature', 1);
-    expect(r.distinct).toBe(8);
+    expect(r.distinct).toBe(24);
+  });
+
+  it('phase-02 targets: below-target skills from phase 01 clear their bar', () => {
+    // Reasoning >= 24 and geometry/measurement >= 12 distinct visible prompts per
+    // skill x tier. These are the skills the phase-01 counter found below target.
+    const opts = { draws: 2000, trials: 2, cap: 200 };
+    const below: [string, SkillTier, number][] = [
+      ['geo-midpoint', 1, 12],
+      ['geo-midpoint', 2, 12],
+      ['geo-radius-diameter', 1, 12],
+      ['meas-ml', 1, 12],
+      ['meas-ml', 2, 12],
+      ['meas-area-square', 1, 12],
+      ['meas-area-square', 2, 12],
+      ['meas-area-square', 3, 12],
+    ];
+    for (const [skill, tier, target] of below) {
+      const r = countSkill(skill, tier, opts);
+      expect(r.distinct, `${skill} t${tier}`).toBeGreaterThanOrEqual(target);
+    }
+  });
+
+  it('word-problem skills have at least 4 story contexts (phase 02)', () => {
+    // Phase 01 measured exactly 1 context per wp-* skill (2 for more-less); phase 02
+    // adds +3–5 per skill so no child re-reads the same sentence every run.
+    const wp = [
+      'wp-times-then-add',
+      'wp-divide-then-add',
+      'wp-more-less-then-total',
+      'wp-unit-then-times',
+      'wp-times-compare',
+      'wp-difference-compare',
+    ];
+    for (const skill of wp) {
+      const contexts = countStoryContexts(skill, 1);
+      expect(contexts.length, skill).toBeGreaterThanOrEqual(4);
+    }
+    expect(countStoryContexts('wp-more-less-then-total', 1).length).toBeGreaterThanOrEqual(5);
   });
 
   it('fact pools are the pools the levels actually draw from', () => {

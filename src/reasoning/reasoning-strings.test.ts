@@ -5,6 +5,7 @@ import type { SkillTier } from '../learning/skill-tiers';
 import { REASONING_SKILLS, reasoningItemForSkill } from './reasoning-item-for-skill';
 import { renderPrompt } from './reasoning-strings';
 import type { PromptRef, ReasoningItem } from './reasoning-types';
+import { WP_CONTEXT_KEYS } from './word-problem-contexts';
 
 afterEach(() => setLanguage('vi'));
 
@@ -38,5 +39,46 @@ describe('reasoning strings', () => {
     expect(renderPrompt(story)).toBe('Có 29 cái kẹo. Mình xếp vào các hộp, mỗi hộp 4 cái kẹo.');
     setLanguage('en');
     expect(renderPrompt(story)).toBe('There are 29 sweets, packed 4 to a box.');
+  });
+
+  it('every phase-02 context renders fully in vi and en', () => {
+    // A context that never renders (missing key, unfilled placeholder) is a broken
+    // prompt a child would see, so each one is drawn and rendered in both languages.
+    const wanted: Record<string, readonly string[]> = {
+      ...WP_CONTEXT_KEYS,
+      'div-rem-ceil': ['divRemCeil', 'divRemCeilCamp', 'divRemCeilCinema'],
+      'unknown-add-sub': ['unknownEq', 'unknownEqFind'],
+      'unknown-mul-div': ['unknownEq', 'unknownEqFind'],
+      'expr-from-story': [
+        'exprStoryEat',
+        'exprStoryBox',
+        'exprStoryShare',
+        'exprStoryShareFriends',
+      ],
+    };
+    const samples = new Map<string, ReasoningItem>();
+    for (const [id, keys] of Object.entries(wanted))
+      for (const tier of [1, 2, 3] as SkillTier[])
+        for (
+          let seed = 0;
+          seed < 2000 && !keys.every((k) => samples.has(`${id}|${k}`));
+          seed++
+        ) {
+          const item = reasoningItemForSkill(id, mulberry32(seed), tier);
+          samples.set(`${id}|${item.story.key}`, item);
+        }
+    for (const [id, keys] of Object.entries(wanted))
+      for (const key of keys) {
+        const item = samples.get(`${id}|${key}`);
+        expect(item, `${id} ${key}`).toBeDefined();
+        for (const lang of ['vi', 'en'] as const) {
+          setLanguage(lang);
+          for (const p of prompts(item as ReasoningItem)) {
+            const text = renderPrompt(p);
+            expect(text, `${lang} ${p.key}`).not.toMatch(/[{}]|^reasoning\.|\bi:[a-z]/);
+            expect(text.length).toBeGreaterThan(0);
+          }
+        }
+      }
   });
 });

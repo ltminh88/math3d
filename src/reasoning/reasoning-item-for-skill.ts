@@ -14,13 +14,12 @@ import {
   unknownMulDiv,
 } from './unknown-and-pattern-generators';
 import {
-  wpDifferenceCompare,
   wpDivideThenAdd,
   wpMoreLessThenTotal,
-  wpTimesCompare,
   wpTimesThenAdd,
   wpUnitThenTimes,
 } from './word-problem-generators';
+import { wpDifferenceCompare, wpTimesCompare } from './word-problem-compare-generators';
 
 const GENERATORS: Readonly<Record<string, ReasoningGenerator>> = {
   'wp-times-then-add': wpTimesThenAdd,

@@ -112,7 +112,15 @@ const ORACLE: Record<string, (i: GeoItem) => void> = {
     expect(values(i)).toEqual([a * b, c * c, a * b - c * c]);
   },
   squareArea: (i) => expect(last(i)).toBe(p(i, 's') * p(i, 's')),
+  squareAreaTile: (i) => expect(last(i)).toBe(p(i, 's') * p(i, 's')),
+  squareAreaCard: (i) => expect(last(i)).toBe(p(i, 's') * p(i, 's')),
   squareFromRect: (i) => {
+    const r = p(i, 'a') * p(i, 'b');
+    const side = values(i)[2] as number;
+    expect(values(i)).toEqual([r, 2 * r, side]);
+    expect(side * side).toBe(2 * r);
+  },
+  squareFromRectTile: (i) => {
     const r = p(i, 'a') * p(i, 'b');
     const side = values(i)[2] as number;
     expect(values(i)).toEqual([r, 2 * r, side]);

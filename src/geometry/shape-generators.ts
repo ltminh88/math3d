@@ -62,7 +62,8 @@ export const geoShapeClassify: GeoGenerator = (rng, tier) => {
   const shapes = order.map((f, i) => ({
     label: LETTERS[i] as string,
     vertices: makeShape(rng, f.kind),
-    rotationDeg: tier === 3 ? pick(rng, [0, randInt(rng, ...ROTATION_RANGE)]) : 0,
+    // Phase 02: rotated figures from tier 2 (was tier 3 only), within ROTATION_RANGE.
+    rotationDeg: tier === 1 ? 0 : pick(rng, [0, randInt(rng, ...ROTATION_RANGE)]),
   }));
   const options = letterOptions(
     order.map((f) => ({

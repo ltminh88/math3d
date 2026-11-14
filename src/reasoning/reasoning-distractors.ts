@@ -99,12 +99,22 @@ export const reasoningItem = (
   work: readonly number[] = [],
 ): ReasoningItem => ({ skillId, tier, story, steps, work });
 
-const NOUNS = ['i:marble', 'i:candy', 'i:flower', 'i:book', 'i:apple', 'i:fish'] as const;
+/** Countable things a word problem can be about (the `i:` noun params). */
+export const GENERIC_NOUNS = [
+  'i:marble',
+  'i:candy',
+  'i:flower',
+  'i:book',
+  'i:apple',
+  'i:fish',
+] as const;
 const NAMES = [
   ['Mai', 'Nam'],
   ['An', 'Bình'],
   ['Lan', 'Hùng'],
 ] as const;
 
-export const pickNoun = (rng: Rng): string => pick(rng, NOUNS);
+export const pickNoun = (rng: Rng): string => pick(rng, GENERIC_NOUNS);
 export const pickNames = (rng: Rng): readonly [string, string] => pick(rng, NAMES);
+/** One name (a context that names a single child, not a pair). */
+export const pickName = (rng: Rng): string => pick(rng, NAMES.flat());

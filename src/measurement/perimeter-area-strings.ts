@@ -37,13 +37,22 @@ export const PERIMETER_AREA_VI = {
   askCutArea: 'Diện tích hình vuông cắt đi là bao nhiêu xăng-ti-mét vuông?',
   askLeftArea: 'Diện tích phần còn lại là bao nhiêu xăng-ti-mét vuông?',
   squareArea: 'Hình vuông có cạnh {s} cm.',
+  // Phase 02: two more framings for the same square (tile, card) so tiers 1–2 clear 12.
+  squareAreaTile: 'Viên gạch hình vuông có cạnh {s} cm.',
+  squareAreaCard: 'Tấm bìa hình vuông có cạnh {s} cm.',
   askAreaSquare: 'Diện tích hình vuông là bao nhiêu xăng-ti-mét vuông?',
   askAreaSquareNum: 'Số đo diện tích hình vuông là bao nhiêu?',
   squareFromRect:
     'Thẻ đỏ hình chữ nhật dài {b} cm, rộng {a} cm. Thẻ vàng hình vuông có diện tích gấp đôi thẻ đỏ.',
+  // Phase 02: the same double-area pair as a tile, so tier 3 clears 12 (7 pairs × 2).
+  squareFromRectTile:
+    'Viên gạch hình chữ nhật dài {b} cm, rộng {a} cm. Viên gạch hình vuông có diện tích gấp đôi viên gạch hình chữ nhật.',
   askRedArea: 'Diện tích thẻ đỏ là bao nhiêu xăng-ti-mét vuông?',
   askYellowArea: 'Diện tích thẻ vàng là bao nhiêu xăng-ti-mét vuông?',
   askYellowSide: 'Cạnh thẻ vàng dài bao nhiêu xăng-ti-mét?',
+  askRedTileArea: 'Diện tích viên gạch hình chữ nhật là bao nhiêu xăng-ti-mét vuông?',
+  askYellowTileArea: 'Diện tích viên gạch hình vuông là bao nhiêu xăng-ti-mét vuông?',
+  askYellowTileSide: 'Cạnh viên gạch hình vuông dài bao nhiêu xăng-ti-mét?',
 };
 
 export const PERIMETER_AREA_EN: Record<keyof typeof PERIMETER_AREA_VI, string> = {
@@ -82,11 +91,18 @@ export const PERIMETER_AREA_EN: Record<keyof typeof PERIMETER_AREA_VI, string> =
   askCutArea: 'What is the area of the square cut off, in square centimetres?',
   askLeftArea: 'What is the area of the part left, in square centimetres?',
   squareArea: 'A square has sides of {s} cm.',
+  squareAreaTile: 'A square tile has sides of {s} cm.',
+  squareAreaCard: 'A square card has sides of {s} cm.',
   askAreaSquare: 'What is the area of the square, in square centimetres?',
   askAreaSquareNum: 'The area of the square is:',
   squareFromRect:
     'A red card is {b} cm long and {a} cm wide. A yellow square card has twice its area.',
+  squareFromRectTile:
+    'A rectangular tile is {b} cm long and {a} cm wide. A square tile has twice its area.',
   askRedArea: 'What is the area of the red card, in square centimetres?',
   askYellowArea: 'What is the area of the yellow card, in square centimetres?',
   askYellowSide: 'How many centimetres long is a side of the yellow card?',
+  askRedTileArea: 'What is the area of the rectangular tile, in square centimetres?',
+  askYellowTileArea: 'What is the area of the square tile, in square centimetres?',
+  askYellowTileSide: 'How many centimetres long is a side of the square tile?',
 };

@@ -120,7 +120,12 @@ export const measTemperature: GeoGenerator = (rng, tier) => {
   const [lo, hi] = TEMP_RANGE;
   if (tier === 1) {
     const value = 5 * randInt(rng, lo / 5, hi / 5);
-    const s = scene({ kind: 'thermometers', minorStep: 5, readings: [{ label: 'A', value }] }, 32);
+    // Phase 02: the thermometer is labelled A, B or C (8 values × 3 labels = 24 prompts).
+    const label = pick(rng, ['A', 'B', 'C'] as const);
+    const s = scene(
+      { kind: 'thermometers', minorStep: 5, readings: [{ label, value }] },
+      32,
+    );
     return geoItem(
       'meas-temperature',
       tier,

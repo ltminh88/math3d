@@ -9,11 +9,13 @@ export const RULER_MAX_CM = 10;
 /** B31: gram weights on the balance (the book uses 20 g, 50 g, 100 g...; 100 g would fill the cap). */
 export const WEIGHTS = [50, 20, 10, 5, 2, 1] as const;
 
-/** B32: a 100 ml jug; marks per tier (10 ml a mark, then 4 or 5 marks to work out). */
+/** B32: a 100 ml jug; marks per tier (10 ml a mark, then 4 or 5 marks to work out). Phase 02
+ * widened the mark sets (tier 1 gains a 5-mark jug, tier 2 gains the 10-mark jug) so both
+ * clear the 12-prompt bar: tier 1 is 9 + 4 = 13, tier 2 is 3 + 4 + 9 = 16. */
 export const JUG_CAPACITY = 100;
 export const JUG_MARKS: Readonly<Record<SkillTier, readonly number[]>> = {
-  1: [10],
-  2: [4, 5],
+  1: [10, 5],
+  2: [4, 5, 10],
   3: [10],
 };
 

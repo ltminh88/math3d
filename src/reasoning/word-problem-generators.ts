@@ -1,18 +1,26 @@
 // Two-step word problems (KNTT T1 B24, B27, B28, B39). Tier 1 asks each step, tier 2 only the
 // result, tier 3 first asks which calculation solves it (misconception expressions) then the result.
+// Story contexts live in word-problem-contexts.ts (phase 02): the generator draws the context
+// by the seeded rng, so the same seed still reproduces the same item.
 import { pick, type Rng, randInt } from '../learning/seeded-rng';
 import type { SkillTier } from '../learning/skill-tiers';
 import {
   expressionChoiceStep,
   numberChoiceStep,
   numberStep,
+  pickName,
   pickNames,
-  pickNoun,
   reasoningItem,
   ref,
 } from './reasoning-distractors';
 import { MAX_NUMBER, TIER_RANGES } from './reasoning-ranges';
 import type { ReasoningGenerator, ReasoningStep } from './reasoning-types';
+import {
+  WP_DIVIDE_THEN_ADD,
+  WP_MORE_LESS_THEN_TOTAL,
+  WP_TIMES_THEN_ADD,
+  WP_UNIT_THEN_TIMES,
+} from './word-problem-contexts';
 
 const PICK_EXPR = ref('pickExpr');
 const askBoth = (item: string) => ref('askBoth', { item });
@@ -33,8 +41,9 @@ export const wpTimesThenAdd: ReasoningGenerator = (rng, tier) => {
   const n = pick(rng, TIER_RANGES[tier].factors);
   const a = randInt(rng, 2, Math.min(TIER_RANGES[tier].maxBase, Math.floor(MAX_NUMBER / (n + 1))));
   const [who1, who2] = pickNames(rng);
-  const item = pickNoun(rng);
-  const story = ref('wpTimesThenAdd', { who1, who2, a, n, item });
+  const ctx = pick(rng, WP_TIMES_THEN_ADD);
+  const item = pick(rng, ctx.nouns);
+  const story = ref(ctx.key, { who1, who2, a, n, item });
   const steps = tiered(
     tier,
     numberStep(ref('askOther', { who: who2, item }), a * n),
@@ -59,8 +68,9 @@ export const wpDivideThenAdd: ReasoningGenerator = (rng, tier) => {
   const q = randInt(rng, 2, Math.max(2, maxQ));
   const a = q * n;
   const [who1, who2] = pickNames(rng);
-  const item = pickNoun(rng);
-  const story = ref('wpDivideThenAdd', { who1, who2, a, n, item });
+  const ctx = pick(rng, WP_DIVIDE_THEN_ADD);
+  const item = pick(rng, ctx.nouns);
+  const story = ref(ctx.key, { who1, who2, a, n, item });
   const steps = tiered(
     tier,
     numberStep(ref('askOther', { who: who2, item }), q),
@@ -77,15 +87,16 @@ export const wpDivideThenAdd: ReasoningGenerator = (rng, tier) => {
 
 /** A, B has d more / fewer; how many together? a + (a ± d). */
 export const wpMoreLessThenTotal: ReasoningGenerator = (rng, tier) => {
-  const more = rng() < 0.5;
+  const ctx = pick(rng, WP_MORE_LESS_THEN_TOTAL);
+  const more = ctx.more;
   const maxA = Math.min(TIER_RANGES[tier].maxBase, 45);
   const a = randInt(rng, 6, maxA);
   const d = more ? randInt(rng, 1, Math.min(20, MAX_NUMBER - 2 * a)) : randInt(rng, 1, a - 1);
   const b = more ? a + d : a - d;
   const sign = more ? '+' : '−';
   const [who1, who2] = pickNames(rng);
-  const item = pickNoun(rng);
-  const story = ref(more ? 'wpMoreThenTotal' : 'wpLessThenTotal', {
+  const item = pick(rng, ctx.nouns);
+  const story = ref(ctx.key, {
     who1,
     who2,
     a,
@@ -116,8 +127,15 @@ export const wpUnitThenTimes: ReasoningGenerator = (rng, tier) => {
   );
   const unit = randInt(rng, 2, Math.max(2, Math.floor(MAX_NUMBER / Math.max(boxes, m))));
   const total = boxes * unit;
-  const item = pickNoun(rng);
-  const story = ref('wpUnitThenTimes', { boxes, total, m, item });
+  const ctx = pick(rng, WP_UNIT_THEN_TIMES);
+  const item = pick(rng, ctx.nouns);
+  const story = ref(ctx.key, {
+    ...(ctx.who ? { who: pickName(rng) } : {}),
+    boxes,
+    total,
+    m,
+    item,
+  });
   const steps = tiered(
     tier,
     numberStep(ref('askUnit', { item }), unit),
@@ -130,46 +148,4 @@ export const wpUnitThenTimes: ReasoningGenerator = (rng, tier) => {
     numberStep(ref('askTotal', { m, item }), unit * m),
   );
   return reasoningItem('wp-unit-then-times', tier, story, steps, [unit, unit * m]);
-};
-
-function comparePair(rng: Rng, tier: SkillTier): { big: number; small: number; n: number } {
-  const n = pick(rng, [...TIER_RANGES[tier].factors, ...(tier > 1 ? [10] : [])]);
-  const small = randInt(
-    rng,
-    2,
-    Math.max(2, Math.floor(Math.min(TIER_RANGES[tier].maxBase, MAX_NUMBER) / n)),
-  );
-  return { big: small * n, small, n };
-}
-
-/** "big gấp mấy lần small?" (B39); the trap is the difference. */
-export const wpTimesCompare: ReasoningGenerator = (rng, tier) => {
-  const { big, small, n } = comparePair(rng, tier);
-  const item = pickNoun(rng);
-  const story = ref('wpTimesCompare', { big, small, item });
-  const ask = ref('askTimes', { item });
-  const trap = [{ value: big - small, misconception: 'difference-not-quotient' as const }];
-  const steps: ReasoningStep[] =
-    tier === 1
-      ? [numberChoiceStep(rng, ask, n, trap)]
-      : tier === 2
-        ? [numberStep(ask, n)]
-        : [numberStep(ref('askMore', { item }), big - small), numberStep(ask, n)];
-  return reasoningItem('wp-times-compare', tier, story, steps, [n]);
-};
-
-/** "big hơn small bao nhiêu?" (B39); the trap is the quotient. */
-export const wpDifferenceCompare: ReasoningGenerator = (rng, tier) => {
-  const { big, small, n } = comparePair(rng, tier);
-  const item = pickNoun(rng);
-  const story = ref('wpDifferenceCompare', { big, small, item });
-  const ask = ref('askMore', { item });
-  const trap = [{ value: n, misconception: 'quotient-not-difference' as const }];
-  const steps: ReasoningStep[] =
-    tier === 1
-      ? [numberChoiceStep(rng, ask, big - small, trap)]
-      : tier === 2
-        ? [numberStep(ask, big - small)]
-        : [numberStep(ref('askTimes', { item }), n), numberStep(ask, big - small)];
-  return reasoningItem('wp-difference-compare', tier, story, steps, [big - small]);
 };
