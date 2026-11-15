@@ -218,7 +218,12 @@ export class World implements WorldPublicApi {
     this.sky.position.copy(this.camera.position);
     updateSunShadow(this);
     animateAmbient(this, dt);
-    this.renderer.render(this.scene, this.camera);
+    // While a dialog or the map is open the world is paused: do not re-render the
+    // scene every frame. Each software-rendered frame costs seconds on weak
+    // hardware, which starves the modal UI — every click then waits seconds for
+    // its target to settle (shop-purchase.spec.ts:143 timed out this way). The
+    // canvas keeps its last frame; rendering resumes when the world unpauses.
+    if (!this.paused) this.renderer.render(this.scene, this.camera);
     const { x, z } = this.player.position;
     this.onFrame?.(this.nearMilo(), x > 12 && Math.abs(z) < 4, 1 / Math.max(dt, 0.001));
   };
