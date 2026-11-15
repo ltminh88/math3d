@@ -21,6 +21,8 @@ export interface WorldPublicApi {
   active: boolean;
   /** Freezes movement and pointer input (dialogs, map). */
   paused: boolean;
+  /** Ask the frame loop for one fresh frame (while paused the loop skips its render). */
+  requestRedraw(): void;
   /** Lower-cased `KeyboardEvent.key` values currently held. */
   readonly keys: Set<string>;
   joystick: JoystickVector;

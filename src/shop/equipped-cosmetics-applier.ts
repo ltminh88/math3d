@@ -31,6 +31,7 @@ export class EquippedCosmeticsApplier {
 
   constructor(private readonly world: WorldPublicApi) {}
 
+  // No redraw request here: equipping while the shop dialog is open would pay one full 3D render per swap (shop:143 times out on tablet-portrait); the card flips immediately and the scene refreshes when the dialog closes.
   apply(snapshot: GameSnapshot): void {
     for (const slot of COSMETIC_SLOTS) {
       const item = equippedItem(snapshot, slot);

@@ -115,6 +115,11 @@ export function createParityDriver({ page, scenarioId, outDir, written }) {
       // One frame: count its WebGL draws and read its pixels in the same task as the render.
       const { gl, png } = await page.evaluate(() => {
         window.__parityGl.reset();
+        // The world skips its render while paused, so no render would happen in
+        // this task and toDataURL would read a black buffer (no
+        // preserveDrawingBuffer). Ask for one fresh frame first; the step below
+        // runs the frame loop, which renders it in this same task.
+        window.__parity.requestRedraw();
         const dataUrl = window.__parityStep(1, true);
         return {
           gl: { calls: window.__parityGl.calls, triangles: window.__parityGl.triangles },
