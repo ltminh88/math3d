@@ -216,6 +216,30 @@ re-shoots the quiz/level prompt screenshots, not the world.
   unchanged (field 17, forest 36, city 30, tower 116).
 - **Goldens byte-identical** — the widened generators did not reshuffle any
   seeded quiz order in the traced paths.
+- **Review fix (2026-11-16, after PR #5 was opened).** The author found the
+  phase-02 counts were prettier than reality in two places, and both are fixed
+  here (see `reports/pool-counts.md`, "Review fix"):
+  - `meas-ml`: the 5-mark 100 ml jug left tier 1 (20 ml a mark in one step is
+    tier 2 reasoning) and the 10-mark 100 ml jug left tier 2 (per = 10 makes
+    the `wrong-step` distractor equal the right answer). Real expansion
+    instead, inside B32: a 50 ml jug — 5 marks at tier 1 (10 ml a mark),
+    10 marks at tier 2 (5 ml a mark, asked per-mark first). Totals unchanged
+    (t1 13, t2 16), composition now honest. `JUG_MARKS` became `JUG_SETS`
+    (capacity + marks per tier).
+  - `meas-temperature` t1: the A/B/C labels are gone (same thermometer, same
+    reading). The thermometer is now labelled with a place from `PLACES` and
+    the question names it (`askTemp` takes `{place}`): 6 places × 8 values =
+    48, med 12.5. The counter test now asserts 48, not 24.
+  - `unknownEqFind` ("Tìm số còn thiếu:"): kept — it is a genuinely different
+    visible format, and `unknown-add-sub` t1 is already 1482, so it was never
+    needed for the target; the choice is recorded here, not hidden.
+  - The review fix also exposed that `biome check` lints the `.preview/deploy`
+    build output (3454 errors) and that `.preview/` was not git-ignored, so
+    both now exclude it, mirroring `dist`. The formatter also reflowed two
+    `geoItem` calls in the ml generator (no behaviour change).
+  - Counter re-run after the fix: all 117 rows identical except
+    `meas-temperature` t1 (24 → 48). Gates re-run green; a new preview was
+    deployed and CI re-run on the fix commit.
 
 ## Next steps
 - 07–10 consume the widened pools; 03–06 use the verified fact-pool counts.

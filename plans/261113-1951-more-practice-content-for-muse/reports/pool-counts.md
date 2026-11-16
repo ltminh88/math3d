@@ -161,7 +161,7 @@ contexts column is the current (phase-02) list.
 | meas-ml × t1 | 9 | 13 (med 5) |
 | meas-ml × t2 | 7 | 16 (med 5) |
 | meas-ml × t3 | 93 | 93 (med 7.5) |
-| meas-temperature × t1 | 8 | 24 (med 7.5) |
+| meas-temperature × t1 | 8 | 48 (med 12.5) |
 | meas-temperature × t2 | 9991 | 9991 (med >1000) |
 | meas-temperature × t3 | 296 | 296 (med 21) |
 | meas-perimeter-polygon × t1 | 7760 | 7760 (med 125) |
@@ -196,15 +196,37 @@ target in phase 01 and how phase 02 widened them:
 | geo-midpoint × t1 | 6 | 12 (med 5) | segment lengths 2–24 cm (was 2–12) |
 | geo-midpoint × t2 | 10 | 12 (med 5) | segment lengths 2–24 cm (was 2–20) |
 | geo-radius-diameter × t1 | 10 | 12 (med 5) | radius 1–12 cm (was 1–10) |
-| meas-ml × t1 | 9 | 13 (med 5) | jug marks [10, 5] (was [10]) |
-| meas-ml × t2 | 7 | 16 (med 5) | jug marks [4, 5, 10] (was [4, 5]) |
-| meas-temperature × t1 | 8 | 24 (med 7.5) | thermometer labelled A, B or C |
+| meas-ml × t1 | 9 | 13 (med 5) | jugs (100 ml, 10 marks) + (50 ml, 5 marks) (was [10]) |
+| meas-ml × t2 | 7 | 16 (med 5) | jugs (100 ml, 4/5 marks) + (50 ml, 10 marks) (was [4, 5]) |
+| meas-temperature × t1 | 8 | 48 (med 12.5) | thermometer labelled with a place (6 places × 8 values) |
 | meas-area-square × t1 | 9 | 27 (med 6.5) | square / tile / card framings |
 | meas-area-square × t2 | 9 | 27 (med 8) | square / tile / card framings |
 | meas-area-square × t3 | 7 | 14 (med 5) | red/yellow card + tile framings |
 
 No phase 03–10 adjustment is needed: no skill is on a shortfall list. Fact pools are
 unchanged (field 17, forest 36, city 30, tower 116) — no new facts exist to add.
+
+### Review fix (2026-11-16)
+
+As first submitted, phase 02 counted three things the child does not see as new
+questions, so the counts were prettier than reality. The author caught all three
+in review and they are fixed here; the counter below is re-run after the fix
+(117 skill × tier rows, only `meas-temperature` t1 changed: 24 → 48):
+
+- `meas-ml` t1: the 5-mark 100 ml jug is gone (20 ml a mark in one step, with no
+  lead-in, is tier 2 reasoning). Real expansion instead: a 50 ml jug with 5 marks
+  (10 ml a mark, the book's step), so t1 stays 9 + 4 = 13.
+- `meas-ml` t2: the 10-mark 100 ml jug is gone (per = 10 makes the `wrong-step`
+  distractor, level × 10, equal the right answer). Real expansion instead: a 50 ml
+  jug with 10 marks (5 ml a mark, asked per-mark first), so t2 stays 3 + 4 + 9 = 16.
+- `meas-temperature` t1: the A/B/C labels are gone (same thermometer, same
+  reading). The thermometer is now labelled with a place from `PLACES` and the
+  question names it, so t1 is 6 places × 8 values = 48 — a real question each.
+
+The counter counts what the child sees: the signature is the story, every step's
+prompt and correct answer, and the whole scene (jug capacity and marks, thermometer
+label and reading). A jug's capacity is printed in its story text and on the jug;
+a thermometer's place label is drawn under it.
 
 ## Catalog freeze decision (phase 01)
 

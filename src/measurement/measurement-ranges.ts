@@ -9,14 +9,30 @@ export const RULER_MAX_CM = 10;
 /** B31: gram weights on the balance (the book uses 20 g, 50 g, 100 g...; 100 g would fill the cap). */
 export const WEIGHTS = [50, 20, 10, 5, 2, 1] as const;
 
-/** B32: a 100 ml jug; marks per tier (10 ml a mark, then 4 or 5 marks to work out). Phase 02
- * widened the mark sets (tier 1 gains a 5-mark jug, tier 2 gains the 10-mark jug) so both
- * clear the 12-prompt bar: tier 1 is 9 + 4 = 13, tier 2 is 3 + 4 + 9 = 16. */
-export const JUG_CAPACITY = 100;
-export const JUG_MARKS: Readonly<Record<SkillTier, readonly number[]>> = {
-  1: [10, 5],
-  2: [4, 5, 10],
-  3: [10],
+/** B32: jugs by tier. A jug is a (capacity, marks) pair; one mark is capacity / marks ml.
+ * Tier 1 asks one step only, so every mark is the book's 10 ml: a 100 ml jug with
+ * 10 marks and a 50 ml jug with 5 marks. Tier 2 asks per-mark first, so other
+ * per-mark values are fair: 25 ml (100 ml / 4 marks), 20 ml (100 ml / 5),
+ * 5 ml (50 ml / 10). Two phase-02 sets were not real questions and are gone: the
+ * 5-mark 100 ml jug at tier 1 (one step would force the child to work out 20 ml
+ * a mark with no lead-in — that is tier 2 reasoning) and the 10-mark 100 ml jug
+ * at tier 2 (per = 10 makes the 'wrong-step' distractor, level × 10, equal the
+ * right answer). Counts after the fix: tier 1 is 9 + 4 = 13, tier 2 is 3 + 4 + 9 = 16. */
+export interface JugSet {
+  readonly capacity: number;
+  readonly marks: number;
+}
+export const JUG_SETS: Readonly<Record<SkillTier, readonly JugSet[]>> = {
+  1: [
+    { capacity: 100, marks: 10 },
+    { capacity: 50, marks: 5 },
+  ],
+  2: [
+    { capacity: 100, marks: 4 },
+    { capacity: 100, marks: 5 },
+    { capacity: 50, marks: 10 },
+  ],
+  3: [{ capacity: 100, marks: 10 }],
 };
 
 /** B33: air temperatures 5-40 °C as in the book (Sa Pa 10, Hà Nội 30); scale 0-100. */

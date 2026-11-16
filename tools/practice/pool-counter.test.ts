@@ -30,11 +30,13 @@ describe('pool counter', () => {
     expect(a).toEqual(b);
   });
 
-  it('meas-temperature tier 1 has 24 distinct prompts (phase 02)', () => {
+  it('meas-temperature tier 1 has 48 distinct prompts (review fix)', () => {
     // TEMP_RANGE is [5, 40]; tier 1 reads a multiple of 5: 5, 10, …, 40 — 8 values —
-    // and the thermometer is labelled A, B or C (phase 02): 8 values × 3 labels.
+    // and the thermometer is labelled with a place from PLACES (6 places):
+    // 8 values × 6 places. Phase 02 counted 24 by relabelling A/B/C, which is
+    // not a new question for the child (same thermometer, same reading).
     const r = countSkill('meas-temperature', 1);
-    expect(r.distinct).toBe(24);
+    expect(r.distinct).toBe(48);
   });
 
   it('phase-02 targets: below-target skills from phase 01 clear their bar', () => {
