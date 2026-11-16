@@ -3,15 +3,18 @@
 // Tiers raise the reasoning (rotated figures, choose-all, two steps), never the numbers.
 import type { SkillTier } from '../learning/skill-tiers';
 
-/** B16: even segment lengths so the midpoint lands on whole centimetres. */
+/** B16: even segment lengths so the midpoint lands on whole centimetres. Phase 02 widened
+ * tiers 1–2 to 24 cm (12 distinct lengths each) so the skill clears the 12-prompt bar;
+ * the book's own segments are shorter, but the length is stated, never measured. */
 export const MIDPOINT_LENGTHS: Readonly<Record<SkillTier, readonly [number, number]>> = {
-  1: [2, 12],
-  2: [2, 20],
+  1: [2, 24],
+  2: [2, 24],
   3: [4, 20],
 };
 
-/** B17: radius in cm; tier 3 puts up to 3 equal circles in a row (6 × 16 = 96). */
-export const RADIUS_MAX: Readonly<Record<SkillTier, number>> = { 1: 10, 2: 25, 3: 16 };
+/** B17: radius in cm; tier 3 puts up to 3 equal circles in a row (6 × 16 = 96). Phase 02
+ * widened tier 1 to 12 cm (12 distinct radii) so it clears the 12-prompt bar. */
+export const RADIUS_MAX: Readonly<Record<SkillTier, number>> = { 1: 12, 2: 25, 3: 16 };
 export const CIRCLE_ROW_COUNTS = [2, 3] as const;
 
 /** B18: angles that are clearly not right next to 90 (tier 3 adds the closer 75 / 105). */

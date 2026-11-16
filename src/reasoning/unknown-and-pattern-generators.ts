@@ -1,12 +1,16 @@
 // Find the unknown (KNTT T1 B3, B13) and number patterns (dãy số, luyện tập). Tier 3 unknowns
 // need a calculation on the other side first; tier 3 patterns hide a middle term too.
-import { pick, randInt } from '../learning/seeded-rng';
+import { pick, type Rng, randInt } from '../learning/seeded-rng';
 import type { SkillTier } from '../learning/skill-tiers';
 import { numberChoiceStep, numberStep, reasoningItem, ref } from './reasoning-distractors';
 import { MAX_NUMBER, PATTERN_STEPS, TIER_RANGES } from './reasoning-ranges';
 import type { ReasoningGenerator, ReasoningStep } from './reasoning-types';
 
 const ASK_X = ref('askUnknown');
+
+/** Phase 02: the same unknown in two wordings ("Dấu ? là số nào?" / "Tìm số còn thiếu:"). */
+const unknownStory = (rng: Rng, text: string) =>
+  ref(pick(rng, ['unknownEq', 'unknownEqFind'] as const), { text });
 
 function unknownSteps(
   rng: () => number,
@@ -30,7 +34,7 @@ export const unknownAddSub: ReasoningGenerator = (rng, tier) => {
     const a = randInt(rng, 1, MAX_NUMBER - b * c);
     const text = `? − ${a} = ${b} × ${c}`;
     const steps = unknownSteps(rng, tier, b * c + a, 0, { text: `${b} × ${c}`, value: b * c });
-    return reasoningItem('unknown-add-sub', tier, ref('unknownEq', { text }), steps, [
+    return reasoningItem('unknown-add-sub', tier, unknownStory(rng, text), steps, [
       b * c,
       b * c + a,
     ]);
@@ -45,7 +49,7 @@ export const unknownAddSub: ReasoningGenerator = (rng, tier) => {
     [`? − ${a} = ${s - a}`, s, s - 2 * a],
   ][form] as [string, number, number];
   const steps = unknownSteps(rng, tier, x, trap);
-  return reasoningItem('unknown-add-sub', tier, ref('unknownEq', { text }), steps, [x]);
+  return reasoningItem('unknown-add-sub', tier, unknownStory(rng, text), steps, [x]);
 };
 
 /** `? × n = p`, `n × ? = p`, `p : ? = q`, `? : n = q`; tier 3: `? × n = a + b`. */
@@ -58,7 +62,7 @@ export const unknownMulDiv: ReasoningGenerator = (rng, tier) => {
     const a = randInt(rng, 1, p - 1);
     const text = `? × ${n} = ${a} + ${p - a}`;
     const steps = unknownSteps(rng, tier, q, 0, { text: `${a} + ${p - a}`, value: p });
-    return reasoningItem('unknown-mul-div', tier, ref('unknownEq', { text }), steps, [p, q]);
+    return reasoningItem('unknown-mul-div', tier, unknownStory(rng, text), steps, [p, q]);
   }
   const form = randInt(rng, 0, 3);
   const [text, x, trap] = [
@@ -68,7 +72,7 @@ export const unknownMulDiv: ReasoningGenerator = (rng, tier) => {
     [`? : ${n} = ${q}`, p, q - n > 0 ? q - n : n + q],
   ][form] as [string, number, number];
   const steps = unknownSteps(rng, tier, x, trap);
-  return reasoningItem('unknown-mul-div', tier, ref('unknownEq', { text }), steps, [x]);
+  return reasoningItem('unknown-mul-div', tier, unknownStory(rng, text), steps, [x]);
 };
 
 /** Five terms; tier 1 hides the last, tier 2 the last two, tier 3 one in the middle and the last. */
@@ -108,5 +112,7 @@ export const patternSkipCount: ReasoningGenerator = (rng, tier) => {
   const d = pick(rng, TIER_RANGES[tier].factors);
   const k = randInt(rng, 1, Math.max(1, Math.floor(MAX_NUMBER / d) - 4));
   const up = [0, 1, 2, 3, 4].map((i) => (k + i) * d);
-  return pattern('pattern-skip-count', tier, tier === 3 ? up.reverse() : up);
+  // Phase 02: tiers 1–2 count down too (tier 3 already did), doubling the pool.
+  const down = tier === 3 || rng() < 0.5;
+  return pattern('pattern-skip-count', tier, down ? up.reverse() : up);
 };

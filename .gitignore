@@ -12,6 +12,7 @@
 node_modules
 dist
 dev-dist
+.preview
 playwright-report
 test-results
 supabase/.temp

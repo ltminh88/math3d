@@ -9,6 +9,7 @@
       "!.takumi",
       "!dist",
       "!dev-dist",
+      "!.preview",
       "!recovered",
       "!src/sync/supabase-database-types.ts"
     ]

@@ -142,16 +142,18 @@ export const measAreaSquare: GeoGenerator = (rng, tier) => {
     const [a, b] = pick(rng, DOUBLE_TO_SQUARE);
     const red = a * b;
     const side = Math.round(Math.sqrt(2 * red));
+    // Phase 02: the same pair as a tile (7 pairs × 2 framings = 14 prompts).
+    const tile = rng() < 0.5;
     const steps = [
-      numberStep(ref('askRedArea'), red),
-      numberStep(ref('askYellowArea'), 2 * red),
-      qtyChoiceStep(rng, ref('askYellowSide'), side, 'cm', [
+      numberStep(ref(tile ? 'askRedTileArea' : 'askRedArea'), red),
+      numberStep(ref(tile ? 'askYellowTileArea' : 'askYellowArea'), 2 * red),
+      qtyChoiceStep(rng, ref(tile ? 'askYellowTileSide' : 'askYellowSide'), side, 'cm', [
         { value: red, misconception: 'one-step-only' },
         { value: (2 * red) / 4, misconception: 'area-not-perimeter' },
         { value: red / 2, misconception: 'wrong-step' },
       ]),
     ];
-    const story = ref('squareFromRect', { a, b });
+    const story = ref(tile ? 'squareFromRectTile' : 'squareFromRect', { a, b });
     return geoItem('meas-area-square', tier, story, steps, rectScene(b, a), 'cm', [
       red,
       2 * red,
@@ -160,6 +162,8 @@ export const measAreaSquare: GeoGenerator = (rng, tier) => {
   }
   const s = randInt(rng, 2, AREA_SIDE_MAX);
   const area = s * s;
+  // Phase 02: three framings of the same square (3 × 9 sides = 27 prompts).
+  const storyKey = pick(rng, ['squareArea', 'squareAreaTile', 'squareAreaCard'] as const);
   const steps =
     tier === 1
       ? [numberStep(ref('askAreaSquare'), area)]
@@ -171,5 +175,5 @@ export const measAreaSquare: GeoGenerator = (rng, tier) => {
           unitChoiceStep(rng, 'cm2', ['cm', 'mm']),
         ];
   const sc = rectScene(s, s, { showHeight: false });
-  return geoItem('meas-area-square', tier, ref('squareArea', { s }), steps, sc, 'cm2', [area]);
+  return geoItem('meas-area-square', tier, ref(storyKey, { s }), steps, sc, 'cm2', [area]);
 };

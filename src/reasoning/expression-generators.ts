@@ -7,6 +7,7 @@ import {
   expressionChoiceStep,
   numberChoiceStep,
   numberStep,
+  pickNames,
   pickNoun,
   reasoningItem,
   ref,
@@ -124,21 +125,27 @@ export const exprFromStory: ReasoningGenerator = (rng, tier) => {
     const a = randInt(rng, 1, total - 1);
     const b = total - a;
     const item = pickNoun(rng);
-    const story = ref('exprStoryShare', { a, b, n, item });
+    // Phase 02: the same share between friends, not groups.
+    const friends = rng() < 0.5;
+    const [who1, who2] = pickNames(rng);
+    const story = friends
+      ? ref('exprStoryShareFriends', { who1, who2, a, b, n, item })
+      : ref('exprStoryShare', { a, b, n, item });
     const steps = [
       expressionChoiceStep(rng, pickExpr, `(${a} + ${b}) : ${n}`, [
         { value: `${a} + ${b} : ${n}`, misconception: 'ignore-brackets' },
         { value: `(${a} + ${b}) × ${n}`, misconception: 'wrong-inverse' },
         { value: `${a} + ${b} − ${n}`, misconception: 'minus-instead-of-divide' },
       ]),
-      numberStep(ref('askEach', { item }), total / n),
+      numberStep(ref(friends ? 'askEachFriend' : 'askEach', { item }), total / n),
     ];
     return reasoningItem('expr-from-story', tier, story, steps, [total, total / n]);
   }
   const [n, p] = product(rng, 90);
   const e = randInt(rng, 1, n * p - 1);
   const item = pickNoun(rng);
-  const story = ref('exprStoryEat', { n, p, e, item });
+  // Phase 02: the same n × p − e as boxes, not bags.
+  const story = ref(pick(rng, ['exprStoryEat', 'exprStoryBox'] as const), { n, p, e, item });
   const left = numberStep(ref('askLeftOver', { item }), n * p - e);
   const steps =
     tier === 1

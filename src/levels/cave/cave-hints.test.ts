@@ -79,6 +79,34 @@ describe('cave hints', () => {
     }
   });
 
+  it('every phase-02 word-problem frame has a first-step expression', () => {
+    // A new context draws a new story key; a key missing from FIRST_STEP makes rung 3
+    // fall back to the generic ask and the child loses the first calculation.
+    const wpSkills = [
+      'wp-times-then-add',
+      'wp-divide-then-add',
+      'wp-more-less-then-total',
+      'wp-unit-then-times',
+      'wp-times-compare',
+      'wp-difference-compare',
+    ];
+    for (const skill of wpSkills)
+      for (let seed = 1; seed <= 40; seed++) {
+        const [c] = buildCaveChambers([skill], {}, mulberry32(seed));
+        const expr = firstStepExpression(c as CaveChamber);
+        expect(expr, `${skill} s${seed} ${c?.item.story.key}`).not.toBeNull();
+      }
+    // The shared compare frames take their operation from the skill, not the key.
+    for (let seed = 1; seed <= 40; seed++) {
+      const [times] = buildCaveChambers(['wp-times-compare'], {}, mulberry32(seed));
+      const [diff] = buildCaveChambers(['wp-difference-compare'], {}, mulberry32(seed));
+      if (times?.item.story.key.startsWith('wpCompare'))
+        expect(firstStepExpression(times as CaveChamber)).toContain(':');
+      if (diff?.item.story.key.startsWith('wpCompare'))
+        expect(firstStepExpression(diff as CaveChamber)).toContain('−');
+    }
+  });
+
   it('rung 2 draws the line diagram for word problems and restates the question', () => {
     const [wp] = buildCaveChambers(['wp-unit-then-times'], {}, mulberry32(5));
     const text = caveHintText(cs, 2, wp as CaveChamber, 0);

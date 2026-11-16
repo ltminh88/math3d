@@ -17,10 +17,10 @@
   and ranges the new contexts must stay inside)
 
 ## Overview
-- Priority P1. Status **not started**. Depends on 01 (counter + catalog
-  freeze). Parallel with 03 (different folders; 03 consumes the widened
-  generators but its stage *formats* do not depend on the new contexts).
-  Effort **12 h** (branch `muse/wider-item-pools`, one PR).
+- Priority P1. Status **done** — content, counter, gates and local e2e done
+  (40/40 across 4 projects); preview deployed at
+  https://mathgame-bnxf3pv0d-vlm5.vercel.app. Effort **12 h**
+  (branch `muse/wider-item-pools`, one PR).
 - Widen the pools *inside* the existing generators — more story contexts,
   shapes and scene variants — so no child sees the same visible prompt
   twice within three runs of a level. No new skill ids (phase 01 froze
@@ -143,13 +143,13 @@ and level rounds) — same surfaces, new wording. The parity reviewer
 re-shoots the quiz/level prompt screenshots, not the world.
 
 ## Todo list
-- [ ] word-problem contexts (+3–5 per `wp-*` skill)
-- [ ] remainder / unknown / pattern / expression / logic variants
-- [ ] geometry templates + solid variants
-- [ ] measurement combination variants
-- [ ] oracle + vi/en tests green
-- [ ] after-report with before/after counts; shortfall list
-- [ ] preview deploy + URL in PR
+- [x] word-problem contexts (+3–5 per `wp-*` skill)
+- [x] remainder / unknown / pattern / expression / logic variants (logic deliberately skipped — already ~30× target)
+- [x] geometry templates + solid variants
+- [x] measurement combination variants
+- [x] oracle + vi/en tests green
+- [x] after-report with before/after counts; shortfall list (none)
+- [x] preview deploy + URL in PR (https://mathgame-bnxf3pv0d-vlm5.vercel.app, deployment dpl_3AcG9u1L26GLQkiQTPcztyC4wHVR)
 
 ## Success Criteria
 - Every skill × tier meets its target, or is on the shortfall list with a
@@ -167,7 +167,14 @@ re-shoots the quiz/level prompt screenshots, not the world.
 - Will verify: unit oracles, vi/en render tests, counter re-run, golden
   check.
 - Deliberately skipped: new skill ids, new generator kinds, new round
-  formats (phases 03–10), any UI or scene change.
+  formats (phases 03–10), any UI or scene change. Also skipped after measuring:
+  new logic statement families (choose-all-correct 7238 / tf-explain 803 at t1,
+  ~30× target already); new polygon templates (all 9 KNTT B19 kinds are already in
+  `polygon-templates.ts`; widening came from sizes/rotations instead);
+  pattern-add/sub variants (332+ already ≥ 24); widening unknown-mul-div t1's
+  quotient range (would push numbers toward the 100 cap; t1 is 128 already);
+  more meas-area-square t3 pairs (7 pairs × 2 framings = 14 is exhaustive within
+  the ≤ 100 cap).
 
 ## Risk Assessment
 | Risk | L | I | Countermove |
@@ -180,6 +187,59 @@ re-shoots the quiz/level prompt screenshots, not the world.
 ## Security Considerations
 - None beyond existing: generators are pure and seeded; no input is
   parsed, no save-code change in this phase.
+
+## Findings during the phase
+
+- **New contexts broke a cave hint (found by the unit tests, fixed in this
+  phase).** `src/levels/cave/cave-hints.ts` maps story keys to the first
+  calculation (`FIRST_STEP`); the new frames were missing, so rung 3 fell back
+  to the generic ask for every new context (`cave-hints.test.ts` failed:
+  `firstStepExpression` returned null where `'8 × 4'` was expected). All new
+  keys were added with their base frame's formula; the three compare frames are
+  shared by both compare skills, so their operation comes from the chamber's
+  skill (`:` for wp-times-compare, `−` for wp-difference-compare). A regression
+  test asserts a first-step expression exists for every wp skill × 40 seeds and
+  the right operation for the shared frames. This is the risk the Risk table
+  named ("new context breaks a hint rung") — it bit, and the hint tests caught
+  it.
+- **`reasoning-strings.ts` grew past 200 lines (233)**, so the 31 phase-02
+  context string keys moved verbatim into the new
+  `src/reasoning/word-problem-context-strings.ts`
+  (`WORD_PROBLEM_CONTEXT_VI` / `_EN`, spread into the single
+  `defineStrings('reasoning', …)` table — the same pattern as
+  `perimeter-area-strings.ts`). Key-set verified mechanically: 89 keys before,
+  89 after, no loss or duplication. The split also exposed two unused imports
+  left by the compare-generator split, removed.
+- **Counter re-run reproduces the after-report exactly** (all 117 skill × tier
+  rows, same seed and method). No shortfalls; closest to target: geo-midpoint
+  12/12, geo-radius-diameter 12, meas-ml 13, meas-area-square t3 14. Fact pools
+  unchanged (field 17, forest 36, city 30, tower 116).
+- **Goldens byte-identical** — the widened generators did not reshuffle any
+  seeded quiz order in the traced paths.
+- **Review fix (2026-11-16, after PR #5 was opened).** The author found the
+  phase-02 counts were prettier than reality in two places, and both are fixed
+  here (see `reports/pool-counts.md`, "Review fix"):
+  - `meas-ml`: the 5-mark 100 ml jug left tier 1 (20 ml a mark in one step is
+    tier 2 reasoning) and the 10-mark 100 ml jug left tier 2 (per = 10 makes
+    the `wrong-step` distractor equal the right answer). Real expansion
+    instead, inside B32: a 50 ml jug — 5 marks at tier 1 (10 ml a mark),
+    10 marks at tier 2 (5 ml a mark, asked per-mark first). Totals unchanged
+    (t1 13, t2 16), composition now honest. `JUG_MARKS` became `JUG_SETS`
+    (capacity + marks per tier).
+  - `meas-temperature` t1: the A/B/C labels are gone (same thermometer, same
+    reading). The thermometer is now labelled with a place from `PLACES` and
+    the question names it (`askTemp` takes `{place}`): 6 places × 8 values =
+    48, med 12.5. The counter test now asserts 48, not 24.
+  - `unknownEqFind` ("Tìm số còn thiếu:"): kept — it is a genuinely different
+    visible format, and `unknown-add-sub` t1 is already 1482, so it was never
+    needed for the target; the choice is recorded here, not hidden.
+  - The review fix also exposed that `biome check` lints the `.preview/deploy`
+    build output (3454 errors) and that `.preview/` was not git-ignored, so
+    both now exclude it, mirroring `dist`. The formatter also reflowed two
+    `geoItem` calls in the ml generator (no behaviour change).
+  - Counter re-run after the fix: all 117 rows identical except
+    `meas-temperature` t1 (24 → 48). Gates re-run green; a new preview was
+    deployed and CI re-run on the fix commit.
 
 ## Next steps
 - 07–10 consume the widened pools; 03–06 use the verified fact-pool counts.

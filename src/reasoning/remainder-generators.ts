@@ -64,7 +64,9 @@ export const divRemFloor: ReasoningGenerator = (rng, tier) => {
 /** "Cần ít nhất mấy xe?": the remainder needs one more (the trap is rounding down). */
 export const divRemCeil: ReasoningGenerator = (rng, tier) => {
   const s = split(rng, tier);
-  const story = ref('divRemCeil', { total: s.total, per: s.per });
+  // Phase 02: three trips for the same ceil (trip, camping, cinema).
+  const storyKey = pick(rng, ['divRemCeil', 'divRemCeilCamp', 'divRemCeilCinema'] as const);
+  const story = ref(storyKey, { total: s.total, per: s.per });
   const need = ref('askNeed');
   const steps: ReasoningStep[] =
     tier === 1

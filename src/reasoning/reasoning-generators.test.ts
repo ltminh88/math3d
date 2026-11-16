@@ -25,7 +25,8 @@ const ORACLE: Record<string, (item: ReasoningItem) => void> = {
   'wp-divide-then-add': (i) => expect(finalNumber(i)).toBe(p(i, 'a') + p(i, 'a') / p(i, 'n')),
   'wp-more-less-then-total': (i) =>
     expect(finalNumber(i)).toBe(
-      2 * p(i, 'a') + (i.story.key === 'wpMoreThenTotal' ? p(i, 'd') : -p(i, 'd')),
+      // Phase 02: more/less frames are wpMoreThenTotal* / wpLessThenTotal*.
+      2 * p(i, 'a') + (i.story.key.includes('More') ? p(i, 'd') : -p(i, 'd')),
     ),
   'wp-unit-then-times': (i) =>
     expect(finalNumber(i)).toBe((p(i, 'total') / p(i, 'boxes')) * p(i, 'm')),
@@ -60,7 +61,8 @@ const ORACLE: Record<string, (item: ReasoningItem) => void> = {
   },
   'expr-from-story': (i) =>
     expect(finalNumber(i)).toBe(
-      i.story.key === 'exprStoryEat'
+      // Phase 02: both n × p − e frames are 'exprStoryEat' / 'exprStoryBox'; the rest share.
+      ['exprStoryEat', 'exprStoryBox'].includes(i.story.key)
         ? p(i, 'n') * p(i, 'p') - p(i, 'e')
         : (p(i, 'a') + p(i, 'b')) / p(i, 'n'),
     ),

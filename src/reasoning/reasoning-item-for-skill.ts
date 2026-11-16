@@ -13,11 +13,10 @@ import {
   unknownAddSub,
   unknownMulDiv,
 } from './unknown-and-pattern-generators';
+import { wpDifferenceCompare, wpTimesCompare } from './word-problem-compare-generators';
 import {
-  wpDifferenceCompare,
   wpDivideThenAdd,
   wpMoreLessThenTotal,
-  wpTimesCompare,
   wpTimesThenAdd,
   wpUnitThenTimes,
 } from './word-problem-generators';

@@ -13,7 +13,7 @@ import {
   twoNouns,
   weightsFor,
 } from './measurement-distractors';
-import { JUG_CAPACITY, JUG_MARKS, PLACES, TEMP_RANGE, WEIGHTS } from './measurement-ranges';
+import { JUG_SETS, PLACES, TEMP_RANGE, WEIGHTS } from './measurement-ranges';
 
 const balance = (item: string, count: number, grams: number) =>
   scene({ kind: 'balance', item, count, weights: weightsFor(grams) }, 32);
@@ -68,21 +68,21 @@ export const measGram: GeoGenerator = (rng, tier) => {
   return geoItem('meas-gram', tier, story, steps, balance(item, count, total), 'g', [total, per]);
 };
 
-const jug = (marks: number, level: number) =>
-  scene({ kind: 'jug', capacity: JUG_CAPACITY, marks, level }, 32);
+const jug = (capacity: number, marks: number, level: number) =>
+  scene({ kind: 'jug', capacity, marks, level }, 32);
 
 export const measMl: GeoGenerator = (rng, tier) => {
-  const marks = pick(rng, JUG_MARKS[tier]);
-  const per = JUG_CAPACITY / marks;
+  const { capacity, marks } = pick(rng, JUG_SETS[tier]);
+  const per = capacity / marks;
   if (tier === 1) {
     const level = randInt(rng, 1, marks - 1);
-    const story = ref('jugRead', { capacity: JUG_CAPACITY, marks });
+    const story = ref('jugRead', { capacity, marks });
     return geoItem(
       'meas-ml',
       tier,
       story,
       [numberStep(ref('askWaterMl'), level * per)],
-      jug(marks, level),
+      jug(capacity, marks, level),
       'ml',
     );
   }
@@ -96,8 +96,11 @@ export const measMl: GeoGenerator = (rng, tier) => {
         { value: level * 10, misconception: 'wrong-step' },
       ]),
     ];
-    const story = ref('jugMarks', { capacity: JUG_CAPACITY, marks });
-    return geoItem('meas-ml', tier, story, steps, jug(marks, level), 'ml', [per, level * per]);
+    const story = ref('jugMarks', { capacity, marks });
+    return geoItem('meas-ml', tier, story, steps, jug(capacity, marks, level), 'ml', [
+      per,
+      level * per,
+    ]);
   }
   // Tier 3: pour equal cups out of the jug, then what is left.
   const level = randInt(rng, 3, marks);
@@ -113,19 +116,29 @@ export const measMl: GeoGenerator = (rng, tier) => {
     ]),
   ];
   const story = ref('jugPour', { total, cups, per: cupMl });
-  return geoItem('meas-ml', tier, story, steps, jug(marks, level), 'ml', [poured, total - poured]);
+  return geoItem('meas-ml', tier, story, steps, jug(capacity, marks, level), 'ml', [
+    poured,
+    total - poured,
+  ]);
 };
 
 export const measTemperature: GeoGenerator = (rng, tier) => {
   const [lo, hi] = TEMP_RANGE;
   if (tier === 1) {
     const value = 5 * randInt(rng, lo / 5, hi / 5);
-    const s = scene({ kind: 'thermometers', minorStep: 5, readings: [{ label: 'A', value }] }, 32);
+    // Review fix: the thermometer is labelled with a place from PLACES, not a
+    // letter — relabelling A/B/C is not a new question for the child (same
+    // thermometer, same reading), a place is (6 places × 8 values = 48).
+    const place = pick(rng, PLACES);
+    const s = scene(
+      { kind: 'thermometers', minorStep: 5, readings: [{ label: place, value }] },
+      32,
+    );
     return geoItem(
       'meas-temperature',
       tier,
       ref('tempRead'),
-      [numberStep(ref('askTemp'), value)],
+      [numberStep(ref('askTemp', { place }), value)],
       s,
       'degC',
     );

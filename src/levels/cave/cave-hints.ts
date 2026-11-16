@@ -27,17 +27,35 @@ type Build = (p: Readonly<Record<string, number | string>>) => string | null;
 /** First calculation per story or statement key, from the numbers the child already reads. */
 const FIRST_STEP: Readonly<Record<string, Build>> = {
   wpTimesThenAdd: (p) => `${p.a} × ${p.n}`,
+  // Phase 02: the new frames do the same first calculation as their base frame.
+  wpTimesThenAddChairs: (p) => `${p.a} × ${p.n}`,
+  wpTimesThenAddCakes: (p) => `${p.a} × ${p.n}`,
+  wpTimesThenAddHarvest: (p) => `${p.a} × ${p.n}`,
   wpDivideThenAdd: (p) => `${p.a} : ${p.n}`,
+  wpDivideThenAddHarvest: (p) => `${p.a} : ${p.n}`,
+  wpDivideThenAddMake: (p) => `${p.a} : ${p.n}`,
+  wpDivideThenAddPack: (p) => `${p.a} : ${p.n}`,
   wpMoreThenTotal: (p) => `${p.a} + ${p.d}`,
+  wpMoreThenTotalHarvest: (p) => `${p.a} + ${p.d}`,
+  wpMoreThenTotalMake: (p) => `${p.a} + ${p.d}`,
   wpLessThenTotal: (p) => `${p.a} − ${p.d}`,
+  wpLessThenTotalHarvest: (p) => `${p.a} − ${p.d}`,
+  wpLessThenTotalMake: (p) => `${p.a} − ${p.d}`,
   wpUnitThenTimes: (p) => `${p.total} : ${p.boxes}`,
+  wpUnitThenTimesPack: (p) => `${p.total} : ${p.boxes}`,
+  wpUnitThenTimesShop: (p) => `${p.total} : ${p.boxes}`,
+  wpUnitThenTimesStore: (p) => `${p.total} : ${p.boxes}`,
   wpTimesCompare: (p) => `${p.big} : ${p.small}`,
   wpDifferenceCompare: (p) => `${p.big} − ${p.small}`,
   divRemFloor: (p) => `${p.total} : ${p.per}`,
   divRemCeil: (p) => `${p.total} : ${p.per}`,
+  divRemCeilCamp: (p) => `${p.total} : ${p.per}`,
+  divRemCeilCinema: (p) => `${p.total} : ${p.per}`,
   exprValue: (p) => firstPart(String(p.text)),
   exprStoryEat: (p) => `${p.n} × ${p.p}`,
+  exprStoryBox: (p) => `${p.n} × ${p.p}`,
   exprStoryShare: (p) => `${p.a} + ${p.b}`,
+  exprStoryShareFriends: (p) => `${p.a} + ${p.b}`,
   rectPerim: (p) => `${p.a} + ${p.b}`,
   rectPerimBack: (p) => `${p.p} : 2`,
   rectArea: (p) => `${p.a} × ${p.b}`,
@@ -60,6 +78,15 @@ const firstOf = (ref: PromptRef | undefined): string | null =>
 export function firstStepExpression(chamber: CaveChamber): string | null {
   const first = chamber.steps[0];
   if (chamber.format === 'tf-explain' && first?.kind === 'verdict') return firstOf(first.statement);
+  // Phase 02: the three compare frames are shared by both compare skills, so the
+  // operation comes from the chamber's skill, not the story key.
+  const key = chamber.item.story.key;
+  if (key === 'wpCompareCrates' || key === 'wpCompareClasses' || key === 'wpCompareGardens') {
+    const p = chamber.item.story.params ?? {};
+    return chamber.skillId === 'wp-difference-compare'
+      ? `${p.big} − ${p.small}`
+      : `${p.big} : ${p.small}`;
+  }
   return firstOf(chamber.item.story);
 }
 
