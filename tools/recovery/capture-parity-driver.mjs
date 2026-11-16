@@ -119,7 +119,9 @@ export function createParityDriver({ page, scenarioId, outDir, written }) {
         // this task and toDataURL would read a black buffer (no
         // preserveDrawingBuffer). Ask for one fresh frame first; the step below
         // runs the frame loop, which renders it in this same task.
-        window.__parity.requestRedraw();
+        // Optional-chained: the parity job renders the base commit with HEAD's
+        // tooling, and base has no requestRedraw (it renders every frame).
+        window.__parity.requestRedraw?.();
         const dataUrl = window.__parityStep(1, true);
         return {
           gl: { calls: window.__parityGl.calls, triangles: window.__parityGl.triangles },
