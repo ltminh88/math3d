@@ -128,6 +128,18 @@ export class World implements WorldPublicApi {
     this.redraw.request();
   }
 
+  /**
+   * True while a reward effect is still playing: a bridge segment still falling
+   * (its group sits above y=0 until the loop lowers it) or sparks still alive.
+   * The ambient animation (windmill, clouds, floaters, ripples, beacon) is NOT
+   * an effect: it keeps moving in the simulation while paused, but nobody sees
+   * it, and rendering it every frame is exactly what starved the shop dialog.
+   */
+  private effectsActive(): boolean {
+    if (this.sparks.length > 0) return true;
+    return this.bridge.children.some((segment) => segment.position.y > 0);
+  }
+
   /** Left and right leg of the player model (walk cycle). */
   get legs(): readonly Mesh[] {
     return this.playerParts.legs;
@@ -256,7 +268,13 @@ export class World implements WorldPublicApi {
     // this way). A redraw still happens on demand through the flag: entering
     // pause, a resize, a context restore, a scene change while paused, or a
     // parity capture (toDataURL reads black when no render happened in its task).
-    if (!this.paused || this.redraw.take()) this.renderer.render(this.scene, this.camera);
+    // Exception: a reward effect that is still playing (a bridge segment dropping
+    // in, a spark burst) keeps rendering every frame until it finishes — the
+    // child watches it behind the quiz dialog, and the shop never spawns these
+    // effects, so shop:143 keeps its one-frame-while-paused behaviour.
+    if (!this.paused || this.redraw.take() || this.effectsActive()) {
+      this.renderer.render(this.scene, this.camera);
+    }
     const { x, z } = this.player.position;
     this.onFrame?.(this.nearMilo(), x > 12 && Math.abs(z) < 4, 1 / Math.max(dt, 0.001));
   };
