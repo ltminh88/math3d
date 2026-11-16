@@ -50,7 +50,10 @@ export class ValleyPanel {
     const name = el('strong', 'valley-guide__name', tc('guideName'));
     this.guide.append(el('span', 'valley-guide__dot', '✦'), name, this.guideText);
     this.progress.append(this.roundText, this.stones);
-    this.hint = button('text-button valley-hint-button', `💡 ${vs('hint')}`, handlers.onHint);
+    this.hint = button('text-button valley-hint-button', '', handlers.onHint);
+    // The 💡 gets its own span so the offer nudge can animate it without moving the
+    // button's box (a transform on the button makes Playwright's tap wait forever).
+    this.hint.append(el('span', 'hint-nudge', '💡'), ` ${vs('hint')}`);
     this.next = button('primary valley-next', '', handlers.onNext);
     this.next.hidden = true;
     this.hintArea.hidden = true;

@@ -18,8 +18,24 @@ import {
 // transition:none ends any running CSS transition (spec: changing transition-property cancels
 // it), so world labels stop holding compositor layers whose raster offset depends on real-time
 // history. Deterministic: every origin runs the same protocol at the same virtual frame.
+// backdrop-filter:none is the same class of fix for the blur: the dialog/top-bar glass blurs
+// the backdrop on the GPU (SwiftShader on Linux), and the blur raster varies by ±1 level
+// run to run over the whole blurred area (menus--book-welcome 15.7% in CI run 43435349261,
+// reproduced locally: menus--book 16.7% between two identical captures) while the shot JSON
+// stays byte-exact. dialog::backdrop carries its own blur(4px) and is not matched by `*`,
+// so it is listed explicitly — it alone covered 43–59% of the pixels outside the dialog.
+// animation:none is the same fix for composited-layer animations (dialog pop, map-in,
+// float-up): the virtual clock pins their CSS time, but the compositor still rasters the
+// layer with a real-time-dependent offset, so DOM shots render them at their settled state.
+// box-shadow:none / text-shadow:none are the same fix for GPU blurs: the dialog's
+// `box-shadow: 0 30px 100px` falloff raster varies by ±1 on SwiftShader (help shot: 63.7%
+// of the shadow zone, decaying 88% at the dialog edge to 18% 100px out, while the dialog
+// interior is 0%), and the one 8px-blur caption text-shadow is the same class. The *values*
+// stay gated exactly: the style tag is removed before snapshotDomState, so cssHash keeps
+// covering the animation/backdrop-filter/box-shadow/text-shadow shorthands (keyframe bodies
+// are not rendered in DOM shots — that is the trade-off for determinism here).
 const DOM_ONLY_CSS =
-  '#world{visibility:hidden!important}*,*::before,*::after{transition:none!important}';
+  '#world{visibility:hidden!important}*,*::before,*::after,dialog::backdrop{transition:none!important;animation:none!important;backdrop-filter:none!important;-webkit-backdrop-filter:none!important;box-shadow:none!important;text-shadow:none!important}';
 
 const sha256 = (text) => createHash('sha256').update(text).digest('hex');
 
@@ -99,6 +115,13 @@ export function createParityDriver({ page, scenarioId, outDir, written }) {
       // One frame: count its WebGL draws and read its pixels in the same task as the render.
       const { gl, png } = await page.evaluate(() => {
         window.__parityGl.reset();
+        // The world skips its render while paused, so no render would happen in
+        // this task and toDataURL would read a black buffer (no
+        // preserveDrawingBuffer). Ask for one fresh frame first; the step below
+        // runs the frame loop, which renders it in this same task.
+        // Optional-chained: the parity job renders the base commit with HEAD's
+        // tooling, and base has no requestRedraw (it renders every frame).
+        window.__parity.requestRedraw?.();
         const dataUrl = window.__parityStep(1, true);
         return {
           gl: { calls: window.__parityGl.calls, triangles: window.__parityGl.triangles },
@@ -109,6 +132,15 @@ export function createParityDriver({ page, scenarioId, outDir, written }) {
       // Every face the shown text uses is loaded (no fallback glyphs) before the DOM shot.
       await page.evaluate(waitForUsedFontFaces);
       await screenshotDom(`${base}.dom.png`);
+      // screenshotDom removes the suppression tag, which restarts the animations it had
+      // turned off — and the virtual clock's animationstart listener re-pins them only
+      // when the event is dispatched, which can race the snapshot below. The snapshot
+      // then reads a real-time phase (a few ms into a restarted animation) instead of
+      // the pinned virtual time, so cssHash varied run to run on shots taken while an
+      // animation was freshly started (menus--first-frame, language-en--welcome). Re-pin
+      // synchronously here: every animation is paused at a deterministic virtual
+      // currentTime before any computed style is read.
+      await page.evaluate(() => window.__paritySyncAnimations());
       const dom = await page.evaluate(snapshotDomState);
       const { computedStyles, ...rest } = dom;
       // PARITY_DEBUG_CSS=1 keeps the full computed-style text to diff a cssHash mismatch.

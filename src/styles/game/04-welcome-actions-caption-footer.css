@@ -20,6 +20,11 @@
   font-size: 14px;
   font-weight: 800;
 }
+/* The hint-offer nudge animates this span (the 💡), not the button itself, so the
+   button's box never moves while it bounces. Inline-block so transform applies. */
+.text-button .hint-nudge {
+  display: inline-block;
+}
 .welcome > .text-button {
   margin: 10px auto 0;
 }

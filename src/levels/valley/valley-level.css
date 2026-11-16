@@ -126,9 +126,20 @@
   border-color: #11392f;
   color: #fffbea;
 }
+.valley-hint-button {
+  /* Height must not depend on the platform font: on Linux the 14 px text-button
+     renders 43 px tall (CI: "text-button valley-hint-button 54x43"), under the 44 px
+     touch target. Garden/cave/workshop already carry this guard on their hint button. */
+  min-height: 44px;
+}
 .valley-hint-button.offer {
   color: var(--gold-deep);
   text-decoration: underline;
+}
+.valley-hint-button.offer .hint-nudge {
+  /* The nudge runs on the bulb span, not the button: a transform on the button moves
+     its box forever, so Playwright never sees it stable (city hint tap timed out on
+     mobile-pixel after 680 "element is not stable" retries). The box stays put now. */
   animation: nudge 1.6s infinite ease-in-out;
 }
 .valley-hint[hidden],

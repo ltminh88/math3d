@@ -150,6 +150,11 @@
 .garden-hint-button.offer {
   color: var(--gold-deep);
   text-decoration: underline;
+}
+.garden-hint-button.offer .hint-nudge {
+  /* The nudge runs on the bulb span, not the button: a transform on the button moves
+     its box, so Playwright never sees it stable (city hint tap timed out on
+     mobile-pixel after 680 "element is not stable" retries). The box stays put now. */
   animation: nudge 1.6s infinite ease-in-out;
 }
 .garden-next {

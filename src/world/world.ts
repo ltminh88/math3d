@@ -12,6 +12,7 @@ import {
   Vector3,
   type WebGLRenderer,
 } from 'three';
+import { attachContextLossHandler } from '../core/context-loss-handler';
 import type { Avatar } from '../save/save-types';
 import { showBridgeSegments } from './bridge-segments';
 import { type Spark, spawnSparkBurst } from './burst-sparks';
@@ -24,6 +25,7 @@ import {
 } from './camera-rig';
 import { applyAvatar, type PlayerModelParts } from './characters-milo-avatar';
 import { type JoystickVector, stepPlayer, tryJump } from './player-controller';
+import { RedrawFlag } from './redraw-flag';
 import { createSkyDome } from './sky-dome';
 import type { Floater, ObstacleCircle } from './world-build-context';
 import { buildWorldScene } from './world-build-pipeline';
@@ -71,7 +73,7 @@ export class World implements WorldPublicApi {
   time = 0;
   readonly lowPower: boolean;
   active = false;
-  paused = false;
+  private _paused = false;
   joystick: JoystickVector = { x: 0, y: 0 };
   onFrame: ((nearMilo: boolean, crossedBridge: boolean, fps: number) => void) | undefined;
   onJump: (() => void) | undefined;
@@ -79,6 +81,8 @@ export class World implements WorldPublicApi {
   private readonly playerParts: PlayerModelParts;
   private readonly interactables = new InteractableRegistry();
   private readonly suspension = new WorldSuspension();
+  private readonly redraw = new RedrawFlag();
+  private readonly detachContextLoss: () => void;
   private readonly observer: ResizeObserver;
   private frame = 0;
 
@@ -93,6 +97,12 @@ export class World implements WorldPublicApi {
     this.playerParts = buildWorldScene(this);
     const container = canvas.parentElement;
     if (!container) throw new Error('World canvas must be attached to a container element');
+    this.detachContextLoss = attachContextLossHandler(canvas, {
+      // Rendering is a no-op while the context is lost; the loop keeps ticking.
+      onLost: () => undefined,
+      // The drawing buffer is blank after a restore, so draw one fresh frame.
+      onRestored: () => this.redraw.request(),
+    });
     this.observer = new ResizeObserver(() => this.resize());
     this.observer.observe(container);
     this.resize();
@@ -100,6 +110,34 @@ export class World implements WorldPublicApi {
     // Clock started on its first getDelta (delta 0); reset() keeps that: first frame dt = 0.
     this.timer.reset();
     this.animate();
+  }
+
+  /** Freezes movement and pointer input (dialogs, map). Entering pause asks for one fresh
+    frame: the pause transition itself may have changed what is shown. */
+  get paused(): boolean {
+    return this._paused;
+  }
+
+  set paused(value: boolean) {
+    if (value && !this._paused) this.redraw.request();
+    this._paused = value;
+  }
+
+  /** Ask the frame loop for one fresh frame (used while paused: parity capture, scene edits). */
+  requestRedraw(): void {
+    this.redraw.request();
+  }
+
+  /**
+   * True while a reward effect is still playing: a bridge segment still falling
+   * (its group sits above y=0 until the loop lowers it) or sparks still alive.
+   * The ambient animation (windmill, clouds, floaters, ripples, beacon) is NOT
+   * an effect: it keeps moving in the simulation while paused, but nobody sees
+   * it, and rendering it every frame is exactly what starved the shop dialog.
+   */
+  private effectsActive(): boolean {
+    if (this.sparks.length > 0) return true;
+    return this.bridge.children.some((segment) => segment.position.y > 0);
   }
 
   /** Left and right leg of the player model (walk cycle). */
@@ -113,11 +151,13 @@ export class World implements WorldPublicApi {
 
   setAvatar(avatar: Avatar): void {
     applyAvatar(this, this.playerParts, avatar);
+    this.redraw.request();
   }
 
   setBridge(segments: number, animate = false): void {
     this.bridgeCount = segments;
     showBridgeSegments(this.bridge, segments, animate, (at) => this.burst(at));
+    this.redraw.request();
   }
 
   resize(): void {
@@ -125,6 +165,9 @@ export class World implements WorldPublicApi {
     this.renderer.setSize(width, height, false);
     this.camera.aspect = width / height;
     this.camera.updateProjectionMatrix();
+    // Resizing clears the drawing buffer, so draw one fresh frame (also covers
+    // rotate and the resume-after-suspend path, which resizes too).
+    this.redraw.request();
   }
 
   jump(): void {
@@ -202,6 +245,7 @@ export class World implements WorldPublicApi {
   dispose(): void {
     cancelAnimationFrame(this.frame);
     this.observer.disconnect();
+    this.detachContextLoss();
     this.timer.dispose();
     this.renderer.dispose();
   }
@@ -218,7 +262,19 @@ export class World implements WorldPublicApi {
     this.sky.position.copy(this.camera.position);
     updateSunShadow(this);
     animateAmbient(this, dt);
-    this.renderer.render(this.scene, this.camera);
+    // While a dialog or the map is open the world is paused: do not re-render the
+    // scene every frame — each software-rendered frame costs seconds on weak
+    // hardware, which starves the modal UI (shop-purchase.spec.ts:143 timed out
+    // this way). A redraw still happens on demand through the flag: entering
+    // pause, a resize, a context restore, a scene change while paused, or a
+    // parity capture (toDataURL reads black when no render happened in its task).
+    // Exception: a reward effect that is still playing (a bridge segment dropping
+    // in, a spark burst) keeps rendering every frame until it finishes — the
+    // child watches it behind the quiz dialog, and the shop never spawns these
+    // effects, so shop:143 keeps its one-frame-while-paused behaviour.
+    if (!this.paused || this.redraw.take() || this.effectsActive()) {
+      this.renderer.render(this.scene, this.camera);
+    }
     const { x, z } = this.player.position;
     this.onFrame?.(this.nearMilo(), x > 12 && Math.abs(z) < 4, 1 / Math.max(dt, 0.001));
   };
