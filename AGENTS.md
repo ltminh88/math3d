@@ -16,3 +16,14 @@ Hard rules:
 - Do not change `REGIONS`, `ROADS`, `WALKABLE_BOUNDS`, the golden traces or the parity baselines.
 - Before a pull request: `npm run lint`, `npm run typecheck`, `npm test`, `npm run build`,
   `node tools/recovery/golden/generate-golden-traces.mjs --check`, `npx playwright test`.
+
+Reporting progress (the author must never have to ask):
+- After every push to a pull request, wait for CI in the same session:
+  `gh pr checks <n> --watch --fail-fast`, and report the moment it exits. Only if you must
+  end the session first, schedule a check for the expected finish time and say so.
+- A red job is reported at once with the failing test and its log line, not at the end.
+- Never end a turn with work "in progress" and no next check booked; the last message of a
+  session states what is done, what is running, and when you will report next.
+- Any wait over 30 minutes: give the expected finish time up front, and a one-line update
+  every 60 minutes until it is done.
+- Every report: status (green/red/running), links (PR, CI run, preview), next step, ETA.
