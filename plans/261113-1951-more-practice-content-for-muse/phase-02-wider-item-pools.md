@@ -17,9 +17,10 @@
   and ranges the new contexts must stay inside)
 
 ## Overview
-- Priority P1. Status **in progress** — content, counter and gates done; local e2e
-  running, preview + PR pending (preview waits on the Vercel token, flagged to the
-  author at phase start). Effort **12 h** (branch `muse/wider-item-pools`, one PR).
+- Priority P1. Status **done** — content, counter, gates and local e2e done
+  (40/40 across 4 projects); preview deployed at
+  https://mathgame-bnxf3pv0d-vlm5.vercel.app. Effort **12 h**
+  (branch `muse/wider-item-pools`, one PR).
 - Widen the pools *inside* the existing generators — more story contexts,
   shapes and scene variants — so no child sees the same visible prompt
   twice within three runs of a level. No new skill ids (phase 01 froze
@@ -148,7 +149,7 @@ re-shoots the quiz/level prompt screenshots, not the world.
 - [x] measurement combination variants
 - [x] oracle + vi/en tests green
 - [x] after-report with before/after counts; shortfall list (none)
-- [ ] preview deploy + URL in PR (waits on the Vercel token)
+- [x] preview deploy + URL in PR (https://mathgame-bnxf3pv0d-vlm5.vercel.app, deployment dpl_3AcG9u1L26GLQkiQTPcztyC4wHVR)
 
 ## Success Criteria
 - Every skill × tier meets its target, or is on the shortfall list with a
