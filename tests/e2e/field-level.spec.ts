@@ -174,7 +174,16 @@ test('leaving the field frees its geometries and textures (once and after 10 vis
   expect(baseline.geometries).toBeGreaterThan(0);
   const leaveOnce = async () => {
     await enterField(page);
-    expect((await rendererMemory(page)).geometries).toBeGreaterThan(baseline.geometries);
+    // The level's meshes are built synchronously in start(), but three.js uploads
+    // their geometries to the GPU only when a frame draws them; on a loaded
+    // SwiftShader runner that first level frame can arrive seconds after the
+    // DOM/state signals enterField waits for, so a bare read can see the
+    // baseline (no level geometry uploaded yet) and flake. Poll the count
+    // itself until the upload lands; the comparison is unchanged and the test
+    // still fails (on the poll timeout) if the level builds nothing.
+    await expect
+      .poll(() => rendererMemory(page).then((m) => m.geometries), { timeout: 30_000 })
+      .toBeGreaterThan(baseline.geometries);
     await page.locator('.level-leave').click();
     await page.waitForFunction(() => window.__game?.levelRunning() === false);
   };
