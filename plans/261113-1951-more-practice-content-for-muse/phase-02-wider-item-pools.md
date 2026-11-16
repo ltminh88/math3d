@@ -17,10 +17,9 @@
   and ranges the new contexts must stay inside)
 
 ## Overview
-- Priority P1. Status **not started**. Depends on 01 (counter + catalog
-  freeze). Parallel with 03 (different folders; 03 consumes the widened
-  generators but its stage *formats* do not depend on the new contexts).
-  Effort **12 h** (branch `muse/wider-item-pools`, one PR).
+- Priority P1. Status **in progress** — content, counter and gates done; local e2e
+  running, preview + PR pending (preview waits on the Vercel token, flagged to the
+  author at phase start). Effort **12 h** (branch `muse/wider-item-pools`, one PR).
 - Widen the pools *inside* the existing generators — more story contexts,
   shapes and scene variants — so no child sees the same visible prompt
   twice within three runs of a level. No new skill ids (phase 01 froze
@@ -143,13 +142,13 @@ and level rounds) — same surfaces, new wording. The parity reviewer
 re-shoots the quiz/level prompt screenshots, not the world.
 
 ## Todo list
-- [ ] word-problem contexts (+3–5 per `wp-*` skill)
-- [ ] remainder / unknown / pattern / expression / logic variants
-- [ ] geometry templates + solid variants
-- [ ] measurement combination variants
-- [ ] oracle + vi/en tests green
-- [ ] after-report with before/after counts; shortfall list
-- [ ] preview deploy + URL in PR
+- [x] word-problem contexts (+3–5 per `wp-*` skill)
+- [x] remainder / unknown / pattern / expression / logic variants (logic deliberately skipped — already ~30× target)
+- [x] geometry templates + solid variants
+- [x] measurement combination variants
+- [x] oracle + vi/en tests green
+- [x] after-report with before/after counts; shortfall list (none)
+- [ ] preview deploy + URL in PR (waits on the Vercel token)
 
 ## Success Criteria
 - Every skill × tier meets its target, or is on the shortfall list with a
@@ -167,7 +166,14 @@ re-shoots the quiz/level prompt screenshots, not the world.
 - Will verify: unit oracles, vi/en render tests, counter re-run, golden
   check.
 - Deliberately skipped: new skill ids, new generator kinds, new round
-  formats (phases 03–10), any UI or scene change.
+  formats (phases 03–10), any UI or scene change. Also skipped after measuring:
+  new logic statement families (choose-all-correct 7238 / tf-explain 803 at t1,
+  ~30× target already); new polygon templates (all 9 KNTT B19 kinds are already in
+  `polygon-templates.ts`; widening came from sizes/rotations instead);
+  pattern-add/sub variants (332+ already ≥ 24); widening unknown-mul-div t1's
+  quotient range (would push numbers toward the 100 cap; t1 is 128 already);
+  more meas-area-square t3 pairs (7 pairs × 2 framings = 14 is exhaustive within
+  the ≤ 100 cap).
 
 ## Risk Assessment
 | Risk | L | I | Countermove |
@@ -180,6 +186,35 @@ re-shoots the quiz/level prompt screenshots, not the world.
 ## Security Considerations
 - None beyond existing: generators are pure and seeded; no input is
   parsed, no save-code change in this phase.
+
+## Findings during the phase
+
+- **New contexts broke a cave hint (found by the unit tests, fixed in this
+  phase).** `src/levels/cave/cave-hints.ts` maps story keys to the first
+  calculation (`FIRST_STEP`); the new frames were missing, so rung 3 fell back
+  to the generic ask for every new context (`cave-hints.test.ts` failed:
+  `firstStepExpression` returned null where `'8 × 4'` was expected). All new
+  keys were added with their base frame's formula; the three compare frames are
+  shared by both compare skills, so their operation comes from the chamber's
+  skill (`:` for wp-times-compare, `−` for wp-difference-compare). A regression
+  test asserts a first-step expression exists for every wp skill × 40 seeds and
+  the right operation for the shared frames. This is the risk the Risk table
+  named ("new context breaks a hint rung") — it bit, and the hint tests caught
+  it.
+- **`reasoning-strings.ts` grew past 200 lines (233)**, so the 31 phase-02
+  context string keys moved verbatim into the new
+  `src/reasoning/word-problem-context-strings.ts`
+  (`WORD_PROBLEM_CONTEXT_VI` / `_EN`, spread into the single
+  `defineStrings('reasoning', …)` table — the same pattern as
+  `perimeter-area-strings.ts`). Key-set verified mechanically: 89 keys before,
+  89 after, no loss or duplication. The split also exposed two unused imports
+  left by the compare-generator split, removed.
+- **Counter re-run reproduces the after-report exactly** (all 117 skill × tier
+  rows, same seed and method). No shortfalls; closest to target: geo-midpoint
+  12/12, geo-radius-diameter 12, meas-ml 13, meas-area-square t3 14. Fact pools
+  unchanged (field 17, forest 36, city 30, tower 116).
+- **Goldens byte-identical** — the widened generators did not reshuffle any
+  seeded quiz order in the traced paths.
 
 ## Next steps
 - 07–10 consume the widened pools; 03–06 use the verified fact-pool counts.

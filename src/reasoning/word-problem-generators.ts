@@ -2,11 +2,10 @@
 // result, tier 3 first asks which calculation solves it (misconception expressions) then the result.
 // Story contexts live in word-problem-contexts.ts (phase 02): the generator draws the context
 // by the seeded rng, so the same seed still reproduces the same item.
-import { pick, type Rng, randInt } from '../learning/seeded-rng';
+import { pick, randInt } from '../learning/seeded-rng';
 import type { SkillTier } from '../learning/skill-tiers';
 import {
   expressionChoiceStep,
-  numberChoiceStep,
   numberStep,
   pickName,
   pickNames,

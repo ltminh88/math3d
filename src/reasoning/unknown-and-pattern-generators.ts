@@ -1,6 +1,6 @@
 // Find the unknown (KNTT T1 B3, B13) and number patterns (dãy số, luyện tập). Tier 3 unknowns
 // need a calculation on the other side first; tier 3 patterns hide a middle term too.
-import { pick, randInt, type Rng } from '../learning/seeded-rng';
+import { pick, type Rng, randInt } from '../learning/seeded-rng';
 import type { SkillTier } from '../learning/skill-tiers';
 import { numberChoiceStep, numberStep, reasoningItem, ref } from './reasoning-distractors';
 import { MAX_NUMBER, PATTERN_STEPS, TIER_RANGES } from './reasoning-ranges';

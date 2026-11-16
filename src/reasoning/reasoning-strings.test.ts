@@ -59,11 +59,7 @@ describe('reasoning strings', () => {
     const samples = new Map<string, ReasoningItem>();
     for (const [id, keys] of Object.entries(wanted))
       for (const tier of [1, 2, 3] as SkillTier[])
-        for (
-          let seed = 0;
-          seed < 2000 && !keys.every((k) => samples.has(`${id}|${k}`));
-          seed++
-        ) {
+        for (let seed = 0; seed < 2000 && !keys.every((k) => samples.has(`${id}|${k}`)); seed++) {
           const item = reasoningItemForSkill(id, mulberry32(seed), tier);
           samples.set(`${id}|${item.story.key}`, item);
         }

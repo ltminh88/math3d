@@ -7,9 +7,9 @@ import { numberChoiceStep, numberStep, reasoningItem, ref } from './reasoning-di
 import { MAX_NUMBER, TIER_RANGES } from './reasoning-ranges';
 import type { ReasoningGenerator, ReasoningStep } from './reasoning-types';
 import {
+  type CompareContext,
   WP_DIFFERENCE_COMPARE,
   WP_TIMES_COMPARE,
-  type CompareContext,
 } from './word-problem-contexts';
 
 function comparePair(rng: Rng, tier: SkillTier): { big: number; small: number; n: number } {
