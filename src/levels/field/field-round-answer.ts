@@ -9,13 +9,25 @@ import { tf, tipWithKeys } from './field-strings';
 export function mountRoundAnswer(
   hud: FieldHud,
   round: FieldRound,
-  on: { equations(ids: string[]): void; total(value: number): void },
+  on: {
+    equations(ids: string[]): void;
+    total(value: number): void;
+    missing(value: number): void;
+  },
 ): AnswerWidget {
   if (round.type === 'equations') {
     hud.setPrompt(tf('equationsPrompt'), tipWithKeys(tf('equationsTip'), 'equationsKeysTip'));
     return mountEquationChoices(hud.body, round.options, (ids) =>
       ids.length === 2 ? on.equations(ids) : hud.setFeedback(tf('pickTwo'), 'gentle'),
     );
+  }
+  if (round.type === 'missing') {
+    const equation =
+      round.missingFactor === round.rows
+        ? `? × ${round.cols} = ${round.total}`
+        : `${round.rows} × ? = ${round.total}`;
+    hud.setPrompt(tf('missingPrompt', { equation }), tipWithKeys('', 'toolsKeysTip'));
+    return mountNumberPad(hud.body, on.missing);
   }
   const title = round.type === 'build' ? tf('totalPrompt') : tf('recallPrompt');
   hud.setPrompt(title, tipWithKeys('', 'toolsKeysTip'));

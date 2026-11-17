@@ -47,12 +47,14 @@ export interface PlanReasoningInput {
   facts: readonly FactKey[];
   skills: readonly string[];
   rng: Rng;
+  /** Stage 4: the reasoning round is the stage's content, not a reward for known tables. */
+  force?: boolean;
 }
 
 /** The run's reasoning round, or null; the rng is only used when there is one. */
 export function planReasoningRound(input: PlanReasoningInput): ReasoningRoundPlan | null {
-  const { stats, facts, skills, rng } = input;
-  if (!reasoningSlot(stats, facts, skills)) return null;
+  const { stats, facts, skills, rng, force } = input;
+  if (!force && !reasoningSlot(stats, facts, skills)) return null;
   const skillId = chooseReasoningSkill(stats, skills);
   const factKey = skillKey(skillId);
   const tier = skillTierOf(stats[factKey]);

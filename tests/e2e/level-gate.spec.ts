@@ -82,7 +82,7 @@ test('gates stay locked before the bridge quest; VLM keeps his prompt', async ({
 test('the bridge opens the field gate; the field opens the forest gate', async ({ page }) => {
   await startPlaying(page);
   await page.evaluate(() => window.__game?.seedProgress({ bridgeComplete: true }));
-  await expect(page.locator('#gate-field-label small')).toHaveText('Cổng đã mở');
+  await expect(page.locator('#gate-field-label small')).toHaveText('Cổng đã mở · Chặng 1/6');
   await page.evaluate(() => window.__game?.teleportToGate('field'));
   await expect(page.locator('#interact')).toContainText('Vào Cổng Cánh Đồng Phép Tính');
   expect(await page.evaluate(() => window.__game?.gateStatus('field'))).toBe('open');

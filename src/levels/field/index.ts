@@ -7,7 +7,7 @@ const field: LevelDefinition = {
   regionId: 'meadow',
   tables: [3, 4],
   rounds: 5,
-  stages: 1,
+  stages: 6,
   requires: 'bridge',
   load: () => import('./field-scene'),
 };

@@ -47,21 +47,22 @@ function openLevelRun(
   const canvas = world.renderer.domElement;
   const sessionNo = store.nextSessionNo();
   const stats = () => store.getSnapshot().factStats;
+  const progress = store.getSnapshot().levelProgress[definition.id];
+  const stage = nextStage({
+    stages: definition.stages,
+    stageStars: progress?.stageStars ?? [],
+  });
   const recorder = createSessionRecorder({
     profileId: store.getSnapshot().profile.id,
     levelId: definition.id,
     sessionNo,
+    stage,
     getStat: (key) => stats()[key],
     now: Date.now,
     newId,
   });
   const ui = mountLevelRunUi(gateNameOf(definition.id), () => exit({ completed: false }));
   let closed = false;
-  const progress = store.getSnapshot().levelProgress[definition.id];
-  const stage = nextStage({
-    stages: definition.stages,
-    stageStars: progress?.stageStars ?? [],
-  });
   return {
     context: {
       stage,

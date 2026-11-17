@@ -13,6 +13,8 @@ export interface FieldTestHook {
     rows: number;
     cols: number;
     total: number;
+    /** The value the number pad expects (the total, or the hidden factor on missing rounds). */
+    answer: number;
     correctOptions: string[];
     hintRung: number;
   };
@@ -43,6 +45,7 @@ export function installFieldTestHook(
       rows: game.status().grid.rows,
       cols: game.status().grid.cols,
       total: game.status().round.total,
+      answer: game.status().round.missingFactor ?? game.status().round.total,
       correctOptions: game
         .status()
         .round.options.filter((o) => o.correct)

@@ -28,7 +28,8 @@ async function startWithBridge(page: Page): Promise<void> {
   await page.locator('#play').click();
   await expect(page.locator('body')).toHaveClass(/playing/);
   await page.evaluate(() => window.__game?.seedProgress({ bridgeComplete: true }));
-  await expect(page.locator('#gate-field-label small')).toHaveText('Cổng đã mở');
+  // The field gate names its next stage now that the level has 6 stages.
+  await expect(page.locator('#gate-field-label small')).toHaveText('Cổng đã mở · Chặng 1/6');
 }
 
 async function enterField(page: Page): Promise<void> {
@@ -81,19 +82,24 @@ async function answer(page: Page, touch: boolean): Promise<void> {
     else await page.keyboard.press('Enter');
     return;
   }
+  // The pad answer is the total, or the hidden factor on a missing-factor round.
   if (touch) {
     const pad = page.locator('.field-pad');
-    for (const digit of String(state.total)) {
+    for (const digit of String(state.answer)) {
       await pad.getByRole('button', { name: digit, exact: true }).tap();
     }
     await pad.getByRole('button', { name: 'Xong' }).tap();
   } else {
-    await page.keyboard.type(String(state.total));
+    await page.keyboard.type(String(state.answer));
     await page.keyboard.press('Enter');
   }
 }
 
-async function playFiveRounds(page: Page, touch: boolean): Promise<void> {
+async function playFiveRounds(
+  page: Page,
+  touch: boolean,
+  opts: { bonus?: boolean; stageLine?: string } = {},
+): Promise<void> {
   for (let round = 0; round < 5; round++) {
     await page.waitForFunction((i) => window.__field?.state().index === i, round);
     const state = await fieldState(page);
@@ -121,10 +127,32 @@ async function playFiveRounds(page: Page, touch: boolean): Promise<void> {
   }
   await waitPhase(page, 'done');
   await expect(page.locator('.field-panel--done .field-stars')).toBeVisible();
-  // First clear: the one-time bonus is shown (QA m-12).
-  await expect(page.locator('.field-bonus')).toHaveText(
-    'Thưởng lần đầu hoàn thành: +50 XP · +10 xu',
-  );
+  if (opts.stageLine)
+    await expect(page.locator('.field-panel--done')).toContainText(opts.stageLine);
+  if (opts.bonus !== false) {
+    // First clear: the one-time bonus is shown (QA m-12). Later stages pay no bonus.
+    await expect(page.locator('.field-bonus')).toHaveText(
+      'Thưởng lần đầu hoàn thành: +50 XP · +10 xu',
+    );
+  }
+}
+
+async function startWithStages(page: Page, stageStars: number[]): Promise<void> {
+  await page.goto('/');
+  await waitForStoreBoot(page);
+  await page.waitForFunction(() => '__game' in window);
+  await page.locator('#play').click();
+  await expect(page.locator('body')).toHaveClass(/playing/);
+  await page.evaluate(() => window.__game?.seedProgress({ bridgeComplete: true }));
+  await page.evaluate((stars) => window.__game?.seedStageProgress('field', stars), stageStars);
+}
+
+async function leaveField(page: Page, touch: boolean): Promise<void> {
+  const back = page.getByRole('button', { name: 'Về cổng' });
+  if (touch) await back.tap();
+  else await page.keyboard.press('Enter');
+  await page.waitForFunction(() => window.__game?.levelRunning() === false);
+  await expect(page.locator('.field-hud')).toHaveCount(0);
 }
 
 test('the field level is played to the end and opens the way to the forest', async ({
@@ -190,6 +218,81 @@ test('leaving the field frees its geometries and textures (once and after 10 vis
   await leaveOnce();
   await expect.poll(() => rendererMemory(page)).toEqual(baseline);
   for (let i = 0; i < 10; i++) await leaveOnce();
+  await expect.poll(() => rendererMemory(page)).toEqual(baseline);
+  expect(await page.evaluate(() => window.__field)).toBeUndefined();
+});
+
+test('stage 2 plays equations rounds and records only its own stage stars', async ({
+  page,
+}, testInfo) => {
+  const errors: string[] = [];
+  page.on('pageerror', (e) => errors.push(String(e)));
+  const touch = testInfo.project.name === 'mobile-pixel';
+  await startWithStages(page, [2]);
+  await expect(page.locator('#gate-field-label small')).toHaveText('Đã hoàn thành ★★☆ · Chặng 2/6');
+  await enterField(page);
+  expect(await page.evaluate(() => window.__game?.levelRunning())).toBe(true);
+  expect(await drawCalls(page)).toBeLessThanOrEqual(60);
+
+  await playFiveRounds(page, touch, { bonus: false, stageLine: 'Chặng 2/6' });
+  expect(await drawCalls(page)).toBeLessThanOrEqual(60);
+  const maxCalls = await page.locator('.level-layer').getAttribute('data-max-draw-calls');
+  expect(Number(maxCalls)).toBeGreaterThan(0);
+  expect(Number(maxCalls)).toBeLessThanOrEqual(60);
+  await leaveField(page, touch);
+
+  await expect(page.locator('#interact')).toContainText('Cổng Cánh Đồng Phép Tính');
+  // The commit runs in the background after the level closes: poll the store until it lands.
+  await expect
+    .poll(() => page.evaluate(() => window.__game?.snapshot()?.levelProgress.field?.stageStars))
+    .toEqual([2, expect.any(Number)]);
+  const field = await page.evaluate(() => window.__game?.snapshot()?.levelProgress.field);
+  expect(field?.stageStars?.[0]).toBe(2);
+  expect(field?.stageStars?.[1]).toBeGreaterThanOrEqual(1);
+  // A stage-2 run never overwrites stage 1's stars (the level's `stars` stay 2).
+  expect(field?.stars).toBe(2);
+  await expect(page.locator('#gate-field-label small')).toHaveText(/Chặng 3\/6/);
+  expect(errors).toEqual([]);
+});
+
+test('stage 3 plays missing-factor rounds on the pad', async ({ page }, testInfo) => {
+  const errors: string[] = [];
+  page.on('pageerror', (e) => errors.push(String(e)));
+  const touch = testInfo.project.name === 'mobile-pixel';
+  await startWithStages(page, [2, 2]);
+  await expect(page.locator('#gate-field-label small')).toHaveText('Đã hoàn thành ★★☆ · Chặng 3/6');
+  await enterField(page);
+  expect(await page.evaluate(() => window.__game?.levelRunning())).toBe(true);
+  expect(await drawCalls(page)).toBeLessThanOrEqual(60);
+
+  await playFiveRounds(page, touch, { bonus: false, stageLine: 'Chặng 3/6' });
+  expect(await drawCalls(page)).toBeLessThanOrEqual(60);
+  await leaveField(page, touch);
+
+  // The commit runs in the background after the level closes: poll the store until it lands.
+  await expect
+    .poll(() => page.evaluate(() => window.__game?.snapshot()?.levelProgress.field?.stageStars))
+    .toEqual([2, 2, expect.any(Number)]);
+  const field = await page.evaluate(() => window.__game?.snapshot()?.levelProgress.field);
+  expect(field?.stageStars?.[0]).toBe(2);
+  expect(field?.stageStars?.[1]).toBe(2);
+  expect(field?.stageStars?.[2]).toBeGreaterThanOrEqual(1);
+  expect(field?.stars).toBe(2);
+  await expect(page.locator('#gate-field-label small')).toHaveText(/Chặng 4\/6/);
+  expect(errors).toEqual([]);
+});
+
+test('leaving a later stage frees its geometries too', async ({ page }) => {
+  await startWithStages(page, [2, 2]);
+  await page.evaluate(() => window.__game?.teleportToGate('field'));
+  const baseline = await settledMemory(page);
+  expect(baseline.geometries).toBeGreaterThan(0);
+  await enterField(page);
+  await expect
+    .poll(() => rendererMemory(page).then((m) => m.geometries), { timeout: 30_000 })
+    .toBeGreaterThan(baseline.geometries);
+  await page.locator('.level-leave').click();
+  await page.waitForFunction(() => window.__game?.levelRunning() === false);
   await expect.poll(() => rendererMemory(page)).toEqual(baseline);
   expect(await page.evaluate(() => window.__field)).toBeUndefined();
 });

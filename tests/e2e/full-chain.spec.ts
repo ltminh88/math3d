@@ -69,7 +69,11 @@ async function expectMapWithoutComingSoon(page: Page, press: Press, stage: Stage
   await expect(page.locator('#world-map')).toBeVisible();
   await expect(page.locator('#map-regions')).not.toContainText('Sắp ra mắt');
   await press(page.locator(`[data-region="${stage.region}"]`));
-  await expect(page.locator('#map-detail .map-gate')).toHaveText('Cổng màn chơi: Cổng đã mở');
+  await expect(page.locator('#map-detail .map-gate')).toHaveText(
+    stage.levelId === 'field'
+      ? 'Cổng màn chơi: Cổng đã mở · Chặng 1/6'
+      : 'Cổng màn chơi: Cổng đã mở',
+  );
   await press(page.locator('#close-map'));
   await expect(page.locator('#world-map')).toBeHidden();
 }
@@ -127,7 +131,9 @@ test('the 9-stage chain: each stage opens the next gate, every level loads and e
       CHAIN.map((_, j) => (j < i ? 'completed' : j === i ? 'open' : 'locked')),
     );
     await expectCard(page, i, stage);
-    await expect(page.locator(`#gate-${stage.levelId}-label small`)).toHaveText('Cổng đã mở');
+    await expect(page.locator(`#gate-${stage.levelId}-label small`)).toHaveText(
+      stage.levelId === 'field' ? 'Cổng đã mở · Chặng 1/6' : 'Cổng đã mở',
+    );
     await expect(page.locator('body')).not.toContainText('Sắp ra mắt');
 
     await expectVlmPointsAt(page, press, stage.gate);
