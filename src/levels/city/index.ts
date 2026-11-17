@@ -8,7 +8,7 @@ const cityLevel: LevelDefinition = {
   regionId: 'city',
   tables: [6, 7, 8, 9],
   rounds: 5,
-  stages: 1,
+  stages: 6,
   requires: 'forest',
   load: () => import('./city-scene'),
 };

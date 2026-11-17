@@ -174,7 +174,9 @@ test('the forest level plays five rounds and records division facts', async ({ p
   await page.locator('#open-map').click();
   await expect(page.locator('#world-map')).toBeVisible();
   await page.locator('[data-region="city"]').click();
-  await expect(page.locator('#map-detail .map-gate')).toHaveText('Cổng màn chơi: Cổng đã mở');
+  await expect(page.locator('#map-detail .map-gate')).toHaveText(
+    'Cổng màn chơi: Cổng đã mở · Chặng 1/6',
+  );
   await page.locator('[data-region="tower"]').click();
   await expect(page.locator('#map-detail .map-gate')).toHaveText(
     'Cổng màn chơi: Hoàn thành Thành Phố Con Số để mở',
