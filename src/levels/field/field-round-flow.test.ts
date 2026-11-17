@@ -2,6 +2,7 @@ import { describe, expect, it } from 'vitest';
 import { mulberry32 } from '../../learning/seeded-rng';
 import {
   answerEquations,
+  answerMissing,
   answerTotal,
   askHint,
   planFieldRounds,
@@ -56,6 +57,19 @@ describe('planFieldRounds', () => {
     ).toEqual(['3 × 4', '4 × 3']);
     expect(round?.options.filter((o) => !o.correct).every((o) => o.value !== 12)).toBe(true);
   });
+
+  it('missing-factor rounds hide one factor (either side, by seed) and nothing else', () => {
+    const rounds = planFieldRounds({
+      facts: ['mul:3x4', 'mul:3x4', 'mul:3x4', 'mul:3x4'],
+      boxOf: () => 1,
+      rng: rng(),
+      typeFor: () => 'missing',
+    });
+    expect(rounds.every((r) => r.type === 'missing')).toBe(true);
+    expect(rounds.every((r) => r.total === 12)).toBe(true);
+    expect(rounds.every((r) => r.missingFactor === 3 || r.missingFactor === 4)).toBe(true);
+    expect(rounds.every((r) => r.options.length === 0)).toBe(true);
+  });
 });
 
 describe('round answers', () => {
@@ -109,5 +123,37 @@ describe('round answers', () => {
     expect(missed.state.wrongAnswers).toEqual([wrong.value]);
     expect(answerEquations(missed.state, right).verdict).toBe('correct');
     expect(roundOutcome(answerEquations(missed.state, right).state, 1).firstTry).toBe(false);
+  });
+
+  it('missing factor: the hidden factor is the answer, the total is not', () => {
+    const [round] = planFieldRounds({
+      facts: ['mul:3x4'],
+      boxOf: () => 1,
+      rng: mulberry32(11),
+      typeFor: () => 'missing',
+    });
+    if (!round || round.missingFactor === null) throw new Error('no missing round');
+    expect(answerMissing(startRound(round), round.total).verdict).toBe('wrong');
+    const { verdict, state } = answerMissing(startRound(round), round.missingFactor);
+    expect(verdict).toBe('correct');
+    expect(roundOutcome(state, 5000)).toMatchObject({
+      factKey: 'mul:3x4',
+      correct: true,
+      firstTry: true,
+    });
+  });
+
+  it('missing factor: three misses reveal the round, as with the other kinds', () => {
+    const [round] = planFieldRounds({
+      facts: ['mul:3x4'],
+      boxOf: () => 1,
+      rng: mulberry32(11),
+      typeFor: () => 'missing',
+    });
+    if (!round || round.missingFactor === null) throw new Error('no missing round');
+    const wrong = round.missingFactor === 3 ? 4 : 3;
+    let state = startRound(round);
+    for (let i = 0; i < 2; i++) state = answerMissing(state, wrong).state;
+    expect(answerMissing(state, wrong).verdict).toBe('revealed');
   });
 });

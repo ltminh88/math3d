@@ -64,7 +64,7 @@ export function start(ctx: LevelContext): LevelSession {
   const material = createMaterialCache();
   const lowPower = Math.min(window.innerWidth, window.innerHeight) < 600;
   const stage = createFieldStage(lowPower);
-  const diorama = buildFieldDiorama(material);
+  const diorama = buildFieldDiorama(material, ctx.stage);
   const view = createGridView(material, ctx.reducedMotion);
   stage.scene.add(diorama.group, view.group);
   const interaction = ctx.input.createInteraction(stage.camera);

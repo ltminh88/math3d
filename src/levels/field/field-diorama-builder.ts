@@ -19,6 +19,12 @@ import {
   shade,
 } from './field-materials';
 
+/** Sprout tint per stage (cheap stage dressing: same meshes, same draw calls, only the
+ * standing crop's colour changes, so the child can tell the stages apart). */
+const STAGE_SPROUT: readonly number[] = [
+  0x6aa95c, 0x7fb069, 0x8fbc5a, 0x5da271, 0x4e9b6d, 0x3f8f5f,
+];
+
 export const PATCH_COUNT = 5;
 const TUFTS_PER_PATCH = 6;
 const PATCHES: readonly (readonly [x: number, z: number])[] = [
@@ -104,11 +110,12 @@ function buildInstancedProps(group: Group, mat: MaterialCache): void {
   }
 }
 
-export function buildFieldDiorama(mat: MaterialCache): FieldDiorama {
+export function buildFieldDiorama(mat: MaterialCache, stage = 1): FieldDiorama {
   const group = new Group();
   group.name = 'field-diorama';
   buildFarmProps(group, mat);
   buildInstancedProps(group, mat);
+  const sprout = STAGE_SPROUT[stage - 1] ?? C.sprout;
   const beds = new InstancedMesh(new BoxGeometry(3.2, 0.16, 2.6), mat(0xffffff), PATCH_COUNT);
   const tufts = new InstancedMesh(
     new ConeGeometry(0.16, 0.9, 5),
@@ -125,7 +132,7 @@ export function buildFieldDiorama(mat: MaterialCache): FieldDiorama {
     for (let k = 0; k < TUFTS_PER_PATCH; k++) {
       const x = px - 1.1 + (k % 3) * 1.1;
       const z = pz - 0.55 + Math.floor(k / 3) * 1.1;
-      const color = t > 0.5 ? C.sprout : C.straw;
+      const color = t > 0.5 ? sprout : C.straw;
       const lean = (1 - t) * 1.35;
       setInstance(tufts, index * TUFTS_PER_PATCH + k, { x, y: 0.2 + t * 0.3, z, rz: lean }, color);
     }

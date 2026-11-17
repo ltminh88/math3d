@@ -29,6 +29,8 @@ export interface RecorderOptions {
   getStat: (key: FactKey) => FactStat | undefined;
   now: () => number;
   newId: () => string;
+  /** Stage of this run (1-based, from the host): stages 2+ record their stars in `stageStars`. */
+  stage?: number;
 }
 
 export interface SessionRecorder {
@@ -95,13 +97,24 @@ export function createSessionRecorder(opts: RecorderOptions): SessionRecorder {
 
     finish(completed = true) {
       const stars = starsFor({ total, firstTryClean, hintsUsed, completed });
+      const stage = opts.stage ?? 1;
+      const level: { stars: number; bestScore: number; stageStars?: readonly number[] } =
+        stage > 1
+          ? {
+              // Stage 1 keeps the level's `stars` (and its first-completion bonus); a later
+              // stage records only its own slot, so it never overwrites stage 1's stars.
+              stars: 0,
+              bestScore: xp,
+              stageStars: Array.from({ length: stage }, (_, i) => (i === stage - 1 ? stars : 0)),
+            }
+          : { stars, bestScore: xp };
       const delta: SessionDelta = {
         batchId: opts.newId(),
         profileId: opts.profileId,
         clientTs: opts.now(),
         v: 1,
         facts,
-        levels: completed ? { [opts.levelId]: { stars, bestScore: xp } } : {},
+        levels: completed ? { [opts.levelId]: level } : {},
         xp,
         coins,
       };

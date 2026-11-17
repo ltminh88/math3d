@@ -104,6 +104,21 @@ describe('session recorder', () => {
     expect(r.finish().delta.facts['mul:6x7']?.box).toBe(1);
   });
 
+  it('a later stage records only its own stageStars slot, never stage 1’s stars', () => {
+    const r = createSessionRecorder({
+      profileId: 'p1',
+      levelId: 'field',
+      sessionNo: 3,
+      stage: 3,
+      getStat: () => undefined,
+      now: () => 1000,
+      newId: () => 'batch-1',
+    });
+    r.recordQuestion(clean('mul:3x4'));
+    const { delta } = r.finish();
+    expect(delta.levels.field).toEqual({ stars: 0, bestScore: 10, stageStars: [0, 0, 3] });
+  });
+
   it('awards stars on clean play and omits the level when abandoned', () => {
     const r = make();
     for (let i = 0; i < 10; i++) r.recordQuestion(clean('mul:2x2'));

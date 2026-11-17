@@ -13,7 +13,7 @@ import {
 import { type Rng, shuffle } from '../../learning/seeded-rng';
 import type { QuestionOutcome } from '../../learning/session-recorder';
 
-export type FieldRoundType = 'build' | 'equations' | 'recall';
+export type FieldRoundType = 'build' | 'equations' | 'recall' | 'missing';
 
 /** Facts from this box on are recalled instead of built (spec: "box 3+"). */
 export const RECALL_BOX = 3;
@@ -33,6 +33,8 @@ export interface FieldRound {
   readonly type: FieldRoundType;
   /** Factor order the equation is shown in (recall rounds may swap it). */
   readonly shownOrder: readonly [number, number];
+  /** Missing-factor rounds only: the factor the child must supply (null otherwise). */
+  readonly missingFactor: number | null;
   /** Equations round only: 4 options, two of them correct. */
   readonly options: readonly EquationOption[];
 }
@@ -41,6 +43,8 @@ export interface PlanRoundsInput {
   facts: readonly FactKey[];
   boxOf: (key: FactKey) => number;
   rng: Rng;
+  /** Stage format rule (field-stage-plan.ts); defaults to today's rule (stage 1). */
+  typeFor?: (fact: FactKey, index: number, box: number) => FieldRoundType;
 }
 
 function equationOptions(rows: number, cols: number, rng: Rng): EquationOption[] {
@@ -53,14 +57,16 @@ function equationOptions(rows: number, cols: number, rng: Rng): EquationOption[]
   return shuffle(rng, options);
 }
 
-export function planFieldRounds({ facts, boxOf, rng }: PlanRoundsInput): FieldRound[] {
+export function planFieldRounds({ facts, boxOf, rng, typeFor }: PlanRoundsInput): FieldRound[] {
   return facts.map((factKey, index) => {
     const fact = parseFactKey(factKey);
     if (fact?.op !== 'mul') throw new Error(`Field rounds need multiplication facts: ${factKey}`);
     const { min: rows, max: cols } = fact;
     const square = rows === cols;
+    const box = boxOf(factKey);
     const type: FieldRoundType =
-      boxOf(factKey) >= RECALL_BOX ? 'recall' : index % 2 === 1 && !square ? 'equations' : 'build';
+      typeFor?.(factKey, index, box) ??
+      (box >= RECALL_BOX ? 'recall' : index % 2 === 1 && !square ? 'equations' : 'build');
     const swap = type === 'recall' && rng() < 0.5;
     return {
       factKey,
@@ -69,6 +75,8 @@ export function planFieldRounds({ facts, boxOf, rng }: PlanRoundsInput): FieldRo
       total: rows * cols,
       type,
       shownOrder: swap ? [cols, rows] : [rows, cols],
+      // The hidden factor of a missing-factor round (either side of the plot, by seed).
+      missingFactor: type === 'missing' ? (rng() < 0.5 ? rows : cols) : null,
       options: type === 'equations' ? equationOptions(rows, cols, rng) : [],
     };
   });
@@ -108,6 +116,10 @@ function judge(state: RoundState, right: boolean, wrongValue: number) {
 /** Number answer (build and recall rounds). */
 export const answerTotal = (state: RoundState, value: number) =>
   judge(state, value === state.round.total, value);
+
+/** Missing-factor answer (stage 3+): right when the value is the hidden factor. */
+export const answerMissing = (state: RoundState, value: number) =>
+  judge(state, value === state.round.missingFactor, value);
 
 /** Equations round: right only when exactly the two correct options are picked. */
 export function answerEquations(state: RoundState, ids: readonly string[]) {

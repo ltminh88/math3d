@@ -76,7 +76,7 @@ test('crossing the bridge leads to the field gate', async ({ page }) => {
   await expectCard(page, 'NHIỆM VỤ TIẾP THEO', 'Cánh Đồng Phép Tính', 'Đến Cổng Cánh Đồng');
   await expect(page.locator('#quest-copy')).toContainText('✨ Cổng Cánh Đồng Phép Tính');
   await expect(page.locator('#quest-steps .done')).toHaveCount(1);
-  await expect(page.locator('#gate-field-label small')).toHaveText('Cổng đã mở');
+  await expect(page.locator('#gate-field-label small')).toHaveText('Cổng đã mở · Chặng 1/6');
 
   await talkToVlm(page);
   await expect(page.locator('#dialog .dialog-copy')).toContainText(

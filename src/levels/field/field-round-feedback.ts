@@ -37,16 +37,27 @@ export function showRoundResult(
 
 /**
  * The celebration card: score, stars and, on the first clear that earns a star, the one-time
- * bonus the host pays on commit (QA m-12). "Về cổng" ends the run as completed.
+ * bonus the host pays on commit (QA m-12). "Về cổng" ends the run as completed. The card
+ * names the stage just played ("Chặng {n}/6 · {sao} sao").
  */
 export function showFieldCelebration(
-  ctx: Pick<LevelContext, 'audio' | 'announce' | 'exit' | 'firstCompletion'>,
+  ctx: Pick<
+    LevelContext,
+    'audio' | 'announce' | 'exit' | 'firstCompletion' | 'stage' | 'definition'
+  >,
   hud: FieldHud,
   tally: FieldRunTally,
 ): void {
   const stars = tally.stars();
   const bonus = ctx.firstCompletion && stars >= 1 ? tf('bonusLine', LEVEL_COMPLETE_BONUS) : null;
-  hud.celebrate(tf('doneScore', tally.score()), stars, () => ctx.exit({ completed: true }), bonus);
+  const stageLine = tf('stageLine', { n: ctx.stage, m: ctx.definition.stages, stars });
+  hud.celebrate(
+    tf('doneScore', tally.score()),
+    stars,
+    () => ctx.exit({ completed: true }),
+    bonus,
+    stageLine,
+  );
   ctx.audio.celebrate();
   ctx.announce(tf('doneTitle'));
 }

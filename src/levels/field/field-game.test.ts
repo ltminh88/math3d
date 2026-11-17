@@ -34,7 +34,7 @@ vi.mock('./field-answer-widgets', () => {
 
 const noop = () => {};
 
-function setup(facts: string[], firstCompletion = true) {
+function setup(facts: string[], firstCompletion = true, stage = 1) {
   let pendingTurn: (() => void) | undefined;
   const view = {
     animating: false,
@@ -84,8 +84,8 @@ function setup(facts: string[], firstCompletion = true) {
   const labels = { set: noop, place: noop, hide: (h: boolean) => hidden.push(h) };
   const audio = new Proxy({}, { get: () => noop });
   const ctx = {
-    definition: { tables: [3, 4], rounds: facts.length, stages: 1 },
-    stage: 1,
+    definition: { tables: [3, 4], rounds: facts.length, stages: 6 },
+    stage,
     learning: {
       stats: () => ({}),
       sessionNo: 1,
@@ -152,6 +152,19 @@ describe('field game rounds', () => {
     widgets.submit?.(9);
     expect(hud.feedback).toContain('3 × 3 = 9');
     expect(hud.feedback.match(/3 × 3/g)).toHaveLength(1);
+  });
+
+  it('a stage-3 missing round is answered with the hidden factor, not the total', () => {
+    const { game, hud } = setup(['mul:3x4'], true, 3);
+    const round = game.status().round;
+    expect(round.type).toBe('missing');
+    expect(round.missingFactor).toBe(3);
+    expect(game.status().phase).toBe('answer');
+    widgets.submit?.(round.total);
+    expect(game.status().phase).toBe('answer');
+    widgets.submit?.(round.missingFactor as number);
+    expect(game.status().phase).toBe('solved');
+    expect(hud.feedback).toContain('3 × 4 = 12');
   });
 
   it('the celebration shows the one-time bonus only on the first clear (m-12)', () => {

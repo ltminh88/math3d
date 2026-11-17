@@ -4,15 +4,16 @@
 import type { LevelContext } from '../shared/level-types';
 import type { AnswerWidget } from './field-answer-widgets';
 import type { FieldDiorama } from './field-diorama-builder';
-import { applyHintPlan, hintPlan } from './field-hints';
+import { applyHintPlan, hintPlan, missingHintPlan } from './field-hints';
 import type { FieldHud } from './field-hud';
 import type { PlantingInput } from './field-planting-input';
 import type { ProjectedLabels } from './field-projected-labels';
-import { planFieldRun, startFieldReasoningRound } from './field-reasoning-round';
+import { startFieldReasoningRound } from './field-reasoning-round';
 import { mountRoundAnswer } from './field-round-answer';
 import { showFieldCelebration, showRoundResult } from './field-round-feedback';
 import * as flow from './field-round-flow';
 import { createRunTally } from './field-run-tally';
+import { planFieldRun } from './field-stage-plan';
 import { tf, tipWithKeys } from './field-strings';
 import * as model from './planting-grid';
 import type { GridView } from './planting-grid-view';
@@ -30,7 +31,7 @@ export interface FieldGameParts {
 
 export function createFieldGame({ ctx, view, hud, labels, diorama, planting }: FieldGameParts) {
   const { learning, audio, definition } = ctx;
-  const run = planFieldRun(learning, definition);
+  const run = planFieldRun(learning, definition, ctx.stage);
   const rounds = run.rounds;
   if (rounds.length === 0) throw new Error('Field level: the planner returned no facts');
   const tally = createRunTally();
@@ -45,9 +46,17 @@ export function createFieldGame({ ctx, view, hud, labels, diorama, planting }: F
   /** Bumped when a round starts or the run ends: a plot turn begun before then is stale. */
   let serial = 0;
 
-  const equationLabel = (suffix: string) => {
+  const equationLabel = (suffix: string, solved = false) => {
     const at = view.worldOf('front');
-    const text = `${grid.rows} × ${grid.cols}${suffix}`;
+    const round = state.round;
+    // A missing-factor round shows its question ("3 × ? = 12") until it is solved; the
+    // round's own factors, not the grid's, so a turn never changes the question.
+    const text =
+      round.type === 'missing' && !solved
+        ? round.missingFactor === round.rows
+          ? `? × ${round.cols} = ${round.total}`
+          : `${round.rows} × ? = ${round.total}`
+        : `${grid.rows} × ${grid.cols}${suffix}`;
     labels.set(at && equationShown ? [{ text, at, anchor: 'top' }] : []);
   };
   const setFocus = (cell: model.GridCell | null) => {
@@ -106,6 +115,7 @@ export function createFieldGame({ ctx, view, hud, labels, diorama, planting }: F
     widget = mountRoundAnswer(hud, round, {
       equations: (ids) => settle(flow.answerEquations(state, ids)),
       total: (value) => settle(flow.answerTotal(state, value)),
+      missing: (value) => settle(flow.answerMissing(state, value)),
     });
   }
 
@@ -129,7 +139,7 @@ export function createFieldGame({ ctx, view, hud, labels, diorama, planting }: F
     const { rows, cols, total } = state.round;
     showRoundResult(ctx, hud, widget, state.round, outcome);
     equationShown = true;
-    equationLabel(` = ${total}`);
+    equationLabel(` = ${total}`, true);
     diorama.restorePatch(index, ctx.reducedMotion);
     const line = rows === cols ? 'squareLine' : 'rotateLine';
     hud.speak(tf(line, { rows: grid.rows, cols: grid.cols, total }));
@@ -159,14 +169,17 @@ export function createFieldGame({ ctx, view, hud, labels, diorama, planting }: F
     if (turnOf !== serial) return; // a new round started or the run ended while the plot turned
     showGrid(model.rotateGrid(grid));
     labels.hide(false);
-    equationLabel(phase === 'solved' ? ` = ${state.round.total}` : ' = ?');
+    equationLabel(phase === 'solved' ? ` = ${state.round.total}` : ' = ?', phase === 'solved');
     ctx.announce(tf('rotated', { rows: grid.rows, cols: grid.cols }));
   }
 
   function hint(): void {
     if (phase !== 'answer') return;
     state = flow.askHint(state);
-    const plan = hintPlan(state.hint.rung, grid, view);
+    const plan =
+      state.round.type === 'missing'
+        ? missingHintPlan(state.hint.rung, state.round)
+        : hintPlan(state.hint.rung, grid, view);
     audio.hint();
     applyHintPlan(plan, { hud, view, labels, announce: ctx.announce });
     if (plan.rotate) void rotate();
