@@ -135,9 +135,7 @@ test('the 9-stage chain: each stage opens the next gate, every level loads and e
     );
     await expectCard(page, i, stage);
     await expect(page.locator(`#gate-${stage.levelId}-label small`)).toHaveText(
-      STAGED_LEVELS.has(stage.levelId)
-        ? 'Cổng đã mở · Chặng 1/6'
-        : 'Cổng đã mở',
+      STAGED_LEVELS.has(stage.levelId) ? 'Cổng đã mở · Chặng 1/6' : 'Cổng đã mở',
     );
     await expect(page.locator('body')).not.toContainText('Sắp ra mắt');
 
