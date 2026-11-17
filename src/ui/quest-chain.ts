@@ -10,6 +10,7 @@ import { progressionState } from '../levels/shared/level-progression';
 import { levelDefinition } from '../levels/shared/level-registry';
 import { LEVEL_COMPLETE_BONUS } from '../levels/shared/level-run-result';
 import { tshop } from '../shop/shop-strings';
+import { renderDailyQuestReminder } from './daily-practice-guide-section';
 import { gameState } from './game-state';
 import { byId, icon } from './icons';
 import { isCoarsePointer } from './pointer-kind';
@@ -166,6 +167,7 @@ function chainCopy(stage: Exclude<QuestStage, 'bridge'>): CardCopy {
 
 /** Writes the quest card for the current stage (DOM touched only where text changed). */
 export function renderQuestCard(): void {
+  renderDailyQuestReminder();
   const stage = currentQuestStage();
   if (stage === 'bridge') {
     setTextAfterIcon('#quest-toggle .eyebrow', undefined);
