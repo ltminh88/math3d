@@ -20,7 +20,8 @@ export type DialogKind =
   | 'complete'
   | 'save-code'
   | 'notice'
-  | 'shop';
+  | 'shop'
+  | 'sticker-book';
 
 export interface GameState {
   progress: ProgressView;

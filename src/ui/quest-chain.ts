@@ -24,6 +24,7 @@ import {
 } from './quest-chain-stage';
 import { tq } from './quest-chain-strings';
 import { setMarkup } from './set-markup-if-changed';
+import { wireStickerBookButton } from './sticker-guide-section';
 import './quest-chain-steps.css';
 
 /** Current quest stage (bridge flag from the progress view, levels from the store). */
@@ -175,6 +176,7 @@ export function renderQuestCard(): void {
     byId('quest-progress').textContent = bridgeProgress();
     setMarkup('quest-steps', bridgeStepsHtml());
     renderChapterLabel(undefined);
+    wireStickerBookButton();
     return;
   }
   const card = chainCopy(stage);
@@ -185,4 +187,5 @@ export function renderQuestCard(): void {
   byId('quest-progress').textContent = card.progress;
   setMarkup('quest-steps', chainStepsHtml(stage));
   renderChapterLabel(stage);
+  wireStickerBookButton();
 }

@@ -9,6 +9,7 @@ import { interactWithNearest } from './interact-target';
 import { saveQuestAccepted } from './progress-sync';
 import { chainGuideLine, currentQuestStage } from './quest-chain';
 import { openQuiz } from './quiz-dialog';
+import { stickerGuideSectionHtml, wireStickerGuideSection } from './sticker-guide-section';
 import { showToast } from './toast-and-persist';
 
 /** After the bridge quest: VLM points at the next open gate (or offers practice at the end). */
@@ -22,7 +23,7 @@ function afterQuestLine(): string {
 
 function miloBodyHtml(bridgeDone: boolean): string {
   const questComplete = gameState.progress.questComplete;
-  return `<div class="dialog-eyebrow">NGƯỜI DẪN ĐƯỜNG CỦA BẠN</div><p class="dialog-copy">${bridgeDone ? `Cây cầu của chúng mình thật đẹp! ${questComplete ? afterQuestLine() : 'Bạn hãy đi qua cầu đến khu vườn bên kia nhé. Mình cũng luôn sẵn sàng luyện tập cùng bạn!'}` : 'Khu vườn bên kia sông đang chờ chúng mình. Hãy giúp mình xây <strong>6 đoạn cầu</strong> bằng những viên đá phép thuật nhé!'}</p><div class="milo-tip"><span>✦</span><p>${bridgeDone ? 'Cứ thong thả, không cần vội. Mỗi lần thử là một lần bạn tiến bộ!' : 'Chọn phép nhân cho đúng số viên đá. Mỗi câu đúng: <b>+10 XP, +5 xu</b>. Nếu chưa đúng, chúng mình cùng đếm lại!'}</p></div><button id="accept-quest" class="primary wide">${bridgeDone ? 'Cùng luyện tập' : 'Cùng xây cầu nào!'} ${icon('arrow')}</button>`;
+  return `<div class="dialog-eyebrow">NGƯỜI DẪN ĐƯỜNG CỦA BẠN</div><p class="dialog-copy">${bridgeDone ? `Cây cầu của chúng mình thật đẹp! ${questComplete ? afterQuestLine() : 'Bạn hãy đi qua cầu đến khu vườn bên kia nhé. Mình cũng luôn sẵn sàng luyện tập cùng bạn!'}` : 'Khu vườn bên kia sông đang chờ chúng mình. Hãy giúp mình xây <strong>6 đoạn cầu</strong> bằng những viên đá phép thuật nhé!'}</p><div class="milo-tip"><span>✦</span><p>${bridgeDone ? 'Cứ thong thả, không cần vội. Mỗi lần thử là một lần bạn tiến bộ!' : 'Chọn phép nhân cho đúng số viên đá. Mỗi câu đúng: <b>+10 XP, +5 xu</b>. Nếu chưa đúng, chúng mình cùng đếm lại!'}</p></div><button id="accept-quest" class="primary wide">${bridgeDone ? 'Cùng luyện tập' : 'Cùng xây cầu nào!'} ${icon('arrow')}</button>${stickerGuideSectionHtml()}`;
 }
 
 /** Opens VLM's dialog when playing and near him; otherwise nudges the player toward him. */
@@ -42,6 +43,7 @@ export function talkToGuide(): void {
     refreshHud();
     openQuiz(bridgeDone ? 'practice' : 'bridge');
   };
+  wireStickerGuideSection();
 }
 
 export function wireGuideTriggers(): void {
