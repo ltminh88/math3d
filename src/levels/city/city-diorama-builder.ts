@@ -27,6 +27,11 @@ const SIDEWALK = 0xe7d09b;
 const BLOCK_COLORS: readonly number[] = [0xe9c67e, 0x82b5b0, 0xe59b78, 0x9b9bd0];
 const BLOCK_CAP = 0xf0e2c0;
 const BLOCK_WINDOW = 0xfdf6dc;
+/** Lit-window tint per stage (cheap stage dressing: same meshes, same draw calls, only the
+ * backdrop windows warm from day to dusk, so the child can tell the stages apart). */
+const STAGE_WINDOW: readonly number[] = [
+  0xfdf6dc, 0xffe9a8, 0xffd98a, 0xffc46b, 0xffb35c, 0xff9e4d,
+];
 const LAMP_POST = 0x4a5a5a;
 const LAMP_LIGHT = 0xffe7a0;
 /** Roofs of the street houses: the region tint (#8fb3c9) and the block palette. */
@@ -43,7 +48,7 @@ function scratchContext(scene: Scene): WorldBuildContext {
   };
 }
 
-function buildBlocks(ctx: WorldBuildContext): void {
+function buildBlocks(ctx: WorldBuildContext, windowColor: number): void {
   const blocks = [-12, -7, -2, 3, 8, 13];
   blocks.forEach((x, i) => {
     const height = 4 + ((i * 7) % 4);
@@ -52,13 +57,13 @@ function buildBlocks(ctx: WorldBuildContext): void {
     addBox(ctx, ctx.scene, x, height + 0.3, -10.5, 4.5, 0.6, 4.1, BLOCK_CAP);
     for (let y = 1; y < height - 0.6; y += 1.3) {
       for (const wx of [-1.2, 0, 1.2]) {
-        addBox(ctx, ctx.scene, x + wx, y + 0.3, -8.58, 0.6, 0.7, 0.06, BLOCK_WINDOW);
+        addBox(ctx, ctx.scene, x + wx, y + 0.3, -8.58, 0.6, 0.7, 0.06, windowColor);
       }
     }
   });
 }
 
-function buildStreet(ctx: WorldBuildContext): void {
+function buildStreet(ctx: WorldBuildContext, stage = 1): void {
   const root = ctx.scene;
   addBox(ctx, root, 0, -0.1, -2, 52, 0.2, 34, CITY_GROUND);
   addBox(ctx, root, 0, 0.03, 3.2, 52, 0.06, 3, ROAD);
@@ -68,7 +73,7 @@ function buildStreet(ctx: WorldBuildContext): void {
     addCylinder(ctx, root, x, 1.2, 0.8, 0.07, 0.09, 2.4, LAMP_POST);
     addSphere(ctx, root, x, 2.5, 0.8, 0.22, LAMP_LIGHT);
   }
-  buildBlocks(ctx);
+  buildBlocks(ctx, STAGE_WINDOW[stage - 1] ?? BLOCK_WINDOW);
   for (const [x, z, scale, variant] of [
     [-14.5, -4, 1.1, 1],
     [14.5, -4.5, 1, 2],
@@ -108,7 +113,7 @@ export interface CityDiorama {
   readonly sun: DirectionalLight;
 }
 
-export function buildCityDiorama(scene: Scene): CityDiorama {
+export function buildCityDiorama(scene: Scene, stage = 1): CityDiorama {
   scene.background = new Color(SKY_HORIZON_COLOR);
   const material = new MeshStandardMaterial({
     vertexColors: true,
@@ -117,7 +122,7 @@ export function buildCityDiorama(scene: Scene): CityDiorama {
   });
   const backdrop = new Scene();
   const ctx = scratchContext(backdrop);
-  buildStreet(ctx);
+  buildStreet(ctx, stage);
   for (const [{ x, z }, build] of [
     [POSTMAN_AT, (g: Group) => buildPostman(ctx, g)],
     [GUIDE_AT, (g: Group) => buildMiloModel(ctx, g)],

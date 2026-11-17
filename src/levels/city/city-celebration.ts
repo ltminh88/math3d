@@ -12,6 +12,8 @@ export function showCityCelebration(
   onBack: () => void,
   /** First clear: the one-time bonus the host adds on commit (QA m-12), else null. */
   bonus: { xp: number; coins: number } | null = null,
+  /** The stage just played ("Chặng {n}/6 · {sao} sao"), else null. */
+  stageLine: string | null = null,
 ): HTMLElement {
   const card = document.createElement('section');
   card.className = 'city-done glass';
@@ -26,6 +28,12 @@ export function showCityCelebration(
   starRow.textContent = '★'.repeat(stars) + '☆'.repeat(3 - stars);
   starRow.setAttribute('aria-label', ts('stars', { n: stars }));
   starRow.dataset.stars = String(stars);
+  if (stageLine) {
+    const line = document.createElement('p');
+    line.className = 'city-stage-line';
+    line.textContent = stageLine;
+    starRow.after(line);
+  }
   (card.querySelector('.city-done__line strong') as HTMLElement).textContent =
     `${tc('guideName')}:`;
   (card.querySelector('.city-done__line span') as HTMLElement).textContent = ts('doneLine');

@@ -49,6 +49,8 @@ export interface PlanCityInput {
   /** The child's last wrong answers for a fact (distractor "personal" class). */
   errorsOf: (key: FactKey) => readonly number[];
   rng: Rng;
+  /** Stage plan override (phase 05): absent = today's rule, rng order unchanged. */
+  kindFor?: (fact: FactKey, index: number, box: number) => CityRoundKind;
 }
 
 /** Value of "a × b" / "a + b" (labels of the learning core use a plain "x"). */
@@ -66,7 +68,13 @@ function reverseParcels(factKey: FactKey, table: number, other: number, rng: Rng
   }));
 }
 
-export function planCityRounds({ facts, boxOf, errorsOf, rng }: PlanCityInput): CityRound[] {
+export function planCityRounds({
+  facts,
+  boxOf,
+  errorsOf,
+  rng,
+  kindFor,
+}: PlanCityInput): CityRound[] {
   return facts.map((factKey, index) => {
     const fact = parseFactKey(factKey);
     if (fact?.op !== 'mul') throw new Error(`City rounds need multiplication facts: ${factKey}`);
@@ -81,7 +89,8 @@ export function planCityRounds({ facts, boxOf, errorsOf, rng }: PlanCityInput): 
     const other = table === fact.min ? fact.max : fact.min;
     const product = table * other;
     const kind: CityRoundKind =
-      boxOf(factKey) >= REVERSE_BOX ? 'reverse' : index % 2 === 0 ? 'deliver' : 'windows';
+      kindFor?.(factKey, index, boxOf(factKey)) ??
+      (boxOf(factKey) >= REVERSE_BOX ? 'reverse' : index % 2 === 0 ? 'deliver' : 'windows');
     if (kind === 'reverse') {
       const parcels = reverseParcels(factKey, table, other, rng);
       return { kind, factKey, table, other, product, houses: [product], parcels };
