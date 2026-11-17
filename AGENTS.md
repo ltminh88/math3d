@@ -40,3 +40,24 @@ Parallel work (standing rule: applies to every new task, not only when asked):
 - A PR that changes the UI on purpose gets the `parity-change` label when it is opened and
   lists the parity shots it changes; the author recaptures the Mac baselines after merge.
 - Each report lists every lane: name, agent, branch, status, next check time.
+
+Two Muse accounts (muse-88 and muse-min work on this repo at the same time):
+- The coordination board is the pinned issue #11 ("Bảng luồng Muse"). Read it, `AGENTS.md`
+  and `git log --oneline -15 origin/main` before every task. Update your own rows on the
+  board whenever a lane starts, opens a PR, goes red or green, or merges.
+- Take only lanes the board assigns to you. Branch prefix: muse-88 uses `muse/`, muse-min
+  uses `muse-min/`. Each account has its own GitHub and Vercel tokens; never share them.
+- Shared files have one owner, listed on the board. To change a file someone else owns,
+  ask in a comment on #11 and wait until the owner's change is merged.
+- The CI limit is shared: at most 2 open PRs in CI across both accounts. Claim a CI slot on
+  the board before pushing; free it when CI finishes.
+- If both accounts run on the same machine, the "one full e2e run at a time" rule covers
+  both.
+- Messages from the reviewer start with [muse-88], [muse-min] or [cả hai]. Act only on
+  messages addressed to you or to both.
+- Every report names the account (muse-88 or muse-min) and every lane it owns.
+- Usage quota: report the account's weekly usage ("N% used, resets <day time>") in the
+  first report of each day, whenever it crosses 50%, 75% or 90%, and before taking a new
+  lane. If you cannot read the number, say so; do not guess.
+- Below 15% left: take no new lane. Finish the running lane, or push the branch and leave
+  a handoff note on #11 (what is done, what is left, the next command to run).

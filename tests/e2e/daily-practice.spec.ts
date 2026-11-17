@@ -207,14 +207,14 @@ test('locked: the daily button shows the locked line before field stage 1', asyn
   await boot(page, false);
   await openDaily(page, touch);
   await expect(page.locator('#dialog-content')).toContainText(
-    'Luyện tập hôm nay sẽ mở sau khi con qua Cánh Đồng Phép Tính.',
+    'Luyện tập hôm nay sẽ mở sau khi con xong chặng 1 ở Cánh Đồng Phép Tính.',
   );
   await page.locator('#close-dialog').click();
   await expect(page.locator('#dialog')).not.toHaveAttribute('open', '');
   // VLM shows the locked line too (no entry button), and the quest card stays silent.
   await openMilo(page, touch);
   await expect(page.locator('#dialog-content')).toContainText(
-    'Luyện tập hôm nay sẽ mở sau khi con qua Cánh Đồng Phép Tính.',
+    'Luyện tập hôm nay sẽ mở sau khi con xong chặng 1 ở Cánh Đồng Phép Tính.',
   );
   await expect(page.locator('#dialog-content #daily-guide-button')).toHaveCount(0);
   await expect(page.locator('#quest-daily')).toHaveCount(0);
@@ -330,7 +330,7 @@ test('day 1 → replay → day 2 → skipped day: streak 1 → 1 → 2 → 1, co
   await openDaily(page, touch);
   await expect(page.locator('#dialog-content .daily-note')).toHaveCount(0);
   expect(await playDailyRun(page, touch)).toBe(10);
-  await expect(page.locator('#dialog-content')).toContainText('Bạn đã luyện 1 ngày liên tiếp!');
+  await expect(page.locator('#dialog-content')).toContainText('Con đã luyện 1 ngày liên tiếp!');
   await expect(coins(page)).toHaveText('60');
   const day1 = await dailyOf(page);
   expect(day1?.dailyStreak).toBe(1);
@@ -339,7 +339,7 @@ test('day 1 → replay → day 2 → skipped day: streak 1 → 1 → 2 → 1, co
   await expect(page.locator('#quest-daily')).toHaveText('Hôm nay: đã luyện ✓');
   await openMilo(page, touch);
   await expect(page.locator('#dialog-content .daily-guide-streak')).toContainText(
-    'Bạn đã luyện 1 ngày liên tiếp!',
+    'Con đã luyện 1 ngày liên tiếp!',
   );
   await page.locator('#close-dialog').click();
   await expect(page.locator('#dialog')).not.toHaveAttribute('open', '');
@@ -350,7 +350,7 @@ test('day 1 → replay → day 2 → skipped day: streak 1 → 1 → 2 → 1, co
     'Hôm nay con đã luyện rồi.',
   );
   expect(await playDailyRun(page, touch)).toBe(10);
-  await expect(page.locator('#dialog-content')).toContainText('Bạn đã luyện 1 ngày liên tiếp!');
+  await expect(page.locator('#dialog-content')).toContainText('Con đã luyện 1 ngày liên tiếp!');
   await expect(coins(page)).toHaveText('110');
   expect(await dailyOf(page)).toEqual(day1);
   await closeDaily(page, touch);
@@ -359,7 +359,7 @@ test('day 1 → replay → day 2 → skipped day: streak 1 → 1 → 2 → 1, co
   await page.evaluate(() => window.__advanceDays?.(1));
   await openDaily(page, touch);
   expect(await playDailyRun(page, touch)).toBe(10);
-  await expect(page.locator('#dialog-content')).toContainText('Bạn đã luyện 2 ngày liên tiếp!');
+  await expect(page.locator('#dialog-content')).toContainText('Con đã luyện 2 ngày liên tiếp!');
   await expect(coins(page)).toHaveText('170');
   const day2 = await dailyOf(page);
   expect(day2?.dailyStreak).toBe(2);
@@ -371,7 +371,7 @@ test('day 1 → replay → day 2 → skipped day: streak 1 → 1 → 2 → 1, co
   await openDaily(page, touch);
   expect(await playDailyRun(page, touch)).toBe(10);
   const content = page.locator('#dialog-content');
-  await expect(content).toContainText('Bạn đã luyện 1 ngày liên tiếp!');
+  await expect(content).toContainText('Con đã luyện 1 ngày liên tiếp!');
   await expect(content).not.toContainText(/mất chuỗi|đứt chuỗi|buồn/i);
   await expect(coins(page)).toHaveText('230');
   const day4 = await dailyOf(page);
