@@ -6,10 +6,10 @@ export const td = defineStrings('daily', {
   vi: {
     button: 'Luyện tập hôm nay',
     title: 'Luyện tập hôm nay',
-    locked: 'Luyện tập hôm nay sẽ mở sau khi con qua Cánh Đồng Phép Tính.',
+    locked: 'Luyện tập hôm nay sẽ mở sau khi con xong chặng 1 ở Cánh Đồng Phép Tính.',
     itemOf: 'Câu {n}/{total}',
     alreadyDone: 'Hôm nay con đã luyện rồi. Muốn luyện thêm cho vui không?',
-    streak: 'Bạn đã luyện {n} ngày liên tiếp!',
+    streak: 'Con đã luyện {n} ngày liên tiếp!',
     finishTitle: 'Xong rồi!',
     finishCoins: 'Hôm nay con được +{coins} xu.',
     finishBonus: 'Thưởng hoàn thành: +{coins} xu.',
@@ -26,7 +26,7 @@ export const td = defineStrings('daily', {
   en: {
     button: 'Practice today',
     title: 'Daily practice',
-    locked: 'Daily practice opens after you clear the Math Meadow.',
+    locked: 'Daily practice opens after you finish stage 1 of the Math Meadow.',
     itemOf: 'Question {n} of {total}',
     alreadyDone: 'You already practiced today. Want an extra round for fun?',
     streak: 'You have practiced {n} days in a row!',

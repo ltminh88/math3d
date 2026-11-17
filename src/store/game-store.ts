@@ -157,11 +157,11 @@ export async function openGameStore(options: OpenStoreOptions = {}): Promise<Gam
         validateDelta(delta, profileId);
         await inTransaction(db, async (tx) => {
           await assertActiveProfile(tx, profileId);
-          const sessionNo = (await readSessionCount(tx, profileId)) + 1;
+          // The answers commit already counted this run as one session; the finish
+          // reward (+10 coins) must not count it a second time. Pass the current
+          // count through to applyDelta and do not write metaSessionCountKey.
+          const sessionNo = await readSessionCount(tx, profileId);
           await applyDelta(tx, delta, { now: at, sessionNo });
-          await tx
-            .objectStore('meta')
-            .put({ key: metaSessionCountKey(profileId), value: sessionNo });
           await appendOutbox(tx, delta, at);
           await tx.objectStore('meta').put({ key: metaDailyKey(profileId), value: next });
         });
