@@ -251,6 +251,27 @@ describe('commitDailyRun', () => {
     store.close();
   });
 
+  it('one full daily run counts exactly one session: answers + finish reward', async () => {
+    const name = freshName();
+    const store = await openGameStore({ dbName: name, newId: ids() });
+    const pid = store.getSnapshot().profile.id;
+    expect(store.getSnapshot().sessionCount).toBe(0);
+    // The answers batch, as commitDailyAnswers commits it through commitSession.
+    await store.commitSession(session(pid, 'answers'));
+    expect(store.getSnapshot().sessionCount).toBe(1);
+    // The finish reward (+10 coins) must not count a second session.
+    const finish = await store.commitDailyRun(20345);
+    expect(finish.counted).toBe(true);
+    expect(store.getSnapshot().sessionCount).toBe(1);
+    expect(store.getSnapshot().wallet.coins).toBe(20);
+    // The next day's run counts one more session, not zero.
+    await store.commitSession(session(pid, 'answers-2'));
+    await store.commitDailyRun(20346);
+    expect(store.getSnapshot().sessionCount).toBe(2);
+    expect(store.getSnapshot().wallet.coins).toBe(40);
+    store.close();
+  });
+
   it('a second run the same day is not counted and pays no second reward', async () => {
     const store = await openGameStore({ dbName: freshName(), newId: ids() });
     await store.commitDailyRun(20345);
