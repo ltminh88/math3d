@@ -110,7 +110,7 @@ test('the forest opens the city gate, the city the tower gate (no "Sắp ra mắ
     window.__game?.seedProgress({ bridgeComplete: true, completedLevels: ['field', 'forest'] }),
   );
   expect(await gateStatuses(page)).toEqual(['completed', 'completed', 'open', 'locked']);
-  await expect(page.locator('#gate-city-label small')).toHaveText('Cổng đã mở');
+  await expect(page.locator('#gate-city-label small')).toHaveText('Cổng đã mở · Chặng 1/6');
   await expect(page.locator('#gate-tower-label small')).toHaveText(
     'Hoàn thành Thành Phố Con Số để mở',
   );

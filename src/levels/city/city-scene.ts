@@ -7,13 +7,14 @@ import type { LevelContext, LevelModule, LevelSession } from '../shared/level-ty
 import { CityBuildingView } from './city-building-view';
 import { buildingFrame, CityCamera, STREET_FRAME } from './city-camera';
 import { showCityCelebration } from './city-celebration';
-import { planCityRun, startCityReasoningRound } from './city-compare-round';
+import { startCityReasoningRound } from './city-compare-round';
 import { buildCityDiorama } from './city-diorama-builder';
 import { wireCityInput } from './city-input';
 import { CityLabels } from './city-labels';
 import { CityPanel } from './city-panel';
 import { CityRoundController } from './city-round-controller';
 import { CityRoundFlow } from './city-round-flow';
+import { planCityRun } from './city-stage-plan';
 import { CityStreetView } from './city-street-view';
 import { cityStrings } from './city-strings';
 import { installCityTestHook } from './city-test-hook';
@@ -28,13 +29,13 @@ function start(ctx: LevelContext): LevelSession {
   const ts = cityStrings(ctx.defineStrings);
   const scene = new Scene();
   scene.name = 'city';
-  const { root, houses, sun } = buildCityDiorama(scene);
+  const { root, houses, sun } = buildCityDiorama(scene, ctx.stage);
   const street = new CityStreetView(ctx.reducedMotion);
   const building = new CityBuildingView();
   root.add(street.group, building.group);
   const view = new CityCamera();
   const labels = new CityLabels(ctx.ui);
-  const cityRun = planCityRun(ctx.learning, ctx.definition);
+  const cityRun = planCityRun(ctx.learning, ctx.definition, ctx.stage);
   const flow = new CityRoundFlow(cityRun.rounds, () => performance.now(), cityRun.total);
   let reasoned = false;
   // Created before the number pad: both listen on document, and the 3D keyboard layer must see
@@ -106,7 +107,8 @@ function start(ctx: LevelContext): LevelSession {
       ctx.announce(ts('doneTitle'));
       const bonus = ctx.firstCompletion ? LEVEL_COMPLETE_BONUS : null;
       const exit = () => ctx.exit({ completed: true });
-      doneCard = showCityCelebration(ctx.ui, ts, earned, stars, exit, bonus);
+      const stageLine = ts('stageLine', { n: ctx.stage, m: ctx.definition.stages, stars });
+      doneCard = showCityCelebration(ctx.ui, ts, earned, stars, exit, bonus, stageLine);
       doneCard.addEventListener('animationend', frame, { once: true });
       frame();
     },

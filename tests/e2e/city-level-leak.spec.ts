@@ -42,3 +42,32 @@ test('leaving the city frees its geometries and textures (once and after 10 visi
   // Leaving before any answer commits nothing: the gate is still open, not completed.
   expect(await page.evaluate(() => window.__game?.gateStatus('city'))).toBe('open');
 });
+
+test('leaving a later stage frees its geometries too', async ({ page }, info) => {
+  const tap = info.project.name === 'mobile-pixel';
+  await page.goto('/');
+  await waitForStoreBoot(page);
+  await page.waitForFunction(() => '__game' in window);
+  await page.locator('#play').click();
+  await expect(page.locator('body')).toHaveClass(/playing/);
+  await page.evaluate(() =>
+    window.__game?.seedProgress({ bridgeComplete: true, completedLevels: ['field', 'forest'] }),
+  );
+  // Stage 3 is next (stages 1-2 done with 2 stars each).
+  await page.evaluate(() => window.__game?.seedStageProgress('city', [2, 2]));
+  await page.evaluate(() => window.__game?.teleportToGate('city'));
+  const interact = page.locator('#interact');
+  await expect(interact).toContainText('Vào Cổng Thành Phố Con Số');
+  const baseline = await settledMemory(page);
+  expect(baseline.geometries).toBeGreaterThan(0);
+  if (tap) await interact.tap();
+  else await interact.click();
+  await expect(page.locator('.city-panel')).toBeVisible();
+  await expect(page.locator('.level-layer')).toHaveAttribute('data-draw-calls', /\d+/);
+  expect((await rendererMemory(page)).geometries).toBeGreaterThan(baseline.geometries);
+  const leave = page.locator('.level-leave');
+  if (tap) await leave.tap();
+  else await leave.click();
+  await expect.poll(() => page.evaluate(() => window.__game?.levelRunning())).toBe(false);
+  await expect.poll(() => rendererMemory(page)).toEqual(baseline);
+});

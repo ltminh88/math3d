@@ -11,6 +11,9 @@ import { expect, SLOW_TEST_MS, waitForStoreBoot } from './legacy-live-save-fixtu
 test.use({ locale: 'vi-VN' });
 test.describe.configure({ timeout: SLOW_TEST_MS * 4 });
 
+/** Levels with 6 stages show the stage line on their gate ("Cổng đã mở · Chặng 1/6"). */
+const STAGED_LEVELS = new Set(['field', 'forest', 'city']);
+
 /** Tap on touch projects, click with a mouse. */
 type Press = (target: Locator) => Promise<void>;
 
@@ -70,7 +73,7 @@ async function expectMapWithoutComingSoon(page: Page, press: Press, stage: Stage
   await expect(page.locator('#map-regions')).not.toContainText('Sắp ra mắt');
   await press(page.locator(`[data-region="${stage.region}"]`));
   await expect(page.locator('#map-detail .map-gate')).toHaveText(
-    stage.levelId === 'field' || stage.levelId === 'forest'
+    STAGED_LEVELS.has(stage.levelId)
       ? 'Cổng màn chơi: Cổng đã mở · Chặng 1/6'
       : 'Cổng màn chơi: Cổng đã mở',
   );
@@ -132,7 +135,7 @@ test('the 9-stage chain: each stage opens the next gate, every level loads and e
     );
     await expectCard(page, i, stage);
     await expect(page.locator(`#gate-${stage.levelId}-label small`)).toHaveText(
-      stage.levelId === 'field' || stage.levelId === 'forest'
+      STAGED_LEVELS.has(stage.levelId)
         ? 'Cổng đã mở · Chặng 1/6'
         : 'Cổng đã mở',
     );
