@@ -12,9 +12,11 @@ import { ForestCountLabels } from './forest-count-labels';
 import { buildForestDiorama } from './forest-diorama-builder';
 import { FRUIT_Y } from './forest-layout';
 import { ForestPanel } from './forest-panel';
-import { planForestRun, startForestReasoningRound } from './forest-remainder-round';
+import { startForestReasoningRound } from './forest-remainder-round';
 import { ForestRoundController } from './forest-round-controller';
 import { ForestRoundFlow } from './forest-round-flow';
+import { createRunTally } from './forest-run-tally';
+import { planForestRun } from './forest-stage-plan';
 import { forestStrings } from './forest-strings';
 import { ForestTableView } from './forest-table-view';
 import { fruitIndexOf } from './fruit-pile';
@@ -28,10 +30,11 @@ function start(ctx: LevelContext): LevelSession {
   const scene = new Scene();
   scene.name = 'forest';
   const { root, sun } = buildForestDiorama(scene);
-  const table = new ForestTableView(root, createAnimalMaterial(), ts, ctx.reducedMotion);
+  const table = new ForestTableView(root, createAnimalMaterial(), ts, ctx.reducedMotion, ctx.stage);
   const view = new ForestCamera();
   const labels = new ForestCountLabels(ctx.ui);
-  const forestRun = planForestRun(ctx.learning, ctx.definition);
+  const forestRun = planForestRun(ctx.learning, ctx.definition, ctx.stage);
+  const tally = createRunTally();
   const flow = new ForestRoundFlow(forestRun.rounds, () => performance.now(), forestRun.total);
   const controller: { current?: ForestRoundController } = {};
   const run = (fn: (c: ForestRoundController) => void) => () => {
@@ -66,40 +69,70 @@ function start(ctx: LevelContext): LevelSession {
     labels.place(view.camera);
   };
 
-  const c = new ForestRoundController(ctx, ts, flow, panel, card, table, labels, {
-    onTableChanged(snap) {
-      const active = c.interactive;
-      interaction.setPickables(active ? table.props.pickables() : []);
-      interaction.setZones(active ? table.zones(c.sharing) : []);
-      labels.set(c.round?.kind === 'family' ? [] : table.labels(c.sharing));
-      const kind = c.round?.kind === 'pack' ? 'pack' : 'share';
-      if (snap) view.setExtent(table.extent(kind, c.sharing.groups));
-      labels.place(view.camera);
-    },
-    onLevelDone(earned) {
-      interaction.setPickables([]);
-      interaction.setZones([]);
-      labels.set([]);
-      const { reasoning } = forestRun;
-      if (reasoning && !reasoned) {
-        // The last round: the remainder puzzle, then this celebration.
-        reasoned = true;
-        startForestReasoningRound(ctx, ts, panel, { ...forestRun, reasoning }, earned, () =>
-          this.onLevelDone(earned),
+  const c = new ForestRoundController(
+    ctx,
+    ts,
+    flow,
+    panel,
+    card,
+    table,
+    labels,
+    {
+      onTableChanged(snap) {
+        const active = c.interactive;
+        interaction.setPickables(active ? table.props.pickables() : []);
+        interaction.setZones(active ? table.zones(c.sharing) : []);
+        labels.set(c.round?.kind === 'family' ? [] : table.labels(c.sharing));
+        const kind = c.round?.kind === 'pack' ? 'pack' : 'share';
+        if (snap) view.setExtent(table.extent(kind, c.sharing.groups));
+        labels.place(view.camera);
+      },
+      onLevelDone(earned) {
+        interaction.setPickables([]);
+        interaction.setZones([]);
+        labels.set([]);
+        const { reasoning } = forestRun;
+        if (reasoning && !reasoned) {
+          // The last round: the remainder puzzle (or the word problem in stage 4), then this
+          // celebration.
+          reasoned = true;
+          startForestReasoningRound(
+            ctx,
+            ts,
+            panel,
+            { ...forestRun, reasoning },
+            earned,
+            () => this.onLevelDone(earned),
+            tally,
+            ctx.stage,
+          );
+          frame();
+          return;
+        }
+        panel.hide();
+        panel.say(ts('doneTitle'));
+        table.celebrate();
+        ctx.audio.celebrate();
+        ctx.announce(ts('doneTitle'));
+        const bonus = ctx.firstCompletion ? LEVEL_COMPLETE_BONUS : null;
+        const stageLine = ts('stageLine', {
+          n: ctx.stage,
+          m: ctx.definition.stages,
+          stars: tally.stars(),
+        });
+        showForestCelebration(
+          ctx.ui,
+          ts,
+          earned,
+          () => ctx.exit({ completed: true }),
+          bonus,
+          stageLine,
         );
         frame();
-        return;
-      }
-      panel.hide();
-      panel.say(ts('doneTitle'));
-      table.celebrate();
-      ctx.audio.celebrate();
-      ctx.announce(ts('doneTitle'));
-      const bonus = ctx.firstCompletion ? LEVEL_COMPLETE_BONUS : null;
-      showForestCelebration(ctx.ui, ts, earned, () => ctx.exit({ completed: true }), bonus);
-      frame();
+      },
     },
-  });
+    tally,
+  );
   controller.current = c;
 
   const onInput = (event: InteractionEvent): void => {

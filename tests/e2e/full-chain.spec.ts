@@ -70,7 +70,7 @@ async function expectMapWithoutComingSoon(page: Page, press: Press, stage: Stage
   await expect(page.locator('#map-regions')).not.toContainText('Sắp ra mắt');
   await press(page.locator(`[data-region="${stage.region}"]`));
   await expect(page.locator('#map-detail .map-gate')).toHaveText(
-    stage.levelId === 'field'
+    stage.levelId === 'field' || stage.levelId === 'forest'
       ? 'Cổng màn chơi: Cổng đã mở · Chặng 1/6'
       : 'Cổng màn chơi: Cổng đã mở',
   );
@@ -132,7 +132,9 @@ test('the 9-stage chain: each stage opens the next gate, every level loads and e
     );
     await expectCard(page, i, stage);
     await expect(page.locator(`#gate-${stage.levelId}-label small`)).toHaveText(
-      stage.levelId === 'field' ? 'Cổng đã mở · Chặng 1/6' : 'Cổng đã mở',
+      stage.levelId === 'field' || stage.levelId === 'forest'
+        ? 'Cổng đã mở · Chặng 1/6'
+        : 'Cổng đã mở',
     );
     await expect(page.locator('body')).not.toContainText('Sắp ra mắt');
 

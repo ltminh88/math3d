@@ -10,6 +10,8 @@ export function showForestCelebration(
   onBack: () => void,
   /** First clear: the one-time bonus the host adds on commit (QA m-12), else null. */
   bonus: { xp: number; coins: number } | null = null,
+  /** Stage just played ("Chặng {n}/6 · {sao} sao"), shown under the score. */
+  stageLine?: string | null,
 ): HTMLElement {
   const card = document.createElement('section');
   card.className = 'forest-done glass';
@@ -27,6 +29,12 @@ export function showForestCelebration(
     const line = document.createElement('p');
     line.className = 'completion-rewards forest-bonus';
     line.textContent = ts('bonusLine', bonus);
+    card.querySelector('.completion-rewards')?.after(line);
+  }
+  if (stageLine) {
+    const line = document.createElement('p');
+    line.className = 'forest-stage-line';
+    line.textContent = stageLine;
     card.querySelector('.completion-rewards')?.after(line);
   }
   const back = card.querySelector('.forest-back') as HTMLButtonElement;

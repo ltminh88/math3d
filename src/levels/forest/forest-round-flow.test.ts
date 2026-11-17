@@ -61,6 +61,24 @@ describe('forest round plan', () => {
     const rounds = planForestRounds(['div:12/3', 'div:45/5'], { 'div:12/3': stat(3) });
     expect(rounds.map((r) => r.kind)).toEqual(['family', 'family']);
   });
+
+  it('a stage may choose the kind itself (kindFor); without it the rule above is today’s rule', () => {
+    const facts = ['div:12/3', 'div:8/2', 'div:6/3', 'div:10/2', 'div:4/2'];
+    expect(planForestRounds(facts, {}, () => 'family').map((r) => r.kind)).toEqual([
+      'family',
+      'family',
+      'family',
+      'family',
+      'family',
+    ]);
+    expect(planForestRounds(facts, {}).map((r) => r.kind)).toEqual([
+      'share',
+      'pack',
+      'family',
+      'share',
+      'pack',
+    ]);
+  });
 });
 
 describe('fact family equations', () => {

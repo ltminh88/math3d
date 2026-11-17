@@ -47,6 +47,12 @@
   color: var(--muted);
   line-height: 1.6;
 }
+.forest-stage-line {
+  margin: 8px 0 0;
+  color: var(--muted);
+  font-size: 15px;
+  line-height: 1.6;
+}
 .forest-done .primary {
   width: 100%;
   margin-top: 14px;

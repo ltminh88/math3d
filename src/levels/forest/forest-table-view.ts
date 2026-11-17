@@ -12,6 +12,7 @@ import {
   PACK_BEAR,
   PILE_CENTER,
 } from './forest-layout';
+import { stageAnimalOrder } from './forest-stage-plan';
 import { ANIMAL_NAME_KEYS, type ForestStrings } from './forest-strings';
 import { ForestProps, fruitIndexOf } from './fruit-pile';
 import { canMove, countsOf, type SharingState, type Spot, visibleGroups } from './sharing-model';
@@ -32,6 +33,8 @@ export class ForestTableView {
     material: Material,
     private readonly ts: ForestStrings,
     private readonly reducedMotion: boolean,
+    /** Stage dressing: which friend stands first (same five friends, rotated per stage). */
+    private readonly stage = 1,
   ) {
     this.props = new ForestProps(root, reducedMotion);
     for (const kind of ANIMAL_NAME_KEYS) {
@@ -50,13 +53,15 @@ export class ForestTableView {
       if (bear) Object.assign(bear, { visible: true }).position.set(PACK_BEAR.x, 0, PACK_BEAR.z);
       return;
     }
-    ANIMAL_NAME_KEYS.slice(0, groups).forEach((name, i) => {
-      const mesh = this.animals.get(name);
-      if (!mesh) return;
-      const at = animalPosition(groupCenter('share', i, groups));
-      mesh.visible = true;
-      mesh.position.set(at.x, 0, at.z);
-    });
+    stageAnimalOrder(this.stage)
+      .slice(0, groups)
+      .forEach((name, i) => {
+        const mesh = this.animals.get(name);
+        if (!mesh) return;
+        const at = animalPosition(groupCenter('share', i, groups));
+        mesh.visible = true;
+        mesh.position.set(at.x, 0, at.z);
+      });
   }
 
   /** Half-width of the scene the camera must show for this table. */

@@ -8,6 +8,7 @@ import { renderHint } from './forest-hints';
 import type { ForestPanel } from './forest-panel';
 import { CONCRETE_MAX_FRUIT, type ForestRound, type ForestRoundFlow } from './forest-round-flow';
 import { roundTexts, wrongFeedbackKey } from './forest-round-texts';
+import type { ForestRunTally } from './forest-run-tally';
 import type { ForestStrings } from './forest-strings';
 import { type ForestTableView, zoneSpot } from './forest-table-view';
 import {
@@ -43,6 +44,8 @@ export class ForestRoundController {
     readonly table: ForestTableView,
     private readonly labels: ForestCountLabels,
     private readonly hooks: ForestRoundHooks,
+    /** The run's tally: every finished round counts toward the celebration's stars. */
+    private readonly tally: ForestRunTally,
   ) {}
 
   get round(): ForestRound | undefined {
@@ -162,6 +165,7 @@ export class ForestRoundController {
       return;
     }
     this.ctx.learning.record(result.outcome);
+    this.tally.add(result.outcome);
     const reward = questionReward(result.outcome);
     this.earned = { xp: this.earned.xp + reward.xp, coins: this.earned.coins + reward.coins };
     const equation = this.card.equationText(this.card.storyEquation(round));

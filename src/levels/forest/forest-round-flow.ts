@@ -34,7 +34,14 @@ const FOREST_TABLES = [2, 3, 4, 5] as const;
 /** Last taught rung (rung 5 is only reached by three misses). */
 const FOREST_LAST_RUNG = 4;
 const MIN_KNOWN_FACTS = 3;
-const ROUND_KINDS: readonly RoundKind[] = ['share', 'pack', 'family', 'share', 'pack'];
+/** Today's rotation: share, pack, family, share, pack (symbolic facts take family instead). */
+export const FOREST_ROUND_KINDS: readonly RoundKind[] = [
+  'share',
+  'pack',
+  'family',
+  'share',
+  'pack',
+];
 
 type Stats = Readonly<Record<FactKey, FactStat | undefined>>;
 
@@ -61,12 +68,22 @@ export function forestFactPool(stats: Stats): FactKey[] {
   );
 }
 
-/** Rounds for the planned facts: share, pack, family, share, pack unless the fact is symbolic. */
-export function planForestRounds(facts: readonly FactKey[], stats: Stats): ForestRound[] {
+/** Rounds for the planned facts: share, pack, family, share, pack unless the fact is symbolic.
+ * A stage may pass `kindFor` to choose the kind itself (stage 3 and 5 lean on fact families);
+ * without it the rule above is today's rule, unchanged. */
+export function planForestRounds(
+  facts: readonly FactKey[],
+  stats: Stats,
+  kindFor?: (fact: FactKey, index: number, box: number) => RoundKind,
+): ForestRound[] {
   return facts.map((factKey, i) => {
     const { dividend, divisor } = divParts(factKey);
-    const symbolic = dividend > CONCRETE_MAX_FRUIT || (stats[factKey]?.box ?? 0) >= SYMBOLIC_BOX;
-    const kind = symbolic ? 'family' : (ROUND_KINDS[i % ROUND_KINDS.length] as RoundKind);
+    const box = stats[factKey]?.box ?? 0;
+    const kind = kindFor
+      ? kindFor(factKey, i, box)
+      : box >= SYMBOLIC_BOX || dividend > CONCRETE_MAX_FRUIT
+        ? 'family'
+        : (FOREST_ROUND_KINDS[i % FOREST_ROUND_KINDS.length] as RoundKind);
     return { kind, factKey, dividend, divisor, quotient: dividend / divisor };
   });
 }
