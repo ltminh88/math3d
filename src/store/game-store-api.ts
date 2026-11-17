@@ -4,11 +4,17 @@ import type { PurchaseResult } from './cosmetic-purchase-transaction';
 import type { OpenDbOrMemoryOptions } from './open-game-db-with-memory-fallback';
 import type { ProgressRecords, ReplaceOptions } from './profile-replacement';
 import type { GameSnapshot } from './progress-repository';
-import type { GameMeta } from './save-schema';
+import type { DailyProgress, GameMeta } from './save-schema';
 
 /** Fired after the outbox gained an item (session finished or cosmetic bought). Phase 09 flushes on it. */
 export interface SessionCommittedEvent {
   delta: SessionDelta;
+}
+
+/** Result of counting a daily run: the stored streak and whether this run counted. */
+export interface DailyRunCommit {
+  daily: DailyProgress;
+  counted: boolean;
 }
 
 export interface GameStore {
@@ -27,6 +33,13 @@ export interface GameStore {
    * Idempotent per batchId: a retry of an already committed delta is a no-op success.
    */
   commitSession(delta: SessionDelta, local?: Record<FactKey, FactLocalState>): Promise<void>;
+  /**
+   * Counts a finished daily run for `today` (local day number). The streak is computed from
+   * the stored record inside the write, so a second run the same day cannot extend it or pay
+   * the finish reward twice. When counted, the +10 finish coins land in the same transaction
+   * as the streak, and the outbox gains the finish delta.
+   */
+  commitDailyRun(today: number): Promise<DailyRunCommit>;
   /** Atomic debit + ownership + outbox record. Price semantics live in src/shop. */
   purchaseCosmetic(cosmeticId: string, price: number): Promise<PurchaseResult>;
   /** Stored in profile settings; ownership is the shop's concern (default items are never "purchased"). */

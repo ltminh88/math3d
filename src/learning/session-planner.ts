@@ -36,7 +36,7 @@ function isKnown(table: number, input: PlanInput): boolean {
 }
 
 /** No two neighbours from the same group (table, or skill family) where avoidable. */
-function interleave(keys: FactKey[], tables: readonly number[]): FactKey[] {
+export function interleaveFacts(keys: FactKey[], tables: readonly number[]): FactKey[] {
   const rest = keys.slice();
   const out: FactKey[] = [];
   while (rest.length > 0) {
@@ -109,5 +109,5 @@ export function planSession(input: PlanInput): FactKey[] {
 
   const shuffled = shuffle(rng, plan);
   // Skills are never taught blocked by table, so a pool with skills is always interleaved.
-  return mixed || plan.some(isSkillKey) ? interleave(shuffled, tables) : shuffled;
+  return mixed || plan.some(isSkillKey) ? interleaveFacts(shuffled, tables) : shuffled;
 }

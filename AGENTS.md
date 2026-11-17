@@ -27,3 +27,16 @@ Reporting progress (the author must never have to ask):
 - Any wait over 30 minutes: give the expected finish time up front, and a one-line update
   every 60 minutes until it is done.
 - Every report: status (green/red/running), links (PR, CI run, preview), next step, ETA.
+- Local gates in a report name the exact command and passed/total (e.g.
+  `npm run test:e2e -- --project=mobile-pixel` → 87/87). A partial run is reported as partial.
+
+Parallel work (standing rule: applies to every new task, not only when asked):
+- Before starting, split the task into independent lanes (no shared files, or shared files
+  agreed with the author first). Run each lane as its own agent at the same time, each on its
+  own branch and git worktree from the latest main. Up to 3 lanes.
+- Lanes run one after another only when one depends on another; say which and why in the
+  first report.
+- At most 2 PRs in CI at once, and never two full e2e runs at once on the same machine.
+- A PR that changes the UI on purpose gets the `parity-change` label when it is opened and
+  lists the parity shots it changes; the author recaptures the Mac baselines after merge.
+- Each report lists every lane: name, agent, branch, status, next check time.
