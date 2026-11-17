@@ -13,6 +13,7 @@ export type DialogKind =
   | ''
   | 'milo'
   | 'quiz'
+  | 'daily'
   | 'book'
   | 'help'
   | 'settings'

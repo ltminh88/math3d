@@ -183,6 +183,17 @@ export async function commitLevelRun(
 }
 
 /**
+ * Commits a finished daily-practice answer batch (facts + per-answer coins) after any pending
+ * quiz answers, retried like a quiz batch. No level result, no bonus: the daily finish
+ * reward is the store's commitDailyRun, not this delta. Coins are already in the progress
+ * view (optimistic, at answer time), so nothing is added here.
+ */
+export async function commitDailyAnswers(result: SessionResult): Promise<boolean> {
+  unsent.push({ session: result });
+  return flushProgress();
+}
+
+/**
  * Replaces all progress (reset, save-code import) and re-hydrates the view; pending answers
  * belonged to the old progress and are dropped. False when the store refused (view unchanged).
  */

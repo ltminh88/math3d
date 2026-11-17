@@ -74,6 +74,32 @@
   .hud-left {
     width: 270px;
   }
+  /* The player card at 270px: desktop-sized contents (48px avatar, 12px gaps) let the
+     level badge run into the wallet (PR #6 CI: gap -24.4px on tablet-portrait; the daily
+     button sits below the quest card and is not the cause). Compact it the way the
+     ≤700px rules do, so the badge stays clear of the wallet. */
+  .player-card {
+    padding: 8px 10px 8px 8px;
+    gap: 8px;
+  }
+  .avatar-face {
+    width: 40px;
+    height: 42px;
+    font-size: 26px;
+  }
+  .player-info strong {
+    font-size: 13px;
+  }
+  .wallet {
+    padding: 6px 9px 6px 7px;
+  }
+  .wallet svg {
+    width: 19px;
+    height: 19px;
+  }
+  .wallet strong {
+    font-size: 17px;
+  }
   .minimap {
     width: 150px;
     height: 150px;

@@ -8,6 +8,7 @@ import { initLevelGates } from '../levels/shared/level-gates';
 import { World } from '../world/world';
 import type { WorldPublicApi } from '../world/world-public-api';
 import { wireBookAndHelp } from './book-help-dialogs';
+import { initDailyButton } from './daily-hud-button';
 import { wireDialog } from './dialog';
 import { gameShellHtml } from './dom-template';
 import { gameState } from './game-state';
@@ -35,6 +36,7 @@ declare global {
 
 function wireControls(): void {
   initQuestCard();
+  initDailyButton();
   wireDialog();
   wireMenu();
   wireGuideTriggers();

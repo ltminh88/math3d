@@ -40,10 +40,14 @@
   be conflated: changing `BOX_INTERVAL` to days would change every
   level's planning. The daily intervals mirror the session numbers in
   days (box 1: 1 day, 2: 2, 3: 4, 4: 8, 5: 16) in a new pure module.
-- A day is the device-local calendar day (local `YYYYMMDD` int). Timezone
-  is the child's device timezone — no server, no UTC conversion, no
-  attempt to be clever about travel. The faked-clock test is what pins
-  the behaviour, not the timezone choice.
+- A day is the device-local calendar day, stored as a **day number**
+  (`dayNumber()`: days since the epoch in the device's local timezone),
+  NOT a `YYYYMMDD` int. Reason: phase 01 froze `lastDailyDay` as a day
+  number, and the M3D4 codec rejects values above 100,000 — a YYYYMMDD
+  int (e.g. 20261117) would be refused on decode. Timezone is the
+  child's device timezone — no server, no UTC conversion, no attempt to
+  be clever about travel. The faked-clock test is what pins the
+  behaviour, not the timezone choice.
 - "No penalty" is a copy rule as much as a logic rule: the UI never says
   a streak was lost, never counts down, never shows a sad state. The
   streak is a count of consecutive days with a completed run; a missed
@@ -98,8 +102,10 @@
   - Streak copy: "Bạn đã luyện {n} ngày liên tiếp!" — shown after a
     completed run and on the VLM dialog. No copy ever mentions losing a
     streak.
-- **Storage**: `lastDailyDay` (local YYYYMMDD int, 0 = never) +
-  `dailyStreak` (int), in the store and in M3D4's `d` field (phase 01).
+- **Storage**: `lastDailyDay` (device-local day number from `dayNumber()`,
+  0 = never — NOT a YYYYMMDD int: the M3D4 codec caps values at 100,000,
+  so YYYYMMDD would be rejected on decode) + `dailyStreak` (int), in the
+  store and in M3D4's `d` field (phase 01).
   A run completed on `lastDailyDay + 1` increments the streak; on the
   same day it is already counted; on any later day it restarts at 1.
   Clock going backwards never increments the streak and never corrupts
