@@ -17,6 +17,7 @@ import { gameState, getWorld } from '../../ui/game-state';
 import { createStepCard } from '../../ui/kit/step-card';
 import { connectedStore, flushProgress } from '../../ui/progress-sync';
 import { renderProgress } from '../../ui/render-progress';
+import { openStickerBook, pendingEarningLines } from '../../ui/sticker-book';
 import { gateFrontPoint } from './level-gate-builder';
 import { currentGateStatus, isLevelRunning, refreshLevelGates } from './level-gates';
 import type { GateStatus } from './level-progression';
@@ -56,6 +57,10 @@ export interface TestGameHook {
   snapshot(): GameSnapshot | undefined;
   /** `renderer.info.memory` (leak checks). */
   memory(): { geometries: number; textures: number };
+  /** Opens the sticker book dialog (test entry until the quest-card button lands). */
+  openStickerBook(): void;
+  /** Earning lines collected since boot (not yet shown in the guide dialog). */
+  pendingEarningLines(): string[];
 }
 
 declare global {
@@ -176,5 +181,7 @@ export function installTestDebugHook(): void {
     levelRunning: isLevelRunning,
     snapshot: () => connectedStore()?.getSnapshot(),
     memory: () => ({ ...getWorld().renderer.info.memory }),
+    openStickerBook,
+    pendingEarningLines,
   };
 }

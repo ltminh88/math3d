@@ -1,0 +1,94 @@
+/* Sticker book dialog: six topic pages, tap to flip, every target at least 44 px. */
+.sticker-tabs {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin: 18px 0 10px;
+}
+.sticker-tabs button {
+  min-height: 44px;
+  padding: 8px 12px;
+  border: 1px solid #d6dfc7;
+  border-radius: 12px;
+  background: #edf0e0;
+  font-weight: 800;
+  font-size: 14px;
+}
+.sticker-tabs button[aria-pressed="true"] {
+  background: var(--ink);
+  border-color: var(--ink);
+  color: #fffbeb;
+}
+.sticker-count {
+  margin: 4px 0 12px;
+  text-align: center;
+  font-size: 22px;
+  font-weight: 900;
+  color: var(--gold-deep);
+}
+.sticker-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(84px, 1fr));
+  gap: 8px;
+}
+.sticker {
+  display: flex;
+  min-height: 72px;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 4px;
+  padding: 8px 4px;
+  border: 2px dashed #c9cdb2;
+  border-radius: 14px;
+  background: #f0f1e4;
+  color: var(--muted-2);
+}
+.sticker.earned {
+  border-style: solid;
+  border-color: #8fbf7f;
+  background: #e3f0da;
+  color: var(--ink);
+}
+.sticker-emoji {
+  font-size: 26px;
+  line-height: 1;
+  filter: grayscale(1);
+  opacity: 0.4;
+}
+.sticker.earned .sticker-emoji {
+  filter: none;
+  opacity: 1;
+}
+.sticker-name {
+  font-size: 12px;
+  font-weight: 700;
+  line-height: 1.25;
+  text-align: center;
+}
+.sticker-detail {
+  min-height: 48px;
+  margin: 14px 0 4px;
+  font-size: 15px;
+  line-height: 1.6;
+  color: var(--muted);
+}
+.sticker-nav {
+  display: flex;
+  gap: 8px;
+  margin-top: 8px;
+}
+.sticker-nav button {
+  min-height: 44px;
+  flex: 1;
+}
+/* The quest card's entry button (added by wireStickerBookButton). */
+.sticker-book-button {
+  min-height: 44px;
+}
+/* VLM's dialog entry button (rendered by stickerGuideSectionHtml). */
+#open-sticker-book-guide {
+  width: 100%;
+  min-height: 44px;
+  margin-top: 12px;
+}

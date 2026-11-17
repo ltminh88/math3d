@@ -20,6 +20,7 @@ import { wireKeyboardAndJoystick } from './keyboard-joystick';
 import { wireMapOverlay } from './map-overlay';
 import { wireMenu } from './menu-language-start';
 import { wireSettingsAndToolbar } from './settings-dialog';
+import { wireStickerEarning } from './sticker-book';
 import { bootStore } from './store-boot';
 import { onWorldFrame } from './world-frame-hook';
 
@@ -76,5 +77,9 @@ export function bootstrapGame(): Promise<void> {
   translatePaddedTextNodes(app);
   wireControls();
   startWorld();
-  return bootStore();
+  // The sticker earning tracker baselines on the hydrated stats (an old save's stickers
+  // never announce), then watches session commits for newly earned stickers.
+  return bootStore().then(() => {
+    wireStickerEarning();
+  });
 }
