@@ -56,3 +56,8 @@ Two Muse accounts (muse-88 and muse-min work on this repo at the same time):
 - Messages from the reviewer start with [muse-88], [muse-min] or [cả hai]. Act only on
   messages addressed to you or to both.
 - Every report names the account (muse-88 or muse-min) and every lane it owns.
+- Usage quota: report the account's weekly usage ("N% used, resets <day time>") in the
+  first report of each day, whenever it crosses 50%, 75% or 90%, and before taking a new
+  lane. If you cannot read the number, say so; do not guess.
+- Below 15% left: take no new lane. Finish the running lane, or push the branch and leave
+  a handoff note on #11 (what is done, what is left, the next command to run).
