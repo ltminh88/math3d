@@ -1,3 +1,4 @@
+import { DAILY_FINISH_COINS, nextDailyStreak } from '../learning/daily-streak';
 import type { SessionDelta } from '../learning/learning-types';
 import { assertActiveProfile, ProfileSwitchedError } from './active-profile-guard';
 import {
@@ -20,7 +21,13 @@ import {
   newLevelProgress,
   readSessionCount,
 } from './progress-repository';
-import { metaGameKey, metaSessionCountKey, type Profile } from './save-schema';
+import {
+  DEFAULT_DAILY,
+  metaDailyKey,
+  metaGameKey,
+  metaSessionCountKey,
+  type Profile,
+} from './save-schema';
 import { inTransaction } from './store-transaction';
 
 export { ProfileSwitchedError } from './active-profile-guard';
@@ -126,6 +133,40 @@ export async function openGameStore(options: OpenStoreOptions = {}): Promise<Gam
           await appendOutbox(tx, delta, at);
         });
         await afterCommit(delta);
+      });
+    },
+
+    commitDailyRun(today) {
+      return write(async () => {
+        const at = now();
+        const profileId = snapshot.profile.id;
+        const current = snapshot.daily ?? DEFAULT_DAILY;
+        const next = nextDailyStreak(current, today);
+        // Same day (or a backwards clock): already counted — no write, no second reward.
+        if (next.lastDailyDay === current.lastDailyDay) return { daily: current, counted: false };
+        const delta: SessionDelta = {
+          batchId: newId(),
+          profileId,
+          clientTs: at,
+          v: 1,
+          facts: {},
+          levels: {},
+          xp: 0,
+          coins: DAILY_FINISH_COINS,
+        };
+        validateDelta(delta, profileId);
+        await inTransaction(db, async (tx) => {
+          await assertActiveProfile(tx, profileId);
+          const sessionNo = (await readSessionCount(tx, profileId)) + 1;
+          await applyDelta(tx, delta, { now: at, sessionNo });
+          await tx
+            .objectStore('meta')
+            .put({ key: metaSessionCountKey(profileId), value: sessionNo });
+          await appendOutbox(tx, delta, at);
+          await tx.objectStore('meta').put({ key: metaDailyKey(profileId), value: next });
+        });
+        await afterCommit(delta);
+        return { daily: next, counted: true };
       });
     },
 

@@ -332,3 +332,20 @@
     padding: 15px 18px;
   }
 }
+
+/* Very narrow phones (320px): the player card is only ~180px wide, so even the compact
+   card cannot fit avatar + name + badge + wallet on one row (probe: gap -59px). Let the
+   wallet take its own row instead of running into the level badge, and show the daily
+   button as icon-only (aria-label kept, touch target stays ≥ 44px). */
+@media (max-width: 380px) {
+  .player-card {
+    flex-wrap: wrap;
+  }
+  .wallet {
+    flex: 1 1 100%;
+    justify-content: flex-end;
+  }
+  #open-daily span {
+    display: none;
+  }
+}

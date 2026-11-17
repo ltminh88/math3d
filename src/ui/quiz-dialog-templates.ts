@@ -1,6 +1,8 @@
 // Quiz dialog body markup. The multiplication template is the recovered one, byte-identical (DOM
 // parity; quiz-dialog-templates.test.ts snapshots it); the word-problem template (phase 04) shares
-// its answer buttons and footer.
+// its answer buttons and footer. The division template (phase 11, daily practice) mirrors the
+// multiplication one with `:` and a "phép chia" eyebrow.
+import { parseFactKey } from '../learning/fact-key';
 import type { Question } from '../quiz/question-types';
 import { icon } from './icons';
 import { wordProblemTexts } from './quiz-word-problem-strings';
@@ -32,6 +34,14 @@ function wordBodyHtml(question: Question, view: QuizView): string {
   return `<div class="dialog-eyebrow">${eyebrow}</div><p class="question-intro quiz-word-badge">${texts.badge}</p><p class="quiz-word-story">${texts.story}</p><p class="quiz-word-ask">${texts.ask}</p>${answersHtml(question)}${footerHtml()}`;
 }
 
+function divBodyHtml(question: Question, view: QuizView): string {
+  const { bridgeMode } = view;
+  return `<div class="dialog-eyebrow">${bridgeMode ? bridgeEyebrow(view) : question.review ? 'ÔN LẠI PHÉP CHIA' : 'LUYỆN TẬP CÙNG VLM'}</div><p class="question-intro">Bạn tìm được kết quả không?</p><div class="equation">${question.a} <span>:</span> ${question.b} <span>=</span> ?</div>${answersHtml(question)}${footerHtml()}`;
+}
+
 export function quizBodyHtml(question: Question, view: QuizView): string {
-  return question.word ? wordBodyHtml(question, view) : mulBodyHtml(question, view);
+  if (question.word) return wordBodyHtml(question, view);
+  return parseFactKey(question.factKey)?.op === 'div'
+    ? divBodyHtml(question, view)
+    : mulBodyHtml(question, view);
 }

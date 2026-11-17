@@ -1,0 +1,46 @@
+import { defineStrings } from '../i18n/i18n';
+
+/** Daily-practice strings: vi is the source, written for kids aged 7-9. No copy ever mentions
+ * losing a streak: a missed day restarts the count silently at 1 (asserted in the test). */
+export const td = defineStrings('daily', {
+  vi: {
+    button: 'Luyện tập hôm nay',
+    title: 'Luyện tập hôm nay',
+    locked: 'Luyện tập hôm nay sẽ mở sau khi con qua Cánh Đồng Phép Tính.',
+    itemOf: 'Câu {n}/{total}',
+    alreadyDone: 'Hôm nay con đã luyện rồi. Muốn luyện thêm cho vui không?',
+    streak: 'Bạn đã luyện {n} ngày liên tiếp!',
+    finishTitle: 'Xong rồi!',
+    finishCoins: 'Hôm nay con được +{coins} xu.',
+    finishBonus: 'Thưởng hoàn thành: +{coins} xu.',
+    leave: 'Dừng lại',
+    backToWorld: 'Về thế giới',
+    next: 'Câu tiếp theo',
+    seeResult: 'Xem kết quả',
+    correctMul: '✓ Chính xác! {a} × {b} = {answer}. +5 xu',
+    correctDiv: '✓ Chính xác! {a} : {b} = {answer}. +5 xu',
+    wrong: '↻ Chưa đúng rồi. Mình cùng đếm lại nhé!',
+    questTodo: 'Hôm nay: chưa luyện',
+    questDone: 'Hôm nay: đã luyện ✓',
+  },
+  en: {
+    button: 'Practice today',
+    title: 'Daily practice',
+    locked: 'Daily practice opens after you clear the Math Meadow.',
+    itemOf: 'Question {n} of {total}',
+    alreadyDone: 'You already practiced today. Want an extra round for fun?',
+    streak: 'You have practiced {n} days in a row!',
+    finishTitle: 'Done!',
+    finishCoins: 'You earned +{coins} coins today.',
+    finishBonus: 'Completion bonus: +{coins} coins.',
+    leave: 'Stop for now',
+    backToWorld: 'Back to the world',
+    next: 'Next question',
+    seeResult: 'See results',
+    correctMul: '✓ Correct! {a} × {b} = {answer}. +5 coins',
+    correctDiv: '✓ Correct! {a} : {b} = {answer}. +5 coins',
+    wrong: '↻ Not quite. Let’s count it together!',
+    questTodo: 'Today: not practiced yet',
+    questDone: 'Today: practiced ✓',
+  },
+});

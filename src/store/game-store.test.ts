@@ -238,3 +238,65 @@ describe('game store', () => {
     store.close();
   });
 });
+
+describe('commitDailyRun', () => {
+  it('counts the first run: streak 1, +10 coins, one outbox finish delta', async () => {
+    const name = freshName();
+    const store = await openGameStore({ dbName: name, newId: ids() });
+    const first = await store.commitDailyRun(20345);
+    expect(first).toEqual({ daily: { lastDailyDay: 20345, dailyStreak: 1 }, counted: true });
+    expect(store.getSnapshot().daily).toEqual({ lastDailyDay: 20345, dailyStreak: 1 });
+    expect(store.getSnapshot().wallet.coins).toBe(10);
+    expect((await allOutbox(name)).map((i) => i.payload.coins)).toEqual([10]);
+    store.close();
+  });
+
+  it('a second run the same day is not counted and pays no second reward', async () => {
+    const store = await openGameStore({ dbName: freshName(), newId: ids() });
+    await store.commitDailyRun(20345);
+    const again = await store.commitDailyRun(20345);
+    expect(again).toEqual({ daily: { lastDailyDay: 20345, dailyStreak: 1 }, counted: false });
+    expect(store.getSnapshot().wallet.coins).toBe(10);
+    store.close();
+  });
+
+  it('increments on the next day and restarts at 1 after a gap', async () => {
+    const store = await openGameStore({ dbName: freshName(), newId: ids() });
+    await store.commitDailyRun(20345);
+    expect(await store.commitDailyRun(20346)).toEqual({
+      daily: { lastDailyDay: 20346, dailyStreak: 2 },
+      counted: true,
+    });
+    expect(store.getSnapshot().wallet.coins).toBe(20);
+    expect(await store.commitDailyRun(20350)).toEqual({
+      daily: { lastDailyDay: 20350, dailyStreak: 1 },
+      counted: true,
+    });
+    expect(store.getSnapshot().wallet.coins).toBe(30);
+    store.close();
+  });
+
+  it('a backwards clock never counts and never corrupts the streak', async () => {
+    const store = await openGameStore({ dbName: freshName(), newId: ids() });
+    await store.commitDailyRun(20345);
+    expect(await store.commitDailyRun(20344)).toEqual({
+      daily: { lastDailyDay: 20345, dailyStreak: 1 },
+      counted: false,
+    });
+    expect(store.getSnapshot().wallet.coins).toBe(10);
+    store.close();
+  });
+
+  it('persists across reload', async () => {
+    const name = freshName();
+    const store = await openGameStore({ dbName: name, newId: ids() });
+    await store.commitDailyRun(20345);
+    await store.commitDailyRun(20346);
+    const before = store.getSnapshot();
+    store.close();
+    const reopened = await openGameStore({ dbName: name, newId: ids() });
+    expect(reopened.getSnapshot().daily).toEqual(before.daily);
+    expect(reopened.getSnapshot().wallet.coins).toBe(20);
+    reopened.close();
+  });
+});
