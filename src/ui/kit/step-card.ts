@@ -76,6 +76,10 @@ export function createStepCard(
   element.append(story, list);
 
   function finishStep(): void {
+    // The host may already have finished the card inside onAnswer (the reasoning
+    // panel reveals every remaining step when the last one is answered right),
+    // so submit() can reach here with no step left — that second finish is a no-op.
+    if (index >= steps.length) return;
     const step = steps[index] as ReasoningStep;
     const row = list.lastElementChild as HTMLElement;
     widget?.destroy();
