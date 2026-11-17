@@ -9,6 +9,9 @@ describe('dailyGuideSectionHtml', () => {
     const html = dailyGuideSectionHtml({ unlocked: false, streak: 0 });
     expect(html).toContain('Luyện tập hôm nay sẽ mở sau khi con qua Cánh Đồng Phép Tính.');
     expect(html).not.toContain('daily-guide-button');
+    // Own class: the dialog's main copy is `.dialog-copy`, and a second match breaks
+    // selectors (strict mode) that expect exactly one (PR #6 CI: quest-chain + full-chain).
+    expect(html).not.toContain('dialog-copy');
   });
 
   it('shows the entry button once unlocked, without a streak line at 0', () => {

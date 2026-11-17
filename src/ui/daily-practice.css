@@ -10,6 +10,21 @@
   margin: 12px 0;
 }
 
+/* Locked line: same look as the dialog's main copy, but its own class — the dialog already
+   has one `.dialog-copy`, and a second would break selectors expecting exactly one. */
+.daily-guide-locked {
+  margin: 12px 0;
+  font-size: 17px;
+  line-height: 1.7;
+  color: var(--muted);
+}
+
+@media (max-width: 700px) {
+  .daily-guide-locked {
+    font-size: 15px;
+  }
+}
+
 #daily-guide-button {
   min-height: 44px;
 }

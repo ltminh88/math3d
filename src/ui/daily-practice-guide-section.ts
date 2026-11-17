@@ -17,7 +17,9 @@ export interface DailyGuideInput {
 
 /** The Milo dialog's daily section: entry button + streak, or the locked line. */
 export function dailyGuideSectionHtml(input: DailyGuideInput): string {
-  if (!input.unlocked) return `<p class="dialog-copy">${td('locked')}</p>`;
+  // Own class, not `dialog-copy`: the dialog's main copy already uses that class, and a
+  // second match breaks selectors (and strict mode) that expect exactly one `.dialog-copy`.
+  if (!input.unlocked) return `<p class="daily-guide-locked">${td('locked')}</p>`;
   const streak =
     input.streak > 0
       ? `<p class="daily-guide-streak">${td('streak', { n: input.streak })}</p>`
