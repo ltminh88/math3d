@@ -129,6 +129,25 @@ describe('stage plan invariants', () => {
     }
   });
 
+  it('never repeats a skill even when the planner repeats facts (fresh-profile spill)', () => {
+    // planSession repeats the chosen facts when the pool is short (its documented spill
+    // behaviour): a fresh profile plans 3 skills twice. The queues dedupe them, so every
+    // stage still plays six distinct skills.
+    const planned = [
+      'sk:pattern-add',
+      'sk:unknown-add-sub',
+      'sk:expr-order',
+      'sk:pattern-add',
+      'sk:unknown-add-sub',
+      'sk:expr-order',
+    ];
+    for (const stage of [1, 2, 3, 4, 5]) {
+      const run = planGardenRun(learning({}, 33, planned), definition, stage);
+      const skills = run.map((r) => r.skillId);
+      expect(new Set(skills).size).toBe(6);
+    }
+  });
+
   it('is deterministic for a seed', () => {
     const a = planGardenRun(learning({}, 33), definition, 4);
     const b = planGardenRun(learning({}, 33), definition, 4);

@@ -87,7 +87,12 @@ export function planGardenRounds(
   const tierOf = (id: string): SkillTier => skillTierOf(stats[skillKey(id)]);
   const queues = new Map<GardenKind, string[]>(
     KINDS.map((k) => {
-      const list = ids.filter((id) => gardenKindOf(id) === k);
+      // The planner repeats facts when the pool is short (its documented spill
+      // behaviour): a fresh profile plans 3 skills twice. A kind's queue would then
+      // hold the same skill twice and both of its slots would play it — dedupe the
+      // queue (first occurrence wins, planned order kept) so a run never repeats a
+      // skill. The least-used fallback covers the slots the queue no longer fills.
+      const list = [...new Set(ids.filter((id) => gardenKindOf(id) === k))];
       if (floor === undefined) return [k, list] as [GardenKind, string[]];
       // Tier floor: skills already at or above the floor play first (stable — planned order
       // kept inside each group). A skill below the floor still plays at its own tier.
