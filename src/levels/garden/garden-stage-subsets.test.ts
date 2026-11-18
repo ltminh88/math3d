@@ -1,5 +1,5 @@
-// Garden stage subsets (phase 07): stages 2-4 drill seven skills each (two rounds per kind,
-// never a repeat); stage 5 drills all eight skills, weakest first.
+// Garden stage subsets (phase 07): stages 2 and 4 drill seven skills, stage 3 six (two rounds
+// per kind, never a repeat); stage 5 drills all eight skills, weakest first.
 import { describe, expect, it } from 'vitest';
 import type { FactStat } from '../../learning/learning-types';
 import { mulberry32 } from '../../learning/seeded-rng';
@@ -55,7 +55,7 @@ function learning(
 const skillsOf = (stage: number, stats: Record<string, FactStat> = {}, seed = 33) =>
   planGardenRun(learning(stats, seed), definition, stage).map((r) => r.skillId);
 
-/** Stage → its seven skills (stage 2: tier-2 floor; stage 3: brackets + stories, no floor). */
+/** Stage → its skills (stage 2: tier-2 floor; stage 3: brackets + stories only, no floor). */
 const SUBSETS: Readonly<Record<number, readonly string[]>> = {
   2: [
     'pattern-add',
@@ -67,7 +67,6 @@ const SUBSETS: Readonly<Record<number, readonly string[]>> = {
     'expr-brackets',
   ],
   3: [
-    'expr-order',
     'expr-brackets',
     'expr-from-story',
     'pattern-add',
@@ -99,14 +98,17 @@ describe('stage subsets', () => {
     }
   });
 
-  it('stage 3 drills brackets and stories (all three bag skills), no floor', () => {
+  it('stage 3 drills brackets and stories in every run, no floor', () => {
     expect(GARDEN_STAGE_SKILLS[3]).toEqual(SUBSETS[3]);
     expect(stageTierFloor(3)).toBeUndefined();
-    const skills = skillsOf(3);
-    expect(skills).toHaveLength(6);
-    expect(new Set(skills).size).toBe(6);
-    for (const s of skills) expect(SUBSETS[3]).toContain(s);
-    expect(skills).toContain('expr-brackets');
+    for (let seed = 1; seed <= 50; seed++) {
+      const skills = skillsOf(3, {}, seed);
+      expect(skills).toHaveLength(6);
+      expect(new Set(skills).size).toBe(6);
+      for (const s of skills) expect(SUBSETS[3]).toContain(s);
+      expect(skills).toContain('expr-brackets');
+      expect(skills).toContain('expr-from-story');
+    }
   });
 
   it('stage 4 drills seven skills with a tier-3 floor', () => {

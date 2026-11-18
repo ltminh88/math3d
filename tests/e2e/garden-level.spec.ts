@@ -230,7 +230,6 @@ const STAGE2_SKILLS = [
   'sk:expr-brackets',
 ];
 const STAGE3_SKILLS = [
-  'sk:expr-order',
   'sk:expr-brackets',
   'sk:expr-from-story',
   'sk:pattern-add',
@@ -305,6 +304,7 @@ test('stage 3 drills brackets and stories and records only its own stage stars',
   expect(new Set(factKeys).size).toBe(ROUNDS);
   for (const key of factKeys) expect(STAGE3_SKILLS).toContain(key);
   expect(factKeys).toContain('sk:expr-brackets');
+  expect(factKeys).toContain('sk:expr-from-story');
 
   for (let i = 0; i < ROUNDS; i++) {
     await playRound(page, i, touch);
