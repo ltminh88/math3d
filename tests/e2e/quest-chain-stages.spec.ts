@@ -1,11 +1,12 @@
 // Phase 13: the quest card's stage sub-line and the map panel's gate pop-panel. The card
-// shows "Chặng 1/m · 0 sao" for its current level (a fresh level — the card moves on once
-// stage 1 is done, so the mid-level lines live on the gate and map labels instead). A level
-// with every stage done offers "Chơi lại chặng…" with one ≥44px row per stage in the map
-// detail panel; an unfinished multi-stage level offers "Vào chơi" for its next stage.
-// Replaying a stage opens that stage, never re-locks anything and never re-pays the
-// first-completion bonus. Uses the test-build hook `window.__game`. Tap only on touch
-// projects. (The cave shows no stage line until PR #20 ships its 5 stages.)
+// shows "Chặng 1/m · 0/3m sao" for its current level (a fresh level — the card moves on once
+// stage 1 is done, so the mid-level lines live on the gate and map labels instead; the
+// denominator is there because the celebration card already uses "Chặng n/m · {stars} sao"
+// for ONE stage's stars). A level with every stage done offers "Chơi lại chặng…" with one
+// ≥44px row per stage in the map detail panel; an unfinished multi-stage level offers
+// "Vào chơi" for its next stage. Replaying a stage opens that stage, never re-locks
+// anything and never re-pays the first-completion bonus. Uses the test-build hook
+// `window.__game`. Tap only on touch projects.
 import { type Page, type TestInfo, test } from '@playwright/test';
 import { expect, SLOW_TEST_MS, waitForStoreBoot } from './legacy-live-save-fixtures';
 
@@ -130,15 +131,15 @@ async function leaveField(page: Page, touch: boolean): Promise<void> {
 test('the quest card shows the current level’s stage line', async ({ page }) => {
   await startPlaying(page);
   await page.evaluate(() => window.__game?.seedProgress({ bridgeComplete: true }));
-  await expect(page.locator('#quest-stage')).toHaveText('Chặng 1/6 · 0 sao');
-  // A one-stage level's card shows no stage line (the cave still has 1 stage until PR #20).
+  await expect(page.locator('#quest-stage')).toHaveText('Chặng 1/6 · 0/18 sao');
+  // The cave's card (5 stages) shows its own line too.
   await page.evaluate(() =>
     window.__game?.seedProgress({
       completedLevels: ['field', 'forest', 'city', 'tower', 'garden', 'valley', 'workshop'],
     }),
   );
   await expect(page.locator('#quest-title')).toHaveText('Hang Đố Vui');
-  await expect(page.locator('#quest-stage')).toHaveCount(0);
+  await expect(page.locator('#quest-stage')).toHaveText('Chặng 1/5 · 0/15 sao');
 });
 
 test('an unfinished level offers its next stage from the map panel', async ({ page }, info) => {

@@ -2,9 +2,6 @@
 // with its old stars, opens stages 2+ at 0, shows the closing quest card, offers the next
 // stage at the gate, and unlocks daily practice with a pool drawn from the imported stats.
 // A fresh profile still sees field stage 1 open and daily locked.
-// The cave gate's own "offers stage 2" case waits for PR #20 (cave 5 stages): on current
-// main the cave still has 1 stage, so the field gate (6 stages) witnesses the same path
-// here, and the cave assertion lands when main is merged after #20.
 // Uses the shipped all-done M3D3 code from stage-migration.spec.ts.
 import { type Page, test } from '@playwright/test';
 import { expect, SLOW_TEST_MS, waitForStoreBoot } from './legacy-live-save-fixtures';
@@ -45,14 +42,22 @@ test('importing a shipped M3D3 code migrates every level to stage 1 done', async
     expect(level?.stageStars, `${levelId} stage 1 inherits its stars`).toEqual([2]);
     expect(level?.completedAt, `${levelId} completedAt`).toBeGreaterThan(0);
   }
-  // The quest card shows the closing card, with the daily line (unlocked, not done today).
+  // The quest card shows the closing card, with the cave's next stage on its sub-line
+  // (stage 1 done with 2 stars, stages 2+ open) and the daily line (unlocked, not done).
   await expect(page.locator('#quest-title')).toHaveText('Bạn đã qua cả chín thử thách!');
+  await expect(page.locator('#quest-stage')).toHaveText('Chặng 2/5 · 2/15 sao');
   await expect(page.locator('#quest-daily')).toHaveText('Hôm nay: chưa luyện');
   // The field gate offers stage 2 (its stage 1 is done, stages 2+ open at 0).
   await page.locator('#open-map').click();
   await page.locator('[data-region="meadow"]').click();
   await expect(page.locator('#map-detail .map-gate')).toHaveText(
     'Cổng màn chơi: Đã hoàn thành ★★☆ · Chặng 2/6',
+  );
+  await expect(page.locator('#map-detail .map-enter')).toHaveText('Vào chơi');
+  // So does the cave gate (5 stages since PR #20).
+  await page.locator('[data-region="cave"]').click();
+  await expect(page.locator('#map-detail .map-gate')).toHaveText(
+    'Cổng màn chơi: Đã hoàn thành ★★☆ · Chặng 2/5',
   );
   await expect(page.locator('#map-detail .map-enter')).toHaveText('Vào chơi');
   await page.locator('#close-map').click();
@@ -70,7 +75,7 @@ test('a fresh profile sees field stage 1 open and daily locked', async ({ page }
   await play(page);
   await page.evaluate(() => window.__game?.seedProgress({ bridgeComplete: true }));
   expect(await page.evaluate(() => window.__game?.gateStatus('field'))).toBe('open');
-  await expect(page.locator('#quest-stage')).toHaveText('Chặng 1/6 · 0 sao');
+  await expect(page.locator('#quest-stage')).toHaveText('Chặng 1/6 · 0/18 sao');
   await expect(page.locator('#quest-daily')).toHaveCount(0);
   await page.locator('#open-daily').click();
   await expect(page.locator('#dialog-content')).toContainText(

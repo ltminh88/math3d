@@ -14,12 +14,12 @@ import { buildExpansionWorld } from '../../world/expansion-world-builder';
 import type { WorldBuildContext } from '../../world/world-build-context';
 import type { WorldPublicApi } from '../../world/world-public-api';
 import { buildLevelGate, type LevelGateView } from './level-gate-builder';
-import { LevelHost } from './level-host';
+import { type EnterOutcome, LevelHost } from './level-host';
 import { createLevelHostPorts } from './level-host-ports';
 import { gateNameOf, tl } from './level-host-strings';
 import { type GateStatus, gateStatus, progressionState } from './level-progression';
 import { levelDefinition } from './level-registry';
-import { requestStage } from './level-stage-override';
+import { clearRequestedStage, requestStage } from './level-stage-override';
 import { nextStage, stagesCompleted } from './level-stages';
 import './level-host.css';
 
@@ -102,17 +102,18 @@ function interactLabel(gate: LevelGate): string {
 /** A level is loading or running: world keys, map and settings stay out of its way. */
 export const isLevelRunning = (): boolean => host?.running ?? false;
 
-async function enterGate(gate: LevelGate): Promise<void> {
+async function enterGate(gate: LevelGate): Promise<EnterOutcome> {
   const definition = levelDefinition(gate.levelId);
   if (!definition || !host || !connectedStore()) {
     showToast(tl('loadFailed'));
-    return;
+    return 'failed';
   }
   gameState.audio.unlock();
   const outcome = await host.enter(definition);
   // A tab older than the last deploy: reload onto the new build (progress is already saved).
   if (outcome === 'stale' && reloadForNewBuild()) showToast(tl('reloadingNewBuild'));
   else if (outcome === 'stale' || outcome === 'failed') showToast(tl('loadFailed'));
+  return outcome;
 }
 
 /**
@@ -130,8 +131,10 @@ export async function enterLevelFromMap(levelId: string, stage?: number): Promis
     showToast(tl('loadFailed'));
     return;
   }
-  if (stage !== undefined) requestStage(stage);
-  await enterGate(gate);
+  if (stage !== undefined) requestStage(levelId, stage);
+  const outcome = await enterGate(gate);
+  // A run that never started must not leave a stale stage armed for a later entry.
+  if (outcome !== 'entered') clearRequestedStage();
 }
 
 function lockedToast(gate: LevelGate): string {

@@ -21,7 +21,7 @@ export function renderStageLine(stage: QuestStage): void {
         result === 'all-done'
           ? tq('stageAllDone')
           : result
-            ? tq('stageLine', { n: result.n, m: result.m, stars: result.stars })
+            ? tq('stageLine', { n: result.n, m: result.m, stars: result.stars, max: result.max })
             : null;
     }
   }

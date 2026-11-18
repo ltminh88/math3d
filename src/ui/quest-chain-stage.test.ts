@@ -53,16 +53,16 @@ describe('quest stage line', () => {
   });
 
   it('starts a fresh level at stage 1 with 0 stars', () => {
-    expect(questStageLine(6, [])).toEqual({ n: 1, m: 6, stars: 0 });
+    expect(questStageLine(6, [])).toEqual({ n: 1, m: 6, stars: 0, max: 18 });
   });
 
   it('names the next stage and the stars earned so far', () => {
-    expect(questStageLine(6, [2])).toEqual({ n: 2, m: 6, stars: 2 });
-    expect(questStageLine(6, [2, 3])).toEqual({ n: 3, m: 6, stars: 5 });
+    expect(questStageLine(6, [2])).toEqual({ n: 2, m: 6, stars: 2, max: 18 });
+    expect(questStageLine(6, [2, 3])).toEqual({ n: 3, m: 6, stars: 5, max: 18 });
   });
 
   it('treats a missing stage entry as 0 stars', () => {
-    expect(questStageLine(5, [2, 1])).toEqual({ n: 3, m: 5, stars: 3 });
+    expect(questStageLine(5, [2, 1])).toEqual({ n: 3, m: 5, stars: 3, max: 15 });
   });
 
   it('reports all-done once every stage has a star', () => {

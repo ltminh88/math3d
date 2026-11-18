@@ -49,10 +49,11 @@ function openLevelRun(
   const sessionNo = store.nextSessionNo();
   const stats = () => store.getSnapshot().factStats;
   const progress = store.getSnapshot().levelProgress[definition.id];
-  // A replay picked in the map panel wins for this one run; otherwise the next uncompleted
-  // stage (all done → the last stage, so a finished level can still be entered from its gate).
+  // A replay picked in the map panel wins for this one run of THIS level; otherwise the
+  // next uncompleted stage (all done → the last stage, so a finished level can still be
+  // entered from its gate). A request for another level is dropped, not kept.
   const stage =
-    takeRequestedStage(definition.stages) ??
+    takeRequestedStage(definition.id, definition.stages) ??
     nextStage({
       stages: definition.stages,
       stageStars: progress?.stageStars ?? [],

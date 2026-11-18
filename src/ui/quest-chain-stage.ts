@@ -57,6 +57,8 @@ export interface QuestStageLine {
   readonly m: number;
   /** Stars earned across the level's stages so far. */
   readonly stars: number;
+  /** Most stars the level can hold (3 per stage). */
+  readonly max: number;
 }
 
 /**
@@ -64,8 +66,10 @@ export interface QuestStageLine {
  * array (stage 1 === the level's stars); a missing entry is 0.
  * - One-stage level: null (nothing extra, like the gate label).
  * - Every stage done: 'all-done' → "Đã qua hết các chặng!".
- * - Else the next stage plus the level's stars so far (a fresh level reads "Chặng 1/m · 0 sao",
- *   the same "Chặng 1/m" the open gate's label already shows).
+ * - Else the next stage plus the level's stars so far over the level's maximum (a fresh
+ *   level reads "Chặng 1/m · 0/3m sao"). The denominator matters: the celebration card
+ *   already uses "Chặng n/m · {stars} sao" for ONE stage's stars, so a bare total would
+ *   read as one stage's.
  */
 export function questStageLine(
   stages: number,
@@ -76,5 +80,5 @@ export function questStageLine(
   const n = nextStage({ stages, stageStars });
   let stars = 0;
   for (let i = 0; i < stages; i++) stars += stageStars[i] ?? 0;
-  return { n, m: stages, stars };
+  return { n, m: stages, stars, max: stages * 3 };
 }

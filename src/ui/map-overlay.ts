@@ -13,6 +13,7 @@ import {
 } from '../levels/shared/level-gates';
 import { tl } from '../levels/shared/level-host-strings';
 import { levelDefinition } from '../levels/shared/level-registry';
+import { clearRequestedStage } from '../levels/shared/level-stage-override';
 import { stagesCompleted } from '../levels/shared/level-stages';
 import { areaAtMapPoint } from '../map/map-area-hit-test';
 import { drawMap, type MapDrawState } from '../map/map-render';
@@ -161,6 +162,9 @@ export function closeMap(): void {
   if (!gameState.mapOpen) return;
   gameState.mapOpen = false;
   byId('world-map').hidden = true;
+  // A replay request that never started a run dies here: closing the map without playing
+  // must not leave a stage armed for a later entry.
+  clearRequestedStage();
   const world = getWorld();
   world.paused = false;
   world.clearInput();

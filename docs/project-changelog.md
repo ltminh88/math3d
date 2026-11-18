@@ -3,7 +3,7 @@
 ## 2026-11-18 — Phase 13: quest card stages, HUD copy, migration, docs
 
 ### Added
-- Quest card stage sub-line ("Chặng n/m · s sao"; "Đã qua hết các chặng!" once every stage of the level is done), from the migrated `stageStars`.
+- Quest card stage sub-line ("Chặng n/m · s/3m sao"; "Đã qua hết các chặng!" once every stage of the level is done), from the migrated `stageStars`. The denominator is there because the celebration card already uses "Chặng n/m · {stars} sao" for one stage's stars.
 - Gate pop-panel in the map detail panel: an unfinished multi-stage level shows its next stage plus "Vào chơi"; a finished level shows "Chơi lại chặng…" with one ≥44 px row per completed stage. Replaying never re-locks anything and never re-pays the first-completion bonus.
 - E2E: `quest-chain-stages.spec.ts` (sub-line, pop-panel, replay) and `save-migration-m3d3-to-m3d4.spec.ts`.
 
