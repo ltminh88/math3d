@@ -142,7 +142,7 @@ test('the field leads to the forest, city and tower gates, then the closing card
   await expect(page.locator('#quest-steps .done')).toHaveCount(2);
 
   await page.evaluate(() => window.__game?.seedProgress({ completedLevels: ['workshop', 'cave'] }));
-  await expectCard(page, 'CHÚC MỪNG BẠN', 'Bạn đã qua cả chín chặng!', '✓ Hoàn thành');
+  await expectCard(page, 'CHÚC MỪNG BẠN', 'Bạn đã qua cả chín thử thách!', '✓ Hoàn thành');
   await expect(page.locator('#quest-copy')).toHaveText(
     'Bạn có thể luyện thêm cùng VLM, hoặc ghé Cửa hàng trong làng để tiêu xu.',
   );
@@ -152,7 +152,7 @@ test('the field leads to the forest, city and tower gates, then the closing card
   // The stage is read back from the store after a reload.
   await page.reload();
   await waitForStoreBoot(page);
-  await expectCard(page, 'CHÚC MỪNG BẠN', 'Bạn đã qua cả chín chặng!', '✓ Hoàn thành');
+  await expectCard(page, 'CHÚC MỪNG BẠN', 'Bạn đã qua cả chín thử thách!', '✓ Hoàn thành');
 });
 
 test('the quest card names the E key only where there is a keyboard-like pointer', async ({
