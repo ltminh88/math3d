@@ -58,7 +58,9 @@ export function refreshHud(): void {
     ),
   );
   renderQuestCard();
-  byId('bridge-count').textContent = `${progress.bridge} / ${BRIDGE_SEGMENTS} đoạn cầu`;
+  byId('bridge-count').textContent = translateLongText(
+    `${progress.bridge} / ${BRIDGE_SEGMENTS} đoạn cầu`,
+  );
   for (const region of LABELED_REGIONS) {
     const label = byId(`${region.id}-label`);
     const unlocked = isRegionUnlocked(region, progress.questComplete);

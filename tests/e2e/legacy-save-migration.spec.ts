@@ -67,8 +67,7 @@ test('language, quest card and mid-quest bridge carry over; progress made later 
     xpText: '30 / 100 XP',
     bridgeBuilt: 3,
     questStepsDone: 3,
-    // Original quirk: the translator matches whole text nodes, so this one stays Vietnamese.
-    questProgress: '3 / 6 đoạn cầu',
+    questProgress: '3 / 6 bridge segments',
     play: /Continue adventure/,
   });
   await expect(page.locator('#language')).toHaveText('VI');
