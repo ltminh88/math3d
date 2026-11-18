@@ -159,7 +159,7 @@ test('the 9-stage chain: each stage opens the next gate, every level loads and e
   await page.evaluate(() => window.__game?.seedProgress({ completedLevels: ['cave'] }));
   expect(await statuses(page)).toEqual(CHAIN.map(() => 'completed'));
   await expect(page.locator('#quest-toggle .eyebrow')).toHaveText('CHÚC MỪNG BẠN');
-  await expect(page.locator('#quest-title')).toHaveText('Bạn đã qua cả chín chặng!');
+  await expect(page.locator('#quest-title')).toHaveText('Bạn đã qua cả chín thử thách!');
   await expect(page.locator('#quest-progress')).toHaveText('✓ Hoàn thành');
   await expect(page.locator('#quest-chapter')).toHaveText('Chương 2 · 4/4');
   await expect(page.locator('#quest-steps .done')).toHaveCount(4);

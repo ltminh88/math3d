@@ -264,7 +264,7 @@ test('the cave: seven chambers of mixed reasoning, then the closing quest card',
   expect(store.completedAt).toBeGreaterThan(0);
   for (const id of skills) expect(store.keys).toContain(`sk:${id}`);
   // Chapter 2 done: the quest card shows its closing card.
-  await expect(page.locator('#quest-title')).toHaveText('Bạn đã qua cả chín chặng!');
+  await expect(page.locator('#quest-title')).toHaveText('Bạn đã qua cả chín thử thách!');
   await shot(page, project, 'closing-card');
   expect(await page.evaluate(() => window.__cave)).toBeUndefined();
   expect(errors).toEqual([]);
