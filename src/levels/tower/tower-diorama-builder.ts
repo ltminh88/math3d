@@ -48,14 +48,19 @@ function scratchContext(scene: Scene): WorldBuildContext {
   };
 }
 
-function buildTowerBody(ctx: WorldBuildContext, root: Object3D): void {
+function buildTowerBody(
+  ctx: WorldBuildContext,
+  root: Object3D,
+  body: number,
+  bodyLight: number,
+): void {
   addBox(ctx, root, 0, -0.1, -2, 40, 0.2, 30, C.ground);
   addCylinder(ctx, root, 0, 0.06, 0, 6.6, 7, 0.12, C.ground, 20);
   addCylinder(ctx, root, 0, 0.2, 0, 4.4, 4.6, 0.2, C.plinth, 14);
   for (let floor = 0; floor < FLOOR_COUNT; floor++) {
     const bottom = floorBottom(floor);
     const radius = floorRadius(floor);
-    const color = floor % 2 === 0 ? C.body : C.bodyLight;
+    const color = floor % 2 === 0 ? body : bodyLight;
     addCylinder(
       ctx,
       root,
@@ -107,12 +112,23 @@ export interface TowerDiorama {
   readonly sun: DirectionalLight;
 }
 
+/** Tower body tint per stage [body, bodyLight]: stage 1 keeps today's purple; later stages deepen toward dusk. Same meshes, same draw calls. */
+const STAGE_BODY: readonly (readonly [number, number])[] = [
+  [0x7773a8, 0x9b92cf],
+  [0x7168a3, 0x9488c6],
+  [0x6a5f9e, 0x8e7dbd],
+  [0x635699, 0x8772b4],
+  [0x5c4d94, 0x8067ab],
+  [0x55448f, 0x795ca2],
+];
+
 /** Builds the tower, sky colour and lights into `scene`. */
-export function buildTowerDiorama(scene: Scene): TowerDiorama {
+export function buildTowerDiorama(scene: Scene, stage = 1): TowerDiorama {
   scene.background = new Color(SKY_HORIZON_COLOR);
   const scratch = new Scene();
   const ctx = scratchContext(scratch);
-  buildTowerBody(ctx, scratch);
+  const [body, bodyLight] = STAGE_BODY[stage - 1] ?? STAGE_BODY[0] ?? [0x7773a8, 0x9b92cf];
+  buildTowerBody(ctx, scratch, body, bodyLight);
   TREES.forEach(([x, z, scale], i) => {
     buildTree(ctx, x, z, scale, i + 1);
   });

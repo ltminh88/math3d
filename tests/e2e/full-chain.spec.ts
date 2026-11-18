@@ -12,7 +12,7 @@ test.use({ locale: 'vi-VN' });
 test.describe.configure({ timeout: SLOW_TEST_MS * 4 });
 
 /** Levels with 6 stages show the stage line on their gate ("Cổng đã mở · Chặng 1/6"). */
-const STAGED_LEVELS = new Set(['field', 'forest', 'city']);
+const STAGED_LEVELS = new Set(['field', 'forest', 'city', 'tower']);
 
 /** Tap on touch projects, click with a mouse. */
 type Press = (target: Locator) => Promise<void>;

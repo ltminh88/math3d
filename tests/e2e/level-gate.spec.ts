@@ -124,7 +124,7 @@ test('the forest opens the city gate, the city the tower gate (no "Sắp ra mắ
 
   await page.evaluate(() => window.__game?.seedProgress({ completedLevels: ['city'] }));
   expect(await gateStatuses(page)).toEqual(['completed', 'completed', 'completed', 'open']);
-  await expect(page.locator('#gate-tower-label small')).toHaveText('Cổng đã mở');
+  await expect(page.locator('#gate-tower-label small')).toHaveText('Cổng đã mở · Chặng 1/6');
   await page.evaluate(() => window.__game?.teleportToGate('tower'));
   await expect(page.locator('#interact')).toContainText('Vào Cổng Tháp Toán Học');
   await expect(page.locator('#interact')).not.toContainText('Sắp ra mắt');
