@@ -13,7 +13,7 @@ import { listenValleyKeys } from './valley-input';
 import { ValleyPanel } from './valley-panel';
 import { ValleyRoundController } from './valley-round-controller';
 import { buildValleyRounds, ValleyRoundFlow } from './valley-round-flow';
-import { type ValleyRoundSpec } from './valley-round-plan';
+import type { ValleyRoundSpec } from './valley-round-plan';
 import { planValleyRun } from './valley-stage-plan';
 import { valleyStrings, valleyText } from './valley-strings';
 import { installValleyTestHook } from './valley-test-hook';
