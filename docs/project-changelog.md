@@ -15,7 +15,7 @@
 - Importing a shipped `M3D3` code keeps every level's stage 1 complete with its old stars; stages 2+ open at 0. The quest card shows the closing card; the gate offers the next stage; daily practice unlocks with a pool drawn from the imported stats. A fresh profile still sees field stage 1 open and daily locked.
 
 ### Testing
-- Unit, golden and e2e numbers to be filled in when the gates run.
+- Unit 942/942 (143 files, incl. the new override and replay cases); typecheck 0; lint 0 errors (9 pre-existing CSS warnings); build 0; golden traces byte-identical. E2E local (one project at a time, `--workers=1`, per the machine rule; mobile-pixel and tablet-landscape left to CI): the 2 new specs 5/5 on desktop-chromium and 5/5 on tablet-portrait; the touched existing specs (quest-chain, level-gate, chapter2-gates-and-regions, stage-migration) 14 passed, 1 skipped on desktop; full-chain 1/1 on desktop after merging main 9e51635 (cave 5 stages).
 
 ## 2026-11-09 — Chapter 2 follow-ups from the author review (tag `chapter2`)
 
