@@ -15,7 +15,7 @@ import { GardenPatternRowView } from './garden-pattern-row-view';
 import { gardenPromptRenderer } from './garden-prompt-render';
 import { GardenRoundController, type GardenViews } from './garden-round-controller';
 import { GardenRoundFlow } from './garden-round-flow';
-import { gardenSkillPool, planGardenRounds } from './garden-round-plan';
+import { planGardenRun } from './garden-round-plan';
 import { GardenSeedBagView } from './garden-seed-bag-view';
 import { gardenStrings } from './garden-strings';
 import { installGardenTestHook } from './garden-test-hook';
@@ -29,7 +29,7 @@ function start(ctx: LevelContext): LevelSession {
   const render = gardenPromptRenderer(gs);
   const scene = new Scene();
   scene.name = 'garden';
-  const { sun } = buildGardenDiorama(scene);
+  const { sun } = buildGardenDiorama(scene, ctx.stage);
   const views: GardenViews = {
     row: new GardenPatternRowView(ctx.reducedMotion),
     balance: new GardenBalanceView(ctx.reducedMotion),
@@ -37,9 +37,7 @@ function start(ctx: LevelContext): LevelSession {
   };
   scene.add(views.row.group, views.balance.group, views.bags.group);
   const view = new GardenCamera();
-  const rounds = ctx.definition.rounds;
-  const planned = ctx.learning.planSession(gardenSkillPool(), rounds);
-  const plan = planGardenRounds(planned, ctx.learning.stats(), ctx.learning.rng, rounds);
+  const plan = planGardenRun(ctx.learning, ctx.definition, ctx.stage);
   const flow = new GardenRoundFlow(plan, () => performance.now());
   const controller: { current?: GardenRoundController } = {};
   const panel = new GardenPanel(ctx.ui, gs, {
@@ -75,7 +73,8 @@ function start(ctx: LevelContext): LevelSession {
       ctx.announce(gs('doneTitle'));
       const bonus = ctx.firstCompletion ? LEVEL_COMPLETE_BONUS : null;
       const exit = () => ctx.exit({ completed: true });
-      doneCard = showGardenCelebration(ctx.ui, gs, earned, stars, exit, bonus);
+      const stageLine = gs('stageLine', { n: ctx.stage, m: ctx.definition.stages, stars });
+      doneCard = showGardenCelebration(ctx.ui, gs, earned, stars, exit, bonus, stageLine);
       frame();
     },
   });

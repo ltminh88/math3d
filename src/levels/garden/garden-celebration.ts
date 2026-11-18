@@ -12,6 +12,8 @@ export function showGardenCelebration(
   onBack: () => void,
   /** First clear: the one-time bonus the host adds on commit, else null. */
   bonus: { xp: number; coins: number } | null = null,
+  /** The stage just played ("Chặng {n}/5 · {sao} sao"), else null. */
+  stageLine: string | null = null,
 ): HTMLElement {
   const card = document.createElement('section');
   card.className = 'garden-done glass';
@@ -26,6 +28,12 @@ export function showGardenCelebration(
   starRow.textContent = '★'.repeat(stars) + '☆'.repeat(3 - stars);
   starRow.setAttribute('aria-label', gs('stars', { n: stars }));
   starRow.dataset.stars = String(stars);
+  if (stageLine) {
+    const line = document.createElement('p');
+    line.className = 'garden-stage-line';
+    line.textContent = stageLine;
+    starRow.after(line);
+  }
   (card.querySelector('.garden-done__line strong') as HTMLElement).textContent =
     `${tc('guideName')}:`;
   (card.querySelector('.garden-done__line span') as HTMLElement).textContent = gs('doneLine');
