@@ -52,7 +52,8 @@ export const REQUIRED_FORMATS: readonly CaveFormat[] = [
   'geo-meas',
 ];
 /** Top-up chambers keep a format to at most two, so the rotation always fits. */
-const MAX_PER_FORMAT = 2;
+/** At most two chambers of one format in a run (the stage plan reuses the same cap). */
+export const MAX_PER_FORMAT = 2;
 
 export interface CaveChamber {
   readonly skillId: string;

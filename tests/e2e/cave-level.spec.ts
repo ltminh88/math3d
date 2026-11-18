@@ -44,6 +44,45 @@ async function enterCave(page: Page, tap: boolean): Promise<void> {
   await expect(page.locator('.level-layer')).toHaveAttribute('data-draw-calls', /\d+/);
 }
 
+/** A profile with stage 1 done (and attempts for the stage-2 pool), ready to play stage 2. */
+async function startWithStages(page: Page, stageStars: number[]): Promise<void> {
+  await page.goto('/');
+  await waitForStoreBoot(page);
+  await page.waitForFunction(() => '__game' in window);
+  await page.locator('#play').click();
+  await expect(page.locator('body')).toHaveClass(/playing/);
+  await page.evaluate(
+    (done) => window.__game?.seedProgress({ bridgeComplete: true, completedLevels: done }),
+    BEFORE_CAVE,
+  );
+  // Attempts for the stage-2 pool: word problems attempted, plus one of each other kind, so
+  // the emphasis plans from real attempts and never invents an unseen skill.
+  await page.evaluate(() =>
+    window.__game?.seedFactStats({
+      'sk:wp-times-then-add': { attempts: 2, box: 2 },
+      'sk:wp-divide-then-add': { attempts: 2, box: 1 },
+      'sk:wp-more-less-then-total': { attempts: 1, box: 1 },
+      'sk:div-rem-floor': { attempts: 2, box: 2 },
+      'sk:choose-all-correct': { attempts: 1, box: 1 },
+      'sk:tf-explain': { attempts: 2, box: 1 },
+      'sk:expr-order': { attempts: 1, box: 1 },
+      'sk:meas-wp-fence': { attempts: 1, box: 1 },
+      'sk:geo-radius-diameter': { attempts: 1, box: 2 },
+    }),
+  );
+  await page.evaluate((stars) => window.__game?.seedStageProgress('cave', stars), stageStars);
+}
+
+async function enterCaveStage(page: Page, tap: boolean): Promise<void> {
+  await page.evaluate(() => window.__game?.teleportToGate('cave'));
+  const interact = page.locator('#interact');
+  await expect(interact).toContainText('Vào Cổng Hang Đố Vui');
+  if (tap) await interact.tap();
+  else await interact.click();
+  await expect(page.locator('.cave-panel')).toBeVisible();
+  await expect(page.locator('.level-layer')).toHaveAttribute('data-draw-calls', /\d+/);
+}
+
 /** One answer to the current step, by taps or by keys. `right` false gives a wrong one. */
 async function give(page: Page, e: Expected, right: boolean, tap: boolean): Promise<void> {
   const card = page.locator('.cave-card');
@@ -144,6 +183,19 @@ async function playChamber(page: Page, index: number, tap: boolean, project: str
   await expect(page.locator('.cave-panel .feedback')).toContainText('Đúng rồi!');
 }
 
+/** Play one chamber answering every step correctly (no misses, no hints). */
+async function playChamberCorrect(page: Page, tap: boolean): Promise<void> {
+  let s = await caveState(page);
+  let guard = 0;
+  while (s.expected !== null && guard < 12) {
+    await give(page, s.expected, true, tap);
+    s = await caveState(page);
+    guard += 1;
+  }
+  expect(s.expected).toBeNull();
+  await expect(page.locator('.cave-panel .feedback')).toContainText('Đúng rồi!');
+}
+
 test('the cave: seven chambers of mixed reasoning, then the closing quest card', async ({
   page,
 }, info) => {
@@ -215,5 +267,73 @@ test('the cave: seven chambers of mixed reasoning, then the closing quest card',
   await expect(page.locator('#quest-title')).toHaveText('Bạn đã qua cả chín thử thách!');
   await shot(page, project, 'closing-card');
   expect(await page.evaluate(() => window.__cave)).toBeUndefined();
+  expect(errors).toEqual([]);
+});
+
+test('stage 2 plays word-problem chambers and ends with the stage celebration, not the closing card', async ({
+  page,
+}, info) => {
+  const tap = !!info.project.use.hasTouch;
+  const errors: string[] = [];
+  page.on('pageerror', (e) => errors.push(String(e)));
+  await startWithStages(page, [2]);
+  await expect(page.locator('#gate-cave-label small')).toHaveText('Đã hoàn thành ★★☆ · Chặng 2/5');
+  await enterCaveStage(page, tap);
+  expect(await page.evaluate(() => window.__game?.levelRunning())).toBe(true);
+
+  const formats = (await page.evaluate(() => window.__cave?.formats())) ?? [];
+  const skills = (await page.evaluate(() => window.__cave?.skills())) ?? [];
+  expect(formats).toHaveLength(CHAMBERS);
+  // Stage 2 drills two-step word problems: two word chambers, from attempted skills only.
+  expect(formats.filter((f) => f === 'word')).toHaveLength(2);
+  for (let i = 1; i < formats.length; i++) expect(formats[i]).not.toBe(formats[i - 1]);
+  const attempted = [
+    'wp-times-then-add',
+    'wp-divide-then-add',
+    'wp-more-less-then-total',
+    'div-rem-floor',
+    'choose-all-correct',
+    'tf-explain',
+    'expr-order',
+    'meas-wp-fence',
+    'geo-radius-diameter',
+  ];
+  for (const id of skills) expect(attempted).toContain(id);
+
+  for (let i = 0; i < CHAMBERS; i++) {
+    await playChamberCorrect(page, tap);
+    await expect(page.locator('.cave-next')).toBeFocused();
+    const s = await caveState(page);
+    expect(s.litCrystals).toBe(i + 1);
+    if (tap) await page.locator('.cave-next').tap();
+    else await page.keyboard.press('Enter');
+  }
+  const done = page.locator('.cave-done');
+  await expect(done).toBeVisible();
+  await expect(done.locator('.cave-stage-line')).toHaveText(/Chặng 2\/5 · \d sao/);
+  // Later stages pay no first-clear bonus, and the chain-closing line is stage 1 only.
+  await expect(done.locator('.cave-bonus')).toHaveCount(0);
+  await expect(done).not.toContainText('Bạn đã đi hết chương 2, giỏi quá!');
+  const maxCalls = Number(await page.locator('.level-layer').getAttribute('data-max-draw-calls'));
+  expect(maxCalls).toBeGreaterThan(0);
+  expect(maxCalls).toBeLessThanOrEqual(DRAW_CALL_BUDGET);
+
+  const back = page.locator('.cave-back');
+  if (tap) await back.tap();
+  else {
+    await expect(back).toBeFocused();
+    await page.keyboard.press('Enter');
+  }
+  await expect.poll(() => page.evaluate(() => window.__game?.levelRunning())).toBe(false);
+  // The commit runs in the background after the level closes: poll the store until it lands.
+  await expect
+    .poll(() => page.evaluate(() => window.__game?.snapshot()?.levelProgress.cave?.stageStars))
+    .toEqual([2, expect.any(Number)]);
+  const cave = await page.evaluate(() => window.__game?.snapshot()?.levelProgress.cave);
+  expect(cave?.stageStars?.[0]).toBe(2);
+  expect(cave?.stageStars?.[1]).toBeGreaterThanOrEqual(1);
+  // A stage-2 run never overwrites stage 1's stars (the level's `stars` stay 2).
+  expect(cave?.stars).toBe(2);
+  await expect(page.locator('#gate-cave-label small')).toHaveText(/Chặng 3\/5/);
   expect(errors).toEqual([]);
 });

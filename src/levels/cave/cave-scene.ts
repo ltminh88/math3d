@@ -6,14 +6,14 @@ import { LEVEL_COMPLETE_BONUS } from '../shared/level-run-result';
 import type { LevelContext, LevelModule, LevelSession } from '../shared/level-types';
 import { showCaveCelebration } from './cave-celebration';
 import { CaveChamberCamera } from './cave-chamber-camera';
-import { buildCaveChambers, caveSkillPool, planCaveSkills } from './cave-chamber-formats';
 import { CaveCrystalView } from './cave-crystal-view';
 import { buildCaveDiorama } from './cave-diorama-builder';
 import { listenCaveKeys } from './cave-input';
-import { CHAMBER_COUNT, TREASURE_INDEX } from './cave-layout';
+import { TREASURE_INDEX } from './cave-layout';
 import { CavePanel } from './cave-panel';
 import { CaveRoundController } from './cave-round-controller';
 import { CaveRoundFlow } from './cave-round-flow';
+import { planCaveRun } from './cave-stage-plan';
 import { caveStrings } from './cave-strings';
 import { installCaveTestHook } from './cave-test-hook';
 import './cave-level.css';
@@ -26,15 +26,10 @@ function start(ctx: LevelContext): LevelSession {
   const scene = new Scene();
   scene.name = 'cave';
   buildCaveDiorama(scene);
-  const crystals = new CaveCrystalView(scene, ctx.reducedMotion);
+  const crystals = new CaveCrystalView(scene, ctx.reducedMotion, ctx.stage);
   const walk = new CaveChamberCamera(ctx.reducedMotion);
-  const stats = ctx.learning.stats();
-  const rounds = Math.min(ctx.definition.rounds, CHAMBER_COUNT);
-  const planned = ctx.learning.planSession(caveSkillPool(), rounds);
-  const ids = planCaveSkills(planned, stats, ctx.learning.rng, rounds);
-  const flow = new CaveRoundFlow(buildCaveChambers(ids, stats, ctx.learning.rng), () =>
-    performance.now(),
-  );
+  const run = planCaveRun(ctx.learning, ctx.definition, ctx.stage);
+  const flow = new CaveRoundFlow(run.chambers, () => performance.now());
   const controller: { current?: CaveRoundController } = {};
   const panel = new CavePanel(ctx.ui, cs, {
     onHint: () => controller.current?.hint(),
@@ -70,7 +65,8 @@ function start(ctx: LevelContext): LevelSession {
       ctx.announce(cs('doneTitle'));
       const bonus = ctx.firstCompletion ? LEVEL_COMPLETE_BONUS : null;
       const exit = () => ctx.exit({ completed: true });
-      showCaveCelebration(ctx.ui, cs, earned, stars, exit, bonus);
+      const stageLine = cs('stageLine', { n: ctx.stage, m: ctx.definition.stages, stars });
+      showCaveCelebration(ctx.ui, cs, earned, stars, exit, bonus, stageLine, ctx.stage === 1);
       frame();
     },
   });
