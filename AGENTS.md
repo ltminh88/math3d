@@ -59,5 +59,8 @@ Two Muse accounts (muse-88 and muse-min work on this repo at the same time):
 - Usage quota: report the account's weekly usage ("N% used, resets <day time>") in the
   first report of each day, whenever it crosses 50%, 75% or 90%, and before taking a new
   lane. If you cannot read the number, say so; do not guess.
-- Below 15% left: take no new lane. Finish the running lane, or push the branch and leave
-  a handoff note on #11 (what is done, what is left, the next command to run).
+- Keep working until the account reaches 99% used. From 90% used, push the branch after
+  every commit and keep a handoff note on #11 current (what is done, what is left, the next
+  command to run). At 99%, stop, push, and hand the lane to the other account through #11;
+  the other account continues on the same branch.
+- Never use paid "additional tokens" unless the author says so.
