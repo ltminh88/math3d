@@ -27,6 +27,8 @@ import {
 const UP = new Vector3(0, 1, 0);
 /** Seconds the chest lid takes to open. */
 const LID_SECONDS = 0.8;
+/** Lit-crystal colour per stage (stage 1 keeps today's icy blue). */
+const STAGE_CRYSTAL: readonly number[] = [0x8fe8ff, 0x9dffb0, 0xffd064, 0xff9ecf, 0xc9a7ff];
 
 export class CaveCrystalView {
   private readonly crystals: InstancedMesh;
@@ -34,6 +36,7 @@ export class CaveCrystalView {
   private readonly lid: Mesh;
   private readonly lidMaterial: MeshStandardMaterial;
   private readonly lit: boolean[] = Array(CHAMBER_COUNT).fill(false);
+  private readonly litColour: number;
   private open = 0;
   private opening = false;
   private readonly m = new Matrix4();
@@ -44,7 +47,9 @@ export class CaveCrystalView {
   constructor(
     scene: Scene,
     private readonly reducedMotion: boolean,
+    stage = 1,
   ) {
+    this.litColour = STAGE_CRYSTAL[stage - 1] ?? CAVE_COLORS.crystalLit;
     this.crystals = new InstancedMesh(
       new OctahedronGeometry(0.5),
       new MeshBasicMaterial(),
@@ -85,7 +90,7 @@ export class CaveCrystalView {
   light(i: number): void {
     if (i < 0 || i >= CHAMBER_COUNT || this.lit[i]) return;
     this.lit[i] = true;
-    this.crystals.setColorAt(i, new Color(CAVE_COLORS.crystalLit));
+    this.crystals.setColorAt(i, new Color(this.litColour));
     if (this.crystals.instanceColor) this.crystals.instanceColor.needsUpdate = true;
   }
 

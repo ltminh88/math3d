@@ -12,6 +12,10 @@ export function showCaveCelebration(
   onBack: () => void,
   /** First clear: the one-time bonus the host adds on commit, else null. */
   bonus: { xp: number; coins: number } | null = null,
+  /** The stage just played ("Chặng {n}/5 · {sao} sao"), else null. */
+  stageLine: string | null = null,
+  /** Stage 1 only: the chain-closing line; later stages end with the stage celebration. */
+  closing = true,
 ): HTMLElement {
   const card = document.createElement('section');
   card.className = 'cave-done glass';
@@ -26,6 +30,13 @@ export function showCaveCelebration(
   starRow.textContent = '★'.repeat(stars) + '☆'.repeat(3 - stars);
   starRow.setAttribute('aria-label', cs('stars', { n: stars }));
   starRow.dataset.stars = String(stars);
+  if (stageLine) {
+    const line = document.createElement('p');
+    line.className = 'cave-stage-line';
+    line.textContent = stageLine;
+    starRow.after(line);
+  }
+  if (!closing) card.querySelector('.cave-done__line')?.remove();
   (card.querySelector('.cave-done__line strong') as HTMLElement).textContent =
     `${tc('guideName')}:`;
   (card.querySelector('.cave-done__line span') as HTMLElement).textContent = cs('doneLine');
