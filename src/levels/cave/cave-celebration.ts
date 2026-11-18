@@ -36,10 +36,13 @@ export function showCaveCelebration(
     line.textContent = stageLine;
     starRow.after(line);
   }
-  if (!closing) card.querySelector('.cave-done__line')?.remove();
-  (card.querySelector('.cave-done__line strong') as HTMLElement).textContent =
-    `${tc('guideName')}:`;
-  (card.querySelector('.cave-done__line span') as HTMLElement).textContent = cs('doneLine');
+  if (closing) {
+    (card.querySelector('.cave-done__line strong') as HTMLElement).textContent =
+      `${tc('guideName')}:`;
+    (card.querySelector('.cave-done__line span') as HTMLElement).textContent = cs('doneLine');
+  } else {
+    card.querySelector('.cave-done__line')?.remove();
+  }
   (card.querySelector('.completion-rewards') as HTMLElement).textContent = cs('doneScore', earned);
   if (bonus) {
     const line = document.createElement('p');
