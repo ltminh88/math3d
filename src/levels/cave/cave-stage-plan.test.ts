@@ -16,8 +16,8 @@ import {
   planCaveSkills,
   REQUIRED_FORMATS,
 } from './cave-chamber-formats';
-import cave from './index';
 import { CAVE_STAGE_TARGETS, planCaveRun, planCaveStageSkills, stagePool } from './cave-stage-plan';
+import cave from './index';
 
 const PLANNED = [
   'sk:wp-times-then-add',
@@ -60,7 +60,15 @@ const richStats = (): Record<string, FactStat> => {
   const stats: Record<string, FactStat> = {};
   for (const id of CAVE_SKILLS) {
     const format = caveFormatOf(id);
-    stats[`sk:${id}`] = stat(format === 'word' ? 1 : format === 'expression' ? 4 : format === 'choose-all' || format === 'tf-explain' ? 3 : 2);
+    stats[`sk:${id}`] = stat(
+      format === 'word'
+        ? 1
+        : format === 'expression'
+          ? 4
+          : format === 'choose-all' || format === 'tf-explain'
+            ? 3
+            : 2,
+    );
   }
   return stats;
 };
