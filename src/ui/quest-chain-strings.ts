@@ -13,7 +13,7 @@ export const tq = defineStrings('questChain', {
     titleValley: 'Thung Lũng Hình Học',
     titleWorkshop: 'Xưởng Đo Đạc',
     titleCave: 'Hang Đố Vui',
-    titleDone: 'Bạn đã qua cả chín chặng!',
+    titleDone: 'Bạn đã qua cả chín thử thách!',
     copyField:
       'Đi theo con đường bên kia cầu tới cánh đồng lúa vàng. Tìm cổng có dấu ✨ {gate}, {enter}',
     copyForest:
@@ -92,7 +92,7 @@ export const tq = defineStrings('questChain', {
     titleValley: 'Geometry Valley',
     titleWorkshop: 'Measuring Workshop',
     titleCave: 'Puzzle Cave',
-    titleDone: 'You finished all nine stages!',
+    titleDone: 'You finished all nine challenges!',
     copyField:
       'Follow the road across the bridge to the golden meadow. Find the ✨ {gate}, {enter}',
     copyForest:
