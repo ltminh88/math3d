@@ -12,7 +12,14 @@ test.use({ locale: 'vi-VN' });
 test.describe.configure({ timeout: SLOW_TEST_MS * 4 });
 
 /** Levels with stages show the stage line on their gate ("Cổng đã mở · Chặng 1/N"). */
-const STAGE_TOTAL: Record<string, number> = { field: 6, forest: 6, city: 6, tower: 6, valley: 5 };
+const STAGE_TOTAL: Record<string, number> = {
+  field: 6,
+  forest: 6,
+  city: 6,
+  tower: 6,
+  valley: 5,
+  workshop: 5,
+};
 
 /** "Cổng đã mở" plus the stage line for a staged level, else "Cổng đã mở". */
 const gateLine = (levelId: string): string =>
