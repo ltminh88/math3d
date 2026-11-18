@@ -45,6 +45,10 @@ Two Muse accounts (muse-88 and muse-min work on this repo at the same time):
 - The coordination board is the pinned issue #11 ("Bảng luồng Muse"). Read it, `AGENTS.md`
   and `git log --oneline -15 origin/main` before every task. Update your own rows on the
   board whenever a lane starts, opens a PR, goes red or green, or merges.
+- Editing the board body: fetch it fresh, change only your own rows, and save it in the same
+  command (`gh issue view 11 --json body --jq .body > f && <edit f> && gh issue edit 11
+  --body-file f`). Never save a copy fetched earlier: that wipes the other account's rows.
+  After saving, read it back and check the other account's rows are still there.
 - Take only lanes the board assigns to you. Branch prefix: muse-88 uses `muse/`, muse-min
   uses `muse-min/`. Each account has its own GitHub and Vercel tokens; never share them.
 - Shared files have one owner, listed on the board. To change a file someone else owns,
