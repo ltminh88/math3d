@@ -199,6 +199,42 @@ async function playRound(page: Page, index: number, touch: boolean, project: str
   expect((await state(page)).gardenStones).toBe(index + 1);
 }
 
+/**
+ * A round of any stage plan: the action, then the card steps until the round ends. `onStep`
+ * runs on each live step before it is answered (the stage tests use it to watch for a
+ * multi-select step). No plan is assumed: the round's skill comes from the stage plan.
+ */
+async function playStageRound(
+  page: Page,
+  index: number,
+  touch: boolean,
+  onStep?: (s: ValleyState) => Promise<void>,
+): Promise<void> {
+  await expect(page.locator(`.valley-panel[data-round="${index}"]`)).toBeVisible();
+  let s = await state(page);
+  // Flat figures are judged top-down (solids keep their 3/4 view).
+  if (s.kind !== 'solids') await expectTrueAngles(page);
+  if (s.phase === 'action') {
+    const corner = s.corners.find((c) => !c.fits) ?? s.corners[0];
+    const target = s.action === 'set-square' && corner ? corner.id : (s.rightTargets[0] as string);
+    await tapTarget(page, target, touch);
+    s = await state(page);
+    if (s.action === 'set-square') expect(s.eke).toBe(target);
+    expect(s.phase).toBe('steps');
+  }
+  while (s.phase === 'steps') {
+    await onStep?.(s);
+    await answerStep(page, s, touch);
+    await expect
+      .poll(async () => JSON.stringify((await state(page)).step))
+      .not.toBe(JSON.stringify(s.step));
+    s = await state(page);
+  }
+  await expect(page.locator('.valley-panel .feedback')).toContainText('Đúng rồi!');
+  await expect(page.locator('.valley-next')).toBeFocused();
+  expect((await state(page)).gardenStones).toBe(index + 1);
+}
+
 test('the valley plays six geometry rounds by taps or keys and records sk:geo-* skills', async ({
   page,
 }, info) => {
@@ -286,5 +322,89 @@ test('the valley plays six geometry rounds by taps or keys and records sk:geo-* 
   for (const { skillId } of PLAN) expect(keys).toContain(`sk:${skillId}`);
   await expect(page.locator('#quest-title')).toHaveText('Xưởng Đo Đạc');
   expect(await page.evaluate(() => window.__valley)).toBeUndefined();
+  expect(errors).toEqual([]);
+});
+
+// Stage 4 (phase 08): seed stages 1-3 done, enter stage 4 with no forced plan, so the stage
+// plan decides the rounds. Every round drills the S4 subset (classify/count), the classify
+// rounds are choose-all (multi-select) by the tier floor, and only stage 4's stars are added.
+test('stage 4 plays choose-all rounds by tap and records only its own stage stars', async ({
+  page,
+}, info) => {
+  const touch = info.project.use.hasTouch === true;
+  const errors: string[] = [];
+  page.on('pageerror', (e) => errors.push(String(e)));
+  await page.goto('/');
+  await waitForStoreBoot(page);
+  await page.waitForFunction(() => '__game' in window);
+  await page.locator('#play').click();
+  await expect(page.locator('body')).toHaveClass(/playing/);
+  await page.evaluate(() =>
+    window.__game?.seedProgress({
+      bridgeComplete: true,
+      completedLevels: ['field', 'forest', 'city', 'tower', 'garden'],
+    }),
+  );
+  await page.evaluate(() => window.__game?.seedStageProgress('valley', [3, 3, 3]));
+  await expect(page.locator('#gate-valley-label small')).toHaveText(
+    'Đã hoàn thành ★★★ · Chặng 4/5',
+  );
+  await page.evaluate(() => window.__game?.teleportToGate('valley'));
+  const interact = page.locator('#interact');
+  await expect(interact).toContainText('Vào Cổng Thung Lũng Hình Học');
+  await press(interact, touch);
+  await expect(page.locator('.valley-panel')).toBeVisible();
+  await expect(page.locator('.level-layer')).toHaveAttribute('data-draw-calls', /\d+/);
+
+  let multiSeen = false;
+  let checked44 = false;
+  for (let i = 0; i < 6; i++) {
+    const s = await state(page);
+    expect(['geo-shape-classify', 'geo-shape-count']).toContain(s.skillId);
+    await playStageRound(page, i, touch, async (step) => {
+      if (step.step?.kind !== 'multi') return;
+      multiSeen = true;
+      if (touch && !checked44) {
+        // The multi-select toggles a child taps are at least 44 × 44 px.
+        const small = await page.evaluate(() =>
+          [...document.querySelectorAll('.level-layer button')]
+            .filter((b) => (b as HTMLElement).offsetParent !== null)
+            .map((b) => ({ r: b.getBoundingClientRect(), t: b.className }))
+            .filter(({ r }) => r.width < 44 || r.height < 44)
+            .map(({ t, r }) => `${t} ${Math.round(r.width)}x${Math.round(r.height)}`),
+        );
+        expect(small).toEqual([]);
+        checked44 = true;
+      }
+    });
+    await press(page.locator('.valley-next'), touch);
+  }
+  expect(multiSeen).toBe(true);
+  const done = page.locator('.valley-done');
+  await expect(done).toBeVisible();
+  await expect(done).toContainText('Chặng 4/5');
+  // Later stages pay no first-clear bonus.
+  await expect(done.locator('.valley-bonus')).toHaveCount(0);
+  const maxCalls = Number(await page.locator('.level-layer').getAttribute('data-max-draw-calls'));
+  expect(maxCalls).toBeGreaterThan(0);
+  expect(maxCalls).toBeLessThanOrEqual(DRAW_CALL_BUDGET);
+  console.log(`valley stage 4 max draw calls (${info.project.name}): ${maxCalls}`);
+
+  const back = page.locator('.valley-back');
+  if (touch) await back.tap();
+  else {
+    await expect(back).toBeFocused();
+    await page.keyboard.press('Enter');
+  }
+  await expect.poll(() => page.evaluate(() => window.__game?.levelRunning())).toBe(false);
+  // The commit runs in the background after the level closes: poll the store until it lands.
+  await expect
+    .poll(() => page.evaluate(() => window.__game?.snapshot()?.levelProgress.valley?.stageStars))
+    .toEqual([3, 3, 3, expect.any(Number)]);
+  const valley = await page.evaluate(() => window.__game?.snapshot()?.levelProgress.valley);
+  expect(valley?.stageStars?.[3]).toBeGreaterThanOrEqual(1);
+  // A stage-4 run never overwrites the earlier stages' stars (the level's `stars` stay 3).
+  expect(valley?.stars).toBe(3);
+  await expect(page.locator('#gate-valley-label small')).toHaveText(/Chặng 5\/5/);
   expect(errors).toEqual([]);
 });
