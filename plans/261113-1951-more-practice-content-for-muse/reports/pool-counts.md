@@ -11,6 +11,16 @@ Phase 02 re-measured with the same method and seed and filled the "after" column
 the tier columns of the Skills table are the phase-01 before numbers, the story
 contexts column is the current (phase-02) list.
 
+## Final numbers (phase 14, main ec63acd)
+
+Re-measured 2026-11-18 on `main` ec63acd with the same command
+(`npx tsx tools/practice/pool-counter.ts --json`, seed 20261113). **Every number is
+identical to the phase-02 "after" column**: all 117 skill × tier distinct counts,
+all 4 fact pools (field 17, forest 36, city 30, tower 116, medians 5.5 / 6.5 / 6 /
+14.5) and all 6 word-problem story-context lists (4 / 4 / 6 / 4 / 4 / 4). Phases
+03–13 added stages (stage plans select skills and tiers) but changed no generator,
+so the tables below are the final numbers — no row was edited for phase 14.
+
 ## Skills
 
 | skill | family | tier 1 | tier 2 | tier 3 | story contexts (wp only) |
