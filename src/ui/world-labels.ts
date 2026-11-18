@@ -66,7 +66,13 @@ export function projectWorldLabels(): void {
     projectLabel(
       byId(`gate-${gate.levelId}-label`),
       new Vector3(gate.position[0], GATE_LABEL_HEIGHT, gate.position[1]),
-      'translate(-50%,-100%)',
+      // The garden gate stands inside the small garden region, so at the opening view its
+      // label lands on the region label (measured overlap 3828 px² on mobile-pixel,
+      // 6732 px² on desktop-chromium, both in English mode). Lift it one label height so
+      // both labels read; the other gates stand clear of their region labels.
+      gate.levelId === 'garden'
+        ? 'translate(-50%,-100%) translateY(-56px)'
+        : 'translate(-50%,-100%)',
       paused,
     );
   }

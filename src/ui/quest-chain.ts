@@ -5,6 +5,7 @@
 // from the same state the level gates read, so the card follows a level commit and a reload.
 import { BRIDGE_SEGMENTS } from '../config/world-constants';
 import { tc } from '../i18n/common-strings';
+import { translateLongText } from '../i18n/legacy-translator';
 import { gateNameOf } from '../levels/shared/level-host-strings';
 import { progressionState } from '../levels/shared/level-progression';
 import { levelDefinition } from '../levels/shared/level-registry';
@@ -48,7 +49,7 @@ function bridgeProgress(): string {
   const progress = gameState.progress;
   if (progress.bridge === BRIDGE_SEGMENTS) return 'Đi qua cầu để hoàn thành';
   return progress.questAccepted
-    ? `${progress.bridge} / ${BRIDGE_SEGMENTS} đoạn cầu`
+    ? translateLongText(`${progress.bridge} / ${BRIDGE_SEGMENTS} đoạn cầu`)
     : 'Gặp người dẫn đường';
 }
 
