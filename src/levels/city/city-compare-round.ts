@@ -8,13 +8,7 @@ import type { ReasoningRoundPlan } from '../shared/reasoning-round-slot';
 import type { CityPanel } from './city-panel';
 import type { CityRoundController } from './city-round-controller';
 import type { CityStrings } from './city-strings';
-
-export interface CityRun {
-  rounds: import('./city-round-flow').CityRound[];
-  reasoning: ReasoningRoundPlan | null;
-  /** Rounds of the run, the reasoning round included. */
-  total: number;
-}
+import type { CityRun } from './city-stage-plan';
 
 /** Shows the parcel puzzle; the city panel gives way and the controller's tally counts it. */
 export function startCityReasoningRound(
