@@ -42,11 +42,17 @@ jobs:
       - run: npm ci
       - run: npx playwright install --with-deps chromium
       - run: npm run test:e2e -- --project=${{ matrix.project }}
+      # On failure keep the evidence: test-results/ holds the per-test trace.zip,
+      # error-context.md and failure screenshots (trace is 'retain-on-failure' in
+      # playwright.config.ts). The old playwright-report upload is gone: the CI
+      # reporter is 'github', so no playwright-report/ dir is ever written and the
+      # step uploaded nothing — verified: 0 artifacts on runs 44275820774 (#20)
+      # and 44290541240 (#22), both with a failed e2e job.
       - uses: actions/upload-artifact@v4
         if: failure()
         with:
-          name: playwright-report-${{ matrix.project }}
-          path: playwright-report
+          name: test-results-${{ matrix.project }}
+          path: test-results
           retention-days: 7
 
   # Visual/behavior parity. Baselines are machine-specific (SwiftShader raster depends on the CPU
