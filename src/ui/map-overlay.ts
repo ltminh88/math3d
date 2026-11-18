@@ -5,8 +5,15 @@ import { expansionRegionText } from '../config/expansion-region-strings';
 import { type AnyRegion, isExpansionRegion } from '../config/expansion-regions';
 import { LEVEL_GATES } from '../config/level-gate-config';
 import { translateDomTree, translateLongText, translateText } from '../i18n/legacy-translator';
-import { currentGateStatus, gateStateText, isLevelRunning } from '../levels/shared/level-gates';
+import {
+  currentGateStatus,
+  enterLevelFromMap,
+  gateStateText,
+  isLevelRunning,
+} from '../levels/shared/level-gates';
 import { tl } from '../levels/shared/level-host-strings';
+import { levelDefinition } from '../levels/shared/level-registry';
+import { stagesCompleted } from '../levels/shared/level-stages';
 import { areaAtMapPoint } from '../map/map-area-hit-test';
 import { drawMap, type MapDrawState } from '../map/map-render';
 import {
@@ -17,6 +24,7 @@ import {
 } from '../map/map-view-transform';
 import { gameState, getWorld } from './game-state';
 import { byId, icon } from './icons';
+import { connectedStore } from './progress-sync';
 
 function mapDrawState(labels: boolean, withSelection = labels): MapDrawState {
   const world = getWorld();
@@ -72,12 +80,31 @@ function regionButtonHtml(region: AnyRegion): string {
   return `<button class="map-region${unlocked ? '' : ' locked'}" data-region="${region.id}" aria-pressed="${gameState.selectedRegionId === region.id}"><span class="map-region-icon" style="--tint:${region.color}">${unlocked ? region.icon : '🔒'}</span><span><strong>${panelText(region, 'name')}</strong><small>${panelText(region, 'subtitle')}</small></span>${gameState.currentRegionId === region.id ? '<em>Bạn ở đây</em>' : ''}</button>`;
 }
 
-/** Region detail line about levels: the gate state for regions with a level gate. */
+/**
+ * Region detail line about levels: the gate state for regions with a level gate, plus the
+ * pop-panel actions. A multi-stage level that is not finished yet shows "Vào chơi" for its
+ * next stage (the state line already names it, "Chặng 2/6"); a level with every stage done
+ * shows "Chơi lại chặng…" with one ≥44px row per stage. One-stage levels and
+ * locked/coming-soon gates show the state line only.
+ */
 function regionLevelHtml(region: AnyRegion): string {
   const gate = LEVEL_GATES.find((g) => g.regionId === region.id);
   if (!gate) return '';
-  const state = gateStateText(gate.levelId, currentGateStatus(gate));
-  return `<p class="map-gate">${tl('mapGate', { state })}</p>`;
+  const status = currentGateStatus(gate);
+  const line = `<p class="map-gate">${tl('mapGate', { state: gateStateText(gate.levelId, status) })}</p>`;
+  const definition = levelDefinition(gate.levelId);
+  if (!definition || definition.stages <= 1 || status === 'locked' || status === 'coming-soon') {
+    return line;
+  }
+  const stageStars = connectedStore()?.getSnapshot().levelProgress[gate.levelId]?.stageStars ?? [];
+  if (stagesCompleted({ stages: definition.stages, stageStars }) >= definition.stages) {
+    const rows = Array.from({ length: definition.stages }, (_, i) => {
+      const n = i + 1;
+      return `<button class="map-replay-stage" data-replay-level="${gate.levelId}" data-replay-stage="${n}">${tl('mapReplayStage', { n, stars: stageStars[i] ?? 0 })}</button>`;
+    }).join('');
+    return `${line}<p class="map-replay-title">${tl('mapReplayTitle')}</p><div class="map-replay-list">${rows}</div>`;
+  }
+  return `${line}<button class="map-enter" data-enter-level="${gate.levelId}">${tl('mapEnter')}</button>`;
 }
 
 function renderMapPanel(): void {
@@ -92,6 +119,24 @@ function renderMapPanel(): void {
     button.onclick = () => {
       gameState.selectedRegionId = button.dataset.region;
       renderMapPanel();
+    };
+  }
+  // Pop-panel actions: close the map first (it pauses the world), then enter the level.
+  for (const button of document.querySelectorAll<HTMLElement>('[data-enter-level]')) {
+    button.onclick = () => {
+      const levelId = button.dataset.enterLevel;
+      if (!levelId) return;
+      closeMap();
+      void enterLevelFromMap(levelId);
+    };
+  }
+  for (const button of document.querySelectorAll<HTMLElement>('[data-replay-stage]')) {
+    button.onclick = () => {
+      const levelId = button.dataset.replayLevel;
+      const stage = Number(button.dataset.replayStage);
+      if (!levelId || !Number.isInteger(stage)) return;
+      closeMap();
+      void enterLevelFromMap(levelId, stage);
     };
   }
 }

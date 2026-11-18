@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest';
 import { progressionState } from '../levels/shared/level-progression';
-import { QUEST_CHAPTERS, questChapter, questStage } from './quest-chain-stage';
+import { QUEST_CHAPTERS, questChapter, questStage, questStageLine } from './quest-chain-stage';
 
 const done = (...ids: string[]) =>
   Object.fromEntries(ids.map((id) => [id, { completedAt: 1_700_000_000_000 }]));
@@ -44,6 +44,29 @@ describe('quest chain stage', () => {
     const allButCave = [...chapter1, 'garden', 'valley', 'workshop'];
     expect(questStage(progressionState(true, done(...allButCave)))).toBe('cave');
     expect(questStage(progressionState(true, done(...allButCave, 'cave')))).toBe('done');
+  });
+});
+
+describe('quest stage line', () => {
+  it('shows nothing for a one-stage level', () => {
+    expect(questStageLine(1, [3])).toBeNull();
+  });
+
+  it('starts a fresh level at stage 1 with 0 stars', () => {
+    expect(questStageLine(6, [])).toEqual({ n: 1, m: 6, stars: 0 });
+  });
+
+  it('names the next stage and the stars earned so far', () => {
+    expect(questStageLine(6, [2])).toEqual({ n: 2, m: 6, stars: 2 });
+    expect(questStageLine(6, [2, 3])).toEqual({ n: 3, m: 6, stars: 5 });
+  });
+
+  it('treats a missing stage entry as 0 stars', () => {
+    expect(questStageLine(5, [2, 1])).toEqual({ n: 3, m: 5, stars: 3 });
+  });
+
+  it('reports all-done once every stage has a star', () => {
+    expect(questStageLine(5, [2, 1, 3, 2, 1])).toBe('all-done');
   });
 });
 

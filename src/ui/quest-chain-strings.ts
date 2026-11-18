@@ -56,6 +56,8 @@ export const tq = defineStrings('questChain', {
     stepWorkshop: 'Xưởng',
     stepCave: 'Hang',
     chapterLabel: 'Chương {n} · {k}/{m}',
+    stageLine: 'Chặng {n}/{m} · {stars} sao',
+    stageAllDone: 'Đã qua hết các chặng!',
     stepDone: 'Chặng {n}: {name}, đã xong',
     stepTodo: 'Chặng {n}: {name}, chưa xong',
     guideField:
@@ -135,6 +137,8 @@ export const tq = defineStrings('questChain', {
     stepWorkshop: 'Workshop',
     stepCave: 'Cave',
     chapterLabel: 'Chapter {n} · {k}/{m}',
+    stageLine: 'Stage {n}/{m} · {stars} stars',
+    stageAllDone: 'All stages done!',
     stepDone: 'Stage {n}: {name}, done',
     stepTodo: 'Stage {n}: {name}, not done yet',
     guideField:

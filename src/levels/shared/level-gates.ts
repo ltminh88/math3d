@@ -19,6 +19,7 @@ import { createLevelHostPorts } from './level-host-ports';
 import { gateNameOf, tl } from './level-host-strings';
 import { type GateStatus, gateStatus, progressionState } from './level-progression';
 import { levelDefinition } from './level-registry';
+import { requestStage } from './level-stage-override';
 import { nextStage, stagesCompleted } from './level-stages';
 import './level-host.css';
 
@@ -112,6 +113,25 @@ async function enterGate(gate: LevelGate): Promise<void> {
   // A tab older than the last deploy: reload onto the new build (progress is already saved).
   if (outcome === 'stale' && reloadForNewBuild()) showToast(tl('reloadingNewBuild'));
   else if (outcome === 'stale' || outcome === 'failed') showToast(tl('loadFailed'));
+}
+
+/**
+ * Enters a level from the map panel — the next stage, or one completed stage to replay.
+ * The override is set only when the run can actually start, so a failed entry never leaks
+ * a stale stage into a later run. Replaying never re-locks anything and never re-pays the
+ * first-completion bonus: a stage 2+ run records only its own `stageStars` slot (merged by
+ * max, so earned stars survive) and `firstCompletionBonus` pays only while `completedAt`
+ * is still 0.
+ */
+export async function enterLevelFromMap(levelId: string, stage?: number): Promise<void> {
+  const gate = LEVEL_GATES.find((g) => g.levelId === levelId);
+  const definition = levelDefinition(levelId);
+  if (!gate || !definition || !host || !connectedStore()) {
+    showToast(tl('loadFailed'));
+    return;
+  }
+  if (stage !== undefined) requestStage(stage);
+  await enterGate(gate);
 }
 
 function lockedToast(gate: LevelGate): string {

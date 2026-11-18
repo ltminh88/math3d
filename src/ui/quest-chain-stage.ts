@@ -2,6 +2,7 @@
 // the field gate, then each level opens the next (forest, city, tower; chapter 2: garden, valley,
 // workshop, cave); after the cave a closing card remains.
 import type { ProgressionState } from '../levels/shared/level-progression';
+import { nextStage, stagesCompleted } from '../levels/shared/level-stages';
 
 /** The levels of the chain in gate order (each one's gate opens once the previous is done). */
 export const CHAIN_LEVELS = [
@@ -47,4 +48,33 @@ export function questChapter(stage: QuestStage): QuestChapterView {
   const stages = QUEST_CHAPTERS[at] ?? [];
   const done = index < 0 ? stages.length : stages.indexOf(stage as ChainStage);
   return { chapter: at + 1, stages, done };
+}
+
+export interface QuestStageLine {
+  /** Next stage to play (1-based). */
+  readonly n: number;
+  /** Total stages in the level. */
+  readonly m: number;
+  /** Stars earned across the level's stages so far. */
+  readonly stars: number;
+}
+
+/**
+ * Stage sub-line for the quest card's current level (pure). `stageStars` is the migrated
+ * array (stage 1 === the level's stars); a missing entry is 0.
+ * - One-stage level: null (nothing extra, like the gate label).
+ * - Every stage done: 'all-done' → "Đã qua hết các chặng!".
+ * - Else the next stage plus the level's stars so far (a fresh level reads "Chặng 1/m · 0 sao",
+ *   the same "Chặng 1/m" the open gate's label already shows).
+ */
+export function questStageLine(
+  stages: number,
+  stageStars: readonly number[],
+): QuestStageLine | 'all-done' | null {
+  if (stages <= 1) return null;
+  if (stagesCompleted({ stages, stageStars }) >= stages) return 'all-done';
+  const n = nextStage({ stages, stageStars });
+  let stars = 0;
+  for (let i = 0; i < stages; i++) stars += stageStars[i] ?? 0;
+  return { n, m: stages, stars };
 }
