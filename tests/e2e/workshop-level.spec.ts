@@ -189,6 +189,7 @@ test('the workshop fills six orders and records the measurement skills', async (
   const done = page.locator('.workshop-done');
   await expect(done).toBeVisible();
   await expect(done).toContainText('Giao xong hết đơn hàng!');
+  await expect(done).toContainText('Chặng 1/5');
   await expect(done.locator('.workshop-bonus')).toHaveText(
     'Thưởng lần đầu hoàn thành: +50 XP · +10 xu',
   );
@@ -208,10 +209,113 @@ test('the workshop fills six orders and records the measurement skills', async (
   await expect
     .poll(() => page.evaluate(() => window.__game?.gateStatus('workshop')))
     .toBe('completed');
+  // The commit runs in the background after the level closes: poll the store until it lands.
+  await expect
+    .poll(() => page.evaluate(() => window.__game?.snapshot()?.levelProgress.workshop?.stageStars))
+    .toEqual([expect.any(Number)]);
+  const workshop = await page.evaluate(() => window.__game?.snapshot()?.levelProgress.workshop);
+  expect(workshop?.stageStars?.[0]).toBeGreaterThanOrEqual(1);
+  await expect(page.locator('#gate-workshop-label small')).toHaveText(/Chặng 2\/5/);
   // The cave opens next (it says "Sắp ra mắt" until its own level ships).
   expect(['open', 'coming-soon']).toContain(
     await page.evaluate(() => window.__game?.gateStatus('cave')),
   );
+  const store = await page.evaluate(() => {
+    const snap = window.__game?.snapshot();
+    return {
+      completedAt: snap?.levelProgress.workshop?.completedAt ?? 0,
+      keys: Object.keys(snap?.factStats ?? {}),
+    };
+  });
+  expect(store.completedAt).toBeGreaterThan(0);
+  for (const r of plan) expect(store.keys).toContain(`sk:${r.skillId}`);
+  expect(await page.evaluate(() => window.__workshop)).toBeUndefined();
+  expect(errors).toEqual([]);
+});
+
+// Stage 4 (phase 09): seed stages 1-3 done, enter stage 4 with no forced plan, so the stage
+// plan decides the rounds. The ruler slot is fixed to cm↔mm, the fence and tiles keep the
+// shared rectangle, the last two rounds are instruments, and only stage 4's stars are added.
+test('stage 4 drills cm-mm and the instruments and records only its own stage stars', async ({
+  page,
+}, info) => {
+  const touch = info.project.use.hasTouch === true;
+  const project = info.project.name;
+  const errors: string[] = [];
+  page.on('pageerror', (e) => errors.push(String(e)));
+  await page.goto('/');
+  await waitForStoreBoot(page);
+  await page.waitForFunction(() => '__game' in window);
+  await page.locator('#play').click();
+  await expect(page.locator('body')).toHaveClass(/playing/);
+  await page.evaluate(
+    (done) => window.__game?.seedProgress({ bridgeComplete: true, completedLevels: done }),
+    DONE,
+  );
+  await page.evaluate(() => window.__game?.seedStageProgress('workshop', [3, 3, 3]));
+  await expect(page.locator('#gate-workshop-label small')).toHaveText(
+    'Đã hoàn thành ★★★ · Chặng 4/5',
+  );
+  await page.evaluate(() => window.__game?.teleportToGate('workshop'));
+  const interact = page.locator('#interact');
+  await expect(interact).toContainText('Vào Cổng Xưởng Đo Đạc');
+  if (touch) await interact.tap();
+  else await page.keyboard.press('e');
+  await expect(page.locator('.workshop-panel')).toBeVisible();
+  await expect(page.locator('.level-layer')).toHaveAttribute('data-draw-calls', /\d+/);
+
+  const plan = (await page.evaluate(() => window.__workshop?.plan())) ?? [];
+  expect(plan).toHaveLength(ROUNDS);
+  expect(plan[0]?.skillId).toBe('meas-mm-convert');
+  expect(plan[1]?.skillId).toBe('meas-perimeter-rect');
+  expect(plan[2]?.skillId).toBe('meas-area-rect');
+  expect([
+    'meas-perimeter-polygon',
+    'meas-perimeter-square',
+    'meas-wp-fence',
+    'meas-area-count',
+    'meas-area-square',
+  ]).toContain(plan[3]?.skillId);
+  expect(new Set([plan[4]?.skillId, plan[5]?.skillId]).size).toBe(2);
+  for (const r of plan.slice(4))
+    expect(['meas-gram', 'meas-ml', 'meas-temperature']).toContain(r.skillId);
+  expect(plan[1]?.rect).not.toBeNull();
+  expect(plan[1]?.rect).toEqual(plan[2]?.rect);
+
+  for (let i = 0; i < ROUNDS; i++) await playRound(page, i, touch, project);
+
+  const done = page.locator('.workshop-done');
+  await expect(done).toBeVisible();
+  await expect(done).toContainText('Giao xong hết đơn hàng!');
+  await expect(done).toContainText('Chặng 4/5');
+  // Later stages pay no first-clear bonus.
+  await expect(done.locator('.workshop-bonus')).toHaveCount(0);
+  await shot(page, 'done-stage-4', project);
+  const maxCalls = Number(await page.locator('.level-layer').getAttribute('data-max-draw-calls'));
+  info.annotations.push({ type: 'max-draw-calls', description: String(maxCalls) });
+  expect(maxCalls).toBeGreaterThan(0);
+  expect(maxCalls).toBeLessThanOrEqual(DRAW_CALL_BUDGET);
+  console.log(`workshop stage 4 max draw calls (${project}): ${maxCalls}`);
+
+  const back = page.locator('.workshop-back');
+  if (touch) await back.tap();
+  else {
+    await expect(back).toBeFocused();
+    await page.keyboard.press('Enter');
+  }
+  await expect.poll(() => page.evaluate(() => window.__game?.levelRunning())).toBe(false);
+  await expect
+    .poll(() => page.evaluate(() => window.__game?.gateStatus('workshop')))
+    .toBe('completed');
+  // The commit runs in the background after the level closes: poll the store until it lands.
+  await expect
+    .poll(() => page.evaluate(() => window.__game?.snapshot()?.levelProgress.workshop?.stageStars))
+    .toEqual([3, 3, 3, expect.any(Number)]);
+  const workshop = await page.evaluate(() => window.__game?.snapshot()?.levelProgress.workshop);
+  expect(workshop?.stageStars?.[3]).toBeGreaterThanOrEqual(1);
+  // A stage-4 run never overwrites the earlier stages' stars (the level's `stars` stay 3).
+  expect(workshop?.stars).toBe(3);
+  await expect(page.locator('#gate-workshop-label small')).toHaveText(/Chặng 5\/5/);
   const store = await page.evaluate(() => {
     const snap = window.__game?.snapshot();
     return {

@@ -12,6 +12,8 @@ export function showWorkshopCelebration(
   onBack: () => void,
   /** First clear: the one-time bonus the host adds on commit, else null. */
   bonus: { xp: number; coins: number } | null = null,
+  /** The stage just played ("Chặng {n}/5 · {sao} sao"), else null. */
+  stageLine: string | null = null,
 ): HTMLElement {
   const card = document.createElement('section');
   card.className = 'workshop-done glass';
@@ -26,6 +28,12 @@ export function showWorkshopCelebration(
   starRow.textContent = '★'.repeat(stars) + '☆'.repeat(3 - stars);
   starRow.setAttribute('aria-label', ws('stars', { n: stars }));
   starRow.dataset.stars = String(stars);
+  if (stageLine) {
+    const line = document.createElement('p');
+    line.className = 'workshop-stage-line';
+    line.textContent = stageLine;
+    starRow.after(line);
+  }
   (card.querySelector('.workshop-done__line strong') as HTMLElement).textContent =
     `${tc('guideName')}:`;
   (card.querySelector('.workshop-done__line span') as HTMLElement).textContent = ws('doneLine');
