@@ -58,7 +58,7 @@ export function chapterRow(stage: number): {
   const names = CHAPTER_CELLS[chapter] ?? [];
   const done = Math.min(position - first, names.length);
   const cells = names.map(
-    (name, i) => `Chặng ${first + i + 1}: ${name}, ${i < done ? 'đã xong' : 'chưa xong'}`,
+    (name, i) => `Thử thách ${first + i + 1}: ${name}, ${i < done ? 'đã xong' : 'chưa xong'}`,
   );
   return { label: `Chương ${chapter + 1} · ${done}/${names.length}`, cells, done };
 }

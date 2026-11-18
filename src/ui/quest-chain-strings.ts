@@ -21,7 +21,7 @@ export const tq = defineStrings('questChain', {
     copyCity:
       'Cổng mới đã mở! Đi theo con đường bên kia cầu tới thành phố của những tòa nhà mang số. Tìm cổng có dấu ✨ {gate}, {enter}',
     copyTower:
-      'Chặng cuối đã mở! Đi theo con đường bên kia cầu tới ngọn tháp cao nhất. Tìm cổng có dấu ✨ {gate}, {enter}',
+      'Thử thách cuối đã mở! Đi theo con đường bên kia cầu tới ngọn tháp cao nhất. Tìm cổng có dấu ✨ {gate}, {enter}',
     copyGarden:
       'Chương 2 đã mở! Quay lại khu vườn ngay bên kia cầu. Tìm cổng có dấu ✨ {gate}, {enter}',
     copyValley:
@@ -29,7 +29,7 @@ export const tq = defineStrings('questChain', {
     copyWorkshop:
       'Cổng mới đã mở! Đi theo con đường mới về phía nam, giữa khu rừng và thành phố. Tìm cổng có dấu ✨ {gate}, {enter}',
     copyCave:
-      'Chặng cuối đã mở! Về làng rồi đi theo con đường qua chòi nghỉ tới hang đá. Tìm cổng có dấu ✨ {gate}, {enter}',
+      'Thử thách cuối đã mở! Về làng rồi đi theo con đường qua chòi nghỉ tới hang đá. Tìm cổng có dấu ✨ {gate}, {enter}',
     copyComingSoon: '{gate} sắp ra mắt. Trong lúc chờ, bạn luyện thêm cùng {guide} nhé!',
     enterKeyOrTap: 'rồi nhấn E hoặc bấm nút Vào cổng nhé!',
     enterTap: 'rồi bấm nút Vào cổng nhé!',
@@ -58,8 +58,8 @@ export const tq = defineStrings('questChain', {
     chapterLabel: 'Chương {n} · {k}/{m}',
     stageLine: 'Chặng {n}/{m} · {stars}/{max} sao',
     stageAllDone: 'Đã qua hết các chặng!',
-    stepDone: 'Chặng {n}: {name}, đã xong',
-    stepTodo: 'Chặng {n}: {name}, chưa xong',
+    stepDone: 'Thử thách {n}: {name}, đã xong',
+    stepTodo: 'Thử thách {n}: {name}, chưa xong',
     guideField:
       '{gate} đang chờ bạn ở cuối con đường bên kia cầu. Bạn cũng có thể luyện thêm phép nhân cùng mình nhé!',
     guideForest:
@@ -102,7 +102,7 @@ export const tq = defineStrings('questChain', {
     copyCity:
       'A new gate is open! Follow the road across the bridge to the city of numbered buildings. Find the ✨ {gate}, {enter}',
     copyTower:
-      'The last stage is open! Follow the road across the bridge to the tallest tower. Find the ✨ {gate}, {enter}',
+      'The last challenge is open! Follow the road across the bridge to the tallest tower. Find the ✨ {gate}, {enter}',
     copyGarden:
       'Chapter 2 is open! Go back to the garden just across the bridge. Find the ✨ {gate}, {enter}',
     copyValley:
@@ -110,7 +110,7 @@ export const tq = defineStrings('questChain', {
     copyWorkshop:
       'A new gate is open! Follow the new road south, between the forest and the city. Find the ✨ {gate}, {enter}',
     copyCave:
-      'The last stage is open! Go back to the village and follow the road past the gazebo to the cave. Find the ✨ {gate}, {enter}',
+      'The last challenge is open! Go back to the village and follow the road past the gazebo to the cave. Find the ✨ {gate}, {enter}',
     copyComingSoon: 'The {gate} is coming soon. Meanwhile, practise more with {guide}!',
     enterKeyOrTap: 'then press E or tap Enter to go in!',
     enterTap: 'then tap Enter to go in!',
@@ -139,8 +139,8 @@ export const tq = defineStrings('questChain', {
     chapterLabel: 'Chapter {n} · {k}/{m}',
     stageLine: 'Stage {n}/{m} · {stars}/{max} stars',
     stageAllDone: 'All stages done!',
-    stepDone: 'Stage {n}: {name}, done',
-    stepTodo: 'Stage {n}: {name}, not done yet',
+    stepDone: 'Challenge {n}: {name}, done',
+    stepTodo: 'Challenge {n}: {name}, not done yet',
     guideField:
       'The {gate} is waiting for you at the end of the road across the bridge. We can also practise multiplication together!',
     guideForest:
