@@ -31,7 +31,7 @@ function start(ctx: LevelContext): LevelSession {
   const props = new WorkshopBenchProps(scene, ctx.reducedMotion);
   const view = new WorkshopCamera(ctx.reducedMotion);
   const stats = ctx.learning.stats();
-  const skills = planWorkshopSkills(stats, ctx.learning.rng, ctx.definition.rounds);
+  const skills = planWorkshopSkills(stats, ctx.learning.rng, ctx.definition.rounds, ctx.stage);
   const flow = new WorkshopRoundFlow(planWorkshopRounds(skills, stats, ctx.learning.rng), () =>
     performance.now(),
   );
