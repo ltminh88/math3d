@@ -19,6 +19,7 @@ const STAGE_TOTAL: Record<string, number> = {
   tower: 6,
   garden: 5,
   valley: 5,
+  workshop: 5,
 };
 
 /** "Cổng đã mở" plus the stage line for a staged level, else "Cổng đã mở". */
