@@ -63,7 +63,15 @@ loop across faked days by `daily-practice.spec.ts` (re-run, not re-written).
 
 ### Testing
 
-- _(fill from the phase-14 gates + CI run)_
+- Unit 942/942 (143 files); typecheck 0; lint 0 errors (9 pre-existing CSS
+  warnings); build 0; golden traces byte-identical.
+- E2E local (one project at a time, `--workers=1`; mobile-pixel and
+  tablet-landscape left to CI): full-chain, quest-chain-stages,
+  stage-migration, save-migration-m3d3-to-m3d4 and daily-practice — 13/13 on
+  desktop-chromium (20m) and 13/13 on tablet-portrait (33m), including the
+  two new full-chain assertions (quest-card stage sub-line + `stageStars`).
+- Preview of the merged main: https://mathgame-cflz178b0-vlm5.vercel.app
+  (dpl_J77AaX3GSw451rNFLShGsR9JGPzE, READY, guest-only).
 
 ## 2026-11-18 — Phase 13: quest card stages, HUD copy, migration, docs
 
