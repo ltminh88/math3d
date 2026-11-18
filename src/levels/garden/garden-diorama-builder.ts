@@ -56,7 +56,10 @@ function scratchContext(scene: Scene): WorldBuildContext {
   };
 }
 
-function buildGardenGround(ctx: WorldBuildContext): void {
+/** Blossom colour per stage (stage 1 keeps today's yellow); same meshes, same draw calls. */
+export const STAGE_BLOSSOM = [0xedb958, 0xf08a5d, 0xe87ea1, 0x9b7ede, 0x5db8d6] as const;
+
+function buildGardenGround(ctx: WorldBuildContext, blossom: number): void {
   const root = ctx.scene;
   const C = GARDEN_COLORS;
   addBox(ctx, root, 0, -0.1, -2, 44, 0.2, 32, C.grass);
@@ -71,7 +74,7 @@ function buildGardenGround(ctx: WorldBuildContext): void {
     addBox(ctx, root, x, 0.09, -2.6, 1, 0.12, 5.5, C.soil);
     for (let i = 0; i < 6; i++) {
       addSphere(ctx, root, x, 0.35, -4.6 + i * 0.8, 0.32, C.leaf);
-      addSphere(ctx, root, x, 0.54, -4.6 + i * 0.8, 0.15, C.blossom);
+      addSphere(ctx, root, x, 0.54, -4.6 + i * 0.8, 0.15, blossom);
     }
   }
   // The scarecrow flag behind, on the right.
@@ -84,11 +87,11 @@ export interface GardenDiorama {
 }
 
 /** Builds the garden, VLM, sky colour and lights into `scene`. */
-export function buildGardenDiorama(scene: Scene): GardenDiorama {
+export function buildGardenDiorama(scene: Scene, stage = 1): GardenDiorama {
   scene.background = new Color(SKY_HORIZON_COLOR);
   const scratch = new Scene();
   const ctx = scratchContext(scratch);
-  buildGardenGround(ctx);
+  buildGardenGround(ctx, STAGE_BLOSSOM[stage - 1] ?? GARDEN_COLORS.blossom);
   for (const [x, z, scale, variant] of TREES) buildTree(ctx, x, z, scale, variant);
   const guide = new Group();
   guide.position.set(GUIDE_AT.x, 0, GUIDE_AT.z);

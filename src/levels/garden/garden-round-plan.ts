@@ -9,6 +9,7 @@ import { type SkillTier, skillTierOf } from '../../learning/skill-tiers';
 import { numberOptions } from '../../reasoning/reasoning-distractors';
 import { reasoningItemForSkill } from '../../reasoning/reasoning-item-for-skill';
 import type { ReasoningItem, ReasoningStep } from '../../reasoning/reasoning-types';
+import type { LevelDefinition, LevelLearning } from '../shared/level-types';
 import { withFirstOpStep } from './garden-expression-steps';
 
 export type GardenKind = 'pattern' | 'balance' | 'bag';
@@ -67,23 +68,43 @@ export function buildGardenItem(skillId: string, rng: Rng, tier: SkillTier): Rea
 /**
  * `length` rounds from the planner's pick: kinds in the order the plan first names them (missing
  * kinds after), cycled; each slot takes the plan's next skill of its kind, else the kind's skill
- * least used so far in this run.
+ * least used so far in this run. `allowed` narrows the pool to a stage's subset (absent: all
+ * eight skills, today's run); `floor` prefers skills already at or above that tier when the
+ * queue and the fallback pick (absent: no preference). The floor never changes a round's
+ * tier — every item is built at `skillTierOf(box)`.
  */
 export function planGardenRounds(
   planned: readonly FactKey[],
   stats: Readonly<Record<FactKey, FactStat | undefined>>,
   rng: Rng,
   length: number,
+  allowed?: readonly string[],
+  floor?: number,
 ): GardenRound[] {
-  const ids = planned.map((k) => k.slice(3)).filter((id) => GARDEN_SKILLS.includes(id));
+  const pool = allowed ?? GARDEN_SKILLS;
+  const ids = planned.map((k) => k.slice(3)).filter((id) => pool.includes(id));
   const order = [...new Set([...ids.map(gardenKindOf), ...KINDS])];
-  const queues = new Map(KINDS.map((k) => [k, ids.filter((id) => gardenKindOf(id) === k)]));
+  const tierOf = (id: string): SkillTier => skillTierOf(stats[skillKey(id)]);
+  const queues = new Map<GardenKind, string[]>(
+    KINDS.map((k) => {
+      const list = ids.filter((id) => gardenKindOf(id) === k);
+      if (floor === undefined) return [k, list] as [GardenKind, string[]];
+      // Tier floor: skills already at or above the floor play first (stable — planned order
+      // kept inside each group). A skill below the floor still plays at its own tier.
+      return [
+        k,
+        [...list.filter((id) => tierOf(id) >= floor), ...list.filter((id) => tierOf(id) < floor)],
+      ] as [GardenKind, string[]];
+    }),
+  );
   const used = new Map<string, number>();
   const rounds: GardenRound[] = [];
   for (let i = 0; i < length; i++) {
     const kind = order[i % order.length] as GardenKind;
-    const fallback = [...SKILLS_BY_KIND[kind]].sort(
-      (p, q) => (used.get(p) ?? 0) - (used.get(q) ?? 0),
+    const fallback = [...pool.filter((id) => gardenKindOf(id) === kind)].sort(
+      (p, q) =>
+        (used.get(p) ?? 0) - (used.get(q) ?? 0) ||
+        (floor === undefined ? 0 : Number(tierOf(p) < floor) - Number(tierOf(q) < floor)),
     )[0] as string;
     const skillId = queues.get(kind)?.shift() ?? fallback;
     used.set(skillId, (used.get(skillId) ?? 0) + 1);
@@ -92,4 +113,70 @@ export function planGardenRounds(
     rounds.push({ kind, skillId, factKey, item });
   }
   return rounds;
+}
+
+// Stage plan for the garden (phase 07): a stage is a skill subset + tier floor in the
+// existing round planner — no new round type, no new wiring. Stage 1 is today's run; later
+// stages drill a subset with a different emphasis. Every stage keeps ≥ 2 skills per kind,
+// so the two slots each kind gets in a 6-round run never repeat a skill. The plan maps stage
+// to its config, so the 6th-stage contingency (phase 00) is one more table row plus strings.
+
+/** Stage → the skills it drills (stage 1 and 5: all eight; stages 2–4: seven each). */
+export const GARDEN_STAGE_SKILLS: Readonly<Record<number, readonly string[]>> = {
+  1: GARDEN_SKILLS,
+  2: [
+    'pattern-add',
+    'pattern-sub',
+    'pattern-skip-count',
+    'unknown-add-sub',
+    'unknown-mul-div',
+    'expr-order',
+    'expr-brackets',
+  ],
+  3: [
+    'expr-order',
+    'expr-brackets',
+    'expr-from-story',
+    'pattern-add',
+    'pattern-sub',
+    'unknown-add-sub',
+    'unknown-mul-div',
+  ],
+  4: [
+    'pattern-add',
+    'pattern-sub',
+    'pattern-skip-count',
+    'unknown-add-sub',
+    'unknown-mul-div',
+    'expr-brackets',
+    'expr-from-story',
+  ],
+  5: GARDEN_SKILLS,
+};
+
+/**
+ * Tier floor per stage: stage 2 emphasises tier 2 (box ≥ 3), stage 4 tier 3 (box ≥ 5).
+ * The floor is only a preference for which skills play — it never sets a round's tier.
+ */
+export function stageTierFloor(stage: number): number | undefined {
+  if (stage === 2) return 2;
+  if (stage === 4) return 3;
+  return undefined;
+}
+
+/** The run's rounds for a stage: the host planner picks the facts, the stage picks the subset + tier floor. Stage 5 drills the weakest skills first (lowest box). */
+export function planGardenRun(
+  learning: LevelLearning,
+  definition: LevelDefinition,
+  stage = 1,
+): GardenRound[] {
+  const stats = learning.stats();
+  const planned = learning.planSession(gardenSkillPool(), definition.rounds);
+  const allowed = GARDEN_STAGE_SKILLS[stage] ?? GARDEN_SKILLS;
+  const floor = stageTierFloor(stage);
+  const ordered =
+    stage === 5
+      ? [...planned].sort((a, b) => (stats[a]?.box ?? 1) - (stats[b]?.box ?? 1))
+      : planned;
+  return planGardenRounds(ordered, stats, learning.rng, definition.rounds, allowed, floor);
 }

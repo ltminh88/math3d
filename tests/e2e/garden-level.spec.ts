@@ -194,6 +194,147 @@ test('the garden plays six rotating rounds and records sk: skills', async ({ pag
   expect(errors).toEqual([]);
 });
 
+async function startWithStages(page: Page, stageStars: number[]): Promise<void> {
+  await page.goto('/');
+  await waitForStoreBoot(page);
+  await page.waitForFunction(() => '__game' in window);
+  await page.locator('#play').click();
+  await expect(page.locator('body')).toHaveClass(/playing/);
+  await page.evaluate(() =>
+    window.__game?.seedProgress({
+      bridgeComplete: true,
+      completedLevels: ['field', 'forest', 'city', 'tower'],
+    }),
+  );
+  await page.evaluate((stars) => window.__game?.seedStageProgress('garden', stars), stageStars);
+}
+
+async function enterGardenGate(page: Page, touch: boolean): Promise<void> {
+  await page.evaluate(() => window.__game?.teleportToGate('garden'));
+  const interact = page.locator('#interact');
+  await expect(interact).toContainText('Vào Cổng Khu Vườn Quy Luật');
+  if (touch) await interact.tap();
+  else await page.keyboard.press('e');
+  await expect(page.locator('.garden-panel')).toBeVisible();
+  expect(await page.evaluate(() => window.__game?.levelRunning())).toBe(true);
+  await expect(page.locator('.level-layer')).toHaveAttribute('data-draw-calls', /\d+/);
+}
+
+const STAGE2_SKILLS = [
+  'sk:pattern-add',
+  'sk:pattern-sub',
+  'sk:pattern-skip-count',
+  'sk:unknown-add-sub',
+  'sk:unknown-mul-div',
+  'sk:expr-order',
+  'sk:expr-brackets',
+];
+const STAGE3_SKILLS = [
+  'sk:expr-order',
+  'sk:expr-brackets',
+  'sk:expr-from-story',
+  'sk:pattern-add',
+  'sk:pattern-sub',
+  'sk:unknown-add-sub',
+  'sk:unknown-mul-div',
+];
+
+test('stage 2 drills seven skills and records only its own stage stars', async ({ page }, info) => {
+  const touch = !!info.project.use.hasTouch;
+  const errors: string[] = [];
+  page.on('pageerror', (e) => errors.push(String(e)));
+  await startWithStages(page, [2]);
+  await expect(page.locator('#gate-garden-label small')).toHaveText(
+    'Đã hoàn thành ★★☆ · Chặng 2/5',
+  );
+  await enterGardenGate(page, touch);
+
+  const factKeys = (await page.evaluate(() => window.__garden?.factKeys())) ?? [];
+  expect(factKeys).toHaveLength(ROUNDS);
+  expect(new Set(factKeys).size).toBe(ROUNDS);
+  for (const key of factKeys) expect(STAGE2_SKILLS).toContain(key);
+
+  for (let i = 0; i < ROUNDS; i++) {
+    await playRound(page, i, touch);
+    if (touch) await page.locator('.garden-next').tap();
+    else await page.keyboard.press('Enter');
+  }
+  const done = page.locator('.garden-done');
+  await expect(done).toBeVisible();
+  await expect(done).toContainText('Chặng 2/5');
+  // Later stages pay no first-clear bonus.
+  await expect(done.locator('.garden-bonus')).toHaveCount(0);
+  const maxCalls = Number(await page.locator('.level-layer').getAttribute('data-max-draw-calls'));
+  expect(maxCalls).toBeGreaterThan(0);
+  expect(maxCalls).toBeLessThanOrEqual(DRAW_CALL_BUDGET);
+
+  const back = page.locator('.garden-back');
+  if (touch) await back.tap();
+  else {
+    await expect(back).toBeFocused();
+    await page.keyboard.press('Enter');
+  }
+  await expect.poll(() => page.evaluate(() => window.__game?.levelRunning())).toBe(false);
+  // The commit runs in the background after the level closes: poll the store until it lands.
+  await expect
+    .poll(() => page.evaluate(() => window.__game?.snapshot()?.levelProgress.garden?.stageStars))
+    .toEqual([2, expect.any(Number)]);
+  const garden = await page.evaluate(() => window.__game?.snapshot()?.levelProgress.garden);
+  expect(garden?.stageStars?.[0]).toBe(2);
+  expect(garden?.stageStars?.[1]).toBeGreaterThanOrEqual(1);
+  // A stage-2 run never overwrites stage 1's stars (the level's `stars` stay 2).
+  expect(garden?.stars).toBe(2);
+  await expect(page.locator('#gate-garden-label small')).toHaveText(/Chặng 3\/5/);
+  expect(errors).toEqual([]);
+});
+
+test('stage 3 drills brackets and stories and records only its own stage stars', async ({
+  page,
+}, info) => {
+  const touch = !!info.project.use.hasTouch;
+  const errors: string[] = [];
+  page.on('pageerror', (e) => errors.push(String(e)));
+  await startWithStages(page, [2, 2]);
+  await expect(page.locator('#gate-garden-label small')).toHaveText(
+    'Đã hoàn thành ★★☆ · Chặng 3/5',
+  );
+  await enterGardenGate(page, touch);
+
+  const factKeys = (await page.evaluate(() => window.__garden?.factKeys())) ?? [];
+  expect(factKeys).toHaveLength(ROUNDS);
+  expect(new Set(factKeys).size).toBe(ROUNDS);
+  for (const key of factKeys) expect(STAGE3_SKILLS).toContain(key);
+  expect(factKeys).toContain('sk:expr-brackets');
+
+  for (let i = 0; i < ROUNDS; i++) {
+    await playRound(page, i, touch);
+    if (touch) await page.locator('.garden-next').tap();
+    else await page.keyboard.press('Enter');
+  }
+  const done = page.locator('.garden-done');
+  await expect(done).toBeVisible();
+  await expect(done).toContainText('Chặng 3/5');
+  await expect(done.locator('.garden-bonus')).toHaveCount(0);
+
+  const back = page.locator('.garden-back');
+  if (touch) await back.tap();
+  else {
+    await expect(back).toBeFocused();
+    await page.keyboard.press('Enter');
+  }
+  await expect.poll(() => page.evaluate(() => window.__game?.levelRunning())).toBe(false);
+  await expect
+    .poll(() => page.evaluate(() => window.__game?.snapshot()?.levelProgress.garden?.stageStars))
+    .toEqual([2, 2, expect.any(Number)]);
+  const garden = await page.evaluate(() => window.__game?.snapshot()?.levelProgress.garden);
+  expect(garden?.stageStars?.[0]).toBe(2);
+  expect(garden?.stageStars?.[1]).toBe(2);
+  expect(garden?.stageStars?.[2]).toBeGreaterThanOrEqual(1);
+  expect(garden?.stars).toBe(2);
+  await expect(page.locator('#gate-garden-label small')).toHaveText(/Chặng 4\/5/);
+  expect(errors).toEqual([]);
+});
+
 // Screenshots default to Playwright's per-test output dir (test-results/, untracked),
 // so a plain `npx playwright test` leaves `git status` clean. Set GARDEN_SCREENS to a
 // directory (e.g. the p05 report folder) to keep the report screenshots there instead.

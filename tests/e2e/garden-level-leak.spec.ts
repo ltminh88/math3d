@@ -45,3 +45,34 @@ test('leaving the garden frees its geometries and textures (once and after 10 vi
   // Leaving before any answer commits nothing: the gate is still open, not completed.
   expect(await page.evaluate(() => window.__game?.gateStatus('garden'))).toBe('open');
 });
+
+test('leaving a later stage frees its geometries too', async ({ page }, info) => {
+  const touch = !!info.project.use.hasTouch;
+  await page.goto('/');
+  await waitForStoreBoot(page);
+  await page.waitForFunction(() => '__game' in window);
+  await page.locator('#play').click();
+  await expect(page.locator('body')).toHaveClass(/playing/);
+  await page.evaluate(() =>
+    window.__game?.seedProgress({
+      bridgeComplete: true,
+      completedLevels: ['field', 'forest', 'city', 'tower'],
+    }),
+  );
+  await page.evaluate(() => window.__game?.seedStageProgress('garden', [2, 2]));
+  await page.evaluate(() => window.__game?.teleportToGate('garden'));
+  const interact = page.locator('#interact');
+  await expect(interact).toContainText('Vào Cổng Khu Vườn Quy Luật');
+  const baseline = await settledMemory(page);
+  expect(baseline.geometries).toBeGreaterThan(0);
+  if (touch) await interact.tap();
+  else await interact.click();
+  await expect(page.locator('.garden-panel')).toBeVisible();
+  await expect(page.locator('.level-layer')).toHaveAttribute('data-draw-calls', /\d+/);
+  expect((await rendererMemory(page)).geometries).toBeGreaterThan(baseline.geometries);
+  const leave = page.locator('.level-leave');
+  if (touch) await leave.tap();
+  else await leave.click();
+  await expect.poll(() => page.evaluate(() => window.__game?.levelRunning())).toBe(false);
+  await expect.poll(() => rendererMemory(page)).toEqual(baseline);
+});
