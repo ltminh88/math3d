@@ -34,7 +34,7 @@ function start(ctx: LevelContext): LevelSession {
   const vs = valleyStrings(ctx.defineStrings);
   const scene = new Scene();
   scene.name = 'valley';
-  const { sun } = buildValleyDiorama(scene);
+  const { sun } = buildValleyDiorama(scene, ctx.stage);
   const camera = new ValleyCamera(ctx.reducedMotion);
   const flow = new ValleyRoundFlow(buildValleyRounds(planRounds(ctx), ctx.learning.rng), () =>
     performance.now(),
@@ -86,7 +86,16 @@ function start(ctx: LevelContext): LevelSession {
       ctx.audio.celebrate();
       ctx.announce(vs('doneTitle'));
       const bonus = ctx.firstCompletion ? LEVEL_COMPLETE_BONUS : null;
-      showValleyCelebration(ctx.ui, vs, earned, stars, () => ctx.exit({ completed: true }), bonus);
+      const stageLine = vs('stageLine', { n: ctx.stage, m: ctx.definition.stages, stars });
+      showValleyCelebration(
+        ctx.ui,
+        vs,
+        earned,
+        stars,
+        () => ctx.exit({ completed: true }),
+        bonus,
+        stageLine,
+      );
       frame();
     },
   });

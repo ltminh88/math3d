@@ -39,7 +39,15 @@ function scratchContext(scene: Scene): WorldBuildContext {
   };
 }
 
-function buildValleyFloor(ctx: WorldBuildContext, root: Group): void {
+/** The four decorative rocks around the board (x, z, radius). */
+const ROCKS: readonly (readonly [number, number, number])[] = [
+  [-9.6, 4.8, 0.32],
+  [9.9, 5.2, 0.26],
+  [-4.2, -9.6, 0.36],
+  [4.6, -10, 0.3],
+];
+
+function buildValleyFloor(ctx: WorldBuildContext, root: Group, stage: number): void {
   addBox(ctx, root, 0, -0.1, 0, 90, 0.2, 90, C.ground);
   // The stone board: a raised sandy slab with a darker rim.
   addBox(ctx, root, 0, 0.04, 0, BOARD.width + 0.8, 0.1, BOARD.depth + 0.8, C.rim);
@@ -51,13 +59,15 @@ function buildValleyFloor(ctx: WorldBuildContext, root: Group): void {
   addCylinder(ctx, root, -7.5, 0.07, -7.6, 2, 2, 0.06, C.water, 18).castShadow = false;
   addBox(ctx, root, 7.4, 1.4, -8, 0.3, 2.8, 0.3, C.eke);
   addBox(ctx, root, 8.3, 0.15, -8, 2.1, 0.3, 0.3, C.eke);
-  for (const [x, z, r] of [
-    [-9.6, 4.8, 0.32],
-    [9.9, 5.2, 0.26],
-    [-4.2, -9.6, 0.36],
-    [4.6, -10, 0.3],
-  ] as const) {
-    addSphere(ctx, root, x, r * 0.5, z, r, C.rock).scale.y = 0.6;
+  // Stage dressing, cheap only: the rocks drift 0.25 units outward per stage (1 unit by stage
+  // 5), so each stage's garden looks a little different. A plain rotation was checked and
+  // rejected: the back rocks swing into the pond and the giant ê-ke. The pedestals never
+  // move: the rebuilt garden stones sit on them (valley-garden-stones-view.ts reads PEDESTALS).
+  const drift = (stage - 1) * 0.25;
+  for (const [x, z, r] of ROCKS) {
+    const len = Math.hypot(x, z);
+    addSphere(ctx, root, x + (x / len) * drift, r * 0.5, z + (z / len) * drift, r, C.rock).scale.y =
+      0.6;
   }
 }
 
@@ -66,13 +76,13 @@ export interface ValleyDiorama {
 }
 
 /** Builds the valley floor, sky colour and lights into `scene`. */
-export function buildValleyDiorama(scene: Scene): ValleyDiorama {
+export function buildValleyDiorama(scene: Scene, stage = 1): ValleyDiorama {
   scene.background = new Color(SKY_HORIZON_COLOR);
   const scratch = new Scene();
   const ctx = scratchContext(scratch);
   const root = new Group();
   scratch.add(root);
-  buildValleyFloor(ctx, root);
+  buildValleyFloor(ctx, root, stage);
   TREES.forEach(([x, z, scale], i) => {
     buildTree(ctx, x, z, scale, i + 1);
   });
