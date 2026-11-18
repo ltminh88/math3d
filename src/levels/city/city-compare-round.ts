@@ -7,8 +7,8 @@ import { mountReasoningRound } from '../shared/reasoning-round-panel';
 import type { ReasoningRoundPlan } from '../shared/reasoning-round-slot';
 import type { CityPanel } from './city-panel';
 import type { CityRoundController } from './city-round-controller';
-import type { CityStrings } from './city-strings';
 import type { CityRun } from './city-stage-plan';
+import type { CityStrings } from './city-strings';
 
 /** Shows the parcel puzzle; the city panel gives way and the controller's tally counts it. */
 export function startCityReasoningRound(
