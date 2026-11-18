@@ -117,9 +117,12 @@ async function playFiveRounds(page: Page, touch: boolean, stageLine?: string): P
 }
 
 async function leaveField(page: Page, touch: boolean): Promise<void> {
+  // The done panel offers "Về cổng" (exits as completed, so the run's stars commit); mid-run
+  // only the host's leave button exists (exits as not completed). Prefer the panel's button.
   const back = page.getByRole('button', { name: 'Về cổng' });
-  if (touch) await back.tap();
-  else await page.keyboard.press('Enter');
+  const target = (await back.count()) > 0 ? back : page.locator('.level-leave');
+  if (touch) await target.tap();
+  else await target.click();
   await page.waitForFunction(() => window.__game?.levelRunning() === false);
   await expect(page.locator('.field-hud')).toHaveCount(0);
 }
@@ -184,8 +187,14 @@ test('a finished level offers every stage for replay in the map panel', async ({
   await leaveField(page, touch);
 
   // Nothing re-locked, nothing re-paid: the level's stars and completion are untouched.
+  // The replayed slot itself may improve (merged by max) — it must never drop.
   const after = await page.evaluate(() => window.__game?.snapshot()?.levelProgress.field);
-  expect(after?.stageStars).toEqual([2, 2, 2, 2, 2, 2]);
+  expect(after?.stageStars?.[0]).toBe(2);
+  expect(after?.stageStars?.[1]).toBe(2);
+  expect(after?.stageStars?.[2]).toBeGreaterThanOrEqual(2);
+  expect(after?.stageStars?.[3]).toBe(2);
+  expect(after?.stageStars?.[4]).toBe(2);
+  expect(after?.stageStars?.[5]).toBe(2);
   expect(after?.stars).toBe(before?.stars);
   expect(after?.completedAt).toBe(before?.completedAt);
   expect(await page.evaluate(() => window.__game?.gateStatus('field'))).toBe('completed');

@@ -56,10 +56,12 @@ test('importing a shipped M3D3 code migrates every level to stage 1 done', async
   );
   await expect(page.locator('#map-detail .map-enter')).toHaveText('Vào chơi');
   await page.locator('#close-map').click();
-  // Daily practice is unlocked, with a pool drawn from the imported stats (the code carries
-  // the learned fact 3×7, so the set is planned from it).
+  // Daily practice is unlocked, with a pool drawn from the imported stats: the code carries
+  // only the learned fact 3×7, so the set has that one question (no top-up under 10).
   await page.locator('#open-daily').click();
-  await expect(page.locator('#dialog-content')).toContainText('Luyện tập hôm nay · Câu 1/10');
+  await expect(page.locator('#dialog-content')).toContainText('Luyện tập hôm nay · Câu 1/1');
+  // The fact renders as 3 × 7 or 7 × 3 (multiplication commutes; the set shuffles it).
+  await expect(page.locator('#dialog-content')).toContainText(/[37] × [37] = \?/);
   await page.locator('#close-dialog').click();
 });
 
