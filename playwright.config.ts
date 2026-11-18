@@ -22,6 +22,9 @@ export default defineConfig({
   use: {
     baseURL,
     trace: 'retain-on-failure',
+    // Failure screenshots land in test-results/ next to the trace; CI uploads
+    // test-results/ on a failed e2e job (see .github/workflows/ci.yml).
+    screenshot: 'only-on-failure',
     launchOptions: { args: webglArgs },
   },
   projects: [
