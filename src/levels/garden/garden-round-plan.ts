@@ -126,7 +126,11 @@ export function planGardenRounds(
 // so the two slots each kind gets in a 6-round run never repeat a skill. The plan maps stage
 // to its config, so the 6th-stage contingency (phase 00) is one more table row plus strings.
 
-/** Stage → the skills it drills (stage 1 and 5: all eight; stages 2–4: seven each). */
+/**
+ * Stage → the skills it drills (stage 1 and 5: all eight; stages 2 and 4: seven; stage 3: six).
+ * Stage 3 keeps exactly two bag skills (brackets + stories) so both play in every run: the bag
+ * kind gets two of the six slots, and a third bag skill could crowd brackets out.
+ */
 export const GARDEN_STAGE_SKILLS: Readonly<Record<number, readonly string[]>> = {
   1: GARDEN_SKILLS,
   2: [
@@ -139,7 +143,6 @@ export const GARDEN_STAGE_SKILLS: Readonly<Record<number, readonly string[]>> = 
     'expr-brackets',
   ],
   3: [
-    'expr-order',
     'expr-brackets',
     'expr-from-story',
     'pattern-add',
