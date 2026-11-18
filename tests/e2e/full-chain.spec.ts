@@ -66,6 +66,9 @@ async function expectCard(page: Page, index: number, stage: Stage): Promise<void
     await expect(cells.nth(i)).toHaveAttribute('aria-label', label);
   }
   await expect(page.locator('#quest-steps .done')).toHaveCount(row.done);
+  // The current level is fresh at this step: its stage sub-line reads stage 1 with 0 stars.
+  const stages = STAGE_TOTAL[stage.levelId] ?? 1;
+  await expect(page.locator('#quest-stage')).toHaveText(`Chặng 1/${stages} · 0/${stages * 3} sao`);
   await expectStepsOnOneLine(page);
 }
 
@@ -153,6 +156,15 @@ test('the 9-stage chain: each stage opens the next gate, every level loads and e
     await expectVlmPointsAt(page, press, stage.gate);
     await expectMapWithoutComingSoon(page, press, stage);
     await enterAndLeave(page, press, touch, stage);
+    // The seed committed stage 1 with 1 star; the store migrates it to stageStars [1].
+    if (i > 0) {
+      const prev = await page.evaluate(
+        (id) => window.__game?.snapshot()?.levelProgress[id],
+        CHAIN[i - 1] as string,
+      );
+      expect(prev?.stars).toBe(1);
+      expect(prev?.stageStars).toEqual([1]);
+    }
   }
 
   // Done: the closing card shows chapter 2 complete; every gate is completed.
@@ -163,6 +175,14 @@ test('the 9-stage chain: each stage opens the next gate, every level loads and e
   await expect(page.locator('#quest-progress')).toHaveText('✓ Hoàn thành');
   await expect(page.locator('#quest-chapter')).toHaveText('Chương 2 · 4/4');
   await expect(page.locator('#quest-steps .done')).toHaveCount(4);
+  // The closing card's sub-line follows the cave: stage 1 done with 1 star, stage 2 next.
+  await expect(page.locator('#quest-stage')).toHaveText('Chặng 2/5 · 1/15 sao');
+  // Every level's stage 1 holds its seeded star and nothing else.
+  const all = await page.evaluate(() => window.__game?.snapshot()?.levelProgress);
+  for (const id of CHAIN) {
+    expect(all?.[id]?.stars).toBe(1);
+    expect(all?.[id]?.stageStars).toEqual([1]);
+  }
   await expect(page.locator('body')).not.toContainText('Sắp ra mắt');
   expect(errors).toEqual([]);
 });
