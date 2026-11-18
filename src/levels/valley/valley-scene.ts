@@ -13,7 +13,8 @@ import { listenValleyKeys } from './valley-input';
 import { ValleyPanel } from './valley-panel';
 import { ValleyRoundController } from './valley-round-controller';
 import { buildValleyRounds, ValleyRoundFlow } from './valley-round-flow';
-import { planValleyRounds, type ValleyRoundSpec, valleyFactPool } from './valley-round-plan';
+import { type ValleyRoundSpec } from './valley-round-plan';
+import { planValleyRun } from './valley-stage-plan';
 import { valleyStrings, valleyText } from './valley-strings';
 import { installValleyTestHook } from './valley-test-hook';
 import './valley-level.css';
@@ -25,9 +26,7 @@ const TEST_BUILD = import.meta.env.MODE === 'test';
 function planRounds(ctx: LevelContext): ValleyRoundSpec[] {
   const forced = TEST_BUILD ? window.__valleyPlan : undefined;
   if (forced && forced.length > 0) return forced;
-  const stats = ctx.learning.stats();
-  const rounds = ctx.definition.rounds;
-  return planValleyRounds(ctx.learning.planSession(valleyFactPool(stats), rounds), stats, rounds);
+  return planValleyRun(ctx.learning, ctx.definition, ctx.stage).rounds;
 }
 
 function start(ctx: LevelContext): LevelSession {
