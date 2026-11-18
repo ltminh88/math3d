@@ -13,6 +13,7 @@ import {
   assignFormats,
   buildQuestion,
   factTriple,
+  type TowerFormat,
   type TowerQuestion,
   type TowerStep,
 } from './tower-question-formats';
@@ -69,9 +70,18 @@ export function planTowerFacts(
   return facts.sort((a, b) => box(a) - box(b));
 }
 
-/** Questions for the floors: rotated formats, distractors fed by the child's own errors. */
-export function planTowerQuestions(facts: readonly FactKey[], stats: Stats, rng: Rng) {
-  const formats = assignFormats(facts);
+/**
+ * Questions for the floors: rotated formats, distractors fed by the child's own errors.
+ * `formatFor` (stage 3) forces one format per floor; absent it is today's rotation, so
+ * the rng consumption order — and stage 1 — are unchanged.
+ */
+export function planTowerQuestions(
+  facts: readonly FactKey[],
+  stats: Stats,
+  rng: Rng,
+  formatFor?: (fact: FactKey, index: number) => TowerFormat,
+) {
+  const formats = formatFor ? facts.map((key, i) => formatFor(key, i)) : assignFormats(facts);
   return facts.map((key, i) =>
     buildQuestion(key, formats[i] ?? 'missing', rng, stats[key]?.errs ?? []),
   );

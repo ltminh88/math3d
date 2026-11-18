@@ -1,7 +1,7 @@
 // Tower level "Tháp Toán Học" (city/tower phase 03): seed the first four stages, enter through
 // the tower gate, climb seven floors (keys on desktop, taps on the phone), come back with the level
 // completed, × and : facts stored and the closing quest card. Uses `window.__tower`/`__game`.
-import { type Page, test } from '@playwright/test';
+import { type Locator, type Page, test } from '@playwright/test';
 import { expect, SLOW_TEST_MS, waitForStoreBoot } from './legacy-live-save-fixtures';
 
 test.use({ locale: 'vi-VN' });
@@ -11,6 +11,21 @@ const DRAW_CALL_BUDGET = 60;
 const FLOORS = 7;
 
 type TowerState = NonNullable<ReturnType<NonNullable<Window['__tower']>['state']>>;
+
+async function startWithStages(page: Page, stageStars: number[]): Promise<void> {
+  await page.goto('/');
+  await waitForStoreBoot(page);
+  await page.waitForFunction(() => '__game' in window);
+  await page.locator('#play').click();
+  await expect(page.locator('body')).toHaveClass(/playing/);
+  await page.evaluate(() =>
+    window.__game?.seedProgress({
+      bridgeComplete: true,
+      completedLevels: ['field', 'forest', 'city'],
+    }),
+  );
+  await page.evaluate((stars) => window.__game?.seedStageProgress('tower', stars), stageStars);
+}
 
 async function startAtTowerGate(page: Page): Promise<void> {
   await page.goto('/');
@@ -73,6 +88,69 @@ function wrongOf(s: TowerState): number | boolean {
   if (s.step === 'verdict') return !s.expected;
   if (s.step === 'choice') return s.choices.find((c) => c !== s.expected) as number;
   return (s.expected as number) + 1;
+}
+
+type PlannedStep =
+  | { kind: 'number'; answer: number }
+  | { kind: 'choice'; label: string }
+  | { kind: 'multi'; ids: string[] }
+  | { kind: 'verdict'; answer: boolean };
+
+async function typeNumber(page: Page, pad: Locator, value: number, tap: boolean): Promise<void> {
+  if (tap) {
+    for (const digit of String(value))
+      await pad.getByRole('button', { name: digit, exact: true }).tap();
+    await pad.getByRole('button', { name: 'Xong' }).tap();
+  } else {
+    await blurControls(page);
+    await page.keyboard.type(String(value));
+    await page.keyboard.press('Enter');
+  }
+}
+
+async function press(page: Page, button: Locator, tap: boolean): Promise<void> {
+  if (tap) await button.tap();
+  else {
+    await button.focus();
+    await page.keyboard.press('Enter');
+  }
+}
+
+/** Solves the shared step-kit reasoning round and returns its `sk:` fact key. */
+async function solveReasoningRound(page: Page, tap: boolean): Promise<string> {
+  const round = page.locator('.reasoning-round');
+  await expect(round).toBeVisible();
+  const hook = await page.evaluate(() => {
+    const h = window.__reasoningRound;
+    return h ? { factKey: h.factKey, steps: h.steps as PlannedStep[] } : null;
+  });
+  if (!hook) throw new Error('reasoning round hook missing');
+  for (const [i, step] of hook.steps.entries()) {
+    const row = round.locator('.kit-step').nth(i);
+    if (step.kind === 'number') await typeNumber(page, row.locator('.kit-pad'), step.answer, tap);
+    else if (step.kind === 'choice')
+      await press(
+        page,
+        row.locator('.kit-choices').getByRole('button', { name: step.label, exact: true }),
+        tap,
+      );
+    else if (step.kind === 'verdict')
+      await press(page, row.locator(`[data-verdict="${step.answer}"]`), tap);
+    else {
+      for (const id of step.ids) await press(page, row.locator(`[data-choice="${id}"]`), tap);
+      await press(page, row.locator('.kit-multi__done'), tap);
+    }
+    await expect(row).toHaveClass(/kit-step--done/);
+  }
+  await expect(round.locator('.feedback')).toHaveClass(/success/);
+  const next = round.locator('.reasoning-round__next');
+  if (tap) await next.tap();
+  else {
+    await expect(next).toBeFocused();
+    await page.keyboard.press('Enter');
+  }
+  await expect(round).toHaveCount(0);
+  return hook.factKey;
 }
 
 async function playFloor(page: Page, index: number, tap: boolean): Promise<void> {
@@ -176,6 +254,97 @@ test('the tower climbs seven floors and records × and : facts', async ({ page }
   for (const key of factKeys) expect(store.keys).toContain(key);
   // Chapter 1 done: the quest card opens chapter 2 at the garden.
   await expect(page.locator('#quest-title')).toHaveText('Khu Vườn Quy Luật');
+  // The tower is the gate to chapter 2: the garden gate opens after stage 1, as today.
+  expect(await page.evaluate(() => window.__game?.gateStatus('garden'))).toBe('open');
   expect(await page.evaluate(() => window.__tower)).toBeUndefined();
+  expect(errors).toEqual([]);
+});
+
+test('stage 2 plays expression floors and records only its own stage stars', async ({
+  page,
+}, info) => {
+  const errors: string[] = [];
+  page.on('pageerror', (e) => errors.push(String(e)));
+  const tap = info.project.name === 'mobile-pixel';
+  await startWithStages(page, [2]);
+  await expect(page.locator('#gate-tower-label small')).toHaveText('Đã hoàn thành ★★☆ · Chặng 2/6');
+  await enterTower(page, tap);
+  expect(await page.evaluate(() => window.__game?.levelRunning())).toBe(true);
+
+  // Six standard floors, then the expression floor (forced in stage 2, it takes the last slot).
+  for (let i = 0; i < 6; i++) {
+    await playFloor(page, i, tap);
+    if (tap) await page.locator('.tower-next').tap();
+    else await page.keyboard.press('Enter');
+  }
+  const key = await solveReasoningRound(page, tap);
+  expect(['sk:expr-brackets', 'sk:expr-order', 'sk:tf-explain']).toContain(key);
+  await expect(page.locator('.tower-done')).toContainText('Chặng 2/6');
+  // Later stages pay no first-clear bonus.
+  await expect(page.locator('.tower-done .tower-bonus')).toHaveCount(0);
+  const maxCalls = Number(await page.locator('.level-layer').getAttribute('data-max-draw-calls'));
+  expect(maxCalls).toBeGreaterThan(0);
+  expect(maxCalls).toBeLessThanOrEqual(DRAW_CALL_BUDGET);
+
+  const back = page.locator('.tower-back');
+  if (tap) await back.tap();
+  else {
+    await expect(back).toBeFocused();
+    await page.keyboard.press('Enter');
+  }
+  await expect.poll(() => page.evaluate(() => window.__game?.levelRunning())).toBe(false);
+  // The commit runs in the background after the level closes: poll the store until it lands.
+  await expect
+    .poll(() => page.evaluate(() => window.__game?.snapshot()?.levelProgress.tower?.stageStars))
+    .toEqual([2, expect.any(Number)]);
+  const tower = await page.evaluate(() => window.__game?.snapshot()?.levelProgress.tower);
+  expect(tower?.stageStars?.[0]).toBe(2);
+  expect(tower?.stageStars?.[1]).toBeGreaterThanOrEqual(1);
+  // A stage-2 run never overwrites stage 1's stars (the level's `stars` stay 2).
+  expect(tower?.stars).toBe(2);
+  await expect(page.locator('#gate-tower-label small')).toHaveText(/Chặng 3\/6/);
+  expect(errors).toEqual([]);
+});
+
+test('stage 4 plays word problems and records only its own stage stars', async ({ page }, info) => {
+  const errors: string[] = [];
+  page.on('pageerror', (e) => errors.push(String(e)));
+  const tap = info.project.name === 'mobile-pixel';
+  await startWithStages(page, [2, 2, 2]);
+  await expect(page.locator('#gate-tower-label small')).toHaveText('Đã hoàn thành ★★☆ · Chặng 4/6');
+  await enterTower(page, tap);
+  expect(await page.evaluate(() => window.__game?.levelRunning())).toBe(true);
+
+  for (let i = 0; i < 6; i++) {
+    await playFloor(page, i, tap);
+    if (tap) await page.locator('.tower-next').tap();
+    else await page.keyboard.press('Enter');
+  }
+  // Stage 4 swaps the expression line for the word-problem line.
+  await expect(page.locator('.tower-guide')).toContainText('câu chuyện');
+  const key = await solveReasoningRound(page, tap);
+  expect(['sk:wp-times-then-add', 'sk:wp-divide-then-add', 'sk:wp-more-less-then-total']).toContain(
+    key,
+  );
+  await expect(page.locator('.tower-done')).toContainText('Chặng 4/6');
+  await expect(page.locator('.tower-done .tower-bonus')).toHaveCount(0);
+
+  const back = page.locator('.tower-back');
+  if (tap) await back.tap();
+  else {
+    await expect(back).toBeFocused();
+    await page.keyboard.press('Enter');
+  }
+  await expect.poll(() => page.evaluate(() => window.__game?.levelRunning())).toBe(false);
+  await expect
+    .poll(() => page.evaluate(() => window.__game?.snapshot()?.levelProgress.tower?.stageStars))
+    .toEqual([2, 2, 2, expect.any(Number)]);
+  const tower = await page.evaluate(() => window.__game?.snapshot()?.levelProgress.tower);
+  expect(tower?.stageStars?.[0]).toBe(2);
+  expect(tower?.stageStars?.[1]).toBe(2);
+  expect(tower?.stageStars?.[2]).toBe(2);
+  expect(tower?.stageStars?.[3]).toBeGreaterThanOrEqual(1);
+  expect(tower?.stars).toBe(2);
+  await expect(page.locator('#gate-tower-label small')).toHaveText(/Chặng 5\/6/);
   expect(errors).toEqual([]);
 });

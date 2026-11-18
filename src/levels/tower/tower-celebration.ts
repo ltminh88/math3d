@@ -12,6 +12,8 @@ export function showTowerCelebration(
   onBack: () => void,
   /** First clear: the one-time bonus the host adds on commit (QA m-12), else null. */
   bonus: { xp: number; coins: number } | null = null,
+  /** The stage just played ("Chặng {n}/6 · {sao} sao"), else null. */
+  stageLine: string | null = null,
 ): HTMLElement {
   const card = document.createElement('section');
   card.className = 'tower-done glass';
@@ -26,6 +28,12 @@ export function showTowerCelebration(
   starRow.textContent = '★'.repeat(stars) + '☆'.repeat(3 - stars);
   starRow.setAttribute('aria-label', ts('stars', { n: stars }));
   starRow.dataset.stars = String(stars);
+  if (stageLine) {
+    const line = document.createElement('p');
+    line.className = 'tower-stage-line';
+    line.textContent = stageLine;
+    starRow.after(line);
+  }
   (card.querySelector('.tower-done__line strong') as HTMLElement).textContent =
     `${tc('guideName')}:`;
   (card.querySelector('.tower-done__line span') as HTMLElement).textContent = ts('doneLine');
