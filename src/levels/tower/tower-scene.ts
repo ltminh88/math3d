@@ -7,7 +7,7 @@ import type { LevelContext, LevelModule, LevelSession } from '../shared/level-ty
 import { showTowerCelebration } from './tower-celebration';
 import { TowerClimbCamera } from './tower-climb-camera';
 import { buildTowerDiorama } from './tower-diorama-builder';
-import { planTowerRun, startTowerReasoningFloor } from './tower-expression-floor';
+import { startTowerReasoningFloor } from './tower-expression-floor';
 import { TowerFloorView } from './tower-floor-view';
 import { listenTowerKeys } from './tower-keyboard';
 import { FLOOR_COUNT } from './tower-layout';
@@ -15,6 +15,7 @@ import { TowerPanel } from './tower-panel';
 import { TowerQuestionCard } from './tower-question-card';
 import { TowerRoundController } from './tower-round-controller';
 import { TowerRoundFlow } from './tower-round-flow';
+import { planTowerRun } from './tower-stage-plan';
 import { towerStrings } from './tower-strings';
 import { installTowerTestHook } from './tower-test-hook';
 import './tower-hud-and-answer-panel.css';
@@ -26,10 +27,10 @@ function start(ctx: LevelContext): LevelSession {
   const ts = towerStrings(ctx.defineStrings);
   const scene = new Scene();
   scene.name = 'tower';
-  const { sun } = buildTowerDiorama(scene);
+  const { sun } = buildTowerDiorama(scene, ctx.stage);
   const floors = new TowerFloorView(scene, ctx.reducedMotion);
   const climb = new TowerClimbCamera(ctx.reducedMotion);
-  const towerRun = planTowerRun(ctx.learning, Math.min(ctx.definition.rounds, FLOOR_COUNT));
+  const towerRun = planTowerRun(ctx.learning, ctx.definition, ctx.stage);
   const flow = new TowerRoundFlow(towerRun.questions, () => performance.now(), towerRun.total);
   let reasoned = false;
   const controller: { current?: TowerRoundController } = {};
@@ -77,6 +78,7 @@ function start(ctx: LevelContext): LevelSession {
             onFloorDone: (floor) => this.onFloorDone(floor),
             onNext: () => this.onLevelDone(c.tally.earned(), c.tally.stars()),
           },
+          ctx.stage,
         );
         frame();
         return;
@@ -89,7 +91,8 @@ function start(ctx: LevelContext): LevelSession {
       ctx.announce(ts('doneTitle'));
       const bonus = ctx.firstCompletion ? LEVEL_COMPLETE_BONUS : null;
       const exit = () => ctx.exit({ completed: true });
-      showTowerCelebration(ctx.ui, ts, earned, stars, exit, bonus);
+      const stageLine = ts('stageLine', { n: ctx.stage, m: ctx.definition.stages, stars });
+      showTowerCelebration(ctx.ui, ts, earned, stars, exit, bonus, stageLine);
       frame();
     },
   });
