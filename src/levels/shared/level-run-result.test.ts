@@ -52,6 +52,36 @@ describe('level run result', () => {
     expect(firstCompletionBonus('forest', run)(storeWith(0))).toEqual({ xp: 0, coins: 0 });
   });
 
+  it('a stage 2+ replay pays no first-completion bonus and claims none of the level’s stars', () => {
+    const replay = createSessionRecorder({
+      profileId: 'p1',
+      levelId: 'field',
+      sessionNo: 5,
+      stage: 2,
+      getStat: () => undefined,
+      now: () => 1_700_000_000_000,
+      newId: () => 'batch-2',
+    });
+    replay.recordQuestion(answer());
+    replay.recordQuestion(answer());
+    const run = levelRunToCommit(replay, { completed: true });
+    if (!run) throw new Error('expected a run');
+    // A later stage records only its own slot: the level's stars (stage 1's) stay untouched,
+    // so the store's per-slot max merge keeps the highest stars earned.
+    expect(run.delta.levels.field?.stars).toBe(0);
+    expect(run.delta.levels.field?.stageStars?.[0]).toBe(0);
+    expect(run.delta.levels.field?.stageStars?.[1]).toBeGreaterThanOrEqual(1);
+    // ...and the one-time bonus stays unpaid on an already-completed level.
+    const storeWith = (completedAt: number) =>
+      ({
+        getSnapshot: () => ({ levelProgress: { field: { completedAt } } }),
+      }) as unknown as GameStore;
+    expect(firstCompletionBonus('field', run)(storeWith(1_700_000_000_000))).toEqual({
+      xp: 0,
+      coins: 0,
+    });
+  });
+
   it('an abandoned run keeps its answers but marks no level progress', () => {
     const r = recorder();
     r.recordQuestion(answer(false));

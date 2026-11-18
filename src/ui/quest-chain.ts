@@ -25,6 +25,7 @@ import {
   questStage,
 } from './quest-chain-stage';
 import { tq } from './quest-chain-strings';
+import { renderStageLine } from './quest-stage-line';
 import { setMarkup } from './set-markup-if-changed';
 import { wireStickerBookButton } from './sticker-guide-section';
 import './quest-chain-steps.css';
@@ -179,6 +180,7 @@ export function renderQuestCard(): void {
     byId('quest-progress').textContent = bridgeProgress();
     setMarkup('quest-steps', bridgeStepsHtml());
     renderChapterLabel(undefined);
+    renderStageLine(stage);
     wireStickerBookButton();
     return;
   }
@@ -190,5 +192,6 @@ export function renderQuestCard(): void {
   byId('quest-progress').textContent = card.progress;
   setMarkup('quest-steps', chainStepsHtml(stage));
   renderChapterLabel(stage);
+  renderStageLine(stage);
   wireStickerBookButton();
 }

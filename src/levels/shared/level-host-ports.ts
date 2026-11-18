@@ -19,6 +19,7 @@ import type { LevelHostPorts, LevelRun } from './level-host';
 import { gateNameOf, tl } from './level-host-strings';
 import { firstCompletionBonus, levelRunToCommit } from './level-run-result';
 import { mountLevelRunUi } from './level-run-ui';
+import { takeRequestedStage } from './level-stage-override';
 import { nextStage } from './level-stages';
 import type { LevelDefinition, LevelResult } from './level-types';
 import { saveRendererState } from './renderer-state-snapshot';
@@ -48,10 +49,15 @@ function openLevelRun(
   const sessionNo = store.nextSessionNo();
   const stats = () => store.getSnapshot().factStats;
   const progress = store.getSnapshot().levelProgress[definition.id];
-  const stage = nextStage({
-    stages: definition.stages,
-    stageStars: progress?.stageStars ?? [],
-  });
+  // A replay picked in the map panel wins for this one run of THIS level; otherwise the
+  // next uncompleted stage (all done → the last stage, so a finished level can still be
+  // entered from its gate). A request for another level is dropped, not kept.
+  const stage =
+    takeRequestedStage(definition.id, definition.stages) ??
+    nextStage({
+      stages: definition.stages,
+      stageStars: progress?.stageStars ?? [],
+    });
   const recorder = createSessionRecorder({
     profileId: store.getSnapshot().profile.id,
     levelId: definition.id,

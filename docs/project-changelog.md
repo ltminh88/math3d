@@ -1,5 +1,22 @@
 # Project changelog
 
+## 2026-11-18 — Phase 13: quest card stages, HUD copy, migration, docs
+
+### Added
+- Quest card stage sub-line ("Chặng n/m · s/3m sao"; "Đã qua hết các chặng!" once every stage of the level is done), from the migrated `stageStars`. The denominator is there because the celebration card already uses "Chặng n/m · {stars} sao" for one stage's stars.
+- Gate pop-panel in the map detail panel: an unfinished multi-stage level shows its next stage plus "Vào chơi"; a finished level shows "Chơi lại chặng…" with one ≥44 px row per completed stage. Replaying never re-locks anything and never re-pays the first-completion bonus.
+- E2E: `quest-chain-stages.spec.ts` (sub-line, pop-panel, replay) and `save-migration-m3d3-to-m3d4.spec.ts`.
+
+### Changed
+- HUD daily copy finalised: the button reads "Luyện tập hôm nay", matching the quest card's "Hôm nay: chưa luyện / đã luyện ✓" line (no new HUD element).
+- `docs/code-standards.md`: the stage model, the daily planner + streak rules, and the sticker derivation rule; save-code export now documented as `M3D4` (was `M3D3`).
+
+### Migration (for existing players)
+- Importing a shipped `M3D3` code keeps every level's stage 1 complete with its old stars; stages 2+ open at 0. The quest card shows the closing card; the gate offers the next stage; daily practice unlocks with a pool drawn from the imported stats. A fresh profile still sees field stage 1 open and daily locked.
+
+### Testing
+- Unit 942/942 (143 files, incl. the new override and replay cases); typecheck 0; lint 0 errors (9 pre-existing CSS warnings); build 0; golden traces byte-identical. E2E local (one project at a time, `--workers=1`, per the machine rule; mobile-pixel and tablet-landscape left to CI): the 2 new specs 5/5 on desktop-chromium and 5/5 on tablet-portrait; the touched existing specs (quest-chain, level-gate, chapter2-gates-and-regions, stage-migration) 14 passed, 1 skipped on desktop; full-chain 1/1 on desktop after merging main 9e51635 (cave 5 stages).
+
 ## 2026-11-09 — Chapter 2 follow-ups from the author review (tag `chapter2`)
 
 ### Added

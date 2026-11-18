@@ -14,11 +14,12 @@ import { buildExpansionWorld } from '../../world/expansion-world-builder';
 import type { WorldBuildContext } from '../../world/world-build-context';
 import type { WorldPublicApi } from '../../world/world-public-api';
 import { buildLevelGate, type LevelGateView } from './level-gate-builder';
-import { LevelHost } from './level-host';
+import { type EnterOutcome, LevelHost } from './level-host';
 import { createLevelHostPorts } from './level-host-ports';
 import { gateNameOf, tl } from './level-host-strings';
 import { type GateStatus, gateStatus, progressionState } from './level-progression';
 import { levelDefinition } from './level-registry';
+import { clearRequestedStage, requestStage } from './level-stage-override';
 import { nextStage, stagesCompleted } from './level-stages';
 import './level-host.css';
 
@@ -101,17 +102,39 @@ function interactLabel(gate: LevelGate): string {
 /** A level is loading or running: world keys, map and settings stay out of its way. */
 export const isLevelRunning = (): boolean => host?.running ?? false;
 
-async function enterGate(gate: LevelGate): Promise<void> {
+async function enterGate(gate: LevelGate): Promise<EnterOutcome> {
   const definition = levelDefinition(gate.levelId);
   if (!definition || !host || !connectedStore()) {
     showToast(tl('loadFailed'));
-    return;
+    return 'failed';
   }
   gameState.audio.unlock();
   const outcome = await host.enter(definition);
   // A tab older than the last deploy: reload onto the new build (progress is already saved).
   if (outcome === 'stale' && reloadForNewBuild()) showToast(tl('reloadingNewBuild'));
   else if (outcome === 'stale' || outcome === 'failed') showToast(tl('loadFailed'));
+  return outcome;
+}
+
+/**
+ * Enters a level from the map panel — the next stage, or one completed stage to replay.
+ * The override is set only when the run can actually start, so a failed entry never leaks
+ * a stale stage into a later run. Replaying never re-locks anything and never re-pays the
+ * first-completion bonus: a stage 2+ run records only its own `stageStars` slot (merged by
+ * max, so earned stars survive) and `firstCompletionBonus` pays only while `completedAt`
+ * is still 0.
+ */
+export async function enterLevelFromMap(levelId: string, stage?: number): Promise<void> {
+  const gate = LEVEL_GATES.find((g) => g.levelId === levelId);
+  const definition = levelDefinition(levelId);
+  if (!gate || !definition || !host || !connectedStore()) {
+    showToast(tl('loadFailed'));
+    return;
+  }
+  if (stage !== undefined) requestStage(levelId, stage);
+  const outcome = await enterGate(gate);
+  // A run that never started must not leave a stale stage armed for a later entry.
+  if (outcome !== 'entered') clearRequestedStage();
 }
 
 function lockedToast(gate: LevelGate): string {

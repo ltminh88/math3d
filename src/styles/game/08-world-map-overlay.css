@@ -153,6 +153,43 @@
   width: 16px;
   height: 16px;
 }
+/* Gate pop-panel (phase 13): "Vào chơi" for the next stage, and the replay picker for a
+   level with every stage done. Rows are ≥44px so a child can tap them. */
+.map-enter {
+  margin-top: 10px;
+  min-height: 44px;
+  padding: 0 18px;
+  border: none;
+  border-radius: 12px;
+  background: var(--gold);
+  color: var(--ink);
+  font: inherit;
+  font-size: 14px;
+  font-weight: 900;
+  cursor: pointer;
+}
+.map-replay-title {
+  font-weight: 800;
+}
+.map-replay-list {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  margin-top: 8px;
+}
+.map-replay-stage {
+  min-height: 44px;
+  padding: 0 12px;
+  border: 2px solid transparent;
+  border-radius: 12px;
+  background: #ffffff61;
+  color: var(--ink);
+  font: inherit;
+  font-size: 14px;
+  font-weight: 800;
+  text-align: left;
+  cursor: pointer;
+}
 dialog {
   width: min(560px, calc(100vw - 28px));
   max-height: calc(100dvh - 36px);
