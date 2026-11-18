@@ -1,7 +1,7 @@
 // QA p-6: on touch screens the top-bar buttons (38 px) and the quest toggle (26 px tall) take
 // taps over at least 44 x 44 px, without changing how they look.
 import { type Page, test } from '@playwright/test';
-import { expect, waitForStoreBoot } from './legacy-live-save-fixtures';
+import { expect, waitDialogSettled, waitForStoreBoot } from './legacy-live-save-fixtures';
 
 test.use({ locale: 'vi-VN' });
 
@@ -61,6 +61,7 @@ test('title text buttons and the dialog close button have 44 px touch targets', 
     expect(rows, selector).toBeGreaterThanOrEqual(44);
   }
   await page.locator('#learn-welcome').tap();
+  await waitDialogSettled(page);
   await expect(page.locator('#close-dialog')).toBeVisible();
   expect(await hitsAround(page, '#close-dialog', 0.5)).toEqual([true, true, true, true]);
 });

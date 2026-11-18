@@ -6,7 +6,12 @@
 // use tap() only. Uses the test-build hook `window.__game`.
 import { type Locator, type Page, test } from '@playwright/test';
 import { CHAIN, chapterRow, STAGES, type Stage } from './full-chain-stages';
-import { expect, SLOW_TEST_MS, waitForStoreBoot } from './legacy-live-save-fixtures';
+import {
+  expect,
+  SLOW_TEST_MS,
+  waitDialogSettled,
+  waitForStoreBoot,
+} from './legacy-live-save-fixtures';
 
 test.use({ locale: 'vi-VN' });
 test.describe.configure({ timeout: SLOW_TEST_MS * 4 });
@@ -77,6 +82,7 @@ async function expectVlmPointsAt(page: Page, press: Press, gate: string): Promis
   await expect(page.locator('#interact')).toContainText('Nói chuyện với VLM');
   await press(page.locator('#interact'));
   await expect(page.locator('#dialog .dialog-copy')).toContainText(gate);
+  await waitDialogSettled(page);
   await press(page.locator('#close-dialog'));
   await expect(page.locator('#dialog')).not.toBeVisible();
 }

@@ -1,7 +1,12 @@
 // Phase 12: the sticker book is derived from Leitner boxes — seed stats, play one clean
 // quiz answer, and the book shows the earned sticker; a table at 70% earns its sticker.
 import { type Page, test } from '@playwright/test';
-import { expect, SLOW_TEST_MS, waitForStoreBoot } from './legacy-live-save-fixtures';
+import {
+  expect,
+  SLOW_TEST_MS,
+  waitDialogSettled,
+  waitForStoreBoot,
+} from './legacy-live-save-fixtures';
 
 test.use({ locale: 'vi-VN' });
 test.describe.configure({ timeout: SLOW_TEST_MS });
@@ -123,6 +128,7 @@ test('fresh profile: the book opens on 0 earned, pages flip, targets are 44 px',
   await expect(page.locator('#dialog kbd')).toHaveCount(0);
   // dispatchEvent for dialog closes too: a plain #close-dialog click has hung on the
   // stability check on this VM (same slow-frame cause as #learn / #sticker-next).
+  await waitDialogSettled(page);
   await page.locator('#close-dialog').dispatchEvent('click');
   await expect(page.locator('#dialog')).not.toHaveAttribute('open', '');
 });
@@ -144,6 +150,7 @@ test('a table seeded at 13 of 18 facts at box 4 earns its sticker; 12 does not',
   await page.locator('[data-sticker="sk:geo-midpoint"]').dispatchEvent('click');
   await expect(page.locator('.sticker-detail')).toContainText('Điểm ở giữa — con đã thuộc!');
   await expect(page.locator('.sticker-detail')).toContainText('SGK Toán 3');
+  await waitDialogSettled(page);
   await page.locator('#close-dialog').dispatchEvent('click');
   await expect(page.locator('#dialog')).not.toHaveAttribute('open', '');
   // No sticker field anywhere in the store: the book is derived, not stored. (A reload
@@ -189,6 +196,7 @@ async function earnTable3Sticker(page: Page): Promise<void> {
     await page.locator('#next-question').dispatchEvent('click');
   }
   expect(answeredTarget).toBe(true);
+  await waitDialogSettled(page);
   await page.locator('#close-dialog').dispatchEvent('click');
   // The batch commits on close: the fact reaches box 4 and the sticker is earned.
   await expect
@@ -233,6 +241,7 @@ test('VLM says the earning line once, then offers the book from his dialog', asy
   expect(guideBox?.height).toBeGreaterThanOrEqual(44);
   await tapOrClick(page, '#open-sticker-book-guide', touch);
   await expect(page.locator('.sticker-count')).toHaveText('1/8');
+  await waitDialogSettled(page);
   await page.locator('#close-dialog').dispatchEvent('click');
   await expect(page.locator('#dialog')).not.toHaveAttribute('open', '');
   // The line is consumed on read: talking to VLM again does not repeat it.
@@ -251,6 +260,7 @@ test('VLM says the earning line once, then offers the book from his dialog', asy
   await expect(page.locator('#dialog')).toHaveAttribute('open', '');
   await expect(page.locator('#dialog')).not.toContainText('Con vừa dán được hình Bảng nhân 3!');
   await expect(page.locator('#open-sticker-book-guide')).toBeVisible();
+  await waitDialogSettled(page);
   await page.locator('#close-dialog').dispatchEvent('click');
 });
 

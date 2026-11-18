@@ -2,7 +2,12 @@
 // and wearing an item -> import in a fresh browser context -> gates, quest card, levels, wallet
 // and cosmetics are back (and survive a reload). Uses the test-build hook `window.__game`.
 import { type Page, test } from '@playwright/test';
-import { expect, SLOW_TEST_MS, waitForStoreBoot } from './legacy-live-save-fixtures';
+import {
+  expect,
+  SLOW_TEST_MS,
+  waitDialogSettled,
+  waitForStoreBoot,
+} from './legacy-live-save-fixtures';
 
 test.use({ locale: 'vi-VN' });
 test.describe.configure({ timeout: SLOW_TEST_MS });
@@ -73,6 +78,7 @@ test('export after all levels and a purchase -> fresh context import restores ev
   await expect(card).toHaveAttribute('data-state', 'owned');
   await card.locator('[data-action="equip"]').click();
   await expect(card).toHaveAttribute('data-state', 'equipped');
+  await waitDialogSettled(page);
   await page.locator('#close-dialog').click();
   await expectFullProgress(page);
 

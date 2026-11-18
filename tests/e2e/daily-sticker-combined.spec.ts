@@ -3,7 +3,12 @@
 // card must show BOTH lanes' parts — daily on top, sticker below — on every project,
 // with no horizontal overflow and every button at least 44 px tall.
 import { type Page, test } from '@playwright/test';
-import { expect, SLOW_TEST_MS, waitForStoreBoot } from './legacy-live-save-fixtures';
+import {
+  expect,
+  SLOW_TEST_MS,
+  waitDialogSettled,
+  waitForStoreBoot,
+} from './legacy-live-save-fixtures';
 
 test.use({ locale: 'vi-VN' });
 test.describe.configure({ timeout: SLOW_TEST_MS * 2 });
@@ -118,6 +123,7 @@ test('unlocked: Milo dialog + quest card show daily (top) and sticker (below)', 
   else await guideButton.click();
   await expect(page.locator('.sticker-count')).toHaveText('1/8');
   await expect(page.locator('[data-sticker="table:3"]')).toHaveClass(/earned/);
+  await waitDialogSettled(page);
   await page.locator('#close-dialog').dispatchEvent('click');
   await expect(page.locator('#dialog')).not.toHaveAttribute('open', '');
 });
@@ -139,6 +145,7 @@ test('locked: Milo dialog shows the daily locked line above the sticker entry', 
   await expect(guideButton).toHaveText('📖 Sổ dán hình');
   await expectOrder(page, '.daily-guide-locked', '#open-sticker-book-guide');
   await expectButton44(page, '#open-sticker-book-guide');
+  await waitDialogSettled(page);
   await page.locator('#close-dialog').dispatchEvent('click');
   await expect(page.locator('#dialog')).not.toHaveAttribute('open', '');
 });

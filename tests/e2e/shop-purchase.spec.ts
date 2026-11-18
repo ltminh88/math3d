@@ -3,7 +3,12 @@
 // calls with everything equipped and no geometry leak over 10 equip/unequip cycles. Coins are
 // seeded through a legacy v1 save (imported once into the store at boot, like a returning player).
 import { type Page, test } from '@playwright/test';
-import { expect, SLOW_TEST_MS, waitForStoreBoot } from './legacy-live-save-fixtures';
+import {
+  expect,
+  SLOW_TEST_MS,
+  waitDialogSettled,
+  waitForStoreBoot,
+} from './legacy-live-save-fixtures';
 
 test.use({ locale: 'vi-VN' });
 test.describe.configure({ timeout: SLOW_TEST_MS });
@@ -151,6 +156,7 @@ test('HUD button: everything worn costs <= 6 draw calls; 10 swaps leak no geomet
     await page.locator(`#shop-tab-${tabs[i]}`).click();
     await buy(page, id);
   }
+  await waitDialogSettled(page);
   await page.locator('#close-dialog').click();
   const baseline = await drawCalls(page);
   const geometries = (await page.evaluate(() => window.__game?.memory()))?.geometries;
@@ -160,6 +166,7 @@ test('HUD button: everything worn costs <= 6 draw calls; 10 swaps leak no geomet
     await page.locator(`#shop-tab-${tabs[i]}`).click();
     await setWorn(page, id, true);
   }
+  await waitDialogSettled(page);
   await page.locator('#close-dialog').click();
   expect(await page.evaluate(wornInScene)).toEqual({
     milo: ['cosmetic:vlm-star-band'],
@@ -179,6 +186,7 @@ test('HUD button: everything worn costs <= 6 draw calls; 10 swaps leak no geomet
     await page.locator(`#shop-tab-${tabs[i]}`).click();
     await setWorn(page, id, false);
   }
+  await waitDialogSettled(page);
   await page.locator('#close-dialog').click();
   await page.waitForTimeout(500);
   expect((await page.evaluate(() => window.__game?.memory()))?.geometries).toBe(geometries);
