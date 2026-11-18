@@ -46,6 +46,7 @@ const vi = {
   doneScore: '+{xp} XP · +{coins} xu',
   bonusLine: 'Thưởng lần đầu hoàn thành: +{xp} XP · +{coins} xu',
   stars: '{n}/3 sao',
+  stageLine: 'Chặng {n}/{m} · {stars} sao',
   backToGate: 'Về cổng',
 };
 
@@ -94,6 +95,7 @@ const en: Record<keyof typeof vi, string> = {
   doneScore: '+{xp} XP · +{coins} coins',
   bonusLine: 'First completion bonus: +{xp} XP · +{coins} coins',
   stars: '{n}/3 stars',
+  stageLine: 'Stage {n}/{m} · {stars} stars',
   backToGate: 'Back to the gate',
 };
 

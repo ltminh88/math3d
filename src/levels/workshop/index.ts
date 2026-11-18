@@ -9,7 +9,7 @@ const workshopLevel: LevelDefinition = {
   regionId: 'workshop',
   tables: [10],
   rounds: 6,
-  stages: 1,
+  stages: 5,
   requires: 'valley',
   load: () => import('./workshop-scene'),
 };

@@ -52,7 +52,27 @@ function buildRoom(ctx: WorldBuildContext, root: Object3D): void {
   }
 }
 
-function buildBench(ctx: WorldBuildContext, root: Object3D): void {
+/** Waiting orders on the bench: one small parcel per stage, stacked at the free front-right
+ * corner. Baked into the room mesh, so the stage dressing costs no extra draw call. The
+ * corner is clear of every station: the ruler ends at x 2.7, the jug sits at z -0.2, and the
+ * balance is on the left. */
+function buildOrderParcels(ctx: WorldBuildContext, root: Object3D, stage: number): void {
+  for (let i = 0; i < stage; i++) {
+    addBox(
+      ctx,
+      root,
+      4,
+      BENCH_TOP + 0.14 + i * 0.28,
+      1,
+      0.4,
+      0.28,
+      0.4,
+      i % 2 === 0 ? C.box : C.tin,
+    );
+  }
+}
+
+function buildBench(ctx: WorldBuildContext, root: Object3D, stage: number): void {
   addBox(ctx, root, 0, BENCH_TOP - 0.12, 0, 9, 0.24, 3.2, C.oak);
   for (const x of [-4.1, 4.1])
     for (const z of [-1.3, 1.3])
@@ -75,18 +95,19 @@ function buildBench(ctx: WorldBuildContext, root: Object3D): void {
   const [hx] = STATION_SPOTS.thermometer;
   addBox(ctx, root, hx, 3, -3.82, 0.7, 2.6, 0.08, C.plate);
   addCylinder(ctx, root, hx, 1.85, -3.72, 0.16, 0.16, 0.12, C.mercury, 10).rotation.x = Math.PI / 2;
+  buildOrderParcels(ctx, root, stage);
 }
 
 export interface WorkshopDiorama {
   readonly sun: DirectionalLight;
 }
 
-export function buildWorkshopDiorama(scene: Scene): WorkshopDiorama {
+export function buildWorkshopDiorama(scene: Scene, stage = 1): WorkshopDiorama {
   scene.background = new Color(SKY_HORIZON_COLOR);
   const scratch = new Scene();
   const ctx = scratchContext(scratch);
   buildRoom(ctx, scratch);
-  buildBench(ctx, scratch);
+  buildBench(ctx, scratch, stage);
   const material = new MeshStandardMaterial({
     vertexColors: true,
     roughness: WORLD_LIGHTING.roughness.primitive,

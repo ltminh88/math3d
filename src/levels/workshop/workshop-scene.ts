@@ -27,7 +27,7 @@ function start(ctx: LevelContext): LevelSession {
   const hs = workshopHintStrings(ctx.defineStrings);
   const scene = new Scene();
   scene.name = 'workshop';
-  const { sun } = buildWorkshopDiorama(scene);
+  const { sun } = buildWorkshopDiorama(scene, ctx.stage);
   const props = new WorkshopBenchProps(scene, ctx.reducedMotion);
   const view = new WorkshopCamera(ctx.reducedMotion);
   const stats = ctx.learning.stats();
@@ -74,6 +74,7 @@ function start(ctx: LevelContext): LevelSession {
       ctx.audio.celebrate();
       ctx.announce(ws('doneTitle'));
       const bonus = ctx.firstCompletion ? LEVEL_COMPLETE_BONUS : null;
+      const stageLine = ws('stageLine', { n: ctx.stage, m: ctx.definition.stages, stars });
       showWorkshopCelebration(
         ctx.ui,
         ws,
@@ -81,6 +82,7 @@ function start(ctx: LevelContext): LevelSession {
         stars,
         () => ctx.exit({ completed: true }),
         bonus,
+        stageLine,
       );
       frame();
     },
