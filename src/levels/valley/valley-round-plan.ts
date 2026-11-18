@@ -30,6 +30,20 @@ export interface ValleyRoundSpec {
   readonly tier: SkillTier;
 }
 
+export interface ValleyPlanOptions {
+  /**
+   * Skill ids the run may use; unset means today's pool (a first run meets only the
+   * first three kinds). A stage passes its subset here.
+   */
+  skills?: readonly string[];
+  /**
+   * Lowest tier an item is generated at. The floor lifts only the generated item's
+   * tier (which format appears); the Leitner box is untouched and still orders the
+   * run weakest-first.
+   */
+  tierFloor?: SkillTier;
+}
+
 const seen = (stats: Stats, id: string) => (stats[skillKey(id)]?.attempts ?? 0) > 0;
 
 /** `sk:` keys the planner may pick from for this child. */
@@ -46,10 +60,18 @@ export function planValleyRounds(
   planned: readonly FactKey[],
   stats: Stats,
   rounds: number,
+  options: ValleyPlanOptions = {},
 ): ValleyRoundSpec[] {
-  const pool = valleyFactPool(stats).map((k) => k.slice(3));
+  const skills = options.skills ?? null;
+  if (skills) {
+    const unknown = skills.filter((id) => !GEOMETRY_SKILLS.includes(id));
+    if (unknown.length > 0) throw new Error(`valley plan: no generator for skill "${unknown[0]}"`);
+  }
+  const pool = (skills ?? valleyFactPool(stats).map((k) => k.slice(3))).slice();
+  const floor = options.tierFloor ?? 1;
   const box = (id: string) => stats[skillKey(id)]?.box ?? 1;
   const tries = (id: string) => stats[skillKey(id)]?.attempts ?? 0;
+  const tier = (id: string) => Math.max(skillTierOf(stats[skillKey(id)]), floor) as SkillTier;
   const lead = [...new Set(planned.map((k) => k.slice(3)))].filter((id) => pool.includes(id));
   const rest = pool
     .filter((id) => !lead.includes(id))
@@ -78,7 +100,7 @@ export function planValleyRounds(
     used.set(best, (used.get(best) ?? 0) + 1);
     kindUsed.set(kind, (kindUsed.get(kind) ?? 0) + 1);
     last = kind;
-    out.push({ skillId: best, tier: skillTierOf(stats[skillKey(best)]) });
+    out.push({ skillId: best, tier: tier(best) });
   }
   return out;
 }

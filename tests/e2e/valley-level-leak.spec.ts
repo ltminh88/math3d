@@ -51,3 +51,36 @@ test('leaving the valley frees its geometries and textures (once and after 10 vi
   await expect.poll(() => rendererMemory(page)).toEqual(baseline);
   expect(await page.evaluate(() => window.__game?.gateStatus('valley'))).toBe('open');
 });
+
+test('leaving stage 4 frees its geometries too', async ({ page }, info) => {
+  const tap = info.project.use.hasTouch === true;
+  await page.goto('/');
+  await waitForStoreBoot(page);
+  await page.waitForFunction(() => '__game' in window);
+  await page.locator('#play').click();
+  await expect(page.locator('body')).toHaveClass(/playing/);
+  await page.evaluate(() =>
+    window.__game?.seedProgress({
+      bridgeComplete: true,
+      completedLevels: ['field', 'forest', 'city', 'tower', 'garden'],
+    }),
+  );
+  await page.evaluate(() => window.__game?.seedStageProgress('valley', [3, 3, 3]));
+  await page.evaluate(() => window.__game?.teleportToGate('valley'));
+  const interact = page.locator('#interact');
+  await expect(interact).toContainText('Vào Cổng Thung Lũng Hình Học');
+  const baseline = await settledMemory(page);
+  expect(baseline.geometries).toBeGreaterThan(0);
+  if (tap) await interact.tap();
+  else await interact.click();
+  await expect(page.locator('.valley-panel')).toBeVisible();
+  await expect(page.locator('.level-layer')).toHaveAttribute('data-draw-calls', /\d+/);
+  expect((await rendererMemory(page)).geometries).toBeGreaterThan(baseline.geometries);
+  const leave = page.locator('.level-leave');
+  if (tap) await leave.tap();
+  else await leave.click();
+  await expect.poll(() => page.evaluate(() => window.__game?.levelRunning())).toBe(false);
+  await expect.poll(() => rendererMemory(page)).toEqual(baseline);
+  // Stages 1-3 were already completed (seeded), so the gate stays completed.
+  expect(await page.evaluate(() => window.__game?.gateStatus('valley'))).toBe('completed');
+});
