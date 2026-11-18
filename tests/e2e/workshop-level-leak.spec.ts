@@ -45,3 +45,39 @@ test('leaving the workshop frees its geometries and textures (once and after 10 
   expect(await page.evaluate(() => window.__game?.gateStatus('workshop'))).toBe('open');
   expect(await page.evaluate(() => window.__workshop)).toBeUndefined();
 });
+
+// Stage 4 (phase 09): the stage-4 bench (four order parcels) is built on entry and freed on
+// exit, exactly like stage 1. Stages 1-3 were already completed (seeded), so the gate stays
+// completed.
+test('leaving stage 4 frees its geometries and textures', async ({ page }, info) => {
+  const touch = info.project.use.hasTouch === true;
+  await page.goto('/');
+  await waitForStoreBoot(page);
+  await page.waitForFunction(() => '__game' in window);
+  await page.locator('#play').click();
+  await expect(page.locator('body')).toHaveClass(/playing/);
+  await page.evaluate(() =>
+    window.__game?.seedProgress({
+      bridgeComplete: true,
+      completedLevels: ['field', 'forest', 'city', 'tower', 'garden', 'valley'],
+    }),
+  );
+  await page.evaluate(() => window.__game?.seedStageProgress('workshop', [3, 3, 3]));
+  await page.evaluate(() => window.__game?.teleportToGate('workshop'));
+  const interact = page.locator('#interact');
+  await expect(interact).toContainText('Vào Cổng Xưởng Đo Đạc');
+  const baseline = await settledMemory(page);
+  expect(baseline.geometries).toBeGreaterThan(0);
+  if (touch) await interact.tap();
+  else await interact.click();
+  await expect(page.locator('.workshop-panel')).toBeVisible();
+  await expect(page.locator('.level-layer')).toHaveAttribute('data-draw-calls', /\d+/);
+  expect((await rendererMemory(page)).geometries).toBeGreaterThan(baseline.geometries);
+  const leave = page.locator('.level-leave');
+  if (touch) await leave.tap();
+  else await leave.click();
+  await expect.poll(() => page.evaluate(() => window.__game?.levelRunning())).toBe(false);
+  await expect.poll(() => rendererMemory(page)).toEqual(baseline);
+  expect(await page.evaluate(() => window.__game?.gateStatus('workshop'))).toBe('completed');
+  expect(await page.evaluate(() => window.__workshop)).toBeUndefined();
+});
