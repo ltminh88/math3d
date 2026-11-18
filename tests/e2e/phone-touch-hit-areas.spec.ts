@@ -86,23 +86,37 @@ test('logo and VLM label have 44 px touch targets; the explorer name stays on on
   await page.locator('#play').click();
   await expect(page.locator('body')).toHaveClass(/playing/);
   // The label follows the camera, which glides after Play and passes the label under the quest
-  // card; until the first projected frame it sits at the top-left corner. Stand south of VLM
-  // (label mid-screen) and wait for it to be placed below the top bar and stop moving.
+  // card; until the first projected frame it sits at the top-left corner. Stand just north of
+  // VLM so the settled label sits mid-screen (label top ~371 px on mobile-pixel, well below the
+  // daily-practice button; from (-3, 6) it settles under that button and the quest card), then
+  // wait for it to be placed below the top bar and stop moving.
   await page.waitForFunction(() => '__game' in window);
-  await page.evaluate(() => window.__game?.teleport(-3, 6));
+  await page.evaluate(() => window.__game?.teleport(-3, -1));
   await expect(page.locator('#milo-label')).toBeVisible();
-  const labelBox = () =>
-    page.evaluate(() => {
-      const r = document.querySelector('#milo-label')?.getBoundingClientRect();
-      return r && r.top > 100 ? `${r.left},${r.top}` : 'unplaced';
-    });
-  await expect
-    .poll(async () => {
-      const before = await labelBox();
-      await page.waitForTimeout(500);
-      return before !== 'unplaced' && before === (await labelBox());
-    })
-    .toBe(true);
+  // "Still" is counted in rendered frames, not wall time: the world clamps each frame's dt, so on
+  // a slow CI renderer the glide stretches over many seconds and a 500 ms wait can pass with no
+  // new frame painted (the label was then measured mid-glide, under the daily-practice button).
+  // The camera eases in, so the label creeps for a long time; moving under 2 px across 10
+  // frames puts it within a few px of where it stops.
+  test.setTimeout(90_000);
+  const labelSettled = () =>
+    page.evaluate(
+      () =>
+        new Promise<boolean>((resolve) => {
+          const label = document.querySelector('#milo-label') as HTMLElement;
+          const start = label.getBoundingClientRect();
+          let frames = 0;
+          const tick = () => {
+            const r = label.getBoundingClientRect();
+            const moved = Math.max(Math.abs(r.left - start.left), Math.abs(r.top - start.top));
+            if (start.top <= 100 || moved >= 2) return resolve(false);
+            if (++frames >= 10) return resolve(true);
+            requestAnimationFrame(tick);
+          };
+          requestAnimationFrame(tick);
+        }),
+    );
+  await expect.poll(labelSettled, { timeout: 75_000 }).toBe(true);
   // The widest card the playthrough saw: level 5, 3-digit coins.
   await page.evaluate(() => {
     (document.querySelector('#level') as HTMLElement).textContent = '5';
