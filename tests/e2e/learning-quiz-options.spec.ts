@@ -1,5 +1,10 @@
 import { test } from '@playwright/test';
-import { expect, SLOW_TEST_MS, waitForStoreBoot } from './legacy-live-save-fixtures';
+import {
+  expect,
+  SLOW_TEST_MS,
+  waitDialogSettled,
+  waitForStoreBoot,
+} from './legacy-live-save-fixtures';
 
 test.use({ locale: 'vi-VN' });
 test.describe.configure({ timeout: SLOW_TEST_MS });
@@ -30,6 +35,7 @@ test('30 practice questions: 3 unique options including the answer', async ({ pa
     await page.locator('#next-question').dispatchEvent('click');
   }
   expect(seen.size).toBeGreaterThan(3);
+  await waitDialogSettled(page);
   await page.locator('#close-dialog').click();
   await expect(page.locator('#coins')).toHaveText('150');
 });

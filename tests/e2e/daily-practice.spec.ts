@@ -11,7 +11,7 @@
 // evaluate hung 4 minutes until a fastForward unblocked it) and freezes rAF, so clicks on
 // the dialog close button never become actionable.
 import { type Locator, type Page, type TestInfo, test } from '@playwright/test';
-import { expect, SLOW_TEST_MS } from './legacy-live-save-fixtures';
+import { expect, SLOW_TEST_MS, waitDialogSettled } from './legacy-live-save-fixtures';
 
 test.use({ locale: 'vi-VN' });
 test.describe.configure({ timeout: SLOW_TEST_MS * 3 });
@@ -209,6 +209,7 @@ test('locked: the daily button shows the locked line before field stage 1', asyn
   await expect(page.locator('#dialog-content')).toContainText(
     'Luyện tập hôm nay sẽ mở sau khi con xong chặng 1 ở Cánh Đồng Phép Tính.',
   );
+  await waitDialogSettled(page);
   await page.locator('#close-dialog').click();
   await expect(page.locator('#dialog')).not.toHaveAttribute('open', '');
   // VLM shows the locked line too (no entry button), and the quest card stays silent.
@@ -218,6 +219,7 @@ test('locked: the daily button shows the locked line before field stage 1', asyn
   );
   await expect(page.locator('#dialog-content #daily-guide-button')).toHaveCount(0);
   await expect(page.locator('#quest-daily')).toHaveCount(0);
+  await waitDialogSettled(page);
   await page.locator('#close-dialog').click();
   await expect(page.locator('#dialog')).not.toHaveAttribute('open', '');
 });
@@ -341,6 +343,7 @@ test('day 1 → replay → day 2 → skipped day: streak 1 → 1 → 2 → 1, co
   await expect(page.locator('#dialog-content .daily-guide-streak')).toContainText(
     'Con đã luyện 1 ngày liên tiếp!',
   );
+  await waitDialogSettled(page);
   await page.locator('#close-dialog').click();
   await expect(page.locator('#dialog')).not.toHaveAttribute('open', '');
 

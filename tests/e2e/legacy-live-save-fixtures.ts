@@ -46,6 +46,21 @@ export async function waitForStoreBoot(page: Page): Promise<void> {
   await expect(page.locator('html')).toHaveAttribute('data-boot', 'ready');
 }
 
+/**
+ * Waits for the dialog's open animation to finish before the test taps
+ * #close-dialog. dialog[open] pops in 0.3 s (translateY 14px + scale 0.97);
+ * on slow CI the first frame lingers, so Playwright calls the button "stable"
+ * at the first frame's box and taps where the button was, not where it ends
+ * up — the tap misses and the dialog stays open. Awaiting the animations'
+ * `finished` promises moves the tap to the settled box. No animation running
+ * means an empty list and an immediate return.
+ */
+export async function waitDialogSettled(page: Page): Promise<void> {
+  await page
+    .locator('#dialog')
+    .evaluate((d) => Promise.all(d.getAnimations().map((a) => a.finished)));
+}
+
 /** Waits for the store to hydrate, then checks HUD + world bridge. */
 export async function expectHud(page: Page, hud: HudExpectation): Promise<void> {
   await waitForStoreBoot(page);

@@ -4,7 +4,12 @@
 // card ends the chain. The card shows one chapter row (≤5 cells) and a "Chương n · k/m" label.
 // Uses the test-build hook `window.__game`.
 import { type Page, test } from '@playwright/test';
-import { expect, SLOW_TEST_MS, waitForStoreBoot } from './legacy-live-save-fixtures';
+import {
+  expect,
+  SLOW_TEST_MS,
+  waitDialogSettled,
+  waitForStoreBoot,
+} from './legacy-live-save-fixtures';
 
 test.use({ locale: 'vi-VN' });
 test.describe.configure({ timeout: SLOW_TEST_MS });
@@ -100,6 +105,7 @@ test('the field leads to the forest, city and tower gates, then the closing card
   await expect(page.locator('#dialog .dialog-copy')).toContainText(
     'Cổng Rừng Nhân Chia đã mở! Cổng đang chờ bạn ở cuối con đường bên kia cầu',
   );
+  await waitDialogSettled(page);
   await page.locator('#close-dialog').click();
 
   await page.evaluate(() => window.__game?.seedProgress({ completedLevels: ['forest'] }));
@@ -115,6 +121,7 @@ test('the field leads to the forest, city and tower gates, then the closing card
   await expect(page.locator('#dialog .dialog-copy')).toContainText(
     'Cổng Thành Phố Con Số đã mở! Cổng đang chờ bạn ở cuối con đường bên kia cầu, phía thành phố con số.',
   );
+  await waitDialogSettled(page);
   await page.locator('#close-dialog').click();
 
   await page.evaluate(() => window.__game?.seedProgress({ completedLevels: ['city'] }));
@@ -125,6 +132,7 @@ test('the field leads to the forest, city and tower gates, then the closing card
   await expect(page.locator('#dialog .dialog-copy')).toContainText(
     'Cổng Tháp Toán Học đã mở! Cổng đang chờ bạn ở cuối con đường bên kia cầu, dưới chân ngọn tháp cao nhất.',
   );
+  await waitDialogSettled(page);
   await page.locator('#close-dialog').click();
 
   // Chapter 2 opens after the tower; the garden level has shipped (phase 05).

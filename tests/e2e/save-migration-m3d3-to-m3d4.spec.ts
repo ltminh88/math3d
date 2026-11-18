@@ -4,7 +4,12 @@
 // A fresh profile still sees field stage 1 open and daily locked.
 // Uses the shipped all-done M3D3 code from stage-migration.spec.ts.
 import { type Page, test } from '@playwright/test';
-import { expect, SLOW_TEST_MS, waitForStoreBoot } from './legacy-live-save-fixtures';
+import {
+  expect,
+  SLOW_TEST_MS,
+  waitDialogSettled,
+  waitForStoreBoot,
+} from './legacy-live-save-fixtures';
 
 test.use({ locale: 'vi-VN' });
 test.describe.configure({ timeout: SLOW_TEST_MS });
@@ -67,6 +72,7 @@ test('importing a shipped M3D3 code migrates every level to stage 1 done', async
   await expect(page.locator('#dialog-content')).toContainText('Luyện tập hôm nay · Câu 1/1');
   // The fact renders as 3 × 7 or 7 × 3 (multiplication commutes; the set shuffles it).
   await expect(page.locator('#dialog-content')).toContainText(/[37] × [37] = \?/);
+  await waitDialogSettled(page);
   await page.locator('#close-dialog').click();
 });
 
@@ -81,5 +87,6 @@ test('a fresh profile sees field stage 1 open and daily locked', async ({ page }
   await expect(page.locator('#dialog-content')).toContainText(
     'Luyện tập hôm nay sẽ mở sau khi con xong chặng 1 ở Cánh Đồng Phép Tính.',
   );
+  await waitDialogSettled(page);
   await page.locator('#close-dialog').click();
 });

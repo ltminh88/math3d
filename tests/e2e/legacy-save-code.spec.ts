@@ -9,6 +9,7 @@ import {
   LIVE_SAVE_QUEST_COMPLETE,
   QUEST_COMPLETE_HUD,
   SLOW_TEST_MS,
+  waitDialogSettled,
   waitForStoreBoot,
 } from './legacy-live-save-fixtures';
 
@@ -85,6 +86,7 @@ test('importing over existing progress asks before overwriting', async ({ page }
   await importCode(page, liveCode);
   await expect(page.locator('#dialog-title')).toHaveText('Ghi đè tiến độ hiện tại?');
   await page.locator('#overwrite-no').click();
+  await waitDialogSettled(page);
   await page.locator('#close-dialog').click();
   await expect(page.locator('#coins')).toHaveText('15');
 
