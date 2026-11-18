@@ -1,5 +1,78 @@
 # Project changelog
 
+## 2026-11-18 — More practice: summary of the batch (PRs #13–#26)
+
+Plan: `plans/261113-1951-more-practice-content-for-muse/` (phases 01–14). The
+chain is now the bridge plus 44 stages across 8 levels — field 6, forest 6,
+city 6, tower 6, garden 5, valley 5, workshop 5, cave 5 — and the closing card
+reads "Bạn đã qua cả chín thử thách!". Terminology settled in this batch:
+"thử thách" is one of the 9 levels, "chặng" is a stage inside a level.
+
+### What merged (#13–#26)
+
+- #13 city 6 stages (phase 05), #14 forest 6 stages (phase 04), #15 tower 6
+  stages (phase 06), #16 valley 5 stages (phase 08), #17 garden 5 stages
+  (phase 07), #18 workshop 5 stages (phase 09), #20 cave 5 stages (phase 10).
+  Every stage: numbers ≤ 100, no countdown, hints never show the answer,
+  difficulty from the Leitner box, tap targets ≥ 44 px.
+- #19 end card: "Bạn đã qua cả chín thử thách!" (en: "You finished all nine
+  challenges!").
+- #21 issue #7: bridge count translated in English mode; garden gate label
+  lifted 56 px (the "Pattern Garden" / "Riverside Garden" overlap).
+- #22 CityRun kept in one place (`city-stage-plan`).
+- #23 phase 13: quest-card stage sub-line, map replay picker, HUD daily copy
+  final, M3D3 migration, docs (see the phase-13 entry below).
+- #24 garden stage 3 always plays brackets and stories.
+- #25 CI uploads `test-results/` on e2e failure (trace + screenshot).
+- #26 quest step aria-labels "Chặng n" → "Thử thách n" ("Stage n" →
+  "Challenge n"); "Thử thách cuối đã mở!".
+
+### Pools (final)
+
+Re-measured on main ec63acd with the same counter and seed (phase 14):
+every number is identical to the phase-02 "after" column — 117 skill × tier
+rows, 4 fact pools (field 17, forest 36, city 30, tower 116) — because phases
+03–13 added stage plans but changed no generator. See
+`plans/261113-1951-more-practice-content-for-muse/reports/pool-counts.md`.
+
+### Chain e2e (final)
+
+`full-chain.spec.ts` now asserts, at every step of the bridge → cave walk:
+gate status, the quest-card stage sub-line ("Chặng 1/m · 0/3m sao" for the
+fresh current level), `stageStars` ([1] for each seeded completed level) and
+chain advance; the closing card asserts "Chặng 2/5 · 1/15 sao" for the cave.
+Field stage 2 and the replay path are covered by `field-level.spec.ts`
+(stage 2 records only its own slot) and `quest-chain-stages.spec.ts`
+(replay pays no bonus, merges by max); the M3D3 import path by
+`stage-migration.spec.ts` and `save-migration-m3d3-to-m3d4.spec.ts`; the daily
+loop across faked days by `daily-practice.spec.ts` (re-run, not re-written).
+
+### Still open (author)
+
+- Play time is measured by the author timing the child on the staging preview,
+  not by any test: `reports/playtime-measured.md` (frame, 8 levels × time +
+  daily sitting; target total ≥ 5 h). If the timed total is under 5 h, the
+  city + tower 7th stage is built as a data change.
+- Author playthrough on iPad (one full stage per level, one daily run, the
+  sticker book): `reports/author-review.md` (frame; questions: later stages
+  new practice vs grinding, daily findable via VLM and HUD, HUD button clear
+  of the movement controls).
+- Parity: intentional visible changes listed in
+  `reports/parity-rebaseline-note.md`; baselines re-shot by the reviewer after
+  #21, #23 and #26 (main ec63acd).
+
+### Testing
+
+- Unit 942/942 (143 files); typecheck 0; lint 0 errors (9 pre-existing CSS
+  warnings); build 0; golden traces byte-identical.
+- E2E local (one project at a time, `--workers=1`; mobile-pixel and
+  tablet-landscape left to CI): full-chain, quest-chain-stages,
+  stage-migration, save-migration-m3d3-to-m3d4 and daily-practice — 13/13 on
+  desktop-chromium (20m) and 13/13 on tablet-portrait (33m), including the
+  two new full-chain assertions (quest-card stage sub-line + `stageStars`).
+- Preview of the merged main: https://mathgame-cflz178b0-vlm5.vercel.app
+  (dpl_J77AaX3GSw451rNFLShGsR9JGPzE, READY, guest-only).
+
 ## 2026-11-18 — Phase 13: quest card stages, HUD copy, migration, docs
 
 ### Added
