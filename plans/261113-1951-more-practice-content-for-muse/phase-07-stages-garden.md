@@ -11,9 +11,10 @@
 - Chapter 2 phase 05 (how this level was built).
 
 ## Overview
-- Priority P1. Status **not started**. Depends on 01 (stage model) and 02
-  (widened pools — this level's rounds *are* the `sk:` generators, so
-  thin pools would show immediately). Effort **7 h** (branch
+- Priority P1. Status **done** — merged in PR #17 (merge commit `1dc2f26`,
+  2026-11-18); preview https://mathgame-c12wwl1zo-vlm5.vercel.app. Depends on 01
+  (stage model) and 02 (widened pools — this level's rounds *are* the `sk:`
+  generators, so thin pools would show immediately). Effort **7 h** (branch
   `muse/stages-garden`, one PR into `main`).
 - Give the garden 5 stages (5 runs, 30 fresh rounds). Stage 1 is the
   current run, unchanged; the chain still unlocks after stage 1. One
@@ -102,11 +103,11 @@ tests/e2e/garden-level-leak.spec.ts (mod: later stage)
    preview deploy + URL in PR.
 
 ## Todo list
-- [ ] garden stage plan (S1 parity test first)
-- [ ] stage subsets + tier floors, no-repeat tests
-- [ ] gate / celebration stage text + replay
-- [ ] e2e + leak, 4 projects
-- [ ] preview deploy + URL in PR
+- [x] garden stage plan (S1 parity test first)
+- [x] stage subsets + tier floors, no-repeat tests
+- [x] gate / celebration stage text + replay
+- [x] e2e + leak, 4 projects
+- [x] preview deploy + URL in PR
 
 ## Success Criteria
 - Stage 1 is behaviour-identical to today for a fixed seed.

@@ -14,8 +14,9 @@
 - `tests/e2e/field-level.spec.ts`, `tests/e2e/field-level-leak.spec.ts`
 
 ## Overview
-- Priority P1. Status **not started**. Depends on 01 (stage model).
-  Effort **10 h** (branch `muse/stages-field`, one PR into `main`).
+- Priority P1. Status **done** — merged in PR #8 (merge commit `31aaf95`,
+  2026-11-17); preview https://mathgame-6gi6cumjy-vlm5.vercel.app. Depends on 01
+  (stage model). Effort **10 h** (branch `muse/stages-field`, one PR into `main`).
 - Give the field 6 stages (6 runs, 30 fresh rounds). Stage 1 is the
   current run, unchanged in content, order and rewards; the chain still
   unlocks after stage 1. One level, one PR — phases 03–10 are one phase
@@ -135,12 +136,12 @@ The level keeps its own chunk; no shared-level code is forked. Files
    byte-identical expected), e2e on 4 projects, preview deploy + URL in PR.
 
 ## Todo list
-- [ ] field stage plan (S1 parity test first)
-- [ ] S3 missing-factor round type
-- [ ] S4 word-problem wiring (shared reasoning round)
-- [ ] gate / celebration stage text + replay
-- [ ] e2e + leak, 4 projects
-- [ ] preview deploy + URL in PR
+- [x] field stage plan (S1 parity test first)
+- [x] S3 missing-factor round type
+- [x] S4 word-problem wiring (shared reasoning round)
+- [x] gate / celebration stage text + replay
+- [x] e2e + leak, 4 projects
+- [x] preview deploy + URL in PR
 
 ## Success Criteria
 - Stage 1 is behaviour-identical to today for a fixed seed (unit test

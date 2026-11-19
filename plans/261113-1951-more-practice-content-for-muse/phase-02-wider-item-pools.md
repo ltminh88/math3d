@@ -19,8 +19,8 @@
 ## Overview
 - Priority P1. Status **done** — content, counter, gates and local e2e done
   (40/40 across 4 projects); preview deployed at
-  https://mathgame-bnxf3pv0d-vlm5.vercel.app. Effort **12 h**
-  (branch `muse/wider-item-pools`, one PR).
+  https://mathgame-bnxf3pv0d-vlm5.vercel.app. Merged in PR #5 (merge commit
+  `1756c3e`, 2026-11-16). Effort **12 h** (branch `muse/wider-item-pools`, one PR).
 - Widen the pools *inside* the existing generators — more story contexts,
   shapes and scene variants — so no child sees the same visible prompt
   twice within three runs of a level. No new skill ids (phase 01 froze

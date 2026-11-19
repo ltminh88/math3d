@@ -20,7 +20,9 @@
   decode, shipped-code fixture test).
 
 ## Overview
-- Priority P1. Status **not started**. No deps; unblocks every later phase.
+- Priority P1. Status **done** — merged in PR #2 (merge commit `64f8a6f`,
+  2026-11-14); preview https://mathgame-8o5nhuuqn-vlm5.vercel.app. No deps;
+  unblocks every later phase.
   Effort **12 h** (branch `muse/measure-stage-model-m3d4`, one PR).
 - Foundation in three parts: (a) measure what exists — distinct-prompt
   counts per skill/tier; (b) land the stage data model (`stages` on the
@@ -241,7 +243,7 @@ code; it adds no gate text, no quest-card line, no button and no dialog.
 - [x] `stageStars` + migration (+ e2e)
 - [x] M3D4 (+ frozen fixtures, size test, docs)
 - [x] catalog freeze decision (new ids or none)
-- [ ] preview deploy + URL in PR
+- [x] preview deploy + URL in PR (https://mathgame-8o5nhuuqn-vlm5.vercel.app)
 - [x] re-estimate total effort
 
 ## Success Criteria

@@ -1,7 +1,7 @@
 ---
 title: More practice — longer play from the same world (brief for Muse)
 description: A child finishes the whole game in about one hour. Add much more practice per level and a daily loop, reusing the existing generators and scenes. Work is done by the external agent Muse and reviewed before production.
-status: pending
+status: in-progress
 priority: P1
 effort: to be estimated by Muse in step 0
 branch: muse/* (pull requests into main)
@@ -82,6 +82,36 @@ each played once: field 5 rounds, forest 5, city 5, tower 7, garden 6, valley 6,
 - The play-time goal is met and measured, the daily loop works across days (test with a faked clock).
 - All gates above are green, the reviewer's parity run passes, the author has played staging on an iPad.
 - `docs/project-changelog.md` and `docs/code-standards.md` describe the new stages and daily practice.
+
+## Phase status (2026-11-19)
+
+Phases 01–13 are merged; phase 14 is in progress and waits on the author
+(timed playthrough + review). Phase 00 (design, PR #1) shipped before this
+table was kept. Merge commits are the `main` merge of each phase PR.
+
+| Phase | Status | PR / merge commit |
+|---|---|---|
+| 01 Measure pools, stage model, save code M3D4 | done | #2 / `64f8a6f` |
+| 02 Wider item pools | done | #5 / `1756c3e` |
+| 03 Stages — field (6) | done | #8 / `31aaf95` |
+| 04 Stages — forest (6) | done | #14 / `ebc12ae` |
+| 05 Stages — city (6) | done | #13 / `63a0631` |
+| 06 Stages — tower (6) | done | #15 / `e2d6204` |
+| 07 Stages — garden (5) | done | #17 / `1dc2f26` |
+| 08 Stages — valley (5) | done | #16 / `0d37592` |
+| 09 Stages — workshop (5) | done | #18 / `5e50bec` |
+| 10 Stages — cave (5) | done | #20 / `9e51635` |
+| 11 Daily practice with VLM | done | #6 / `091d5ff` (+ follow-ups #10 / `2f1dfab`) |
+| 12 Sticker book (mastery goals) | done | #9 / `70fcccb` |
+| 13 Quest card / HUD copy / migration / docs | done | #23 / `8b3468f` |
+| 14 Merge, full e2e, parity, staging, author review | in progress | #27 / `eaf4f88` (merge + e2e + reports); production 2026-11-19 from `0a86d75` (PR #28) |
+
+Related fixes merged alongside the phases (not phase work, listed so the
+table above is not misread as the whole batch): #19 end card "nine
+challenges" (`d4c49fe`), #21 issue #7 i18n fix (`117a7d1`), #22 CityRun
+refactor (`f8284e8`), #24 garden stage-3 brackets fix (`a456110`), #25 CI
+test-results artifact (`59d55a1`), #26 "Thử thách" aria rename (`03f41d7`),
+#28 dialog-close settle (`0a86d75`).
 
 ## Open questions for the author (answer in the design pull request)
 - Is "3 stages per level" the right amount, or should the tables-heavy levels (field, forest, city) get more?

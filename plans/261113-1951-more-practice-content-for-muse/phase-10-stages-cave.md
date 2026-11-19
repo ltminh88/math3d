@@ -13,9 +13,10 @@
 - Chapter 2 phase 08 (how this level was built).
 
 ## Overview
-- Priority P1. Status **not started**. Depends on 01 (stage model) and 02
-  (widened pools). Effort **8 h** (branch `muse/stages-cave`, one PR into
-  `main`).
+- Priority P1. Status **done** — merged in PR #20 (merge commit `9e51635`,
+  2026-11-18); preview https://mathgame-jnv7tql8d-vlm5.vercel.app. Depends on 01
+  (stage model) and 02 (widened pools). Effort **8 h** (branch
+  `muse/stages-cave`, one PR into `main`).
 - Give the cave 5 stages (5 runs, 35 fresh rounds). Stage 1 is the
   current run, unchanged — and the cave is the last stage of the whole
   chain, so stage 1's closing card ("Bạn đã qua cả chín chặng!") must
@@ -111,11 +112,11 @@ tests/e2e/cave-level-leak.spec.ts (mod: later stage)
    preview deploy + URL in PR.
 
 ## Todo list
-- [ ] cave stage plan (S1 parity test + closing card first)
-- [ ] stage format emphases + pool-intersection rule
-- [ ] gate / celebration stage text + replay
-- [ ] e2e + leak, 4 projects
-- [ ] preview deploy + URL in PR
+- [x] cave stage plan (S1 parity test + closing card first)
+- [x] stage format emphases + pool-intersection rule
+- [x] gate / celebration stage text + replay
+- [x] e2e + leak, 4 projects
+- [x] preview deploy + URL in PR
 
 ## Success Criteria
 - Stage 1 is behaviour-identical to today for a fixed seed, closing card
