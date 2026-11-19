@@ -16,9 +16,10 @@
   them out of `shop/` entirely.
 
 ## Overview
-- Priority P1. Status **not started**. Depends on 01 (derivation rule
-  frozen: no sticker storage). Parallel with 03–11 (this phase owns
-  `ui/sticker-book.*` + the derivation module only). Effort **10 h**
+- Priority P1. Status **done** — merged in PR #9 (merge commit `70fcccb`,
+  2026-11-17); preview https://mathgame-bphd1eym5-vlm5.vercel.app. Depends on 01
+  (derivation rule frozen: no sticker storage). Parallel with 03–11 (this phase
+  owns `ui/sticker-book.*` + the derivation module only). Effort **10 h**
   (branch `muse/sticker-book`, one PR).
 - A sticker book: one page per topic, one sticker per mastery unit,
   earned when the unit reaches Leitner box 4+. Replaying has a visible
@@ -122,12 +123,12 @@ change.
   quest card and the VLM dialog; these are intentional changes.
 
 ## Todo list
-- [ ] sticker derivation (pure, unit-tested)
-- [ ] book UI (6 pages, tap flip, counts)
-- [ ] quest-card + VLM entry
-- [ ] earning line (once per unit per session)
-- [ ] e2e, 4 projects
-- [ ] preview deploy + URL in PR
+- [x] sticker derivation (pure, unit-tested)
+- [x] book UI (6 pages, tap flip, counts)
+- [x] quest-card + VLM entry
+- [x] earning line (once per unit per session)
+- [x] e2e, 4 projects
+- [x] preview deploy + URL in PR
 
 ## Success Criteria
 - 47 stickers, 6 pages, all derived — no sticker field in the store, the

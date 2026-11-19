@@ -15,9 +15,10 @@
   (both must describe the new stages + daily practice when this phase lands)
 
 ## Overview
-- Priority P1. Status **not started**. Depends on 03–12 (it integrates
-  what they built; it builds no stage, daily or sticker behaviour itself).
-  Effort **7 h** (branch `muse/quest-hud-docs`, one PR).
+- Priority P1. Status **done** — merged in PR #23 (merge commit `8b3468f`,
+  2026-11-18); preview https://mathgame-4d6qreo2y-vlm5.vercel.app. Depends on
+  03–12 (it integrates what they built; it builds no stage, daily or sticker
+  behaviour itself). Effort **7 h** (branch `muse/quest-hud-docs`, one PR).
 - One integration phase: the quest card learns about stages, existing
   saves are verified end to end, and the docs describe the new world.
   Small by design — if it grows past ~800 lines, it splits by surface
@@ -119,12 +120,12 @@ this phase.
   these are intentional changes.
 
 ## Todo list
-- [ ] quest-card stage sub-line
-- [ ] gate pop-panel + replay picker
-- [ ] HUD daily button copy finalisation
-- [ ] migration e2e (M3D3 import + fresh profile)
-- [ ] docs
-- [ ] preview deploy + URL in PR
+- [x] quest-card stage sub-line
+- [x] gate pop-panel + replay picker
+- [x] HUD daily button copy finalisation
+- [x] migration e2e (M3D3 import + fresh profile)
+- [x] docs
+- [x] preview deploy + URL in PR
 
 ## Success Criteria
 - A returning player (finished cave, M3D3 code) loses nothing and sees

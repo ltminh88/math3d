@@ -10,13 +10,49 @@
   real-input playthrough, deploy, author review).
 
 ## Overview
-- Priority P1. Status **not started**. Depends on all phases. Last.
+- Priority P1. Status **in progress**. Depends on all phases. Last.
   Effort **14 h** (branch `muse/merge-more-practice`, one PR).
 - Merge the phase branches in order, run every gate, deploy the *merged*
   preview (never production), and put the game in front of the author on
   an iPad — **the author times the child playing the preview; that
   timing is the play-time measurement**. Nothing in this phase writes new
   game behaviour except fixes the gates find.
+- Done so far (PR #27, merged 2026-11-18, merge commit `eaf4f88`): phases
+  01–13 merged, full-chain e2e cross-check, pool-counts final numbers,
+  parity re-baseline note, changelog batch summary, merged preview
+  deployed. Production deployed by the reviewer 2026-11-19 from `0a86d75`
+  (PR #28 merged) to https://math3d-game.vercel.app. Still pending:
+  author-timed playthrough (`reports/playtime-measured.md`, empty frame),
+  author review (`reports/author-review.md`, empty frame), iPad
+  playthrough, and the city+tower 7th-stage decision if the timed total
+  is under 5 h.
+
+## Status (2026-11-19)
+
+Done:
+- Merge 01–13 (main `ec63acd` at the time; all phases green on CI).
+- Full-chain e2e cross-check (PR #27, `eaf4f88`): `full-chain.spec.ts`
+  assertions for the quest-card stage sub-line and `stageStars`; field S2
+  and replay already covered by `field-level.spec.ts` /
+  `quest-chain-stages.spec.ts`; migration by `stage-migration.spec.ts` +
+  `save-migration-m3d3-to-m3d4.spec.ts`; daily loop re-run, not re-written.
+- `reports/pool-counts.md` final numbers (phase 14, main `ec63acd`):
+  identical to the phase-02 "after" column (117 skill×tier counts, 4 fact
+  pools, 6 story-context lists, 39 skills).
+- Parity re-baseline note (`reports/parity-rebaseline-note.md`): intentional
+  visible changes with introducing PRs and recapture commits.
+- Changelog batch summary (`docs/project-changelog.md`, 2026-11-18 entry,
+  PRs #13–#26).
+- Merged preview deploy (PR #27): https://mathgame-cflz178b0-vlm5.vercel.app.
+- Production deploy by the reviewer, 2026-11-19, from `0a86d75` (PR #28)
+  to https://math3d-game.vercel.app.
+
+Pending (author-side):
+- Author-timed playthrough — `reports/playtime-measured.md` is an empty
+  frame; no numbers filled in here.
+- Author review — `reports/author-review.md` is an empty frame.
+- Author playthrough on iPad (tablet-landscape + portrait, touch only).
+- City+tower 7th-stage decision, only if the timed total is under 5 h.
 
 ## Key Insights
 - The full chain is now 44 runs, not 9 stages. The e2e must *not* walk
@@ -128,12 +164,12 @@ as small commits in the owning phase's folder.
    phase).
 
 ## Todo list
-- [ ] merge 01–13, gates green per PR
-- [ ] full-chain e2e (44-run chain via seed hooks)
+- [x] merge 01–13, gates green per PR
+- [x] full-chain e2e (44-run chain via seed hooks)
 - [ ] author-timed play-through (+ 7th-stage contingency if under 5 h)
-- [ ] preview deploy of the merged whole, URL in PR
+- [x] preview deploy of the merged whole, URL in PR
 - [ ] author playthrough on iPad + review report
-- [ ] changelog final numbers
+- [x] changelog final numbers
 
 ## Success Criteria
 - The play-time goal is met **and timed by the author** (timed total

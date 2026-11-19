@@ -12,9 +12,10 @@
 - Chapter 2 phase 06 (how this level was built).
 
 ## Overview
-- Priority P1. Status **not started**. Depends on 01 (stage model) and 02
-  (widened pools). Effort **8 h** (branch `muse/stages-valley`, one PR
-  into `main`).
+- Priority P1. Status **done** — merged in PR #16 (merge commit `0d37592`,
+  2026-11-18); preview https://mathgame-5yfqc8hr2-vlm5.vercel.app. Depends on 01
+  (stage model) and 02 (widened pools). Effort **8 h** (branch
+  `muse/stages-valley`, one PR into `main`).
 - Give the valley 5 stages (5 runs, 30 fresh rounds). Stage 1 is the
   current run, unchanged; the chain still unlocks after stage 1. One
   level, one PR (PR #1 review, point 3).
@@ -103,11 +104,11 @@ tests/e2e/valley-level-leak.spec.ts (mod: later stage)
    preview deploy + URL in PR.
 
 ## Todo list
-- [ ] valley stage plan (S1 parity test first)
-- [ ] S4 multi-select mount (step kit)
-- [ ] gate / celebration stage text + replay
-- [ ] e2e + leak, 4 projects
-- [ ] preview deploy + URL in PR
+- [x] valley stage plan (S1 parity test first)
+- [x] S4 multi-select mount (step kit)
+- [x] gate / celebration stage text + replay
+- [x] e2e + leak, 4 projects
+- [x] preview deploy + URL in PR
 
 ## Success Criteria
 - Stage 1 is behaviour-identical to today for a fixed seed.

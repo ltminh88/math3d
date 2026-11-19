@@ -12,8 +12,9 @@
 - `tests/e2e/city-level.spec.ts`, `tests/e2e/city-level-leak.spec.ts`
 
 ## Overview
-- Priority P1. Status **not started**. Depends on 01 (stage model).
-  Effort **10 h** (branch `muse/stages-city`, one PR into `main`).
+- Priority P1. Status **done** — merged in PR #13 (merge commit `63a0631`,
+  2026-11-17); preview https://mathgame-de5j9v06t-vlm5.vercel.app. Depends on 01
+  (stage model). Effort **10 h** (branch `muse/stages-city`, one PR into `main`).
 - Give the city 6 stages (6 runs, 30 fresh rounds). Stage 1 is the
   current run, unchanged; the chain still unlocks after stage 1. One
   level, one PR (PR #1 review, point 3). City is a contingency level for
@@ -109,12 +110,12 @@ Files < 200 lines, kebab-case.
    preview deploy + URL in PR.
 
 ## Todo list
-- [ ] city stage plan (S1 parity test first)
-- [ ] S3 compare promotion
-- [ ] S4/S5 word-problem wiring (shared reasoning round)
-- [ ] gate / celebration stage text + replay
-- [ ] e2e + leak, 4 projects
-- [ ] preview deploy + URL in PR
+- [x] city stage plan (S1 parity test first)
+- [x] S3 compare promotion
+- [x] S4/S5 word-problem wiring (shared reasoning round)
+- [x] gate / celebration stage text + replay
+- [x] e2e + leak, 4 projects
+- [x] preview deploy + URL in PR
 
 ## Success Criteria
 - Stage 1 is behaviour-identical to today for a fixed seed.

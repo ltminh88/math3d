@@ -12,8 +12,9 @@
 - `tests/e2e/forest-level.spec.ts`, `tests/e2e/forest-level-leak.spec.ts`
 
 ## Overview
-- Priority P1. Status **not started**. Depends on 01 (stage model).
-  Effort **8 h** (branch `muse/stages-forest`, one PR into `main`).
+- Priority P1. Status **done** — merged in PR #14 (merge commit `ebc12ae`,
+  2026-11-17); preview https://mathgame-nikoi3zlj-vlm5.vercel.app. Depends on 01
+  (stage model). Effort **8 h** (branch `muse/stages-forest`, one PR into `main`).
 - Give the forest 6 stages (6 runs, 30 fresh rounds). Stage 1 is the
   current run, unchanged; the chain still unlocks after stage 1. One
   level, one PR (PR #1 review, point 3). This is the lightest of the
@@ -108,12 +109,12 @@ Files < 200 lines, kebab-case.
    preview deploy + URL in PR.
 
 ## Todo list
-- [ ] forest stage plan (S1 parity test first)
-- [ ] S2 remainder promotion
-- [ ] S4 word-problem wiring (shared reasoning round)
-- [ ] gate / celebration stage text + replay
-- [ ] e2e + leak, 4 projects
-- [ ] preview deploy + URL in PR
+- [x] forest stage plan (S1 parity test first)
+- [x] S2 remainder promotion
+- [x] S4 word-problem wiring (shared reasoning round)
+- [x] gate / celebration stage text + replay
+- [x] e2e + leak, 4 projects
+- [x] preview deploy + URL in PR
 
 ## Success Criteria
 - Stage 1 is behaviour-identical to today for a fixed seed.

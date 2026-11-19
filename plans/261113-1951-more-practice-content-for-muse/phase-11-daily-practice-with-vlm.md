@@ -17,7 +17,10 @@
 - `src/levels/shared/level-progression.ts` (gate model the unlock reuses)
 
 ## Overview
-- Priority P1. Status **not started**. Depends on 01 (M3D4 `d` field, day
+- Priority P1. Status **done** — merged in PR #6 (merge commit `091d5ff`,
+  2026-11-17); preview https://mathgame-i8v4pamdu-vlm5.vercel.app. Follow-up
+  fixes in PR #10 (merge commit `2f1dfab`, 2026-11-17: session count, streak
+  "Con…", locked line names stage 1). Depends on 01 (M3D4 `d` field, day
   intervals). Parallel with 03–10 and 12 (different folders; this phase
   owns `learning/daily-*`, the VLM dialog entry, the daily panel and the
   HUD button). Effort **16 h** (branch `muse/daily-practice`, one PR).
@@ -173,12 +176,12 @@ buttons) and never overlaps the joystick / interact button.
   quest card and the VLM dialog; these are intentional changes.
 
 ## Todo list
-- [ ] daily planner + streak (pure, unit-tested)
-- [ ] daily panel (quiz dialog + step kit reuse)
-- [ ] VLM entry + locked line + quest-card reminder + HUD button
-- [ ] reward + one-counted-run-per-day
-- [ ] faked-clock e2e, 4 projects (+ HUD placement check)
-- [ ] preview deploy + URL in PR
+- [x] daily planner + streak (pure, unit-tested)
+- [x] daily panel (quiz dialog + step kit reuse)
+- [x] VLM entry + locked line + quest-card reminder + HUD button
+- [x] reward + one-counted-run-per-day
+- [x] faked-clock e2e, 4 projects (+ HUD placement check)
+- [x] preview deploy + URL in PR
 
 ## Success Criteria
 - A child with only field done gets a daily set drawn only from what
