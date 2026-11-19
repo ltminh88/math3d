@@ -23,9 +23,9 @@ jobs:
       - run: npm test
       - run: npm run build
 
-  # One job per Playwright project, so the four projects run in parallel instead of
-  # sharing one runner (~1.5-2h). Same tests, timeout and retries as before; each job
-  # uploads its own report.
+  # Each Playwright project is split into two shards (--shard=N/2), so eight jobs run in
+  # parallel instead of four (one project alone took up to ~1.5h). Same tests, timeout and
+  # retries as before; each job uploads its own report.
   e2e:
     runs-on: ubuntu-latest
     needs: build
@@ -33,6 +33,7 @@ jobs:
       fail-fast: false
       matrix:
         project: [desktop-chromium, mobile-pixel, tablet-portrait, tablet-landscape]
+        shard: [1, 2]
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
@@ -41,7 +42,7 @@ jobs:
           cache: npm
       - run: npm ci
       - run: npx playwright install --with-deps chromium
-      - run: npm run test:e2e -- --project=${{ matrix.project }}
+      - run: npm run test:e2e -- --project=${{ matrix.project }} --shard=${{ matrix.shard }}/2
       # On failure keep the evidence: test-results/ holds the per-test trace.zip,
       # error-context.md and failure screenshots (trace is 'retain-on-failure' in
       # playwright.config.ts). The old playwright-report upload is gone: the CI
@@ -51,7 +52,7 @@ jobs:
       - uses: actions/upload-artifact@v4
         if: failure()
         with:
-          name: test-results-${{ matrix.project }}
+          name: test-results-${{ matrix.project }}-${{ matrix.shard }}
           path: test-results
           retention-days: 7
 
