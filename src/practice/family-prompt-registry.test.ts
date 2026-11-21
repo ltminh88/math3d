@@ -26,8 +26,13 @@ function promptsOfStep(step: ReasoningStep): PromptRef[] {
 }
 
 describe('family prompt registry', () => {
-  it('registers geometry, measurement and number', () => {
-    expect([...registeredPromptFamilies()].sort()).toEqual(['geometry', 'measurement', 'number']);
+  it('registers geometry, measurement, number and fraction', () => {
+    expect([...registeredPromptFamilies()].sort()).toEqual([
+      'fraction',
+      'geometry',
+      'measurement',
+      'number',
+    ]);
   });
 
   it('falls back to the same reasoning renderer for unregistered families', () => {
