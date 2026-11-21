@@ -29,8 +29,13 @@ import { compactV5ToImport, snapshotToCompactV5 } from './save-code-v5-payload';
 /** Version written by export. */
 export const SAVE_CODE_VERSION = 5;
 const PREFIX = 'M3D';
-/** Refuse anything longer before decoding (a full save, every fact and item, is ~11 KB). */
-export const MAX_SAVE_CODE_CHARS = 16384;
+/**
+ * Refuse anything longer before decoding. The cap only blocks huge pasted input
+ * before decode; it must stay above the longest code the game itself can write —
+ * a full save at the M3D5 tuple cap is ~52 KB (512 skill tuples, see
+ * save-code-v5.test.ts), so the cap matches MAX_SKILL_TUPLES = 512.
+ */
+export const MAX_SAVE_CODE_CHARS = 65536;
 const CODE_PATTERN = /^M3D(\d+)-([A-Za-z0-9_-]+)-([0-9a-f]{8})$/;
 
 export type SaveCodeErrorReason =

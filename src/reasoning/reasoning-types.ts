@@ -88,7 +88,13 @@ export type Misconception =
   | 'certain-when-impossible'
   | 'possible-when-impossible'
   | 'impossible-when-possible'
-  | 'wrong-face';
+  | 'wrong-face'
+  // Numbers (src/numbers)
+  | 'swapped-digits'
+  | 'dropped-zero'
+  | 'off-by-ten'
+  | 'wrong-place'
+  | 'wrong-sign';
 
 export interface ChoiceOption {
   readonly id: string;

@@ -7,8 +7,8 @@
 //   B9  = tables [6]: 9 mul (6x2..6x10) + 9 div (12/6..60/6).
 //   Topic 2 (B9-B15) has 7 playable lessons: B9-B15 (B14's fraction skills landed in
 //   phase 12).
-//   Next lesson with no stats is B3: B1/B2 have no skills yet, B3's unknown-add-sub is
-//   the first playable skill.
+//   Next lesson with no stats is B1: its six number skills (phase 07) are the
+//   first playable skills.
 import { describe, expect, it } from 'vitest';
 import { divFactsForTables, mulFactsForTables } from './curriculum-tables';
 import type { FactKey } from './fact-key';
@@ -143,19 +143,39 @@ describe('lessonStars', () => {
 });
 
 describe('nextLesson', () => {
-  it('points at B3 with no stats', () => {
-    expect(nextLesson({})).toBe(3);
+  it('points at B1 with no stats', () => {
+    expect(nextLesson({})).toBe(1);
   });
 
   it('moves on once B3 is at 3 stars', () => {
-    expect(nextLesson({ 'sk:unknown-add-sub': stat(4) })).toBe(4);
+    // B1's six number skills are at box 4 too, so B1 is done; B3 at 3 stars
+    // (box 4) moves the pointer to B4.
+    const stats = statsOf(
+      [
+        'sk:num-read-write-1000',
+        'sk:num-place-value-1000',
+        'sk:num-neighbors-1000',
+        'sk:num-compare-1000',
+        'sk:num-order-1000',
+        'sk:num-sequence-1000',
+        'sk:unknown-add-sub',
+      ] as const,
+      4,
+    );
+    expect(nextLesson(stats)).toBe(4);
   });
 
   it('skips lessons with nothing playable yet', () => {
     // B6 is the first lesson below 3 stars (B14's fraction skills landed in phase 12,
-    // but B6 comes first in textbook order).
+    // but B6 comes first in textbook order). B1's six number skills are at box 4 too.
     const stats = statsOf(
       [
+        'sk:num-read-write-1000',
+        'sk:num-place-value-1000',
+        'sk:num-neighbors-1000',
+        'sk:num-compare-1000',
+        'sk:num-order-1000',
+        'sk:num-sequence-1000',
         'sk:unknown-add-sub',
         ...mulFactsForTables([2, 5]),
         ...divFactsForTables([2, 5]),
@@ -183,13 +203,13 @@ describe('topicProgress', () => {
     expect(topicProgress(2, statsOf(b9, 4))).toEqual({ completed: 1, total: 7 });
   });
 
-  it('topic 8 has 2 playable lessons (B47, B49 via the Roman clock)', () => {
-    expect(topicProgress(8, {})).toEqual({ completed: 0, total: 2 });
-    // B49 mixes B45-B48, whose other skills have not landed yet, so the Roman clock
-    // alone completes both B47 and B49.
+  it('topic 8 has 4 playable lessons (B45, B46, B47, B49; B45/B46 via phase 07 numbers)', () => {
+    expect(topicProgress(8, {})).toEqual({ completed: 0, total: 4 });
+    // B49 mixes B45-B48. B45/B46 now have skills (phase 07 numbers), so the
+    // Roman clock alone completes only B47.
     expect(topicProgress(8, statsOf(['sk:roman-clock-hour'], 4))).toEqual({
-      completed: 2,
-      total: 2,
+      completed: 1,
+      total: 4,
     });
   });
 
