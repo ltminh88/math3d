@@ -6,11 +6,14 @@ import { skillsOfFamily } from '../learning/skill-catalog';
 import type { SkillTier } from '../learning/skill-tiers';
 import { dialogRenderable } from '../practice/item-for-skill';
 import type { PracticeItem } from '../practice/practice-scene';
+import { ref } from '../reasoning/reasoning-distractors';
 import { evalExpr } from '../reasoning/reasoning-test-oracles';
 import type { ReasoningStep } from '../reasoning/reasoning-types';
 import { NUMBER_SKILLS, numberItemForSkill } from './number-item-for-skill';
+import { formatDigitRuns } from './numbers-format';
 import { fromDigits } from './numbers-ranges';
 import type { NumberScene } from './numbers-scene-types';
+import { renderNumbersPrompt } from './numbers-strings';
 import {
   correctLabel,
   digitAtPlace,
@@ -179,5 +182,84 @@ describe('numbers generators', () => {
 
   it('refuses skills it has no generator for', () => {
     expect(() => numberItemForSkill('meas-gram', mulberry32(1), 1)).toThrow();
+  });
+});
+
+describe('numbers review fixes (phase 07 follow-up)', () => {
+  const NBSP = '\u202F';
+
+  it('verdict steps: the story shows the claimed sum, same name as the question', () => {
+    for (let seed = 0; seed < 200; seed++) {
+      const item = numberItemForSkill('num-expand-100000', mulberry32(seed), 3);
+      const step = stepAt(item, 0);
+      if (step?.kind !== 'verdict') throw new Error('expand T3 needs a verdict step');
+      const story = renderNumbersPrompt(item.story);
+      const question = renderNumbersPrompt(step.prompt);
+      const claimed = formatDigitRuns(String(step.statement.params?.text));
+      expect(story, `seed ${seed}: story shows the sum`).toContain('+');
+      expect(story, `seed ${seed}: story shows An's sum`).toContain(claimed);
+      expect(question, `seed ${seed}: question names An`).toContain('An');
+      expect(question, `seed ${seed}: question does not name Nam`).not.toContain('Nam');
+    }
+  });
+
+  it('maxMin options are exactly the numbers in the list', () => {
+    for (const skillId of ['num-order-1000', 'num-order-10000', 'num-order-100000'])
+      for (const tier of [1, 2, 3] as SkillTier[])
+        for (let seed = 0; seed < 200; seed++) {
+          const item = numberItemForSkill(skillId, mulberry32(seed), tier);
+          if (item.story.key !== 'maxMin') continue;
+          const list = listOf(item);
+          const step = stepAt(item, 0);
+          if (step.kind !== 'choice') throw new Error('maxMin needs a choice step');
+          for (const o of step.options) {
+            expect(o.label.key).toBe('num');
+            expect(list, `seed ${seed}: option ${o.label.params?.n} in list`).toContain(
+              Number(o.label.params?.n),
+            );
+          }
+        }
+  });
+
+  it('sequence T3 labels the two blanks and asks by label', () => {
+    for (let seed = 0; seed < 200; seed++) {
+      const item = numberItemForSkill('num-sequence-1000', mulberry32(seed), 3);
+      const story = renderNumbersPrompt(item.story);
+      expect(story).toContain('ô A');
+      expect(story).toContain('ô B');
+      const first = renderNumbersPrompt(stepAt(item, 0).prompt);
+      const second = renderNumbersPrompt(stepAt(item, 1).prompt);
+      expect(first).toContain('ô A');
+      expect(second).toContain('ô B');
+      expect(first).not.toBe(second);
+    }
+  });
+
+  it('no rendered numbers story contains "?."', () => {
+    for (const skillId of NUMBER_SKILLS)
+      for (const tier of [1, 2, 3] as SkillTier[])
+        for (let seed = 0; seed < 100; seed++) {
+          const item = numberItemForSkill(skillId, mulberry32(seed), tier);
+          expect(renderNumbersPrompt(item.story), `${skillId} t${tier} #${seed}`).not.toContain(
+            '?.',
+          );
+        }
+  });
+
+  it('numbers ≥ 1000 render grouped with a narrow no-break space', () => {
+    expect(renderNumbersPrompt(ref('writeWords', { n: 77224 }))).toContain(`77${NBSP}224`);
+    expect(renderNumbersPrompt(ref('num', { n: 77224 }))).toBe(`77${NBSP}224`);
+    expect(
+      renderNumbersPrompt(ref('compareExpr', { a: 30254, expr: '60000 + 4000 + 500 + 20' })),
+    ).toContain(`30${NBSP}254`);
+    expect(
+      renderNumbersPrompt(ref('compareExpr', { a: 30254, expr: '60000 + 4000 + 500 + 20' })),
+    ).toContain(`60${NBSP}000 + 4${NBSP}000 + 500 + 20`);
+    expect(renderNumbersPrompt(ref('orderAsc', { list: '12145, 66452, 19476' }))).toContain(
+      `12${NBSP}145, 66${NBSP}452, 19${NBSP}476`,
+    );
+    expect(renderNumbersPrompt(ref('writeWords', { n: 999 }))).toBe(
+      'Số 999 viết bằng chữ thế nào?',
+    );
   });
 });
