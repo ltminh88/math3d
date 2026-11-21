@@ -180,14 +180,12 @@ export const tableSums: DataGenerator = (rng, tier) => {
     ];
   }
   const step = dataChoiceStep(rng, prompt, answer, candidates);
-  return dataSceneItem(
-    'table-sums',
-    tier,
-    ref(TABLE_STORY[group]),
-    [step],
-    tableScene(headers, rows, [...WEEKS]),
-    [answer],
-  );
+  // Review #41 note (for the next PR): the likes group with week rows is about
+  // joining over two weeks, not liking — its story says "tham gia", not "thích".
+  const story = group === 'likes' ? ref('tableStoryJoin') : ref(TABLE_STORY[group]);
+  return dataSceneItem('table-sums', tier, story, [step], tableScene(headers, rows, [...WEEKS]), [
+    answer,
+  ]);
 };
 
 /** Fill the empty cell of the class table (Nam + Nữ = Cả lớp per column). The columns

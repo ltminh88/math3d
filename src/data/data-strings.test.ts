@@ -50,6 +50,7 @@ describe('data strings', () => {
     expect(renderDataPrompt(ref('bagEventOne', { colour: 'c:red' }))).toBe('Lấy ra 1 viên bi đỏ.');
     expect(renderDataPrompt(ref('tableStoryFruits'))).toBe('Bảng ghi số quả hái được.');
     expect(renderDataPrompt(ref('tableStoryLikes'))).toBe('Bảng ghi số bạn thích mỗi môn.');
+    expect(renderDataPrompt(ref('tableStoryJoin'))).toBe('Bảng ghi số bạn tham gia mỗi môn.');
     expect(renderDataPrompt(ref('askTableCell', { header: 'l:group_1' }))).toBe(
       'Cột Tổ 1 có số nào?',
     );

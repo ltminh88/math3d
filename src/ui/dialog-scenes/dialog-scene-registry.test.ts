@@ -3,14 +3,21 @@
 // is asserted here; rendering itself is covered by the daily e2e spec.
 
 import { describe, expect, test } from 'vitest';
-import type { SceneKind } from '../../geometry/geo-scene-types';
+import { DATA_SKILLS } from '../../data/data-item-for-skill';
 import { GEOMETRY_SKILLS } from '../../geometry/geometry-item-for-skill';
 import { mulberry32 } from '../../learning/seeded-rng';
 import { MEASUREMENT_SKILLS } from '../../measurement/measurement-item-for-skill';
+import { MONEY_SKILLS } from '../../money/money-item-for-skill';
 import { dialogRenderable, itemForSkill } from '../../practice/item-for-skill';
-import { hasSceneRenderer, registeredSceneKinds, renderScene } from './dialog-scene-registry';
+import { TIME_SKILLS } from '../../time/time-item-for-skill';
+import {
+  type DialogSceneKind,
+  hasSceneRenderer,
+  registeredSceneKinds,
+  renderScene,
+} from './dialog-scene-registry';
 
-const ALL_KINDS: readonly SceneKind[] = [
+const ALL_KINDS: readonly DialogSceneKind[] = [
   'segment',
   'circle',
   'circle-row',
@@ -25,13 +32,20 @@ const ALL_KINDS: readonly SceneKind[] = [
   'side-polygon',
   'rect',
   'cells',
+  'clock',
+  'month-calendar',
+  'notes',
+  'data-table',
+  'tally',
+  'bag',
+  'dice',
 ];
 
 describe('dialog scene registry', () => {
   test('every SceneBody kind has exactly one renderer', () => {
     expect([...registeredSceneKinds()].sort()).toEqual([...ALL_KINDS].sort());
     for (const kind of ALL_KINDS) expect(hasSceneRenderer(kind)).toBe(true);
-    expect(hasSceneRenderer('nope' as SceneKind)).toBe(false);
+    expect(hasSceneRenderer('nope')).toBe(false);
   });
 
   test('every geo/meas skill x tier sample has a renderable scene', () => {
@@ -39,6 +53,17 @@ describe('dialog scene registry', () => {
       for (const tier of [1, 2, 3] as const) {
         const item = itemForSkill(id, mulberry32(0), tier);
         if (item.scene === undefined) throw new Error(`skill ${id} tier ${tier} has no scene`);
+        expect(hasSceneRenderer(item.scene.kind)).toBe(true);
+        expect(dialogRenderable(item)).toBe(true);
+      }
+    }
+  });
+
+  test('every time/money/data skill x tier sample has a renderable scene (phase 17)', () => {
+    for (const id of [...TIME_SKILLS, ...MONEY_SKILLS, ...DATA_SKILLS]) {
+      for (const tier of [1, 2, 3] as const) {
+        const item = itemForSkill(id, mulberry32(0), tier);
+        if (item.scene === undefined) continue;
         expect(hasSceneRenderer(item.scene.kind)).toBe(true);
         expect(dialogRenderable(item)).toBe(true);
       }

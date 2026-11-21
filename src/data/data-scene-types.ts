@@ -12,7 +12,7 @@ import type { Colour } from './data-ranges';
 /** A data table: column headers, rows of values, an optional hidden cell to fill. */
 export interface DataTableScene {
   readonly kind: 'data-table';
-  /** One 'i:<noun>' ref per column. */
+  /** One 'i:<noun>' or 'l:<key>' ref per column (groups are 'l:' refs). */
   readonly headers: readonly string[];
   /** Rows of cell values; null is the hidden cell (table-fill-missing only). */
   readonly rows: readonly (readonly (number | null)[])[];

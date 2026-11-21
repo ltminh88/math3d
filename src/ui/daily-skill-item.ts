@@ -13,6 +13,7 @@ import { renderPromptFor } from '../practice/family-prompt-registry';
 import { familyOfSkill, itemForSkill } from '../practice/item-for-skill';
 import { renderScene } from './dialog-scenes/dialog-scene-registry';
 import '../styles/dialog-scene.css';
+import '../styles/dialog-scene-market.css';
 import { playableSteps } from '../reasoning/reasoning-step-answers';
 import { td } from './daily-practice-strings';
 import { gameState } from './game-state';

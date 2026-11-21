@@ -107,7 +107,7 @@ describe('dialogRenderable', () => {
     }
   });
 
-  test('time scene-free items render; time scene items wait for the phase-17 renderer', () => {
+  test('time scene-free items render; time scene items render now (phase 17)', () => {
     for (const id of ['months-days-count', 'times-order-digital'])
       expect(dialogRenderable(itemForSkill(id, mulberry32(1), 1))).toBe(true);
     for (const id of [
@@ -121,12 +121,12 @@ describe('dialogRenderable', () => {
       'calendar-days-between',
     ]) {
       const item = itemForSkill(id, mulberry32(1), 1);
-      expect(dialogRenderable(item)).toBe(false);
-      expect(dialogRenderable(item, () => true)).toBe(true);
+      expect(dialogRenderable(item)).toBe(true);
+      expect(dialogRenderable(item, () => false)).toBe(false);
     }
   });
 
-  test('money scene-free items render; money scene items wait for the phase-17 renderer', () => {
+  test('money scene-free items render; money scene items render now (phase 17)', () => {
     for (const id of ['money-change-back', 'money-wp'])
       expect(dialogRenderable(itemForSkill(id, mulberry32(1), 1))).toBe(true);
     for (const id of [
@@ -136,12 +136,12 @@ describe('dialogRenderable', () => {
       'money-pick-notes',
     ]) {
       const item = itemForSkill(id, mulberry32(1), 1);
-      expect(dialogRenderable(item)).toBe(false);
-      expect(dialogRenderable(item, () => true)).toBe(true);
+      expect(dialogRenderable(item)).toBe(true);
+      expect(dialogRenderable(item, () => false)).toBe(false);
     }
   });
 
-  test('data items all need a picture: every data skill waits for the phase-17 renderer', () => {
+  test('data items all need a picture: every data skill renders now (phase 17)', () => {
     for (const id of [
       'tally-count',
       'table-read',
@@ -152,8 +152,8 @@ describe('dialogRenderable', () => {
       'chance-dice',
     ]) {
       const item = itemForSkill(id, mulberry32(1), 1);
-      expect(dialogRenderable(item)).toBe(false);
-      expect(dialogRenderable(item, () => true)).toBe(true);
+      expect(dialogRenderable(item)).toBe(true);
+      expect(dialogRenderable(item, () => false)).toBe(false);
     }
   });
 
