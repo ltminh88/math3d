@@ -83,20 +83,37 @@ describe('skillsOfLesson', () => {
     ]);
   });
 
-  it('returns table facts for B4 (mul + div, deduped)', () => {
+  it('returns table facts plus its own skills for B4', () => {
     const keys = skillsOfLesson(4);
-    expect(keys).toHaveLength(35);
+    expect(keys).toHaveLength(36); // sk:pattern-skip-count + 35 facts (mul:2x5 deduped)
     expect(new Set(keys).size).toBe(keys.length);
+    expect(keys).toContain('sk:pattern-skip-count');
     expect(keys).toContain('mul:2x5');
     expect(keys).toContain('div:10/2');
     expect(keys).toContain('div:50/5');
   });
 
-  it('returns the union of mixOf for B8', () => {
+  it('returns its own skills plus the union of mixOf for B8', () => {
     const keys = skillsOfLesson(8);
     expect(new Set(keys).size).toBe(keys.length);
+    expect(keys).toContain('sk:pattern-add');
+    expect(keys).toContain('sk:pattern-sub');
+    expect(keys).toContain('sk:pattern-skip-count');
     expect(keys).toContain('sk:unknown-add-sub');
     expect(keys).toContain('mul:2x3');
+  });
+
+  it('B7 (not practicable) still yields its tagged skill', () => {
+    expect(skillsOfLesson(7)).toEqual(['sk:pattern-skip-count']);
+  });
+
+  it('no catalog skill is orphaned: every skill appears in at least one practicable lesson', () => {
+    for (const s of SKILL_CATALOG) {
+      const found = ALL_LESSONS.some(
+        (l) => l.practicable && skillsOfLesson(l.n).includes(`sk:${s.id}`),
+      );
+      expect(found, s.id).toBe(true);
+    }
   });
 
   it('returns geometry skills for the B22 review', () => {

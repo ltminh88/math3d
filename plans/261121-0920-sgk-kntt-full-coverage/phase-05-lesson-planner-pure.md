@@ -32,7 +32,7 @@ Ownership: `src/learning/lesson-planner*.ts`, `src/learning/lesson-progress*.ts`
 - [ ] progress + next-lesson + tests
 
 ## Success Criteria
-B25 run gives only remainder skills; B44 mix spreads; empty lesson → []; deterministic.
+B25 run gives B25's skills (2 remainder + choose-all-correct + tf-explain); B44 mix spreads; empty lesson → []; deterministic.
 
 ## Risk Assessment
 | Risk | Countermove |
