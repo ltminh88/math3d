@@ -1,0 +1,202 @@
+/* Dialog scene pictures (phase 04): the item's scene drawn as SVG above the step card.
+   The picture never pushes the answer pad away: it caps at ~40vh and the dialog itself
+   scrolls. Labels are at least 14 px, including the workshop views reused here (their
+   own stylesheet only loads inside the workshop level, so the fills are repeated here,
+   scoped to .daily-scene). */
+.daily-scene {
+  margin: 4px 0 8px;
+}
+
+.daily-scene:empty {
+  display: none;
+}
+
+.daily-scene svg.dialog-scene {
+  display: block;
+  width: 100%;
+  height: auto;
+  max-height: 40vh;
+  margin: 0 auto;
+}
+
+/* Own drawings: same shed palette as the workshop board. */
+.ds-label {
+  font: 800 15px var(--font);
+  fill: #5a4632;
+}
+
+.ds-shape {
+  fill: #d8ebcc;
+  stroke: #5a4632;
+  stroke-width: 2;
+}
+
+.ds-line {
+  stroke: #5a4632;
+  stroke-width: 2.5;
+  stroke-linecap: round;
+}
+
+.ds-point {
+  fill: #5a4632;
+}
+
+.ds-arc {
+  fill: none;
+  stroke: #5a4632;
+  stroke-width: 2;
+}
+
+.ds-circle {
+  fill: none;
+  stroke: #5a4632;
+  stroke-width: 2.5;
+}
+
+.ds-cell {
+  fill: #e8a25b;
+  stroke: #9c5a3c;
+  stroke-width: 1.5;
+}
+
+.ds-solid-front {
+  fill: #d8ebcc;
+  stroke: #5a4632;
+  stroke-width: 2;
+}
+
+.ds-solid-top {
+  fill: #eef6e6;
+  stroke: #5a4632;
+  stroke-width: 2;
+}
+
+.ds-solid-side {
+  fill: #b9d6a4;
+  stroke: #5a4632;
+  stroke-width: 2;
+}
+
+/* Workshop views reused in the dialog (ruler, balance, jug, thermometers, fence). */
+.daily-scene .ws-label {
+  font: 800 15px var(--font);
+  fill: #5a4632;
+}
+
+.daily-scene .ws-label--small {
+  font-size: 14px;
+}
+
+.daily-scene .ws-label--ruler {
+  font-size: 14px;
+}
+
+.daily-scene .ws-label--on {
+  fill: #fff;
+}
+
+.daily-scene .ws-label--weight {
+  font-size: 14px;
+  fill: #fff;
+}
+
+.daily-scene .ws-object {
+  fill: #e8a25b;
+  stroke: #9c5a3c;
+  stroke-width: 2;
+}
+
+.daily-scene .ws-ruler {
+  fill: #f2d36b;
+  stroke: #c9a64a;
+}
+
+.daily-scene .ws-ticks {
+  stroke: #5a4632;
+  stroke-width: 1.2;
+}
+
+.daily-scene .ws-ticks--thin {
+  stroke-width: 1;
+}
+
+.daily-scene .ws-garden {
+  fill: #d8ebcc;
+}
+
+.daily-scene .ws-side__line {
+  stroke: #8c6947;
+  stroke-width: 5;
+  stroke-linecap: round;
+  stroke-dasharray: 10 6;
+}
+
+.daily-scene .ws-wall .ws-side__line {
+  stroke: #9c5a3c;
+  stroke-width: 10;
+  stroke-dasharray: none;
+}
+
+.daily-scene .ws-gate {
+  fill: #fbf3e4;
+}
+
+.daily-scene .ws-floor {
+  fill: #f6dcc0;
+  stroke: #9c5a3c;
+  stroke-width: 3;
+}
+
+.daily-scene .ws-cut {
+  fill: #fbf3e4;
+  stroke: #9c5a3c;
+  stroke-dasharray: 5 4;
+}
+
+.daily-scene .ws-metal {
+  fill: #b0b6bf;
+}
+
+.daily-scene .ws-pan {
+  fill: #d9b45a;
+}
+
+.daily-scene .ws-string {
+  stroke: #5a4632;
+  stroke-width: 1.5;
+}
+
+.daily-scene .ws-goods {
+  fill: #f0a347;
+  stroke: #9c5a3c;
+}
+
+.daily-scene .ws-weight {
+  fill: #5f6670;
+}
+
+.daily-scene .ws-water {
+  fill: #7cc3e8;
+}
+
+.daily-scene .ws-glass {
+  fill: none;
+  stroke: #6f8fa0;
+  stroke-width: 3;
+}
+
+.daily-scene .ws-marks {
+  stroke: #33505f;
+  stroke-width: 2;
+}
+
+.daily-scene .ws-tube {
+  fill: #fff;
+  stroke: #b0b6bf;
+  stroke-width: 2;
+}
+
+.daily-scene .ws-bulb,
+.daily-scene .ws-mercury {
+  fill: #e8562f;
+}

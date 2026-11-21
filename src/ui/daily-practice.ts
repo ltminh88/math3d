@@ -9,9 +9,10 @@ import type { FactStat } from '../learning/learning-types';
 import { COINS_PER_CORRECT } from '../learning/scoring';
 import { mulberry32, type Rng } from '../learning/seeded-rng';
 import type { QuestionOutcome } from '../learning/session-recorder';
+import { skillTierOf } from '../learning/skill-tiers';
 import { isLevelRunning } from '../levels/shared/level-gates';
 import type { ReasoningRoundPlan } from '../levels/shared/reasoning-round-slot';
-import { dialogRenderable } from '../practice/item-for-skill';
+import { dialogRenderable, itemForSkill } from '../practice/item-for-skill';
 import { buildDailyQuestion } from '../quiz/daily-question';
 import { createQuizAnswerBatch, type QuizAnswerBatch } from '../quiz/quiz-answer-batch';
 import type { GameStore } from '../store/game-store-api';
@@ -46,9 +47,13 @@ export interface DailyRunState {
 let run: DailyRunState | null = null;
 
 /**
- * Learned pool without skills whose item needs a scene the dialog cannot draw (phase 04
- * registers dialog scene renderers and lifts this). The planner itself stays unaware of
- * the UI: the call site filters the pool, so a smaller pool just plans fewer items.
+ * Learned pool without skills whose item the dialog cannot draw. Item-based (phase 04,
+ * le 21/11 11:01 — never by family): the generated item is the ground truth — no scene
+ * always renders, a scene renders only when its kind has a renderer. The scene kind is
+ * (skill, tier)-deterministic, so one fixed-seed sample at the skill's tier settles it;
+ * an unknown id throws and is dropped instead of breaking the dialog open. The planner
+ * itself stays unaware of the UI: the call site filters the pool, so a smaller pool
+ * just plans fewer items.
  */
 function renderableStats(
   stats: Readonly<Record<FactKey, FactStat | undefined>>,
@@ -58,7 +63,14 @@ function renderableStats(
     if (isSkillKey(key)) {
       const parsed = parseKey(key);
       const id = parsed?.op === 'skill' ? parsed.id : '';
-      if (!dialogRenderable(id)) continue;
+      let renderable = false;
+      try {
+        const item = itemForSkill(id, mulberry32(0), skillTierOf({ box: stat?.box ?? 1 }));
+        renderable = dialogRenderable(item);
+      } catch {
+        renderable = false;
+      }
+      if (!renderable) continue;
     }
     out[key as FactKey] = stat;
   }

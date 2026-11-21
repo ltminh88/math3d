@@ -338,10 +338,57 @@ test('geo/meas stats do not crash daily: the run opens, plays the renderable ite
     }),
   );
   await openDaily(page, touch);
-  // After the fix the two scene skills are filtered out, so the run has 2 items.
-  await expect(page.locator('#dialog-content')).toContainText('Luyện tập hôm nay · Câu 1/2');
-  expect(await playDailyRun(page, touch)).toBe(2);
+  // Phase 04: the two scene skills have dialog renderers now, so the run has 4 items.
+  await expect(page.locator('#dialog-content')).toContainText('Luyện tập hôm nay · Câu 1/4');
+  expect(await playDailyRun(page, touch)).toBe(4);
   await expect(page.locator('#dialog-content')).toContainText('Xong rồi!');
+  expect(errors).toEqual([]);
+  await closeDaily(page, touch);
+});
+
+test('geo/meas items show their picture in daily and are answerable by tap', async ({
+  page,
+}, info) => {
+  const touch = isTouch(info);
+  const errors: string[] = [];
+  page.on('pageerror', (err) => errors.push(String(err)));
+  await seedDate(page);
+  await page.goto('/');
+  await expect(page.locator('html')).toHaveAttribute('data-boot', 'ready', { timeout: 120_000 });
+  await page.waitForFunction(() => '__game' in window);
+  await page.locator('#play').click();
+  await expect(page.locator('body')).toHaveClass(/playing/);
+  await page.evaluate(() => window.__game?.seedStageProgress('field', [1]));
+  await page.evaluate(() =>
+    window.__game?.seedFactStats({
+      'sk:meas-ruler-read': { box: 1 },
+      'sk:geo-midpoint': { box: 1 },
+    }),
+  );
+  await openDaily(page, touch);
+  // Both seeded skills carry a scene, so the run is 2 scene items.
+  await expect(page.locator('#dialog-content')).toContainText('Luyện tập hôm nay · Câu 1/2');
+  const panel = page.locator('#dialog-content');
+  const scene = panel.locator('svg.dialog-scene');
+  await expect(scene).toBeVisible();
+  // The picture fits the dialog: the answer pad stays visible below it.
+  await expect(panel.locator('.daily-steps .kit-pad')).toBeVisible();
+  // The story/steps render through the item family's prompt namespace, never
+  // as raw keys ("reasoning.rulerCm").
+  await expect(panel).not.toContainText('reasoning.');
+  await page.screenshot({ path: info.outputPath(`scene-${info.project.name}.png`) });
+  await solveSkillItem(page, touch);
+  const next = panel.locator('.daily-next');
+  if (touch) await next.tap();
+  else await next.click();
+  // The second item is the other scene skill: its picture shows too.
+  await expect(page.locator('#dialog-content')).toContainText('Luyện tập hôm nay · Câu 2/2');
+  await expect(panel.locator('svg.dialog-scene')).toBeVisible();
+  await expect(panel).not.toContainText('reasoning.');
+  await solveSkillItem(page, touch);
+  if (touch) await next.tap();
+  else await next.click();
+  await expect(panel).toContainText('Xong rồi!');
   expect(errors).toEqual([]);
   await closeDaily(page, touch);
 });
