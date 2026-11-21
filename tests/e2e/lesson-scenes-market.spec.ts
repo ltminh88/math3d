@@ -169,7 +169,7 @@ test('B68 money: one note card with its grouped value shows and the item solves'
   await oneSkillRun(page, info, 'money-recognize', 'notes', async (scene) => {
     await expect(scene.locator('rect.ds-note')).toHaveCount(1);
     const value = await scene.locator('text.ds-note-value').textContent();
-    expect(value).toMatch(/^\d{1,3}( \d{3})*$/);
+    expect(value).toMatch(/^\d{1,3}(\s\d{3})*$/);
   });
 });
 

@@ -1,16 +1,12 @@
 // Texts of money items for 7-9 year olds (vi source, KNTT terms; en mirror). Generators
 // only name keys. Amounts reach the table already grouped — see formatMoney below.
 import { defineStrings } from '../i18n/i18n';
+import { formatNumber } from '../numbers/numbers-format';
 import type { PromptRef } from '../reasoning/reasoning-types';
 
-/**
- * SGK thousands grouping: "10 000", "200 000". TEMPORARY single place for money text
- * (Brian, 2026-11-21): muse-88 is adding the shared formatter in src/numbers (PR #39).
- * TODO: chuyển sang src/numbers formatter khi #39 gộp — then delete this function and
- * call the shared one. No other money file formats an amount.
- */
+/** Money amounts reuse the shared SGK formatter (phase 07): 10000 → "10 000". */
 export function formatMoney(n: number): string {
-  return String(n).replace(/\B(?=(\d{3})+(?!\d))/g, ' ');
+  return formatNumber(n);
 }
 
 const vi = {

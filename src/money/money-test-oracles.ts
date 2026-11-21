@@ -7,7 +7,9 @@ import type { MoneyItem } from './money-scene-types';
 
 /** "50 000" -> 50000 (SGK grouping stripped). */
 export function parseMoney(s: string): number {
-  return Number(s.replace(/ /g, ''));
+  // \s covers the shared formatter's narrow no-break space (U+202F) as well as
+  // a plain space, so both groupings parse back to the same number.
+  return Number(s.replace(/\s/g, ''));
 }
 
 /** The numeric value of a step: the number answer, or the correct amount/count choice. */
@@ -80,7 +82,7 @@ export function allNumbers(item: MoneyItem): number[] {
   for (const note of notesOf(item)) out.push(note);
   const collect = (params: Record<string, string | number> | undefined): void => {
     for (const v of Object.values(params ?? {})) {
-      if (typeof v === 'string' && /^[\d ]+$/.test(v)) out.push(parseMoney(v));
+      if (typeof v === 'string' && /^[\d\s]+$/.test(v)) out.push(parseMoney(v));
     }
   };
   collect(item.story.params);
