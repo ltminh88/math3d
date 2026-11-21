@@ -1,0 +1,109 @@
+// Lesson planner (phase 05): a run is a list of fact keys for one lesson, weakest box
+// first, round-robin. Oracles below are computed by hand from the catalog (phase 01),
+// not by calling the helpers under test:
+//   B25 = div-rem-floor, div-rem-ceil, choose-all-correct, tf-explain (catalog lines 36-37, 49-50)
+//   B3  = unknown-add-sub only; B1/B2 have no skills yet; B7 mixes nothing; B14 has no
+//         fraction skills yet (phase 12 lands them)
+//   B5  = tables [3]: 9 mul facts (3x2..3x10) + 9 div facts (6/3..30/3)
+//   B44 = mix of [8, 15, 22, 29, 35, 40, 41, 42, 43]: facts (via B8) and skills (via B13/B15)
+import { describe, expect, it } from 'vitest';
+import type { FactKey } from './fact-key';
+import { skillsOfLesson } from './kntt-lesson-index';
+import type { FactStat } from './learning-types';
+import { planLessonRun } from './lesson-planner';
+import { mulberry32 } from './seeded-rng';
+
+const stat = (box: number, attempts = 1): FactStat => ({
+  attempts,
+  correct: attempts,
+  totalMs: 1000,
+  box,
+  lastSeenSession: 1,
+  lastSeenAt: 1000,
+  streak: 0,
+  fluent: false,
+  errs: [],
+});
+
+const B25_SKILLS: readonly FactKey[] = [
+  'sk:div-rem-floor',
+  'sk:div-rem-ceil',
+  'sk:choose-all-correct',
+  'sk:tf-explain',
+];
+
+describe('planLessonRun', () => {
+  it('B25 run uses only B25 skills', () => {
+    const run = planLessonRun(25, {}, mulberry32(1));
+    expect(run).toHaveLength(6);
+    for (const key of run) expect(B25_SKILLS).toContain(key);
+    expect(run).toContain('sk:div-rem-floor');
+    expect(run).toContain('sk:div-rem-ceil');
+    expect(run.every((k) => k.startsWith('sk:'))).toBe(true);
+  });
+
+  it('weakest box first', () => {
+    const stats: Record<FactKey, FactStat> = {
+      'sk:div-rem-floor': stat(5),
+      'sk:div-rem-ceil': stat(1),
+      'sk:choose-all-correct': stat(5),
+      'sk:tf-explain': stat(5),
+    };
+    const run = planLessonRun(25, stats, mulberry32(2));
+    expect(run[0]).toBe('sk:div-rem-ceil');
+  });
+
+  it('tables run gives distinct facts, never the same question twice', () => {
+    const run = planLessonRun(5, {}, mulberry32(3));
+    expect(run).toHaveLength(6);
+    expect(new Set(run).size).toBe(6);
+    expect(run.every((k) => k.startsWith('mul:') || k.startsWith('div:'))).toBe(true);
+  });
+
+  it('B44 mix spreads over its source lessons', () => {
+    // Attribution via the public lesson table (the oracle — 6 distinct sources — is
+    // hand-decided from the round-robin design, not computed by the planner).
+    const mixOf = [8, 15, 22, 29, 35, 40, 41, 42, 43];
+    const sourceOf = (key: FactKey): number => {
+      const src = mixOf.find((m) => skillsOfLesson(m).includes(key));
+      if (src === undefined) throw new Error(`no source for ${key}`);
+      return src;
+    };
+    const run = planLessonRun(44, {}, mulberry32(7));
+    expect(run).toHaveLength(6);
+    expect(new Set(run.map(sourceOf)).size).toBe(6);
+    expect(run.some((k) => k.startsWith('sk:'))).toBe(true);
+  });
+
+  it('a lesson with no plannable skills returns [] (UI shows "Sắp có")', () => {
+    for (const n of [1, 2, 7]) expect(planLessonRun(n, {}, mulberry32(4))).toEqual([]);
+    // B14 has no fraction skills until phase 12 lands them; then this moves.
+    expect(planLessonRun(14, {}, mulberry32(4))).toEqual([]);
+  });
+
+  it('renderable filter excludes skills; none renderable means []', () => {
+    const onlyCeil = planLessonRun(25, {}, mulberry32(5), {
+      renderable: (k) => k === 'sk:div-rem-ceil',
+    });
+    expect(onlyCeil).toHaveLength(3); // one skill, at most 3 items
+    expect(onlyCeil.every((k) => k === 'sk:div-rem-ceil')).toBe(true);
+    expect(planLessonRun(25, {}, mulberry32(5), { renderable: () => false })).toEqual([]);
+  });
+
+  it('one skill contributes at most 3 items; items opt is honoured', () => {
+    expect(planLessonRun(25, {}, mulberry32(6), { items: 2 })).toHaveLength(2);
+    const one = planLessonRun(3, {}, mulberry32(6)); // B3: unknown-add-sub only
+    expect(one).toHaveLength(3);
+    expect(one.every((k) => k === 'sk:unknown-add-sub')).toBe(true);
+  });
+
+  it('is deterministic per (seed, stats)', () => {
+    const a = planLessonRun(25, {}, mulberry32(11));
+    const b = planLessonRun(25, {}, mulberry32(11));
+    expect(a).toEqual(b);
+  });
+
+  it('throws for an unknown lesson', () => {
+    expect(() => planLessonRun(99, {}, mulberry32(1))).toThrow();
+  });
+});
