@@ -13,7 +13,7 @@ import {
   reasoningItem,
   ref,
 } from '../reasoning/reasoning-distractors';
-import type { PromptRef, ReasoningStep } from '../reasoning/reasoning-types';
+import type { ChoiceOption, PromptRef, ReasoningStep } from '../reasoning/reasoning-types';
 import { numberToVietnameseWords } from './number-words-vi';
 import { digitAt, digitsOf, fromDigits, PLACES_OF_RANGE } from './numbers-ranges';
 import type { NumberScene, PlaceName } from './numbers-scene-types';
@@ -131,7 +131,7 @@ export function signChoiceStep(rng: Rng, prompt: PromptRef, a: number, b: number
     { key: 'signLt', correct: a < b },
     { key: 'signEq', correct: a === b },
   ];
-  const options = signs.map((s, i) => ({
+  const options: ChoiceOption[] = signs.map((s, i) => ({
     id: `o${i}`,
     label: ref(s.key),
     correct: s.correct,
