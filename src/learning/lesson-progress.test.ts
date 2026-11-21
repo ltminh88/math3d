@@ -86,6 +86,21 @@ describe('lessonStars', () => {
     expect(lessonStars(66, statsOf(keys, 4))).toBe(3);
   });
 
+  it('B68: 0-3 by hand (phase 14 money skills)', () => {
+    const keys = [
+      'sk:money-recognize',
+      'sk:money-total-notes',
+      'sk:money-exchange',
+      'sk:money-change-back',
+      'sk:money-pick-notes',
+      'sk:money-wp',
+    ] as const;
+    expect(lessonStars(68, {})).toBe(0);
+    expect(lessonStars(68, statsOf(keys, 2))).toBe(1); // all attempted, none >= 3
+    expect(lessonStars(68, statsOf(keys, 3))).toBe(2);
+    expect(lessonStars(68, statsOf(keys, 4))).toBe(3);
+  });
+
   it('tables B5: the 70% share decides', () => {
     const facts = [...mulFactsForTables([3]), ...divFactsForTables([3])];
     expect(facts).toHaveLength(18);
@@ -156,8 +171,8 @@ describe('topicProgress', () => {
     });
   });
 
-  it('topic 13 has 3 playable lessons (B66, B67, B69; B68 money is phase 14)', () => {
-    expect(topicProgress(13, {})).toEqual({ completed: 0, total: 3 });
+  it('topic 13 has 4 playable lessons (B66, B67, B68, B69)', () => {
+    expect(topicProgress(13, {})).toEqual({ completed: 0, total: 4 });
   });
 
   it('an unknown topic is empty', () => {

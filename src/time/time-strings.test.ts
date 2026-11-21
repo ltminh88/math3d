@@ -14,7 +14,7 @@ describe('time strings', () => {
       setLanguage(lang);
       for (const id of TIME_SKILLS)
         for (const tier of [1, 2, 3] as SkillTier[])
-          for (let seed = 0; seed < 40; seed++)
+          for (let seed = 0; seed < 200; seed++)
             for (const p of promptsOf(timeItemForSkill(id, mulberry32(seed), tier))) {
               const text = renderTimePrompt(p);
               expect(text, `${lang} ${p.key}`).not.toMatch(UNRENDERED);
