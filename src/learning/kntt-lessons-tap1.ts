@@ -4,7 +4,8 @@
  * Lesson numbers, topics and kinds follow the in-repo gap report and researcher notes.
  * `mix` = a review/practice lesson whose skills are the union of `mixOf` (earlier lessons).
  * B7 reviews grade-2 geometry/measurement, so it mixes nothing in this book and is not
- * practicable yet; B20 is drawing practice, which has no MCQ/number-pad form.
+ * practicable yet; B20 practises its geometry content (right angles, circles, plane
+ * shapes) through its mix instead of the drawing part.
  */
 import type { KnttLesson } from './kntt-lesson-index';
 
@@ -29,7 +30,7 @@ export const KNTT_LESSONS_TAP1: readonly KnttLesson[] = Object.freeze([
   { n: 17, book: 1, topic: 3, titleVi: 'Hình tròn, tâm, bán kính, đường kính', titleEn: 'Circle: centre, radius, diameter', kind: 'skills', practicable: true },
   { n: 18, book: 1, topic: 3, titleVi: 'Góc vuông, góc không vuông', titleEn: 'Right angles', kind: 'skills', practicable: true },
   { n: 19, book: 1, topic: 3, titleVi: 'Các hình phẳng cơ bản', titleEn: 'Basic plane shapes', kind: 'skills', practicable: true },
-  { n: 20, book: 1, topic: 3, titleVi: 'Thực hành vẽ hình', titleEn: 'Hands-on drawing practice', kind: 'mix', mixOf: [17, 18, 19], practicable: false },
+  { n: 20, book: 1, topic: 3, titleVi: 'Thực hành vẽ hình', titleEn: 'Hands-on drawing practice', kind: 'mix', mixOf: [17, 18, 19], practicable: true },
   { n: 21, book: 1, topic: 3, titleVi: 'Khối lập phương, khối hộp chữ nhật', titleEn: 'Cubes and rectangular boxes', kind: 'skills', practicable: true },
   { n: 22, book: 1, topic: 3, titleVi: 'Luyện tập chung', titleEn: 'Mixed practice', kind: 'mix', mixOf: [16, 17, 18, 19, 20, 21], practicable: true },
   { n: 23, book: 1, topic: 4, titleVi: 'Nhân số hai chữ số với số một chữ số', titleEn: 'Multiply a 2-digit number by a 1-digit number', kind: 'skills', practicable: true },

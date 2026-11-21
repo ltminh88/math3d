@@ -56,8 +56,8 @@ describe('KNTT lesson table', () => {
     ).toEqual([7]);
   });
 
-  it('only B7 (grade-2 review) and B20 (drawing practice) are not practicable', () => {
-    expect(ALL_LESSONS.filter((l) => !l.practicable).map((l) => l.n)).toEqual([7, 20]);
+  it('only B7 (grade-2 review) is not practicable', () => {
+    expect(ALL_LESSONS.filter((l) => !l.practicable).map((l) => l.n)).toEqual([7]);
   });
 
   it('every legacy skill lesson exists in the table', () => {
