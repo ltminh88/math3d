@@ -8,7 +8,7 @@ import { skillTierOf } from '../learning/skill-tiers';
 import { ReasoningRoundFlow } from '../levels/shared/reasoning-round-flow';
 import type { ReasoningRoundPlan } from '../levels/shared/reasoning-round-slot';
 import { trr } from '../levels/shared/reasoning-round-strings';
-import { reasoningItemForSkill } from '../reasoning/reasoning-item-for-skill';
+import { itemForSkill } from '../practice/item-for-skill';
 import { playableSteps } from '../reasoning/reasoning-step-answers';
 import { td } from './daily-practice-strings';
 import { gameState } from './game-state';
@@ -32,7 +32,7 @@ export function skillPlan(skillId: string, box: number, rng: Rng): ReasoningRoun
     skillId,
     tier,
     factKey: skillKey(skillId),
-    item: reasoningItemForSkill(skillId, rng, tier),
+    item: itemForSkill(skillId, rng, tier),
   };
 }
 

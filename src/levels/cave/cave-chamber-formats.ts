@@ -2,13 +2,11 @@
 // required mix of chapter 2 reasoning), their formats (never the same twice in a row) and the
 // generated items. Chamber = one recorded question under `sk:<skill id>`.
 
-import { geometryItemForSkill, isGeometrySkill } from '../../geometry/geometry-item-for-skill';
 import { type FactKey, skillKey } from '../../learning/fact-key';
 import type { FactStat } from '../../learning/learning-types';
 import { type Rng, shuffle } from '../../learning/seeded-rng';
 import { skillTierOf } from '../../learning/skill-tiers';
-import { measurementItemForSkill } from '../../measurement/measurement-item-for-skill';
-import { reasoningItemForSkill } from '../../reasoning/reasoning-item-for-skill';
+import { familyOfSkill, itemForSkill } from '../../practice/item-for-skill';
 import { playableSteps } from '../../reasoning/reasoning-step-answers';
 import type { ReasoningItem, ReasoningStep } from '../../reasoning/reasoning-types';
 
@@ -74,8 +72,12 @@ export function caveFormatOf(skillId: string): CaveFormat {
 
 export const caveSkillPool = (): FactKey[] => CAVE_SKILLS.map(skillKey);
 
-const familyOf = (id: string): CaveFamily =>
-  isGeometrySkill(id) ? 'geometry' : id.startsWith('meas-') ? 'measurement' : 'reasoning';
+const familyOf = (id: string): CaveFamily => {
+  const family = familyOfSkill(id);
+  if (family === 'geometry') return 'geometry';
+  if (family === 'measurement') return 'measurement';
+  return 'reasoning';
+};
 
 /** Could `ids` still be ordered with no format twice in a row, the first one not `last`? */
 function canArrange(ids: readonly string[], last: CaveFormat | undefined): boolean {
@@ -146,11 +148,7 @@ export function planCaveSkills(
 }
 
 function itemFor(id: string, rng: Rng, stats: Stats): ReasoningItem {
-  const tier = skillTierOf(stats[`sk:${id}`]);
-  const family = familyOf(id);
-  if (family === 'geometry') return geometryItemForSkill(id, rng, tier);
-  if (family === 'measurement') return measurementItemForSkill(id, rng, tier);
-  return reasoningItemForSkill(id, rng, tier);
+  return itemForSkill(id, rng, skillTierOf(stats[`sk:${id}`]));
 }
 
 /** Generates each chamber's item at the tier of its skill's Leitner box. */

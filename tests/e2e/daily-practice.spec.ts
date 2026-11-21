@@ -316,6 +316,36 @@ test('leaving mid-run keeps the answered items and does not count the run', asyn
   expect(snap?.wallet.coins).toBe(10);
 });
 
+test('geo/meas stats do not crash daily: the run opens, plays the renderable items, no page error', async ({
+  page,
+}, info) => {
+  const touch = isTouch(info);
+  const errors: string[] = [];
+  page.on('pageerror', (err) => errors.push(String(err)));
+  await seedDate(page);
+  await page.goto('/');
+  await expect(page.locator('html')).toHaveAttribute('data-boot', 'ready', { timeout: 120_000 });
+  await page.waitForFunction(() => '__game' in window);
+  await page.locator('#play').click();
+  await expect(page.locator('body')).toHaveClass(/playing/);
+  await page.evaluate(() => window.__game?.seedStageProgress('field', [1]));
+  await page.evaluate(() =>
+    window.__game?.seedFactStats({
+      'sk:geo-midpoint': { box: 1 },
+      'sk:meas-gram': { box: 1 },
+      'sk:wp-times-then-add': { box: 2 },
+      'sk:pattern-skip-count': { box: 1 },
+    }),
+  );
+  await openDaily(page, touch);
+  // After the fix the two scene skills are filtered out, so the run has 2 items.
+  await expect(page.locator('#dialog-content')).toContainText('Luyện tập hôm nay · Câu 1/2');
+  expect(await playDailyRun(page, touch)).toBe(2);
+  await expect(page.locator('#dialog-content')).toContainText('Xong rồi!');
+  expect(errors).toEqual([]);
+  await closeDaily(page, touch);
+});
+
 test('day 1 → replay → day 2 → skipped day: streak 1 → 1 → 2 → 1, coins, no sad copy', async ({
   page,
 }, info) => {
