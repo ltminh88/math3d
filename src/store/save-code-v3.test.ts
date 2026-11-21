@@ -66,7 +66,7 @@ const code = (version: number, payload: unknown): string => {
 };
 
 describe('M3D3 save code', () => {
-  it('still encodes M3D3 (kept for tests and fixtures; export writes M3D4)', () => {
+  it('still encodes M3D3 (kept for tests and fixtures; export writes M3D5)', () => {
     expect(encodeSaveCodeV3(snapshot(), audio)).toMatch(/^M3D3-[A-Za-z0-9_-]+-[0-9a-f]{8}$/);
   });
 

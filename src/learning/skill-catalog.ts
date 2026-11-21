@@ -2,7 +2,9 @@
  * Skills that are not a single × / : fact (word problems, geometry, measurement) still get Leitner
  * stats, under the fact key `sk:<id>`. The catalog is APPEND-ONLY: ids are part of the save code
  * (M3D3 decodes only ids listed here) and of the future SQL check, so an id is never renamed or
- * removed. A new id needs a new save-code version (M3D4), or old clients reject the code.
+ * removed. A new id needs no new save-code version (M3D5 is lenient: a well-formed unknown id
+ * is dropped on import), but an old client still rejects a code carrying it — old clients only
+ * decode up to M3D4.
  * `lessons` is the structured SGK Toán 3 Kết nối tri thức lesson the skill follows
  * (`book`: 1 | 2 = tập 1/2, `n`: lesson numbers). The display string `lesson` is derived from
  * `lessons` by `lessonLabel` — never stored twice — for the sticker book and pool counter.

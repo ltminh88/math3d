@@ -34,6 +34,12 @@ export type Compact = Record<string, unknown>;
 
 /** Same rule as the shop catalog and the server's owned_cosmetics check. */
 const ID_PATTERN = /^[a-z0-9-]{1,40}$/;
+/**
+ * Well-formed kebab-case id (same grammar as SKILL_ID_PATTERN_SOURCE): M3D5 drops a
+ * well-formed unknown skill/level id and rejects a malformed one. M3D2/M3D3/M3D4 decoding
+ * never consults it — their strict behaviour is unchanged.
+ */
+export const WELL_FORMED_ID_PATTERN = /^[a-z][a-z0-9-]{1,38}$/;
 /** Frozen: the five levels shipped with M3D2 (bridge + field, forest, city, tower gates). */
 const M3D2_LEVELS: ReadonlySet<string> = new Set([
   BRIDGE_LEVEL_ID,
@@ -96,11 +102,15 @@ export const isPlainObject = (v: unknown): v is Compact =>
 function decodeLevels(
   raw: unknown,
   knownLevels: ReadonlySet<string>,
+  lenient = false,
 ): ProgressRecords['levels'] | null {
   if (!isPlainObject(raw)) return null;
   const levels: ProgressRecords['levels'] = {};
   for (const [id, t] of Object.entries(raw)) {
-    if (!knownLevels.has(id) || !Array.isArray(t) || t.length !== 5) return null;
+    const known = knownLevels.has(id);
+    if (!known && !lenient) return null;
+    if (!known && !WELL_FORMED_ID_PATTERN.test(id)) return null;
+    if (!Array.isArray(t) || t.length !== 5) return null;
     const [stars, bestScore, doneSec, progress, acceptedSec] = t as unknown[];
     if (
       !isIntIn(stars, 0, 3) ||
@@ -110,6 +120,7 @@ function decodeLevels(
       !isIntIn(acceptedSec, 0, MAX_EPOCH_SEC)
     )
       return null;
+    if (!known) continue; // well-formed future level: dropped, not rejected
     const completedAt = doneSec * 1000;
     // M3D2/M3D3 carry no stage stars: stage 1 inherits the level's stars (phase 01
     // migration), so an imported finished level still shows stage 1 complete.
@@ -138,11 +149,16 @@ function decodeCosmetics(owned: unknown, equipped: unknown): ProgressRecords['co
   return { owned: [...(o as string[])], equipped: { ...(e as Record<string, string>) } };
 }
 
-/** Compact payload -> import for a level set and allowed keys, or null for anything malformed. */
+/**
+ * Compact payload -> import for a level set and allowed keys, or null for anything malformed.
+ * `lenient` (M3D5 only) drops well-formed unknown level ids instead of rejecting the code;
+ * M3D2/M3D3/M3D4 call without it and stay strict.
+ */
 export function compactFieldsToImport(
   raw: unknown,
   knownLevels: ReadonlySet<string>,
   allowedKeys: readonly string[],
+  lenient = false,
 ): SaveCodeImport | null {
   if (!isPlainObject(raw) || !Object.keys(raw).every((k) => allowedKeys.includes(k))) return null;
   const { x = 0, c = 0, a = 'default', g, s = [1, 0], n = 0 } = raw;
@@ -155,7 +171,7 @@ export function compactFieldsToImport(
   if (!isIntIn(table, 0, MAX_TABLE) || !isIntIn(combo, 0, MAX_COMBO) || !isFlag(started))
     return null;
   if (!Array.isArray(s) || s.length !== 2 || !s.every(isFlag)) return null;
-  const levels = decodeLevels(raw.l ?? {}, knownLevels);
+  const levels = decodeLevels(raw.l ?? {}, knownLevels, lenient);
   const cosmetics = decodeCosmetics(raw.o, raw.e);
   const facts = tuplesToFacts(raw.f ?? []);
   if (!levels || !cosmetics || !facts) return null;
