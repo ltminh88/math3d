@@ -1,6 +1,8 @@
 // One daily-practice `sk:` item in the shared dialog (phase 11): the same step kit and the
 // same step/hint flow as the levels (ReasoningRoundFlow), so steps and hints behave exactly
 // as the child knows them. A solved item pays +5 coins, no XP; a revealed one pays nothing.
+
+import { renderGeometryPrompt } from '../geometry/geometry-strings';
 import { skillKey } from '../learning/fact-key';
 import type { Rng } from '../learning/seeded-rng';
 import type { QuestionOutcome } from '../learning/session-recorder';
@@ -8,7 +10,10 @@ import { skillTierOf } from '../learning/skill-tiers';
 import { ReasoningRoundFlow } from '../levels/shared/reasoning-round-flow';
 import type { ReasoningRoundPlan } from '../levels/shared/reasoning-round-slot';
 import { trr } from '../levels/shared/reasoning-round-strings';
-import { itemForSkill } from '../practice/item-for-skill';
+import { renderMeasurementPrompt } from '../measurement/measurement-strings';
+import { familyOfSkill, itemForSkill } from '../practice/item-for-skill';
+import { renderScene } from './dialog-scenes/dialog-scene-registry';
+import '../styles/dialog-scene.css';
 import { playableSteps } from '../reasoning/reasoning-step-answers';
 import { td } from './daily-practice-strings';
 import { gameState } from './game-state';
@@ -36,10 +41,10 @@ export function skillPlan(skillId: string, box: number, rng: Rng): ReasoningRoun
   };
 }
 
-/** Body HTML for the item: an already-counted note, the badge, and the step-card host. */
+/** Body HTML for the item: an already-counted note, the badge, the scene picture host, and the step-card host. */
 export function skillItemHtml(index: number, total: number, alreadyCounted: boolean): string {
   const note = alreadyCounted ? `<p class="daily-note">${td('alreadyDone')}</p>` : '';
-  return `${note}<div class="dialog-eyebrow">${td('itemOf', { n: index + 1, total }).toUpperCase()}</div><p class="daily-badge">🧠 ${trr('badge')}</p><div class="daily-steps"></div><div class="daily-hint-area" hidden></div><p class="feedback" role="status"></p><div class="daily-footer"><button type="button" class="secondary daily-hint">💡 ${trr('hint')}</button><button type="button" class="text-button daily-leave">${td('leave')}</button></div><button type="button" class="primary wide daily-next" hidden></button>`;
+  return `${note}<div class="dialog-eyebrow">${td('itemOf', { n: index + 1, total }).toUpperCase()}</div><p class="daily-badge">🧠 ${trr('badge')}</p><div class="daily-scene"></div><div class="daily-steps"></div><div class="daily-hint-area" hidden></div><p class="feedback" role="status"></p><div class="daily-footer"><button type="button" class="secondary daily-hint">💡 ${trr('hint')}</button><button type="button" class="text-button daily-leave">${td('leave')}</button></div><button type="button" class="primary wide daily-next" hidden></button>`;
 }
 
 /** Mounts the step card and wires hint / next / leave inside the open dialog. */
@@ -51,6 +56,15 @@ export function mountSkillItem(
 ): { destroy(): void } {
   const flow = new ReasoningRoundFlow(plan, () => performance.now());
   const root = byId('dialog-content');
+  const sceneHost = root.querySelector('.daily-scene') as HTMLElement;
+  // The picture goes above the steps; a scene kind without a renderer never reaches
+  // here (the daily filter plans only renderable skills), so a null is a no-op.
+  // The plan item is a PracticeItem: the scene is right there when it has one.
+  const scene = plan.item.scene;
+  if (scene) {
+    const svg = renderScene(scene);
+    if (svg) sceneHost.append(svg);
+  }
   const stepsHost = root.querySelector('.daily-steps') as HTMLElement;
   const hintArea = root.querySelector('.daily-hint-area') as HTMLElement;
   const feedbackEl = root.querySelector('.feedback') as HTMLElement;
@@ -82,7 +96,18 @@ export function mountSkillItem(
     nextButton.focus({ preventScroll: true });
   };
 
+  // The step card renders the item's story/steps through its family's prompt
+  // namespace (reasoning by default — the same `render` the valley/workshop
+  // pass). Without this, geo/meas prompts show as raw keys ("reasoning.rulerCm").
+  const family = familyOfSkill(plan.skillId);
+  const render =
+    family === 'geometry'
+      ? renderGeometryPrompt
+      : family === 'measurement'
+        ? renderMeasurementPrompt
+        : undefined;
   const card = createStepCard(plan.item, {
+    render,
     onAnswer: (event) => {
       const result = flow.answer(event);
       if (result.verdict === 'step') {

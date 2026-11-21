@@ -1,6 +1,6 @@
 // Dispatcher (phase 00): one skill id -> the item its family generates; only unknown
-// ids throw. A geo/meas item carries a `scene` the dialog cannot draw yet (phase 04),
-// so daily filters those skills out instead of crashing on them.
+// ids throw. A geo/meas item carries a `scene`; daily (phase 04) judges the generated
+// item — no scene always renders, a scene renders only when its kind has a renderer.
 import { describe, expect, test } from 'vitest';
 import { ARITHMETIC_SKILLS, isArithmeticSkill } from '../arithmetic/arithmetic-item-for-skill';
 import { DATA_SKILLS, isDataSkill } from '../data/data-item-for-skill';
@@ -55,19 +55,30 @@ describe('new families (phase 02 scaffolding)', () => {
 });
 
 describe('dialogRenderable', () => {
-  test('reasoning items render in the dialog; scene items do not', () => {
+  test('reasoning items render in the dialog; scene items render when their kind has a renderer', () => {
     const reasoning = itemForSkill('wp-times-then-add', mulberry32(1), 1);
     const geo = itemForSkill('geo-midpoint', mulberry32(1), 1);
     const meas = itemForSkill('meas-gram', mulberry32(1), 1);
     expect(dialogRenderable(reasoning)).toBe(true);
-    expect(dialogRenderable(geo)).toBe(false);
-    expect(dialogRenderable(meas)).toBe(false);
+    // Phase 04 registers every scene kind, so scene items render now.
+    expect(dialogRenderable(geo)).toBe(true);
+    expect(dialogRenderable(meas)).toBe(true);
+    // A kind without a renderer is still filtered out, never a blank picture.
+    expect(dialogRenderable(geo, () => false)).toBe(false);
+    expect(dialogRenderable(meas, () => false)).toBe(false);
   });
 
-  test('an id renders exactly when its family has no scene', () => {
-    expect(dialogRenderable('wp-times-then-add')).toBe(true);
-    expect(dialogRenderable('geo-midpoint')).toBe(false);
-    expect(dialogRenderable('meas-gram')).toBe(false);
-    expect(dialogRenderable('not-a-skill')).toBe(false);
+  test('an item without a scene always renders; a scene item only with a renderer', () => {
+    const reasoning = itemForSkill('wp-times-then-add', mulberry32(1), 1);
+    expect(dialogRenderable(reasoning)).toBe(true);
+    for (const id of ['geo-midpoint', 'meas-gram']) {
+      for (const tier of [1, 2, 3] as const) {
+        const item = itemForSkill(id, mulberry32(1), tier);
+        expect(dialogRenderable(item)).toBe(true);
+        expect(dialogRenderable(item, () => false)).toBe(false);
+      }
+    }
+    // No scene at all (a plain item object) renders too.
+    expect(dialogRenderable({ skillId: 'x', tier: 1 } as never)).toBe(true);
   });
 });

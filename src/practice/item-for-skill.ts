@@ -1,10 +1,10 @@
 // Cross-family dispatcher (phase 00, extended in phase 02): one skill id + rng + tier -> the
 // item its family generates. Reasoning items have no scene and render in the shared dialog;
-// geometry and measurement items carry a scene only their levels draw, so daily filters those
-// skills out until phase 04 registers dialog scene renderers. The six new families (numbers,
-// arithmetic, fractions, time, money, data) have empty GENERATORS until their phases land, so
-// no id dispatches to them yet — but the wiring is here, so adding a skill means editing one
-// family folder only.
+// geometry and measurement items carry a scene, which renders only when a dialog scene
+// renderer covers its kind (phase 04 registers them all; a kind without one stays filtered).
+// The six new families (numbers, arithmetic, fractions, time, money, data) have empty
+// GENERATORS until their phases land, so no id dispatches to them yet — but the wiring is
+// here, so adding a skill means editing one family folder only.
 import { arithmeticItemForSkill, isArithmeticSkill } from '../arithmetic/arithmetic-item-for-skill';
 import { dataItemForSkill, isDataSkill } from '../data/data-item-for-skill';
 import { fractionItemForSkill, isFractionSkill } from '../fractions/fraction-item-for-skill';
@@ -20,6 +20,7 @@ import { isMoneySkill, moneyItemForSkill } from '../money/money-item-for-skill';
 import { isNumberSkill, numberItemForSkill } from '../numbers/number-item-for-skill';
 import { isReasoningSkill, reasoningItemForSkill } from '../reasoning/reasoning-item-for-skill';
 import { isTimeSkill, timeItemForSkill } from '../time/time-item-for-skill';
+import { hasSceneRenderer } from '../ui/dialog-scenes/dialog-scene-registry';
 import type { PracticeItem } from './practice-scene';
 
 /** The skill's family, read from the catalog — never from the id prefix. */
@@ -42,30 +43,17 @@ export function itemForSkill(id: string, rng: Rng, tier: SkillTier): PracticeIte
 }
 
 /**
- * Families whose items carry a scene the shared dialog cannot draw yet. The scene renderers
- * land in phase 04 (geometry, measurement) and phases 16/17 (the six new families); a family
- * leaves this list when its renderer lands. An actual item is the ground truth: one with no
- * scene renders (see the item overload below).
+ * True when the item can be shown in the shared dialog — judged on the ITEM, never on
+ * the skill's family (phase 04, le 21/11 11:01): an item with no scene always renders
+ * (e.g. a number-entry arithmetic item); a scene item renders exactly when its kind
+ * has a renderer (the lookup defaults to the dialog scene registry; a stub keeps this
+ * pure in node tests). A scene item without a renderer is dropped, never a blank
+ * picture. Unknown ids never reach here — the call site drops them (itemForSkill
+ * throws for them) instead of asking this function about an id.
  */
-const SCENE_FAMILIES: readonly SkillFamily[] = [
-  'geometry',
-  'measurement',
-  'number',
-  'arithmetic',
-  'fraction',
-  'time',
-  'money',
-  'data',
-];
-
-/**
- * True when the item can be shown in the shared dialog: a reasoning item has no scene.
- * An id renders exactly when its family has no scene; an unknown id never renders.
- */
-export function dialogRenderable(itemOrId: PracticeItem | string): boolean {
-  if (typeof itemOrId === 'string') {
-    const family = familyOfSkill(itemOrId);
-    return family !== undefined && !SCENE_FAMILIES.includes(family);
-  }
-  return !('scene' in itemOrId);
+export function dialogRenderable(
+  item: PracticeItem,
+  hasRenderer: (kind: string) => boolean = hasSceneRenderer,
+): boolean {
+  return item.scene === undefined || hasRenderer(item.scene.kind);
 }
