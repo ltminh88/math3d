@@ -5,7 +5,8 @@
  * build entries without importing the catalog (which imports those lists — a cycle).
  * The catalog is APPEND-ONLY: ids are part of the save code (M3D3 decodes only ids listed
  * here) and of the future SQL check, so an id is never renamed or removed. A new id needs
- * a new save-code version (M3D4), or old clients reject the code.
+ * no new save-code version (M3D5 is lenient: a well-formed unknown id is dropped on import),
+ * but an old client still rejects a code carrying it — old clients only decode up to M3D4.
  */
 export type SkillFamily =
   | 'word-problem'

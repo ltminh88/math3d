@@ -5,12 +5,14 @@
 import { type FactKey, isSkillKey, skillKey } from '../learning/fact-key';
 import type { FactStat } from '../learning/learning-types';
 import { LEITNER } from '../learning/leitner-box';
-import { isSkillId, SKILL_CATALOG } from '../learning/skill-catalog';
+import { isSkillId, SKILL_CATALOG, SKILL_ID_PATTERN_SOURCE } from '../learning/skill-catalog';
 import { isIntIn, MAX_EPOCH_SEC, toEpochSec } from './save-code-v2-facts';
 
 const MAX_COUNT = 1_000_000;
 const MAX_TOTAL_MS = 1e12;
 const MAX_SESSION = 10_000_000;
+/** Id grammar (same as the catalog): M3D5 drops a well-formed unknown id, rejects a malformed one. */
+const SKILL_ID_PATTERN = new RegExp(`^${SKILL_ID_PATTERN_SOURCE}$`);
 
 type SkillTuple = (string | number)[];
 
@@ -35,13 +37,18 @@ export function skillStatsToTuples(stats: Readonly<Record<FactKey, FactStat>>): 
   return tuples;
 }
 
-function tupleToSkill(raw: unknown): [FactKey, FactStat] | null {
+/**
+ * Parses one tuple's fields (shape, ranges, id grammar). Catalog membership is NOT checked:
+ * the strict decoder (M3D3/M3D4) rejects an id outside the catalog, the lenient decoder
+ * (M3D5) drops it. Null for anything malformed.
+ */
+export function parseSkillTuple(raw: unknown): [string, FactStat] | null {
   if (!Array.isArray(raw) || raw.length < 7 || raw.length > 9) return null;
   const [id, attempts, correct, totalMs, box, session, seenSec, streak = 0, fluent = 0] =
     raw as unknown[];
   if (
     typeof id !== 'string' ||
-    !isSkillId(id) ||
+    !SKILL_ID_PATTERN.test(id) ||
     !isIntIn(attempts, 0, MAX_COUNT) ||
     !isIntIn(correct, 0, attempts) ||
     !isIntIn(totalMs, 0, MAX_TOTAL_MS) ||
@@ -63,6 +70,14 @@ function tupleToSkill(raw: unknown): [FactKey, FactStat] | null {
     fluent: fluent === 1,
     errs: [],
   };
+  return [id, stat];
+}
+
+function tupleToSkill(raw: unknown): [FactKey, FactStat] | null {
+  const parsed = parseSkillTuple(raw);
+  if (!parsed) return null;
+  const [id, stat] = parsed;
+  if (!isSkillId(id)) return null;
   return [skillKey(id), stat];
 }
 

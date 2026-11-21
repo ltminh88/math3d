@@ -4,8 +4,11 @@
 // decoded exactly as before. M3D2: the whole store snapshot, incl. levels and cosmetics
 // (save-code-v2-payload.ts), still decoded as shipped. M3D3 (chapter 2): M3D2's fields for the
 // chapter-2 levels plus skill stats (save-code-v3-payload.ts), still decoded as shipped.
-// M3D4 (written now, phase 01): M3D3's fields plus stage stars (`t`) and the daily fields
-// (`d`) (save-code-v4-payload.ts). The checksum catches typos and truncation. A code is
+// M3D4 (written until phase 03): M3D3's fields plus stage stars (`t`) and the daily fields
+// (`d`) (save-code-v4-payload.ts). M3D5 (written now, phase 03): the same fields as M3D4,
+// but decoding is lenient — a well-formed skill/level id that is not in the catalog/level
+// set yet is dropped, not rejected (save-code-v5-payload.ts), so one version covers all
+// future family ids and chapter-3 levels. The checksum catches typos and truncation. A code is
 // progress, not a credential: it holds no secret, and every decoded field is validated.
 import { mulKey } from '../learning/fact-key';
 import { decodeSaveV1 } from '../save/save-storage';
@@ -21,9 +24,10 @@ import {
 } from './save-code-v2-payload';
 import { compactV3ToImport, snapshotToCompactV3 } from './save-code-v3-payload';
 import { compactV4ToImport, snapshotToCompactV4 } from './save-code-v4-payload';
+import { compactV5ToImport, snapshotToCompactV5 } from './save-code-v5-payload';
 
 /** Version written by export. */
-export const SAVE_CODE_VERSION = 4;
+export const SAVE_CODE_VERSION = 5;
 const PREFIX = 'M3D';
 /** Refuse anything longer before decoding (a full save, every fact and item, is ~11 KB). */
 export const MAX_SAVE_CODE_CHARS = 16384;
@@ -51,7 +55,7 @@ export type DecodedSaveCode =
       /** Leitner box per fact key carried by the code (absent for facts without one). */
       boxes: Record<string, number>;
     }
-  | { version: 2 | 3 | 4; data: SaveCodeImport };
+  | { version: 2 | 3 | 4 | 5; data: SaveCodeImport };
 
 const CRC_TABLE = Array.from({ length: 256 }, (_, n) => {
   let c = n;
@@ -91,9 +95,13 @@ export const encodeSaveCodeV2 = (snapshot: GameSnapshot, audio: SaveCodeAudio): 
 export const encodeSaveCodeV3 = (snapshot: GameSnapshot, audio: SaveCodeAudio): string =>
   frame(3, snapshotToCompactV3(snapshot, audio));
 
-/** Encodes the current M3D4 code: the whole progress snapshot (incl. stage stars) plus audio. */
+/** Encodes an M3D4 code (kept for tests and fixtures; export writes M3D5). */
 export const encodeSaveCodeV4 = (snapshot: GameSnapshot, audio: SaveCodeAudio): string =>
   frame(4, snapshotToCompactV4(snapshot, audio));
+
+/** Encodes the current M3D5 code: the whole progress snapshot (incl. stage stars) plus audio. */
+export const encodeSaveCodeV5 = (snapshot: GameSnapshot, audio: SaveCodeAudio): string =>
+  frame(5, snapshotToCompactV5(snapshot, audio));
 
 /** Store records + audio settings to import for a decoded code of either version. */
 export function importOfDecodedSaveCode(decoded: DecodedSaveCode, now: number): SaveCodeImport {
@@ -114,7 +122,7 @@ export function decodeSaveCode(input: string): DecodedSaveCode {
   const match = CODE_PATTERN.exec(code);
   if (!match) throw new SaveCodeError('format');
   const [, version, payload = '', crc] = match;
-  if (version !== '1' && version !== '2' && version !== '3' && version !== '4')
+  if (version !== '1' && version !== '2' && version !== '3' && version !== '4' && version !== '5')
     throw new SaveCodeError('version');
   if (crc32Hex(payload) !== crc) throw new SaveCodeError('checksum');
   let compact: unknown;
@@ -123,15 +131,20 @@ export function decodeSaveCode(input: string): DecodedSaveCode {
   } catch {
     throw new SaveCodeError('payload');
   }
-  if (version === '2' || version === '3' || version === '4') {
+  if (version === '2' || version === '3' || version === '4' || version === '5') {
     const data =
       version === '2'
         ? compactV2ToImport(compact)
         : version === '3'
           ? compactV3ToImport(compact)
-          : compactV4ToImport(compact);
+          : version === '4'
+            ? compactV4ToImport(compact)
+            : compactV5ToImport(compact);
     if (!data) throw new SaveCodeError('payload');
-    return { version: version === '2' ? 2 : version === '3' ? 3 : 4, data };
+    return {
+      version: version === '2' ? 2 : version === '3' ? 3 : version === '4' ? 4 : 5,
+      data,
+    };
   }
   const expanded = compactToSaveV1Json(compact);
   const save = expanded && decodeSaveV1(JSON.stringify(expanded.v1), { cap: false });
