@@ -2,7 +2,6 @@
 // same step/hint flow as the levels (ReasoningRoundFlow), so steps and hints behave exactly
 // as the child knows them. A solved item pays +5 coins, no XP; a revealed one pays nothing.
 
-import type { GeoItem } from '../geometry/geo-scene-types';
 import { renderGeometryPrompt } from '../geometry/geometry-strings';
 import { skillKey } from '../learning/fact-key';
 import type { Rng } from '../learning/seeded-rng';
@@ -60,9 +59,8 @@ export function mountSkillItem(
   const sceneHost = root.querySelector('.daily-scene') as HTMLElement;
   // The picture goes above the steps; a scene kind without a renderer never reaches
   // here (the daily filter plans only renderable skills), so a null is a no-op.
-  // ReasoningRoundPlan.item is typed ReasoningItem, so read the scene through a
-  // partial GeoItem instead of widening the shared plan type.
-  const scene = (plan.item as Partial<GeoItem>).scene;
+  // The plan item is a PracticeItem: the scene is right there when it has one.
+  const scene = plan.item.scene;
   if (scene) {
     const svg = renderScene(scene);
     if (svg) sceneHost.append(svg);

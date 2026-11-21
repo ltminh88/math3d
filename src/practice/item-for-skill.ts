@@ -20,8 +20,8 @@ import { isMoneySkill, moneyItemForSkill } from '../money/money-item-for-skill';
 import { isNumberSkill, numberItemForSkill } from '../numbers/number-item-for-skill';
 import { isReasoningSkill, reasoningItemForSkill } from '../reasoning/reasoning-item-for-skill';
 import { isTimeSkill, timeItemForSkill } from '../time/time-item-for-skill';
-import type { PracticeItem } from './practice-scene';
 import { hasSceneRenderer } from '../ui/dialog-scenes/dialog-scene-registry';
+import type { PracticeItem } from './practice-scene';
 
 /** The skill's family, read from the catalog — never from the id prefix. */
 export function familyOfSkill(id: string): SkillFamily | undefined {

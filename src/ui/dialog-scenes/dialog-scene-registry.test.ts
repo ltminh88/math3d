@@ -38,7 +38,7 @@ describe('dialog scene registry', () => {
     for (const id of [...GEOMETRY_SKILLS, ...MEASUREMENT_SKILLS]) {
       for (const tier of [1, 2, 3] as const) {
         const item = itemForSkill(id, mulberry32(0), tier);
-        if (!('scene' in item)) throw new Error(`skill ${id} tier ${tier} has no scene`);
+        if (item.scene === undefined) throw new Error(`skill ${id} tier ${tier} has no scene`);
         expect(hasSceneRenderer(item.scene.kind)).toBe(true);
         expect(dialogRenderable(item)).toBe(true);
       }
