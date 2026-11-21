@@ -66,7 +66,13 @@ export type Misconception =
   | 'roman-subtractive'
   | 'wrong-weekday'
   | 'wrong-order'
-  | 'elapsed-hour';
+  | 'elapsed-hour'
+  // Numbers (src/numbers)
+  | 'swapped-digits'
+  | 'dropped-zero'
+  | 'off-by-ten'
+  | 'wrong-place'
+  | 'wrong-sign';
 
 export interface ChoiceOption {
   readonly id: string;
