@@ -4,6 +4,7 @@
 import { describe, expect, test } from 'vitest';
 import { ARITHMETIC_SKILLS, isArithmeticSkill } from '../arithmetic/arithmetic-item-for-skill';
 import { DATA_SKILLS, isDataSkill } from '../data/data-item-for-skill';
+import { DATA_ENTRIES } from '../data/data-skill-entries';
 import { FRACTION_SKILLS, isFractionSkill } from '../fractions/fraction-item-for-skill';
 import { mulberry32 } from '../learning/seeded-rng';
 import { SKILL_CATALOG } from '../learning/skill-catalog';
@@ -40,11 +41,10 @@ describe('familyOfSkill', () => {
 });
 
 describe('new families (phase 02 scaffolding)', () => {
-  test('three families have no generator yet: is<F>Skill is false for every catalog id, <f>ItemForSkill throws', () => {
+  test('two families have no generator yet: is<F>Skill is false for every catalog id, <f>ItemForSkill throws', () => {
     const checks = [
       [isNumberSkill, NUMBER_SKILLS],
       [isArithmeticSkill, ARITHMETIC_SKILLS],
-      [isDataSkill, DATA_SKILLS],
     ] as const;
     for (const [isSkill, skills] of checks) {
       expect(skills).toEqual([]);
@@ -77,6 +77,13 @@ describe('new families (phase 02 scaffolding)', () => {
     expect(MONEY_SKILLS).toEqual(MONEY_ENTRIES.map((e) => e.id));
     for (const id of MONEY_SKILLS) expect(isMoneySkill(id)).toBe(true);
     expect(isMoneySkill('wp-times-then-add')).toBe(false);
+  });
+
+  test('data has generators (phase 15): every data catalog entry has a generator', () => {
+    // Derived from the entries file: the exact ids are pinned in skill-catalog.test.ts.
+    expect(DATA_SKILLS).toEqual(DATA_ENTRIES.map((e) => e.id));
+    for (const id of DATA_SKILLS) expect(isDataSkill(id)).toBe(true);
+    expect(isDataSkill('wp-times-then-add')).toBe(false);
   });
 });
 
@@ -131,6 +138,22 @@ describe('dialogRenderable', () => {
       'money-total-notes',
       'money-exchange',
       'money-pick-notes',
+    ]) {
+      const item = itemForSkill(id, mulberry32(1), 1);
+      expect(dialogRenderable(item)).toBe(false);
+      expect(dialogRenderable(item, () => true)).toBe(true);
+    }
+  });
+
+  test('data items all need a picture: every data skill waits for the phase-17 renderer', () => {
+    for (const id of [
+      'tally-count',
+      'table-read',
+      'table-max-min',
+      'table-sums',
+      'table-fill-missing',
+      'chance-bag',
+      'chance-dice',
     ]) {
       const item = itemForSkill(id, mulberry32(1), 1);
       expect(dialogRenderable(item)).toBe(false);

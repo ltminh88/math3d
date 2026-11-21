@@ -82,8 +82,8 @@ describe('lesson coverage (phase 02 escape hatch)', () => {
     expect(hasGenerator('sk:not-a-skill')).toBe(false);
   });
 
-  it('the three remaining new families have no generator yet; fraction, time, money and the legacy families do', () => {
-    for (const family of ['number', 'arithmetic', 'data'] as const)
+  it('the two remaining new families have no generator yet; fraction, time, money, data and the legacy families do', () => {
+    for (const family of ['number', 'arithmetic'] as const)
       expect(familyHasNoGenerator(family)).toBe(true);
     for (const family of [
       'word-problem',
@@ -92,6 +92,7 @@ describe('lesson coverage (phase 02 escape hatch)', () => {
       'fraction',
       'time',
       'money',
+      'data',
     ] as const)
       expect(familyHasNoGenerator(family)).toBe(false);
   });
