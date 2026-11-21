@@ -72,7 +72,23 @@ export type Misconception =
   | 'wrong-note'
   | 'missed-note'
   | 'double-counted'
-  | 'wrong-exchange';
+  | 'wrong-exchange'
+  // Data (src/data)
+  | 'counted-all'
+  | 'counted-miss'
+  | 'wrong-cell'
+  | 'wrong-total'
+  | 'wrong-category'
+  | 'wrong-row'
+  | 'wrong-column'
+  | 'missed-one'
+  | 'certain-when-possible'
+  | 'possible-when-certain'
+  | 'impossible-when-certain'
+  | 'certain-when-impossible'
+  | 'possible-when-impossible'
+  | 'impossible-when-possible'
+  | 'wrong-face';
 
 export interface ChoiceOption {
   readonly id: string;
