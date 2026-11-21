@@ -42,7 +42,7 @@ const LEGACY_CATALOG: readonly SkillEntry[] = Object.freeze([
   // number sequences (dãy số). Skip-counting is the tables, B4–B12.
   entry('pattern-add', 'pattern', [t1(8)]),
   entry('pattern-sub', 'pattern', [t1(8)]),
-  entry('pattern-skip-count', 'pattern', [t1(4, 5, 6, 7, 8, 9, 10, 11, 12)]),
+  entry('pattern-skip-count', 'pattern', [t1(4, 5, 6, 9, 10, 11, 12)]),
   entry('expr-order', 'expression', [t1(38)]),
   entry('expr-brackets', 'expression', [t1(38)]),
   entry('expr-from-story', 'expression', [t1(38, 42)]),

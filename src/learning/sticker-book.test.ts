@@ -26,9 +26,9 @@ function tableStats(table: number, atBox4: number): Record<FactKey, FactStat> {
   return stats;
 }
 
-it('fresh stats: 47 stickers, none earned, 8/2/5/11/9/12 per page', () => {
+it('fresh stats: 53 stickers, none earned, 8/2/5/11/9/12/6 per page', () => {
   const stickers = deriveStickers({});
-  expect(stickers).toHaveLength(47);
+  expect(stickers).toHaveLength(53);
   expect(stickers.filter((s) => s.earned)).toHaveLength(0);
   expect(topicProgress(stickers, 'tables')).toEqual({ earned: 0, total: 8 });
   expect(topicProgress(stickers, 'remainder')).toEqual({ earned: 0, total: 2 });
@@ -36,6 +36,7 @@ it('fresh stats: 47 stickers, none earned, 8/2/5/11/9/12 per page', () => {
   expect(topicProgress(stickers, 'expression-logic')).toEqual({ earned: 0, total: 11 });
   expect(topicProgress(stickers, 'geometry')).toEqual({ earned: 0, total: 9 });
   expect(topicProgress(stickers, 'measurement')).toEqual({ earned: 0, total: 12 });
+  expect(topicProgress(stickers, 'fraction')).toEqual({ earned: 0, total: 6 });
 });
 
 it('every catalog skill has exactly one sticker, and no other skill sticker exists', () => {
@@ -123,7 +124,8 @@ it('empty family topics stay hidden until their skills exist', () => {
     'expression-logic',
     'geometry',
     'measurement',
+    'fraction',
   ]);
-  for (const topic of ['number', 'arithmetic', 'fraction', 'time', 'money', 'data'] as const)
+  for (const topic of ['number', 'arithmetic', 'time', 'money', 'data'] as const)
     expect(topicProgress(stickers, topic)).toEqual({ earned: 0, total: 0 });
 });

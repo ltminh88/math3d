@@ -2,10 +2,10 @@
 // first, round-robin. Oracles below are computed by hand from the catalog (phase 01),
 // not by calling the helpers under test:
 //   B25 = div-rem-floor, div-rem-ceil, choose-all-correct, tf-explain (catalog lines 36-37, 49-50)
-//   B3  = unknown-add-sub only; B1/B2 have no skills yet; B7 mixes nothing; B14 has no
-//         fraction skills yet (phase 12 lands them)
+//   B3  = unknown-add-sub only; B1/B2 have no skills yet; B7 mixes nothing; B14 =
+//         the six fraction skills (phase 12)
 //   B5  = tables [3]: 9 mul facts (3x2..3x10) + 9 div facts (6/3..30/3), plus
-//         sk:pattern-skip-count (tagged 4-12)
+//         sk:pattern-skip-count (tagged 4, 5, 6, 9-12)
 //   B44 = mix of [8, 15, 22, 29, 35, 40, 41, 42, 43]: facts (via B8) and skills (via B13/B15)
 import { describe, expect, it } from 'vitest';
 import { divFactsForTables, mulFactsForTables } from './curriculum-tables';
@@ -82,11 +82,14 @@ describe('planLessonRun', () => {
   });
 
   it('a lesson with no plannable skills returns [] (UI shows "Sắp có")', () => {
-    for (const n of [1, 2]) expect(planLessonRun(n, {}, mulberry32(4))).toEqual([]);
-    // B7 now yields sk:pattern-skip-count (tagged 4-12) since the skillsOfLesson fix;
-    // it is not practicable, so the picker still shows "Sắp có" for it.
-    // B14 has no fraction skills until phase 12 lands them; then this moves.
-    expect(planLessonRun(14, {}, mulberry32(4))).toEqual([]);
+    for (const n of [1, 2, 7]) expect(planLessonRun(n, {}, mulberry32(4))).toEqual([]);
+    // B7 yields nothing again: pattern-skip-count is tables-only since the phase-12
+    // legacy fix (it is not practicable, so the picker still shows "Sắp có" for it).
+    // B14 plans its six fraction skills now that phase 12 landed them.
+    const b14 = planLessonRun(14, {}, mulberry32(4));
+    expect(b14).toHaveLength(6);
+    expect(new Set(b14).size).toBe(6);
+    expect(b14.every((k) => k.startsWith('sk:fraction-'))).toBe(true);
   });
 
   it('renderable filter excludes skills; none renderable means []', () => {
