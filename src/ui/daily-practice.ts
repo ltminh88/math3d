@@ -5,11 +5,13 @@ import { dayNumber } from '../learning/daily-intervals';
 import { dailySeed, dailyUnlocked, planDailySet } from '../learning/daily-planner';
 import { DAILY_FINISH_COINS, dailyCountedToday } from '../learning/daily-streak';
 import { type FactKey, isSkillKey, parseKey } from '../learning/fact-key';
+import type { FactStat } from '../learning/learning-types';
 import { COINS_PER_CORRECT } from '../learning/scoring';
 import { mulberry32, type Rng } from '../learning/seeded-rng';
 import type { QuestionOutcome } from '../learning/session-recorder';
 import { isLevelRunning } from '../levels/shared/level-gates';
 import type { ReasoningRoundPlan } from '../levels/shared/reasoning-round-slot';
+import { dialogRenderable } from '../practice/item-for-skill';
 import { buildDailyQuestion } from '../quiz/daily-question';
 import { createQuizAnswerBatch, type QuizAnswerBatch } from '../quiz/quiz-answer-batch';
 import type { GameStore } from '../store/game-store-api';
@@ -43,6 +45,26 @@ export interface DailyRunState {
 
 let run: DailyRunState | null = null;
 
+/**
+ * Learned pool without skills whose item needs a scene the dialog cannot draw (phase 04
+ * registers dialog scene renderers and lifts this). The planner itself stays unaware of
+ * the UI: the call site filters the pool, so a smaller pool just plans fewer items.
+ */
+function renderableStats(
+  stats: Readonly<Record<FactKey, FactStat | undefined>>,
+): Readonly<Record<FactKey, FactStat | undefined>> {
+  const out: Record<FactKey, FactStat | undefined> = {};
+  for (const [key, stat] of Object.entries(stats)) {
+    if (isSkillKey(key)) {
+      const parsed = parseKey(key);
+      const id = parsed?.op === 'skill' ? parsed.id : '';
+      if (!dialogRenderable(id)) continue;
+    }
+    out[key as FactKey] = stat;
+  }
+  return out;
+}
+
 export function openDailyPractice(): void {
   const world = getWorld();
   // A level owns the screen (the daily run is a world dialog, never a level). A paused world
@@ -61,7 +83,7 @@ export function openDailyPractice(): void {
     return;
   }
   const seed = dailySeed(today, snapshot.profile.id);
-  const keys = planDailySet({ stats: snapshot.factStats, today, seed });
+  const keys = planDailySet({ stats: renderableStats(snapshot.factStats), today, seed });
   if (keys.length === 0) {
     openDialog(td('title'), `<p class="dialog-copy">${td('locked')}</p>`, 'daily');
     return;
