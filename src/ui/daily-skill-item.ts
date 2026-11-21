@@ -2,7 +2,6 @@
 // same step/hint flow as the levels (ReasoningRoundFlow), so steps and hints behave exactly
 // as the child knows them. A solved item pays +5 coins, no XP; a revealed one pays nothing.
 
-import { renderGeometryPrompt } from '../geometry/geometry-strings';
 import { skillKey } from '../learning/fact-key';
 import type { Rng } from '../learning/seeded-rng';
 import type { QuestionOutcome } from '../learning/session-recorder';
@@ -10,7 +9,7 @@ import { skillTierOf } from '../learning/skill-tiers';
 import { ReasoningRoundFlow } from '../levels/shared/reasoning-round-flow';
 import type { ReasoningRoundPlan } from '../levels/shared/reasoning-round-slot';
 import { trr } from '../levels/shared/reasoning-round-strings';
-import { renderMeasurementPrompt } from '../measurement/measurement-strings';
+import { renderPromptFor } from '../practice/family-prompt-registry';
 import { familyOfSkill, itemForSkill } from '../practice/item-for-skill';
 import { renderScene } from './dialog-scenes/dialog-scene-registry';
 import '../styles/dialog-scene.css';
@@ -97,15 +96,9 @@ export function mountSkillItem(
   };
 
   // The step card renders the item's story/steps through its family's prompt
-  // namespace (reasoning by default — the same `render` the valley/workshop
-  // pass). Without this, geo/meas prompts show as raw keys ("reasoning.rulerCm").
-  const family = familyOfSkill(plan.skillId);
-  const render =
-    family === 'geometry'
-      ? renderGeometryPrompt
-      : family === 'measurement'
-        ? renderMeasurementPrompt
-        : undefined;
+  // renderer from the registry (reasoning by default). Without this, prompts
+  // show as raw keys ("reasoning.rulerCm", "numbers.askNumber").
+  const render = renderPromptFor(familyOfSkill(plan.skillId));
   const card = createStepCard(plan.item, {
     render,
     onAnswer: (event) => {
