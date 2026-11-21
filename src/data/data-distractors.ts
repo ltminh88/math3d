@@ -121,5 +121,9 @@ export const nounRef = (iRef: string): PromptRef => ref(`item_${iRef.slice(2)}`)
 /** A row-label ref ('l:week_this') as a prompt label: the translated label key. */
 export const labelRef = (lRef: string): PromptRef => ref(lRef.slice(2));
 
+/** Any table header ref ('i:<noun>' or 'l:<key>') as a prompt label. */
+export const headerRef = (hRef: string): PromptRef =>
+  hRef.startsWith('i:') ? nounRef(hRef) : labelRef(hRef);
+
 /** A bag colour as a prompt param: 'c:red' (renderDataPrompt translates it in place). */
 export const colourParam = (colour: Colour): string => `c:${colour}`;

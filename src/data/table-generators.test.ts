@@ -5,7 +5,7 @@ import { mulberry32 } from '../learning/seeded-rng';
 import type { SkillTier } from '../learning/skill-tiers';
 import { dataItemForSkill } from './data-item-for-skill';
 import type { DataItem } from './data-scene-types';
-import { stepLabel, stepValue, tableOf, tallyOf } from './data-test-oracles';
+import { headerKey, stepLabel, stepValue, tableOf, tallyOf } from './data-test-oracles';
 import { sweepItem } from './data-test-sweep';
 
 const TABLE_SKILLS = [
@@ -81,7 +81,7 @@ const ORACLE: Record<(typeof TABLE_SKILLS)[number], (item: DataItem, tier: Skill
     for (const step of i.steps) {
       const asked = step.prompt.key === 'askMost' ? max : min;
       const col = row.indexOf(asked);
-      expect(stepLabel(step)).toBe(`item_${(table.headers[col] as string).slice(2)}`);
+      expect(stepLabel(step)).toBe(headerKey(table.headers[col] as string));
     }
     // One numeric answer per step, in step order.
     expect(i.work).toEqual(i.steps.map((s) => (s.prompt.key === 'askMost' ? max : min)));

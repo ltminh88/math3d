@@ -17,6 +17,7 @@ import {
   verdictOfBag,
   verdictOfDice,
 } from './data-test-oracles';
+import { groupOfHeaders } from './data-topics';
 
 function checkOptions(step: ReasoningStep): void {
   if (step.kind !== 'choice' && step.kind !== 'multi') return;
@@ -43,7 +44,13 @@ function checkTable(item: DataItem): void {
   expect(table.headers.length).toBeLessThanOrEqual(5);
   expect(table.rows.length).toBeGreaterThanOrEqual(1);
   expect(table.rows.length).toBeLessThanOrEqual(3);
-  for (const h of table.headers) expect(h.startsWith('i:')).toBe(true);
+  for (const h of table.headers) expect(h.startsWith('i:') || h.startsWith('l:')).toBe(true);
+  // Review #41: every table is one coherent topic — all headers in a single group.
+  expect(groupOfHeaders(table.headers)).toBeDefined();
+  // The Nam/Nữ/Cả lớp table only ever uses the 'likes' group (activities children
+  // can like, choose or join — never animals).
+  if ((table.rowLabels ?? []).includes('l:row_boys'))
+    expect(groupOfHeaders(table.headers)).toBe('likes');
   for (const row of table.rows) {
     expect(row.length).toBe(table.headers.length);
     for (const cell of row) {

@@ -45,15 +45,23 @@ describe('data strings', () => {
       'Cột con chó có số nào?',
     );
     expect(renderDataPrompt(ref('askRowSum', { row: 'l:week_this' }))).toBe(
-      'Cộng cả hàng Tuần này được bao nhiêu?',
+      'Cộng các số ở hàng "Tuần này" được bao nhiêu?',
     );
     expect(renderDataPrompt(ref('bagEventOne', { colour: 'c:red' }))).toBe('Lấy ra 1 viên bi đỏ.');
+    expect(renderDataPrompt(ref('tableStoryFruits'))).toBe('Bảng ghi số quả hái được.');
+    expect(renderDataPrompt(ref('tableStoryLikes'))).toBe('Bảng ghi số bạn thích mỗi môn.');
+    expect(renderDataPrompt(ref('askTableCell', { header: 'l:group_1' }))).toBe(
+      'Cột Tổ 1 có số nào?',
+    );
     setLanguage('en');
     expect(renderDataPrompt(ref('chance_certain'))).toBe('Certain');
     expect(renderDataPrompt(ref('askTableCell', { header: 'i:dog' }))).toBe(
       'What number is in the dogs column?',
     );
     expect(renderDataPrompt(ref('bagEventOne', { colour: 'c:red' }))).toBe('Draw 1 red marble.');
+    expect(renderDataPrompt(ref('askRowSum', { row: 'l:week_this' }))).toBe(
+      'Add up the numbers in the "This week" row.',
+    );
     setLanguage('vi');
   });
 });

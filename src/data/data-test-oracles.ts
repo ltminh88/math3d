@@ -27,7 +27,10 @@ export function stepLabel(step: ReasoningStep | undefined): string {
   throw new Error('step has no label value');
 }
 
-/** The table scene of an item (throws for non-table items). */
+/** The label key of a table header ref ('i:dog' -> 'item_dog', 'l:group_1' -> 'group_1'). */
+export function headerKey(hRef: string): string {
+  return hRef.startsWith('i:') ? `item_${hRef.slice(2)}` : hRef.slice(2);
+}
 export function tableOf(item: DataItem) {
   if (item.scene?.kind !== 'data-table') throw new Error('item has no data-table scene');
   return item.scene;

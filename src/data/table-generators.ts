@@ -7,42 +7,36 @@ import { ref } from '../reasoning/reasoning-distractors';
 import {
   dataChoiceStep,
   dataSceneItem,
+  headerRef,
   labelChoiceStep,
-  nounRef,
   tableScene,
   tallyScene,
 } from './data-distractors';
 import { TALLY_MAX_MARKS, TALLY_MIN_MARKS } from './data-ranges';
 import type { DataGenerator } from './data-scene-types';
-
-const TABLE_HEADERS = [
-  'i:dog',
-  'i:cat',
-  'i:chicken',
-  'i:duck',
-  'i:pig',
-  'i:cow',
-  'i:apple',
-  'i:banana',
-  'i:orange',
-  'i:ball',
-  'i:doll',
-  'i:car',
-] as const;
+import { HEADER_GROUPS, type HeaderGroup, TABLE_STORY } from './data-topics';
 
 const WEEKS = ['l:week_last', 'l:week_this'] as const;
 
 const CLASS_ROWS = ['l:row_boys', 'l:row_girls', 'l:row_all'] as const;
+
+/** Pick a topic group with at least `minSize` headers, then `n` of its headers. */
+function pickGroup(rng: Rng, minSize: number): HeaderGroup {
+  const groups = (Object.keys(HEADER_GROUPS) as HeaderGroup[]).filter(
+    (g) => HEADER_GROUPS[g].length >= minSize,
+  );
+  return pick(rng, groups);
+}
+
+function pickHeaders(rng: Rng, group: HeaderGroup, n: number): string[] {
+  return shuffle(rng, [...HEADER_GROUPS[group]]).slice(0, n);
+}
 
 /** `n` distinct integers in [min, max] (a unique most/least needs distinct values). */
 function distinctValues(rng: Rng, n: number, min: number, max: number): number[] {
   const pool: number[] = [];
   for (let v = min; v <= max; v++) pool.push(v);
   return shuffle(rng, pool).slice(0, n);
-}
-
-function pickHeaders(rng: Rng, n: number): string[] {
-  return shuffle(rng, [...TABLE_HEADERS]).slice(0, n);
 }
 
 /** Tally: a strip of O (hit) / X (miss) marks — count the O's. */
@@ -65,10 +59,15 @@ export const tallyCount: DataGenerator = (rng, tier) => {
   return dataSceneItem('tally-count', tier, ref('tallyStory'), [step], tallyScene(marks), [hits]);
 };
 
-/** Read one cell of a 1-row (T1/T2) or 2-row (T3) table. */
+/** Read one cell of a 1-row (T1/T2) or 2-row (T3) table, all of one topic. */
 export const tableRead: DataGenerator = (rng, tier) => {
+  const group = pickGroup(rng, tier === 2 ? 4 : 3);
   const headers =
-    tier === 1 ? pickHeaders(rng, 3) : tier === 2 ? pickHeaders(rng, 4) : pickHeaders(rng, 3);
+    tier === 1
+      ? pickHeaders(rng, group, 3)
+      : tier === 2
+        ? pickHeaders(rng, group, 4)
+        : pickHeaders(rng, group, 3);
   const value = (min: number, max: number): number => randInt(rng, min, max);
   const rows =
     tier === 3
@@ -90,7 +89,7 @@ export const tableRead: DataGenerator = (rng, tier) => {
   return dataSceneItem(
     'table-read',
     tier,
-    ref('tableStory'),
+    ref(TABLE_STORY[group]),
     [step],
     tableScene(headers, rows, tier === 3 ? [...WEEKS] : undefined),
     [cell],
@@ -99,8 +98,13 @@ export const tableRead: DataGenerator = (rng, tier) => {
 
 /** Which category has the most / fewest — a label choice, never a number. */
 export const tableMaxMin: DataGenerator = (rng, tier) => {
+  const group = pickGroup(rng, tier === 1 ? 3 : tier === 2 ? 4 : 5);
   const headers =
-    tier === 1 ? pickHeaders(rng, 3) : tier === 2 ? pickHeaders(rng, 4) : pickHeaders(rng, 5);
+    tier === 1
+      ? pickHeaders(rng, group, 3)
+      : tier === 2
+        ? pickHeaders(rng, group, 4)
+        : pickHeaders(rng, group, 5);
   const values =
     tier === 1
       ? distinctValues(rng, headers.length, 5, 50)
@@ -114,27 +118,28 @@ export const tableMaxMin: DataGenerator = (rng, tier) => {
     const col = values.indexOf(target);
     const others = headers
       .filter((_, i) => i !== col)
-      .map((h) => ({ value: nounRef(h), misconception: 'wrong-category' as const }));
+      .map((h) => ({ value: headerRef(h), misconception: 'wrong-category' as const }));
     return labelChoiceStep(
       rng,
       ref(which === 'most' ? 'askMost' : 'askLeast'),
-      nounRef(headers[col] as string),
+      headerRef(headers[col] as string),
       others,
     );
   });
   return dataSceneItem(
     'table-max-min',
     tier,
-    ref('tableStory'),
+    ref(TABLE_STORY[group]),
     steps,
     tableScene(headers, [values]),
     steps.map((s) => (s.prompt.key === 'askMost' ? max : min)),
   );
 };
 
-/** Sums: one row (T1), one column (T2), the whole table (T3). */
+/** Sums: one row (T1), one column (T2), the whole table (T3), all of one topic. */
 export const tableSums: DataGenerator = (rng, tier) => {
-  const headers = pickHeaders(rng, 3);
+  const group = pickGroup(rng, 3);
+  const headers = pickHeaders(rng, group, 3);
   const value = (min: number, max: number): number => randInt(rng, min, max);
   const rows =
     tier === 1
@@ -178,16 +183,17 @@ export const tableSums: DataGenerator = (rng, tier) => {
   return dataSceneItem(
     'table-sums',
     tier,
-    ref('tableStory'),
+    ref(TABLE_STORY[group]),
     [step],
     tableScene(headers, rows, [...WEEKS]),
     [answer],
   );
 };
 
-/** Fill the empty cell of the class table (Nam + Nữ = Cả lớp per column). */
+/** Fill the empty cell of the class table (Nam + Nữ = Cả lớp per column). The columns
+ * are activities children can like (bơi / cờ vua / vẽ) — never animals. */
 export const tableFillMissing: DataGenerator = (rng, tier) => {
-  const headers = pickHeaders(rng, 3);
+  const headers = pickHeaders(rng, 'likes', 3);
   const value = (min: number, max: number): number => randInt(rng, min, max);
   const [lo, hi] = tier === 1 ? [5, 20] : tier === 2 ? [10, 40] : [20, 60];
   const boys = headers.map(() => value(lo, hi));
@@ -219,7 +225,7 @@ export const tableFillMissing: DataGenerator = (rng, tier) => {
   return dataSceneItem(
     'table-fill-missing',
     tier,
-    ref('tableStory'),
+    ref('tableStoryLikes'),
     [step],
     tableScene(headers, rows, [...CLASS_ROWS], { row, col }),
     [missing],
