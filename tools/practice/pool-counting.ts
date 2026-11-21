@@ -4,16 +4,11 @@
 // correct answer, and — for geometry/measurement — the whole scene. Wrong options
 // are NOT part of a signature. Used by the `pool-counter.ts` CLI and its test.
 import type { GeoItem } from '../../src/geometry/geo-scene-types';
-import { geometryItemForSkill, isGeometrySkill } from '../../src/geometry/geometry-item-for-skill';
 import { divFactsForTables, mulFactsForTables } from '../../src/learning/curriculum-tables';
 import { mulberry32, pick, type Rng } from '../../src/learning/seeded-rng';
 import type { SkillTier } from '../../src/learning/skill-tiers';
 import { towerFactPool } from '../../src/levels/tower/tower-round-flow';
-import { measurementItemForSkill } from '../../src/measurement/measurement-item-for-skill';
-import {
-  isReasoningSkill,
-  reasoningItemForSkill,
-} from '../../src/reasoning/reasoning-item-for-skill';
+import { itemForSkill } from '../../src/practice/item-for-skill';
 import type { PromptRef, ReasoningItem, ReasoningStep } from '../../src/reasoning/reasoning-types';
 
 const refSig = (ref: PromptRef): string => {
@@ -48,10 +43,9 @@ export function itemSignature(item: ReasoningItem): string {
   return scene ? `${base}|${JSON.stringify(scene)}` : base;
 }
 
+/** Draws one item for a skill through the shared dispatcher (all nine families). */
 export function drawSkillItem(skillId: string, tier: SkillTier, rng: Rng): ReasoningItem {
-  if (isReasoningSkill(skillId)) return reasoningItemForSkill(skillId, rng, tier);
-  if (isGeometrySkill(skillId)) return geometryItemForSkill(skillId, rng, tier);
-  return measurementItemForSkill(skillId, rng, tier);
+  return itemForSkill(skillId, rng, tier);
 }
 
 export interface PoolCount {

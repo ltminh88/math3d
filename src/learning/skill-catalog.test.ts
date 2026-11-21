@@ -96,4 +96,9 @@ describe('skill catalog', () => {
     expect(skillsOfFamily('geometry')).toHaveLength(9);
     expect(skillsOfFamily('measurement')).toHaveLength(12);
   });
+
+  it('the six new families exist but have no skills yet (phase 02 scaffolding)', () => {
+    for (const family of ['number', 'arithmetic', 'fraction', 'time', 'money', 'data'] as const)
+      expect(skillsOfFamily(family)).toEqual([]);
+  });
 });

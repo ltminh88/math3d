@@ -1,16 +1,17 @@
-// The sticker book (phase 12): a world dialog with six topic pages. It reads the store's
+// The sticker book (phase 12): a world dialog with one page per topic. It reads the store's
 // fact/skill stats and derives the stickers (learning/sticker-book.ts) — it never touches
 // coins or the shop. It never opens while a level runs (openDialog enforces that).
+// Empty family pages stay hidden until their first skill exists.
 
 import { skillEntry } from '../learning/skill-catalog';
 import {
   createEarningTracker,
   deriveStickers,
-  STICKER_TOPICS,
   type Sticker,
   type StickerTopic,
   TOPIC_SKILLS,
   topicProgress,
+  visibleTopics,
 } from '../learning/sticker-book';
 import { openDialog } from './dialog';
 import { byId } from './icons';
@@ -25,6 +26,12 @@ const TOPIC_TITLE: Record<StickerTopic, Parameters<typeof ts>[0]> = {
   'expression-logic': 'topicExpressionLogic',
   geometry: 'topicGeometry',
   measurement: 'topicMeasurement',
+  number: 'topicNumber',
+  arithmetic: 'topicArithmetic',
+  fraction: 'topicFraction',
+  time: 'topicTime',
+  money: 'topicMoney',
+  data: 'topicData',
 };
 
 /** One emoji per sticker, in derivation order (TOPIC_SKILLS order per topic, tables 2–9). */
@@ -35,6 +42,13 @@ const TOPIC_EMOJI: Record<StickerTopic, readonly string[]> = {
   'expression-logic': ['🧮', '🔣', '📖', '✅', '💡', '🛒', '🍎', '🎈', '🧺', '🏃', '🎲'],
   geometry: ['📍', '⭕', '🛞', '📐', '🔲', '🟦', '🔺', '📦', '🧊'],
   measurement: ['📏', '🔎', '⚖️', '🥛', '🌡️', '⬡', '▭', '◼', '🟫', '🟥', '⬛', '🏡'],
+  // Family topics have no stickers yet; their emojis land with their first skills.
+  number: [],
+  arithmetic: [],
+  fraction: [],
+  time: [],
+  money: [],
+  data: [],
 };
 
 function stickerEmoji(sticker: Sticker): string {
@@ -61,19 +75,19 @@ function showDetail(sticker: Sticker): void {
   detail.textContent = lesson ? `${line} ${ts('lessonLine', { lesson })}` : line;
 }
 
-const topicAt = (index: number): StickerTopic =>
-  STICKER_TOPICS[
-    ((index % STICKER_TOPICS.length) + STICKER_TOPICS.length) % STICKER_TOPICS.length
-  ] as StickerTopic;
+const topicAt = (topics: readonly StickerTopic[], index: number): StickerTopic =>
+  topics[((index % topics.length) + topics.length) % topics.length] as StickerTopic;
 
 /** Opens the book on `topic` (default: the first page). Re-renders on every page flip. */
 export function openStickerBook(topic: StickerTopic = 'tables'): void {
   const stickers = deriveStickers(connectedStore()?.getSnapshot().factStats ?? {});
-  const page = stickers.filter((s) => s.topic === topic);
-  const { earned, total } = topicProgress(stickers, topic);
+  const topics = visibleTopics(stickers);
+  const shown = topics.includes(topic) ? topic : (topics[0] ?? 'tables');
+  const page = stickers.filter((s) => s.topic === shown);
+  const { earned, total } = topicProgress(stickers, shown);
   openDialog(
     ts('title'),
-    `<div class="dialog-eyebrow">${ts('eyebrow')}</div><div class="sticker-tabs" role="group" aria-label="${ts('title')}">${STICKER_TOPICS.map((t) => `<button type="button" data-topic="${t}" aria-pressed="${t === topic}">${ts(TOPIC_TITLE[t])}</button>`).join('')}</div><p class="sticker-count" aria-label="${ts('countLabel', { earned, total })}">${earned}/${total}</p><div class="sticker-grid">${page.map(stickerButtonHtml).join('')}</div><p class="sticker-detail" aria-live="polite">${ts('bookNote')}</p><div class="sticker-nav"><button type="button" id="sticker-prev" class="secondary">← ${ts('prevPage')}</button><button type="button" id="sticker-next" class="secondary">${ts('nextPage')} →</button></div>`,
+    `<div class="dialog-eyebrow">${ts('eyebrow')}</div><div class="sticker-tabs" role="group" aria-label="${ts('title')}">${topics.map((t) => `<button type="button" data-topic="${t}" aria-pressed="${t === shown}">${ts(TOPIC_TITLE[t])}</button>`).join('')}</div><p class="sticker-count" aria-label="${ts('countLabel', { earned, total })}">${earned}/${total}</p><div class="sticker-grid">${page.map(stickerButtonHtml).join('')}</div><p class="sticker-detail" aria-live="polite">${ts('bookNote')}</p><div class="sticker-nav"><button type="button" id="sticker-prev" class="secondary">← ${ts('prevPage')}</button><button type="button" id="sticker-next" class="secondary">${ts('nextPage')} →</button></div>`,
     'sticker-book',
   );
   // openDialog refuses while a level runs: nothing to wire then (the book stays closed).
@@ -88,9 +102,9 @@ export function openStickerBook(topic: StickerTopic = 'tables'): void {
       if (sticker) showDetail(sticker);
     };
   }
-  const index = STICKER_TOPICS.indexOf(topic);
-  byId('sticker-prev').onclick = () => openStickerBook(topicAt(index - 1));
-  byId('sticker-next').onclick = () => openStickerBook(topicAt(index + 1));
+  const index = topics.indexOf(shown);
+  byId('sticker-prev').onclick = () => openStickerBook(topicAt(topics, index - 1));
+  byId('sticker-next').onclick = () => openStickerBook(topicAt(topics, index + 1));
 }
 
 /** Earning lines VLM has not said yet, oldest first (the guide-dialog patch reads these). */

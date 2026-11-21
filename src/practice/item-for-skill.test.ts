@@ -2,8 +2,14 @@
 // ids throw. A geo/meas item carries a `scene` the dialog cannot draw yet (phase 04),
 // so daily filters those skills out instead of crashing on them.
 import { describe, expect, test } from 'vitest';
+import { ARITHMETIC_SKILLS, isArithmeticSkill } from '../arithmetic/arithmetic-item-for-skill';
+import { DATA_SKILLS, isDataSkill } from '../data/data-item-for-skill';
+import { FRACTION_SKILLS, isFractionSkill } from '../fractions/fraction-item-for-skill';
 import { mulberry32 } from '../learning/seeded-rng';
 import { SKILL_CATALOG } from '../learning/skill-catalog';
+import { isMoneySkill, MONEY_SKILLS } from '../money/money-item-for-skill';
+import { isNumberSkill, NUMBER_SKILLS } from '../numbers/number-item-for-skill';
+import { isTimeSkill, TIME_SKILLS } from '../time/time-item-for-skill';
 import { dialogRenderable, familyOfSkill, itemForSkill } from './item-for-skill';
 
 describe('itemForSkill', () => {
@@ -28,6 +34,23 @@ describe('familyOfSkill', () => {
     expect(familyOfSkill('geo-midpoint')).toBe('geometry');
     expect(familyOfSkill('meas-gram')).toBe('measurement');
     expect(familyOfSkill('not-a-skill')).toBeUndefined();
+  });
+});
+
+describe('new families (phase 02 scaffolding)', () => {
+  test('no generator yet: is<F>Skill is false for every catalog id, <f>ItemForSkill throws', () => {
+    const checks = [
+      [isNumberSkill, NUMBER_SKILLS],
+      [isArithmeticSkill, ARITHMETIC_SKILLS],
+      [isFractionSkill, FRACTION_SKILLS],
+      [isTimeSkill, TIME_SKILLS],
+      [isMoneySkill, MONEY_SKILLS],
+      [isDataSkill, DATA_SKILLS],
+    ] as const;
+    for (const [isSkill, skills] of checks) {
+      expect(skills).toEqual([]);
+      for (const { id } of SKILL_CATALOG) expect(isSkill(id), id).toBe(false);
+    }
   });
 });
 

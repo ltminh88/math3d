@@ -6,77 +6,25 @@
  * `lessons` is the structured SGK Toán 3 Kết nối tri thức lesson the skill follows
  * (`book`: 1 | 2 = tập 1/2, `n`: lesson numbers). The display string `lesson` is derived from
  * `lessons` by `lessonLabel` — never stored twice — for the sticker book and pool counter.
+ * The catalog concatenates the legacy list with one per-family list
+ * (`src/<family>/*-skill-entries.ts`); a family phase appends to its own list only.
+ * The entry kit lives in `skill-entry.ts` so family lists can build entries without a cycle.
  */
-export type SkillFamily =
-  | 'word-problem'
-  | 'remainder'
-  | 'unknown'
-  | 'pattern'
-  | 'expression'
-  | 'logic'
-  | 'geometry'
-  | 'measurement';
+import { ARITHMETIC_ENTRIES } from '../arithmetic/arithmetic-skill-entries';
+import { DATA_ENTRIES } from '../data/data-skill-entries';
+import { FRACTION_ENTRIES } from '../fractions/fraction-skill-entries';
+import { MONEY_ENTRIES } from '../money/money-skill-entries';
+import { NUMBER_ENTRIES } from '../numbers/number-skill-entries';
+import { TIME_ENTRIES } from '../time/time-skill-entries';
+import { entry, type SkillEntry, type SkillFamily, t1, t2 } from './skill-entry';
 
-export interface SkillLessonRef {
-  readonly book: 1 | 2;
-  readonly n: readonly number[];
-}
-
-export interface SkillEntry {
-  readonly id: string;
-  readonly family: SkillFamily;
-  readonly lessons: readonly SkillLessonRef[];
-  /** Display string derived from `lessons` (see `lessonLabel`). */
-  readonly lesson: string;
-}
+export type { SkillEntry, SkillFamily, SkillLessonRef } from './skill-entry';
+export { lessonLabel } from './skill-entry';
 
 export const SKILL_ID_PATTERN_SOURCE = '[a-z][a-z0-9-]{1,38}';
 const SKILL_ID_PATTERN = new RegExp(`^${SKILL_ID_PATTERN_SOURCE}$`);
 
-/** `T1 B24, B28`; a run of 3+ consecutive numbers compresses to `T1 B4-B12`. */
-export function lessonLabel(lessons: readonly SkillLessonRef[]): string {
-  return lessons.map(({ book, n }) => `T${book} ${formatLessonNumbers(n)}`).join(', ');
-}
-
-function formatLessonNumbers(ns: readonly number[]): string {
-  const sorted = [...ns].sort((a, b) => a - b);
-  const [first, ...rest] = sorted;
-  if (first === undefined) return '';
-  const parts: string[] = [];
-  let start = first;
-  let prev = first;
-  const flush = () => {
-    if (prev - start + 1 >= 3) parts.push(`B${start}-B${prev}`);
-    else if (prev === start) parts.push(`B${start}`);
-    else parts.push(`B${start}, B${prev}`);
-  };
-  for (const n of rest) {
-    if (n === prev + 1) prev = n;
-    else {
-      flush();
-      start = n;
-      prev = n;
-    }
-  }
-  flush();
-  return parts.join(', ');
-}
-
-const t1 = (...n: number[]): SkillLessonRef => ({ book: 1, n });
-const t2 = (...n: number[]): SkillLessonRef => ({ book: 2, n });
-
-const entry = (
-  id: string,
-  family: SkillFamily,
-  lessons: readonly SkillLessonRef[],
-): SkillEntry => ({
-  id,
-  family,
-  lessons,
-  lesson: lessonLabel(lessons),
-});
-
-export const SKILL_CATALOG: readonly SkillEntry[] = Object.freeze([
+const LEGACY_CATALOG: readonly SkillEntry[] = Object.freeze([
   // Reasoning (phase 01)
   entry('wp-times-then-add', 'word-problem', [t1(24, 28)]),
   entry('wp-divide-then-add', 'word-problem', [t1(27, 28)]),
@@ -122,6 +70,16 @@ export const SKILL_CATALOG: readonly SkillEntry[] = Object.freeze([
   entry('meas-area-rect', 'measurement', [t2(52)]),
   entry('meas-area-square', 'measurement', [t2(52)]),
   entry('meas-wp-fence', 'measurement', [t2(50, 53)]),
+]);
+
+export const SKILL_CATALOG: readonly SkillEntry[] = Object.freeze([
+  ...LEGACY_CATALOG,
+  ...NUMBER_ENTRIES,
+  ...ARITHMETIC_ENTRIES,
+  ...FRACTION_ENTRIES,
+  ...TIME_ENTRIES,
+  ...MONEY_ENTRIES,
+  ...DATA_ENTRIES,
 ]);
 
 const BY_ID: ReadonlyMap<string, SkillEntry> = new Map(SKILL_CATALOG.map((s) => [s.id, s]));
