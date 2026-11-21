@@ -1,5 +1,11 @@
 import { describe, expect, it } from 'vitest';
-import { isSkillId, SKILL_CATALOG, SKILL_ID_PATTERN_SOURCE, skillsOfFamily } from './skill-catalog';
+import {
+  isSkillId,
+  lessonLabel,
+  SKILL_CATALOG,
+  SKILL_ID_PATTERN_SOURCE,
+  skillsOfFamily,
+} from './skill-catalog';
 
 // Frozen copy of the shipped ids, in order: the catalog is append-only (save codes, SQL check).
 const SHIPPED_IDS = [
@@ -49,13 +55,34 @@ describe('skill catalog', () => {
     expect(SKILL_CATALOG.slice(0, SHIPPED_IDS.length).map((s) => s.id)).toEqual(SHIPPED_IDS);
   });
 
-  it('ids are unique, match the key grammar and carry a family and a KNTT lesson', () => {
+  it('ids are unique, match the key grammar and carry a family and structured KNTT lessons', () => {
     const pattern = new RegExp(`^${SKILL_ID_PATTERN_SOURCE}$`);
     expect(new Set(SKILL_CATALOG.map((s) => s.id)).size).toBe(SKILL_CATALOG.length);
     for (const s of SKILL_CATALOG) {
       expect(pattern.test(s.id), s.id).toBe(true);
-      expect(s.lesson).toMatch(/^T[12] /);
+      expect(s.lessons.length, s.id).toBeGreaterThan(0);
+      for (const ref of s.lessons) {
+        expect([1, 2], s.id).toContain(ref.book);
+        expect(ref.n.length, s.id).toBeGreaterThan(0);
+        for (const n of ref.n) {
+          expect(Number.isInteger(n), s.id).toBe(true);
+          expect(n, s.id).toBeGreaterThanOrEqual(1);
+          expect(n, s.id).toBeLessThanOrEqual(81);
+          if (ref.book === 1) expect(n, s.id).toBeLessThanOrEqual(44);
+          else expect(n, s.id).toBeGreaterThanOrEqual(45);
+        }
+      }
+      // The display string is derived from the structured lessons, never stored twice.
+      expect(s.lesson, s.id).toBe(lessonLabel(s.lessons));
     }
+  });
+
+  it('derives the lesson label from structured lessons (ranges compressed)', () => {
+    expect(lessonLabel([{ book: 1, n: [24, 28] }])).toBe('T1 B24, B28');
+    expect(lessonLabel([{ book: 1, n: [4, 5, 6, 7, 8, 9, 10, 11, 12] }])).toBe('T1 B4-B12');
+    expect(lessonLabel([{ book: 1, n: [25, 38, 39] }])).toBe('T1 B25, B38, B39');
+    expect(lessonLabel([{ book: 2, n: [50, 53] }])).toBe('T2 B50, B53');
+    expect(lessonLabel([{ book: 1, n: [8] }])).toBe('T1 B8');
   });
 
   it('accepts only catalog ids', () => {
