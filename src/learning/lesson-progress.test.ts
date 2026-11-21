@@ -101,6 +101,28 @@ describe('lessonStars', () => {
     expect(lessonStars(68, statsOf(keys, 4))).toBe(3);
   });
 
+  it('B73: 0-3 by hand (phase 15 data table skills)', () => {
+    const keys = [
+      'sk:tally-count',
+      'sk:table-read',
+      'sk:table-max-min',
+      'sk:table-sums',
+      'sk:table-fill-missing',
+    ] as const;
+    expect(lessonStars(73, {})).toBe(0);
+    expect(lessonStars(73, statsOf(keys, 2))).toBe(1); // all attempted, none >= 3
+    expect(lessonStars(73, statsOf(keys, 3))).toBe(2);
+    expect(lessonStars(73, statsOf(keys, 4))).toBe(3);
+  });
+
+  it('B74: 0-3 by hand (phase 15 chance skills)', () => {
+    const keys = ['sk:chance-bag', 'sk:chance-dice'] as const;
+    expect(lessonStars(74, {})).toBe(0);
+    expect(lessonStars(74, statsOf(keys, 2))).toBe(1); // all attempted, none >= 3
+    expect(lessonStars(74, statsOf(keys, 3))).toBe(2);
+    expect(lessonStars(74, statsOf(keys, 4))).toBe(3);
+  });
+
   it('tables B5: the 70% share decides', () => {
     const facts = [...mulFactsForTables([3]), ...divFactsForTables([3])];
     expect(facts).toHaveLength(18);
@@ -173,6 +195,14 @@ describe('topicProgress', () => {
 
   it('topic 13 has 4 playable lessons (B66, B67, B68, B69)', () => {
     expect(topicProgress(13, {})).toEqual({ completed: 0, total: 4 });
+  });
+
+  it('topic 15 has 3 playable lessons (B73, B74, B75)', () => {
+    expect(topicProgress(15, {})).toEqual({ completed: 0, total: 3 });
+  });
+
+  it('topic 16 has 4 playable lessons (B76 via the Roman clock, B79, B80, B81; B77-B78 wait for numbers/arithmetic)', () => {
+    expect(topicProgress(16, {})).toEqual({ completed: 0, total: 4 });
   });
 
   it('an unknown topic is empty', () => {

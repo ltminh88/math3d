@@ -97,8 +97,8 @@ describe('skill catalog', () => {
     expect(skillsOfFamily('measurement')).toHaveLength(12);
   });
 
-  it('the three remaining new families exist but have no skills yet (phase 02 scaffolding)', () => {
-    for (const family of ['number', 'arithmetic', 'data'] as const)
+  it('the two remaining new families exist but have no skills yet (phase 02 scaffolding)', () => {
+    for (const family of ['number', 'arithmetic'] as const)
       expect(skillsOfFamily(family)).toEqual([]);
     // Fraction landed in phase 12 (B14): its six skills are in the catalog.
     expect(skillsOfFamily('fraction')).toEqual([
@@ -130,6 +130,16 @@ describe('skill catalog', () => {
       'money-change-back',
       'money-pick-notes',
       'money-wp',
+    ]);
+    // Data landed in phase 15 (B73, B74): its seven skills are in the catalog.
+    expect(skillsOfFamily('data')).toEqual([
+      'tally-count',
+      'table-read',
+      'table-max-min',
+      'table-sums',
+      'table-fill-missing',
+      'chance-bag',
+      'chance-dice',
     ]);
   });
 });

@@ -115,6 +115,23 @@ describe('planLessonRun', () => {
         /^(sk:clock-|sk:times-|sk:roman-|sk:months-|sk:calendar-|sk:money-)/.test(k),
       ),
     ).toBe(true);
+    // B73 plans its five data table skills now that phase 15 landed them: six items,
+    // the first five unique, the sixth a repeat of one skill.
+    const b73 = planLessonRun(73, {}, mulberry32(4));
+    expect(b73).toHaveLength(6);
+    expect(new Set(b73).size).toBe(5);
+    expect(b73.every((k) => /^(sk:tally-|sk:table-)/.test(k))).toBe(true);
+    // B74 has two chance skills: six items, three rounds of the two.
+    const b74 = planLessonRun(74, {}, mulberry32(4));
+    expect(b74).toHaveLength(6);
+    expect(new Set(b74).size).toBe(2);
+    expect(b74.every((k) => k.startsWith('sk:chance-'))).toBe(true);
+    // B75 and B80 mix B73 and B74: six items, all data keys.
+    for (const n of [75, 80]) {
+      const run = planLessonRun(n, {}, mulberry32(4));
+      expect(run).toHaveLength(6);
+      expect(run.every((k) => /^(sk:tally-|sk:table-|sk:chance-)/.test(k))).toBe(true);
+    }
   });
 
   it('renderable filter excludes skills; none renderable means []', () => {

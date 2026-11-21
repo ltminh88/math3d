@@ -50,6 +50,10 @@ it('fresh stats: one sticker per catalog skill and table, none earned', () => {
     earned: 0,
     total: skillsOfFamily('money').length,
   });
+  expect(topicProgress(stickers, 'data')).toEqual({
+    earned: 0,
+    total: skillsOfFamily('data').length,
+  });
 });
 
 it('every catalog skill has exactly one sticker, and no other skill sticker exists', () => {
@@ -140,7 +144,8 @@ it('empty family topics stay hidden until their skills exist', () => {
     'fraction',
     'time',
     'money',
+    'data',
   ]);
-  for (const topic of ['number', 'arithmetic', 'data'] as const)
+  for (const topic of ['number', 'arithmetic'] as const)
     expect(topicProgress(stickers, topic)).toEqual({ earned: 0, total: 0 });
 });
