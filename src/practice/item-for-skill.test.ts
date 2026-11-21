@@ -10,7 +10,6 @@ import { mulberry32 } from '../learning/seeded-rng';
 import { SKILL_CATALOG } from '../learning/skill-catalog';
 import { isMoneySkill, MONEY_SKILLS } from '../money/money-item-for-skill';
 import { MONEY_ENTRIES } from '../money/money-skill-entries';
-import { isNumberSkill, NUMBER_SKILLS } from '../numbers/number-item-for-skill';
 import { isTimeSkill, TIME_SKILLS } from '../time/time-item-for-skill';
 import { TIME_ENTRIES } from '../time/time-skill-entries';
 import { dialogRenderable, familyOfSkill, itemForSkill } from './item-for-skill';
