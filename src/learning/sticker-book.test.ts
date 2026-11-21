@@ -38,6 +38,10 @@ it('fresh stats: one sticker per catalog skill and table, none earned', () => {
   expect(topicProgress(stickers, 'measurement')).toEqual({ earned: 0, total: 12 });
   // New-family page totals are derived from the catalog, so the next family phase
   // does not have to edit this test (Brian's suggestion, phase 13 onward).
+  expect(topicProgress(stickers, 'number')).toEqual({
+    earned: 0,
+    total: skillsOfFamily('number').length,
+  });
   expect(topicProgress(stickers, 'fraction')).toEqual({
     earned: 0,
     total: skillsOfFamily('fraction').length,
@@ -133,9 +137,10 @@ it('empty family topics stay hidden until their skills exist', () => {
     'expression-logic',
     'geometry',
     'measurement',
+    'number',
     'fraction',
     'time',
   ]);
-  for (const topic of ['number', 'arithmetic', 'money', 'data'] as const)
+  for (const topic of ['arithmetic', 'money', 'data'] as const)
     expect(topicProgress(stickers, topic)).toEqual({ earned: 0, total: 0 });
 });

@@ -124,8 +124,15 @@ describe('skillsOfLesson', () => {
     expect(skillsOfLesson(43)).toContain('sk:meas-gram');
   });
 
-  it('returns [] for B1 (no skills yet; phase 07 adds them)', () => {
-    expect(skillsOfLesson(1)).toEqual([]);
+  it('returns the six numbers-to-1000 skills for B1 (phase 07)', () => {
+    expect(skillsOfLesson(1)).toEqual([
+      'sk:num-read-write-1000',
+      'sk:num-place-value-1000',
+      'sk:num-neighbors-1000',
+      'sk:num-compare-1000',
+      'sk:num-order-1000',
+      'sk:num-sequence-1000',
+    ]);
   });
 
   it('throws for unknown lesson numbers', () => {

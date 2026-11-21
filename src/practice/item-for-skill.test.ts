@@ -8,7 +8,6 @@ import { FRACTION_SKILLS, isFractionSkill } from '../fractions/fraction-item-for
 import { mulberry32 } from '../learning/seeded-rng';
 import { SKILL_CATALOG } from '../learning/skill-catalog';
 import { isMoneySkill, MONEY_SKILLS } from '../money/money-item-for-skill';
-import { isNumberSkill, NUMBER_SKILLS } from '../numbers/number-item-for-skill';
 import { isTimeSkill, TIME_SKILLS } from '../time/time-item-for-skill';
 import { TIME_ENTRIES } from '../time/time-skill-entries';
 import { dialogRenderable, familyOfSkill, itemForSkill } from './item-for-skill';
@@ -41,7 +40,6 @@ describe('familyOfSkill', () => {
 describe('new families (phase 02 scaffolding)', () => {
   test('four families have no generator yet: is<F>Skill is false for every catalog id, <f>ItemForSkill throws', () => {
     const checks = [
-      [isNumberSkill, NUMBER_SKILLS],
       [isArithmeticSkill, ARITHMETIC_SKILLS],
       [isMoneySkill, MONEY_SKILLS],
       [isDataSkill, DATA_SKILLS],
