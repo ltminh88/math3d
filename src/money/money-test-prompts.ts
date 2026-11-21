@@ -14,4 +14,10 @@ export function promptsOf(item: MoneyItem): PromptRef[] {
   return out;
 }
 
-export const UNRENDERED = /[{}]|^money\.|\bi:[a-z]/;
+/**
+ * A rendered prompt must never leak a raw key: no braces, no `i:` noun, and no
+ * "<namespace>.<key>" anywhere in the text (review #40: the old `^money\.` anchor only
+ * caught a raw key at the start — "money.item_marble" mid-sentence slipped through).
+ */
+export const UNRENDERED =
+  /[{}]|\bi:[a-z]|\b(?:money|reasoning|fraction|time|geometry|measurement|numbers|arithmetic|data)\.[a-z_]+/;

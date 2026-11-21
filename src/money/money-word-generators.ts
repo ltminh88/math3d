@@ -58,7 +58,11 @@ export const moneyWp: MoneyGenerator = (rng, tier) => {
     const price = pick(rng, [1000, 2000, 5000] as const);
     const total = count * price;
     const candidates: Candidate<number>[] = [
-      { value: count + price, misconception: 'add-instead-of-times' },
+      // Review #40: no "count + price" glue ("1 003 đồng"). The add-instead-of-times
+      // child adds the price (count - 1) times — one item short; the other miss is one
+      // note too many.
+      { value: (count - 1) * price, misconception: 'add-instead-of-times' },
+      { value: total + price, misconception: 'near-miss' },
     ];
     const step = moneyChoiceStep(rng, ref('askWpTotal', { name }), total, candidates);
     return moneyItem(

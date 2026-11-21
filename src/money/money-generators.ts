@@ -6,6 +6,7 @@ import type { SkillTier } from '../learning/skill-tiers';
 import { type Candidate, ref } from '../reasoning/reasoning-distractors';
 import {
   countChoiceStep,
+  denominationChoiceStep,
   LETTERS,
   letterOptions,
   moneyChoiceStep,
@@ -37,7 +38,7 @@ export const moneyRecognize: MoneyGenerator = (rng, tier) => {
   if (prev !== undefined) candidates.push({ value: prev, misconception: 'wrong-note' });
   const next = DENOMINATIONS[idx + 1];
   if (next !== undefined) candidates.push({ value: next, misconception: 'wrong-note' });
-  const step = moneyChoiceStep(rng, ref('askRecognize'), value, candidates, 500000);
+  const step = denominationChoiceStep(rng, ref('askRecognize'), value, candidates);
   return moneySceneItem(
     'money-recognize',
     tier,

@@ -14,7 +14,7 @@ describe('money strings', () => {
       setLanguage(lang);
       for (const id of MONEY_SKILLS)
         for (const tier of [1, 2, 3] as SkillTier[])
-          for (let seed = 0; seed < 40; seed++)
+          for (let seed = 0; seed < 200; seed++)
             for (const p of promptsOf(moneyItemForSkill(id, mulberry32(seed), tier))) {
               const text = renderMoneyPrompt(p);
               expect(text, `${lang} ${p.key}`).not.toMatch(UNRENDERED);

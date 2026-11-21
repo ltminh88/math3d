@@ -77,6 +77,20 @@ export function moneyChoiceStep(
   return { kind: 'choice', prompt, options: moneyOptions(rng, answer, candidates, max) };
 }
 
+/**
+ * A choice among real denominations only (recognize, review #40): no money-scaled near
+ * misses — a ±1 000 miss on a 500 000 note would invent "499 000 đồng", which is not a
+ * real note. Every option must be a denomination.
+ */
+export function denominationChoiceStep(
+  rng: Rng,
+  prompt: PromptRef,
+  answer: number,
+  candidates: readonly Candidate<number>[],
+): ReasoningStep {
+  return { kind: 'choice', prompt, options: optionsFrom(rng, answer, candidates, moneyLabel, 4) };
+}
+
 /** Count options (exchange): named traps first, then near counts, all positive. */
 export function countChoiceStep(
   rng: Rng,

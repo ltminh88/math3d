@@ -22,6 +22,11 @@ const ORACLE: Record<string, (i: MoneyItem, tier: SkillTier) => void> = {
     if (tier === 3) expect([100000, 200000, 500000]).toContain(v);
     expect(stepValue(i.steps[0])).toBe(v);
     expect(i.work).toEqual([v]);
+    // Review #40: every option is a real denomination — no invented "499 000 đồng".
+    const step = i.steps[0];
+    if (step?.kind === 'choice')
+      for (const o of step.options)
+        expect(DENOMINATIONS).toContain(parseMoney(String(o.label.params?.s)));
   },
   'money-total-notes': (i, tier) => {
     const notes = notesOf(i);

@@ -21,6 +21,14 @@ const vi = {
   item_pen: 'cái bút',
   item_cake: 'cái bánh',
   item_book: 'quyển sách',
+  // Generic nouns (same wording as reasoning-strings): money-change-back reuses
+  // pickNoun, so every generic noun must translate here — a missing one renders as
+  // the raw key ("money.item_marble", review #40).
+  item_marble: 'viên bi',
+  item_candy: 'cái kẹo',
+  item_flower: 'bông hoa',
+  item_apple: 'quả táo',
+  item_fish: 'con cá',
   recognizeStory: 'Nhìn tờ tiền.',
   askRecognize: 'Tờ tiền này là bao nhiêu đồng?',
   totalStory: 'Có các tờ tiền sau đây.',
@@ -50,6 +58,11 @@ const en = {
   item_pen: 'pens',
   item_cake: 'cakes',
   item_book: 'books',
+  item_marble: 'marbles',
+  item_candy: 'sweets',
+  item_flower: 'flowers',
+  item_apple: 'apples',
+  item_fish: 'fish',
   recognizeStory: 'Look at the banknote.',
   askRecognize: 'How many dong is this banknote?',
   totalStory: 'Here are some banknotes.',
