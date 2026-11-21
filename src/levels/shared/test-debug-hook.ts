@@ -7,7 +7,7 @@ import type { FactKey } from '../../learning/fact-key';
 import type { DeltaFact, DeltaLevel } from '../../learning/learning-types';
 import { mulberry32 } from '../../learning/seeded-rng';
 import type { SkillTier } from '../../learning/skill-tiers';
-import { reasoningItemForSkill } from '../../reasoning/reasoning-item-for-skill';
+import { itemForSkill } from '../../practice/item-for-skill';
 import { playableSteps } from '../../reasoning/reasoning-step-answers';
 import { renderPrompt } from '../../reasoning/reasoning-strings';
 import { newId } from '../../store/new-id';
@@ -44,7 +44,7 @@ export interface TestGameHook {
   seedFactStats(stats: SeedFactStats): Promise<void>;
   /** Commits stage stars for one level (stage 1's stars also set the level's stars). */
   seedStageProgress(levelId: string, stageStars: readonly number[]): Promise<void>;
-  /** Shows a step card for a seeded reasoning item over the page; returns the right answers. */
+  /** Shows a step card for a seeded item (any family, via the shared dispatcher) over the page; returns the right answers. */
   mountStepCard(skillId: string, seed: number, tier: SkillTier): PlannedStep[];
   /** Commits `seed` to the store and re-renders the world/HUD from it. */
   seedProgress(seed: SeedProgress): Promise<void>;
@@ -132,7 +132,7 @@ async function seedFactStats(stats: SeedFactStats): Promise<void> {
 }
 
 function mountStepCard(skillId: string, seed: number, tier: SkillTier): PlannedStep[] {
-  const item = reasoningItemForSkill(skillId, mulberry32(seed), tier);
+  const item = itemForSkill(skillId, mulberry32(seed), tier);
   document.getElementById('test-step-card')?.remove();
   const host = document.createElement('div');
   host.id = 'test-step-card';

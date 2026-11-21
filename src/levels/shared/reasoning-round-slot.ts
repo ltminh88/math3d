@@ -6,8 +6,8 @@ import { type FactKey, skillKey } from '../../learning/fact-key';
 import type { FactStat } from '../../learning/learning-types';
 import type { Rng } from '../../learning/seeded-rng';
 import { type SkillTier, skillTierOf } from '../../learning/skill-tiers';
-import { reasoningItemForSkill } from '../../reasoning/reasoning-item-for-skill';
-import type { ReasoningItem } from '../../reasoning/reasoning-types';
+import { itemForSkill } from '../../practice/item-for-skill';
+import type { PracticeItem } from '../../practice/practice-scene';
 
 export const MASTERED_BOX = 3;
 export const MIN_MASTERED_FACTS = 3;
@@ -38,7 +38,7 @@ export interface ReasoningRoundPlan {
   readonly tier: SkillTier;
   /** `sk:<skillId>`: what the round is recorded under. */
   readonly factKey: FactKey;
-  readonly item: ReasoningItem;
+  readonly item: PracticeItem;
 }
 
 export interface PlanReasoningInput {
@@ -58,7 +58,7 @@ export function planReasoningRound(input: PlanReasoningInput): ReasoningRoundPla
   const skillId = chooseReasoningSkill(stats, skills);
   const factKey = skillKey(skillId);
   const tier = skillTierOf(stats[factKey]);
-  return { skillId, tier, factKey, item: reasoningItemForSkill(skillId, rng, tier) };
+  return { skillId, tier, factKey, item: itemForSkill(skillId, rng, tier) };
 }
 
 /** Facts of the standard rounds: the last one gives way to the reasoning round. */

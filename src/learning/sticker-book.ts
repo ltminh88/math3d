@@ -4,6 +4,7 @@
 import { divFactsForTables, mulFactsForTables } from './curriculum-tables';
 import { type FactKey, skillKey } from './fact-key';
 import type { FactStat } from './learning-types';
+import { skillsOfFamily } from './skill-catalog';
 
 /** A unit reaches its sticker at Leitner box 4 (tier 2), before full mastery (box 5). */
 export const STICKER_EARN_BOX = 4;
@@ -18,9 +19,15 @@ export type StickerTopic =
   | 'unknown-pattern'
   | 'expression-logic'
   | 'geometry'
-  | 'measurement';
+  | 'measurement'
+  | 'number'
+  | 'arithmetic'
+  | 'fraction'
+  | 'time'
+  | 'money'
+  | 'data';
 
-/** Book order of the six topic pages. */
+/** Book order of the topic pages (family topics stay hidden until their skills exist). */
 export const STICKER_TOPICS: readonly StickerTopic[] = [
   'tables',
   'remainder',
@@ -28,6 +35,12 @@ export const STICKER_TOPICS: readonly StickerTopic[] = [
   'expression-logic',
   'geometry',
   'measurement',
+  'number',
+  'arithmetic',
+  'fraction',
+  'time',
+  'money',
+  'data',
 ];
 
 export interface Sticker {
@@ -92,6 +105,13 @@ export const TOPIC_SKILLS: Readonly<Record<Exclude<StickerTopic, 'tables'>, read
     'meas-area-square',
     'meas-wp-fence',
   ],
+  // New families: the topic is the family — no per-skill edits when a family phase lands.
+  number: skillsOfFamily('number'),
+  arithmetic: skillsOfFamily('arithmetic'),
+  fraction: skillsOfFamily('fraction'),
+  time: skillsOfFamily('time'),
+  money: skillsOfFamily('money'),
+  data: skillsOfFamily('data'),
 };
 
 type Stats = Readonly<Record<FactKey, FactStat | undefined>>;
@@ -126,6 +146,14 @@ export function topicProgress(
 ): { earned: number; total: number } {
   const page = stickers.filter((s) => s.topic === topic);
   return { earned: page.filter((s) => s.earned).length, total: page.length };
+}
+
+/**
+ * Topics with at least one sticker, in book order. A family topic stays hidden until its
+ * first skill exists — an empty page would show nothing to tap.
+ */
+export function visibleTopics(stickers: readonly Sticker[]): StickerTopic[] {
+  return STICKER_TOPICS.filter((t) => stickers.some((s) => s.topic === t));
 }
 
 /**

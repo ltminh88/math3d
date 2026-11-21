@@ -14,6 +14,7 @@ import {
   STICKER_TABLES,
   TOPIC_SKILLS,
   topicProgress,
+  visibleTopics,
 } from './sticker-book';
 
 const stat = (box: number): FactStat => ({ ...newFactStat(), attempts: 1, correct: 1, box });
@@ -111,4 +112,18 @@ it('topic skills are all catalog ids (the grouping follows the catalog)', () => 
   for (const ids of Object.values(TOPIC_SKILLS)) {
     for (const id of ids) expect(catalog.has(id), id).toBe(true);
   }
+});
+
+it('empty family topics stay hidden until their skills exist', () => {
+  const stickers = deriveStickers({});
+  expect(visibleTopics(stickers)).toEqual([
+    'tables',
+    'remainder',
+    'unknown-pattern',
+    'expression-logic',
+    'geometry',
+    'measurement',
+  ]);
+  for (const topic of ['number', 'arithmetic', 'fraction', 'time', 'money', 'data'] as const)
+    expect(topicProgress(stickers, topic)).toEqual({ earned: 0, total: 0 });
 });
