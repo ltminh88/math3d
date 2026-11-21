@@ -199,6 +199,9 @@ export const timesOrderDigital: TimeGenerator = (rng, tier) => {
   return timeItem('times-order-digital', tier, story, [step]);
 };
 
+/** Adjacent Roman misreads (Brian 2026-11-21): IV reads as VI, IX as XI, and back. */
+const ROMAN_ADJACENT: Record<number, number> = { 4: 6, 6: 4, 9: 11, 11: 9 };
+
 export const romanClockHour: TimeGenerator = (rng, tier) => {
   const h =
     tier === 3 ? pick(rng, [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11] as const) : pick(rng, HOURS_1_12);
@@ -207,15 +210,20 @@ export const romanClockHour: TimeGenerator = (rng, tier) => {
     const candidates: Candidate<readonly [number, number]>[] = [
       { value: [h, 0] as const, misconception: 'am-pm-12h' as const },
     ];
-    const step = digitalChoiceStep(
-      rng,
-      ref('askClock'),
-      h + 12,
-      0,
-      candidates,
-      true,
-      NEAR_BY_TIER[3],
-    );
+    // Even-hour distractors only (Brian 2026-11-21): minute-level near misses like 17:59
+    // do not fit an even-hour question.
+    const adjacent = ROMAN_ADJACENT[h];
+    if (adjacent !== undefined)
+      candidates.push({
+        value: [adjacent + 12, 0] as const,
+        misconception: 'roman-subtractive' as const,
+      });
+    for (const d of [1, -1, 2, -2]) {
+      const hh = h + 12 + d;
+      if (hh >= 13 && hh <= 23)
+        candidates.push({ value: [hh, 0] as const, misconception: 'near-miss' as const });
+    }
+    const step = digitalChoiceStep(rng, ref('askClock'), h + 12, 0, candidates, true, []);
     return timeSceneItem('roman-clock-hour', tier, ref('roman24Story'), [step], sceneData);
   }
   if (tier === 2) {

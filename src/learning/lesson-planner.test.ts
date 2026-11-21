@@ -101,6 +101,20 @@ describe('planLessonRun', () => {
     const b47 = planLessonRun(47, {}, mulberry32(4));
     expect(b47).toHaveLength(3);
     expect(b47.every((k) => k === 'sk:roman-clock-hour')).toBe(true);
+    // B68 plans its six money skills now that phase 14 landed them.
+    const b68 = planLessonRun(68, {}, mulberry32(4));
+    expect(b68).toHaveLength(6);
+    expect(new Set(b68).size).toBe(6);
+    expect(b68.every((k) => k.startsWith('sk:money-'))).toBe(true);
+    // B69 mixes B66, B67 and B68: six items, all time or money keys.
+    const b69 = planLessonRun(69, {}, mulberry32(4));
+    expect(b69).toHaveLength(6);
+    expect(new Set(b69).size).toBe(6);
+    expect(
+      b69.every((k) =>
+        /^(sk:clock-|sk:times-|sk:roman-|sk:months-|sk:calendar-|sk:money-)/.test(k),
+      ),
+    ).toBe(true);
   });
 
   it('renderable filter excludes skills; none renderable means []', () => {

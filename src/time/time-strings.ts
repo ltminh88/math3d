@@ -19,9 +19,9 @@ const vi = {
   seq: '{a}, {b}, {c}',
   clockStory: 'Nhìn đồng hồ.',
   askClock: 'Đồng hồ chỉ mấy giờ?',
-  sangChieuStoryMorning: 'Buổi sáng đồng hồ chỉ như hình. Hỏi là mấy giờ?',
-  sangChieuStoryAfternoon: 'Buổi chiều đồng hồ chỉ như hình. Hỏi là mấy giờ?',
-  sangChieuStoryEvening: 'Buổi tối đồng hồ chỉ như hình. Hỏi là mấy giờ?',
+  sangChieuStoryMorning: 'Buổi sáng, đồng hồ chỉ như hình bên.',
+  sangChieuStoryAfternoon: 'Buổi chiều, đồng hồ chỉ như hình bên.',
+  sangChieuStoryEvening: 'Buổi tối, đồng hồ chỉ như hình bên.',
   elapsedStory: 'Hai đồng hồ chỉ giờ bắt đầu và giờ kết thúc. Hỏi đã qua bao nhiêu phút?',
   askElapsed: 'Đã qua bao nhiêu phút?',
   orderStory: 'Có ba giờ: {a}, {b}, {c}. Xếp theo thứ tự từ sớm đến muộn.',
@@ -31,7 +31,7 @@ const vi = {
   calendarStory: 'Xem tờ lịch tháng {m} năm {y}.',
   askWeekday: 'Ngày {d} là thứ mấy?',
   askBetween: 'Ngày {d1} và ngày {d2} cách nhau bao nhiêu ngày?',
-  roman24Story: 'Buổi chiều đồng hồ có số La Mã chỉ như hình. Hỏi là mấy giờ?',
+  roman24Story: 'Buổi chiều đồng hồ có số La Mã chỉ như hình bên.',
 };
 
 const en = {
@@ -49,9 +49,9 @@ const en = {
   seq: '{a}, {b}, {c}',
   clockStory: 'Look at the clock.',
   askClock: 'What time is it?',
-  sangChieuStoryMorning: 'In the morning the clock shows this time. What time is it?',
-  sangChieuStoryAfternoon: 'In the afternoon the clock shows this time. What time is it?',
-  sangChieuStoryEvening: 'In the evening the clock shows this time. What time is it?',
+  sangChieuStoryMorning: 'In the morning, the clock shows the time in the picture.',
+  sangChieuStoryAfternoon: 'In the afternoon, the clock shows the time in the picture.',
+  sangChieuStoryEvening: 'In the evening, the clock shows the time in the picture.',
   elapsedStory: 'The two clocks show the start time and the end time. How many minutes passed?',
   askElapsed: 'How many minutes passed?',
   orderStory: 'Here are three times: {a}, {b}, {c}. Put them in order from earliest to latest.',
@@ -61,7 +61,7 @@ const en = {
   calendarStory: 'Look at the calendar page for month {m}, {y}.',
   askWeekday: 'What day of the week is the {d}th?',
   askBetween: 'How many days are there between the {d1}th and the {d2}th?',
-  roman24Story: 'In the afternoon the clock with Roman numerals shows this time. What time is it?',
+  roman24Story: 'In the afternoon the clock with Roman numerals shows the time in the picture.',
 };
 
 const ts = defineStrings('time', { vi, en });

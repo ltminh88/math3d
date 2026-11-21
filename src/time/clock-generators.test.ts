@@ -59,6 +59,10 @@ const ORACLE: Record<string, (i: TimeItem, tier: SkillTier) => void> = {
     if (tier === 3) {
       expect(i.story.key).toBe('roman24Story');
       expect(stepValue(i.steps[0])).toBe((s.h + 12) * 60);
+      // Brian 2026-11-21: every option is an even hour — no 17:59/18:01 minute misses.
+      const step = i.steps[0];
+      if (step?.kind === 'choice')
+        for (const o of step.options) expect(Number(o.label.params?.mm)).toBe(0);
     } else {
       expect(stepValue(i.steps[0])).toBe(s.h);
     }

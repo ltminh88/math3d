@@ -8,6 +8,7 @@ import { FRACTION_SKILLS, isFractionSkill } from '../fractions/fraction-item-for
 import { mulberry32 } from '../learning/seeded-rng';
 import { SKILL_CATALOG } from '../learning/skill-catalog';
 import { isMoneySkill, MONEY_SKILLS } from '../money/money-item-for-skill';
+import { MONEY_ENTRIES } from '../money/money-skill-entries';
 import { isNumberSkill, NUMBER_SKILLS } from '../numbers/number-item-for-skill';
 import { isTimeSkill, TIME_SKILLS } from '../time/time-item-for-skill';
 import { TIME_ENTRIES } from '../time/time-skill-entries';
@@ -39,11 +40,10 @@ describe('familyOfSkill', () => {
 });
 
 describe('new families (phase 02 scaffolding)', () => {
-  test('four families have no generator yet: is<F>Skill is false for every catalog id, <f>ItemForSkill throws', () => {
+  test('three families have no generator yet: is<F>Skill is false for every catalog id, <f>ItemForSkill throws', () => {
     const checks = [
       [isNumberSkill, NUMBER_SKILLS],
       [isArithmeticSkill, ARITHMETIC_SKILLS],
-      [isMoneySkill, MONEY_SKILLS],
       [isDataSkill, DATA_SKILLS],
     ] as const;
     for (const [isSkill, skills] of checks) {
@@ -70,6 +70,13 @@ describe('new families (phase 02 scaffolding)', () => {
     expect(TIME_SKILLS).toEqual(TIME_ENTRIES.map((e) => e.id));
     for (const id of TIME_SKILLS) expect(isTimeSkill(id)).toBe(true);
     expect(isTimeSkill('wp-times-then-add')).toBe(false);
+  });
+
+  test('money has generators (phase 14): every money catalog entry has a generator', () => {
+    // Derived from the entries file: the exact ids are pinned in skill-catalog.test.ts.
+    expect(MONEY_SKILLS).toEqual(MONEY_ENTRIES.map((e) => e.id));
+    for (const id of MONEY_SKILLS) expect(isMoneySkill(id)).toBe(true);
+    expect(isMoneySkill('wp-times-then-add')).toBe(false);
   });
 });
 
@@ -109,6 +116,21 @@ describe('dialogRenderable', () => {
       'roman-clock-hour',
       'calendar-weekday',
       'calendar-days-between',
+    ]) {
+      const item = itemForSkill(id, mulberry32(1), 1);
+      expect(dialogRenderable(item)).toBe(false);
+      expect(dialogRenderable(item, () => true)).toBe(true);
+    }
+  });
+
+  test('money scene-free items render; money scene items wait for the phase-17 renderer', () => {
+    for (const id of ['money-change-back', 'money-wp'])
+      expect(dialogRenderable(itemForSkill(id, mulberry32(1), 1))).toBe(true);
+    for (const id of [
+      'money-recognize',
+      'money-total-notes',
+      'money-exchange',
+      'money-pick-notes',
     ]) {
       const item = itemForSkill(id, mulberry32(1), 1);
       expect(dialogRenderable(item)).toBe(false);
