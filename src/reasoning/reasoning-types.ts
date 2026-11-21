@@ -55,7 +55,18 @@ export type Misconception =
   | 'unequal-parts'
   | 'wrong-denominator'
   | 'not-unit'
-  | 'forget-divide';
+  | 'forget-divide'
+  // Time (src/time)
+  | 'swapped-hands'
+  | 'five-min-misread'
+  | 'next-hour'
+  | 'am-pm-12h'
+  | 'inclusive-count'
+  | 'wrong-month-length'
+  | 'roman-subtractive'
+  | 'wrong-weekday'
+  | 'wrong-order'
+  | 'elapsed-hour';
 
 export interface ChoiceOption {
   readonly id: string;

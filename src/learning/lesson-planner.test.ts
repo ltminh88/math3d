@@ -90,6 +90,17 @@ describe('planLessonRun', () => {
     expect(b14).toHaveLength(6);
     expect(new Set(b14).size).toBe(6);
     expect(b14.every((k) => k.startsWith('sk:fraction-'))).toBe(true);
+    // B66 plans its nine time skills now that phase 13 landed them.
+    const b66 = planLessonRun(66, {}, mulberry32(4));
+    expect(b66).toHaveLength(6);
+    expect(new Set(b66).size).toBe(6);
+    expect(
+      b66.every((k) => /^(sk:clock-|sk:times-|sk:roman-|sk:months-|sk:calendar-)/.test(k)),
+    ).toBe(true);
+    // B47 has one time skill (roman-clock-hour): three items of it.
+    const b47 = planLessonRun(47, {}, mulberry32(4));
+    expect(b47).toHaveLength(3);
+    expect(b47.every((k) => k === 'sk:roman-clock-hour')).toBe(true);
   });
 
   it('renderable filter excludes skills; none renderable means []', () => {

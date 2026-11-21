@@ -74,17 +74,28 @@ export const fractionOfSetNumber: FractionGenerator = (rng, tier) => {
   const item = pick(rng, NOUNS);
   const story = ref('setNumberStory', { item, count: total, n });
   if (tier === 3) {
+    // Second step: k parts altogether (k < n; for n = 2 the two parts are the whole set).
+    const ks: number[] = [];
+    for (let k = 2; k < n; k++) ks.push(k);
+    const k = ks.length > 0 ? pick(rng, ks) : 2;
     const steps: ReasoningStep[] = [
-      numberStep(ref('askOnePart'), part),
-      numberStep(ref('askRest'), total - part),
+      numberStep(ref('askOnePart', { item }), part),
+      numberStep(ref('askKParts', { k, item }), k * part),
     ];
-    return fractionItem('fraction-of-set-number', tier, story, steps, [part, total - part]);
+    return fractionItem('fraction-of-set-number', tier, story, steps, [part, k * part]);
   }
   if (tier === 2) {
-    const step = numberChoiceStep(rng, ref('askOnePart'), part, divideCandidates(total, n));
+    const step = numberChoiceStep(
+      rng,
+      ref('askOnePart', { item }),
+      part,
+      divideCandidates(total, n),
+    );
     return fractionItem('fraction-of-set-number', tier, story, [step]);
   }
-  return fractionItem('fraction-of-set-number', tier, story, [numberStep(ref('askOnePart'), part)]);
+  return fractionItem('fraction-of-set-number', tier, story, [
+    numberStep(ref('askOnePart', { item }), part),
+  ]);
 };
 
 type WpContext = 'share' | 'eat' | 'class' | 'read';

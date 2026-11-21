@@ -97,8 +97,8 @@ describe('skill catalog', () => {
     expect(skillsOfFamily('measurement')).toHaveLength(12);
   });
 
-  it('the five remaining new families exist but have no skills yet (phase 02 scaffolding)', () => {
-    for (const family of ['number', 'arithmetic', 'time', 'money', 'data'] as const)
+  it('the four remaining new families exist but have no skills yet (phase 02 scaffolding)', () => {
+    for (const family of ['number', 'arithmetic', 'money', 'data'] as const)
       expect(skillsOfFamily(family)).toEqual([]);
     // Fraction landed in phase 12 (B14): its six skills are in the catalog.
     expect(skillsOfFamily('fraction')).toEqual([
@@ -108,6 +108,19 @@ describe('skill catalog', () => {
       'fraction-of-set-circle',
       'fraction-of-set-number',
       'fraction-wp',
+    ]);
+    // Time landed in phase 13 (B66, B47): its ten skills are in the catalog.
+    expect(skillsOfFamily('time')).toEqual([
+      'clock-read-hour-half',
+      'clock-read-5min',
+      'clock-read-minute',
+      'clock-sang-chieu-24h',
+      'clock-elapsed-minutes',
+      'times-order-digital',
+      'roman-clock-hour',
+      'months-days-count',
+      'calendar-weekday',
+      'calendar-days-between',
     ]);
   });
 });

@@ -1,20 +1,49 @@
 // One entry point for the time family (phase 13): a time-family skill id + rng + tier -> item.
-// Empty until phase 13 adds the first generator; the dispatcher already consults it.
+// Scene-free skills (months-days-count, times-order-digital) render in the shared dialog
+// today; the picture skills wait for the phase-17 scene renderer.
 import type { Rng } from '../learning/seeded-rng';
 import type { SkillTier } from '../learning/skill-tiers';
-import type { PracticeItem } from '../practice/practice-scene';
+import { calendarDaysBetween, calendarWeekday, monthsDaysCount } from './calendar-generators';
+import {
+  clockElapsedMinutes,
+  clockRead5min,
+  clockReadHourHalf,
+  clockReadMinute,
+  clockSangChieu24h,
+  romanClockHour,
+  timesOrderDigital,
+} from './clock-generators';
+import type { TimeGenerator, TimeItem } from './time-scene-types';
 
-export type TimeGenerator = (rng: Rng, tier: SkillTier) => PracticeItem;
+const GENERATORS: Readonly<Record<string, TimeGenerator>> = {
+  'clock-read-hour-half': clockReadHourHalf,
+  'clock-read-5min': clockRead5min,
+  'clock-read-minute': clockReadMinute,
+  'clock-sang-chieu-24h': clockSangChieu24h,
+  'clock-elapsed-minutes': clockElapsedMinutes,
+  'times-order-digital': timesOrderDigital,
+  'roman-clock-hour': romanClockHour,
+  'months-days-count': monthsDaysCount,
+  'calendar-weekday': calendarWeekday,
+  'calendar-days-between': calendarDaysBetween,
+};
 
-const GENERATORS: Readonly<Record<string, TimeGenerator>> = {};
-
-/** The time skills (catalog order) that have a generator (none yet). */
+/** The time skills (catalog order) that have a generator. */
 export const TIME_SKILLS: readonly string[] = Object.keys(GENERATORS);
 
 export const isTimeSkill = (id: string): boolean => id in GENERATORS;
 
+/** The time skills whose items carry no scene (playable in the dialog before phase 17). */
+export const TIME_SCENE_FREE_SKILLS: readonly string[] = Object.freeze([
+  'months-days-count',
+  'times-order-digital',
+]);
+
+/** True when the skill's items never need a picture. */
+export const isTimeSceneFreeSkill = (id: string): boolean => TIME_SCENE_FREE_SKILLS.includes(id);
+
 /** Pure and deterministic for a seeded `rng`; throws for skills without a time generator. */
-export function timeItemForSkill(id: string, rng: Rng, tier: SkillTier): PracticeItem {
+export function timeItemForSkill(id: string, rng: Rng, tier: SkillTier): TimeItem {
   const generate = GENERATORS[id];
   if (!generate) throw new Error(`time: no generator for skill "${id}"`);
   return generate(rng, tier);
