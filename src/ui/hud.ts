@@ -43,6 +43,16 @@ function ensureShopButton(): void {
   byId('learn').before(button);
 }
 
+/** The lesson-mode HUD button (phase 06), added once next to the daily button. The dynamic
+ * import keeps the lesson panel out of the hud import chain: practice-run.ts imports
+ * refreshHud for its coin updates, so a static import here would cycle. */
+let lessonButtonWired = false;
+function ensureLessonButton(): void {
+  if (lessonButtonWired || document.getElementById('open-lesson')) return;
+  lessonButtonWired = true;
+  void import('./lesson-hud-button').then((m) => m.initLessonButton());
+}
+
 /** Re-renders every HUD field from the progress view, then re-runs the DOM translator on the HUD. */
 export function refreshHud(): void {
   const progress = gameState.progress;
@@ -74,6 +84,7 @@ export function refreshHud(): void {
   byId('sound').setAttribute('aria-label', translateText(sound ? 'Tắt âm thanh' : 'Bật âm thanh'));
   gameState.audio.enabled = sound;
   ensureShopButton();
+  ensureLessonButton();
   initShop();
   translateDomTree(byId('hud'));
 }
