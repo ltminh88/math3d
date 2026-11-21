@@ -4,9 +4,11 @@
 //   B25 = div-rem-floor, div-rem-ceil, choose-all-correct, tf-explain (catalog lines 36-37, 49-50)
 //   B3  = unknown-add-sub only; B1/B2 have no skills yet; B7 mixes nothing; B14 has no
 //         fraction skills yet (phase 12 lands them)
-//   B5  = tables [3]: 9 mul facts (3x2..3x10) + 9 div facts (6/3..30/3)
+//   B5  = tables [3]: 9 mul facts (3x2..3x10) + 9 div facts (6/3..30/3), plus
+//         sk:pattern-skip-count (tagged 4-12)
 //   B44 = mix of [8, 15, 22, 29, 35, 40, 41, 42, 43]: facts (via B8) and skills (via B13/B15)
 import { describe, expect, it } from 'vitest';
+import { divFactsForTables, mulFactsForTables } from './curriculum-tables';
 import type { FactKey } from './fact-key';
 import { skillsOfLesson } from './kntt-lesson-index';
 import type { FactStat } from './learning-types';
@@ -54,10 +56,14 @@ describe('planLessonRun', () => {
   });
 
   it('tables run gives distinct facts, never the same question twice', () => {
+    // B5 also carries sk:pattern-skip-count (tagged 4-12); it may appear once, but a
+    // fact key never repeats.
     const run = planLessonRun(5, {}, mulberry32(3));
     expect(run).toHaveLength(6);
-    expect(new Set(run).size).toBe(6);
-    expect(run.every((k) => k.startsWith('mul:') || k.startsWith('div:'))).toBe(true);
+    const facts = run.filter((k) => k.startsWith('mul:') || k.startsWith('div:'));
+    expect(new Set(facts).size).toBe(facts.length);
+    const b5Keys = ['sk:pattern-skip-count', ...mulFactsForTables([3]), ...divFactsForTables([3])];
+    for (const key of run) expect(b5Keys).toContain(key);
   });
 
   it('B44 mix spreads over its source lessons', () => {
@@ -76,7 +82,9 @@ describe('planLessonRun', () => {
   });
 
   it('a lesson with no plannable skills returns [] (UI shows "Sắp có")', () => {
-    for (const n of [1, 2, 7]) expect(planLessonRun(n, {}, mulberry32(4))).toEqual([]);
+    for (const n of [1, 2]) expect(planLessonRun(n, {}, mulberry32(4))).toEqual([]);
+    // B7 now yields sk:pattern-skip-count (tagged 4-12) since the skillsOfLesson fix;
+    // it is not practicable, so the picker still shows "Sắp có" for it.
     // B14 has no fraction skills until phase 12 lands them; then this moves.
     expect(planLessonRun(14, {}, mulberry32(4))).toEqual([]);
   });

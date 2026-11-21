@@ -1,8 +1,8 @@
 // Lesson progress (phase 05): stars are derived from the stats, never stored.
 // Oracles below are computed by hand:
 //   stars: 1 = every skill attempted, 2 = every box >= 3, 3 = every box >= 4;
-//   tables lessons use the 70% share (like the sticker rule): 13/18 facts = 72% earns,
-//   12/18 = 67% does not.
+//   tables lessons use the 70% share (like the sticker rule): 14/19 facts = 74% earns,
+//   13/19 = 68% does not.
 //   B25 = div-rem-floor, div-rem-ceil, choose-all-correct, tf-explain.
 //   B9  = tables [6]: 9 mul (6x2..6x10) + 9 div (12/6..60/6).
 //   Topic 2 (B9-B15) has 6 playable lessons: B9, B10, B11, B12, B13, B15 (B14 has no
@@ -56,10 +56,11 @@ describe('lessonStars', () => {
   it('tables B5: the 70% share decides', () => {
     const facts = [...mulFactsForTables([3]), ...divFactsForTables([3])];
     expect(facts).toHaveLength(18);
-    expect(lessonStars(5, statsOf(facts.slice(0, 12), 1))).toBe(0); // 12/18 = 67%
-    expect(lessonStars(5, statsOf(facts.slice(0, 13), 1))).toBe(1); // 13/18 = 72%
-    expect(lessonStars(5, statsOf(facts.slice(0, 13), 3))).toBe(2);
-    expect(lessonStars(5, statsOf(facts.slice(0, 13), 4))).toBe(3);
+    // B5 has 19 keys: the 18 facts plus sk:pattern-skip-count (tagged 4-12).
+    expect(lessonStars(5, statsOf(facts.slice(0, 13), 1))).toBe(0); // 13/19 = 68%
+    expect(lessonStars(5, statsOf(facts.slice(0, 14), 1))).toBe(1); // 14/19 = 74%
+    expect(lessonStars(5, statsOf(facts.slice(0, 14), 3))).toBe(2);
+    expect(lessonStars(5, statsOf(facts.slice(0, 14), 4))).toBe(3);
   });
 
   it('a lesson with no keys has 0 stars', () => {

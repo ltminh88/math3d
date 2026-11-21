@@ -20,10 +20,10 @@ import { REASONING_SKILLS } from '../reasoning/reasoning-item-for-skill';
 import { TIME_SKILLS } from '../time/time-item-for-skill';
 import type { FactKey } from './fact-key';
 import { isSkillKey } from './fact-key';
-import { lessonByNumber, skillsOfLesson } from './kntt-lesson-index';
+import { type KnttLesson, lessonByNumber, skillsOfLesson } from './kntt-lesson-index';
 import type { FactStat } from './learning-types';
 import { type Rng, shuffle } from './seeded-rng';
-import { type SkillFamily, skillEntry } from './skill-catalog';
+import { SKILL_CATALOG, type SkillFamily, skillEntry } from './skill-catalog';
 
 /** Default items in a lesson run (phase 06). */
 export const LESSON_RUN_ITEMS = 6;
@@ -98,7 +98,7 @@ export function planLessonRun(
   const boxOf = (k: FactKey): number => stats[k]?.box ?? 1;
   // Shuffled first so the stable sort below breaks box ties deterministically by seed.
   const ordered = shuffle(rng, keys).sort((a, b) => boxOf(a) - boxOf(b));
-  const spread = lesson.kind === 'mix' ? spreadBySource(ordered, lesson.mixOf ?? []) : ordered;
+  const spread = lesson.kind === 'mix' ? spreadBySource(ordered, lesson) : ordered;
   const skills = spread.filter(isSkillKey);
   // Round-robin: one item per key, then up to two more rounds over skill keys only (a
   // fact repeated is the same question; a skill re-rolled is a new one).
@@ -109,22 +109,31 @@ export function planLessonRun(
 
 /**
  * Mix lessons spread over their source lessons: one key per source in turn, weakest
- * first within each source. Without this a fact-heavy mix (B44) would plan six facts
- * from its biggest source and never touch the rest.
+ * first within each source — the lesson's own skills lead, then its sources. Without
+ * this a fact-heavy mix (B44) would plan six facts from its biggest source and never
+ * touch the rest.
  */
-function spreadBySource(keys: FactKey[], sources: readonly number[]): FactKey[] {
+function spreadBySource(keys: FactKey[], lesson: KnttLesson): FactKey[] {
+  const own = SKILL_CATALOG.filter((s) =>
+    s.lessons.some((ref) => ref.book === lesson.book && ref.n.includes(lesson.n)),
+  ).map((s) => `sk:${s.id}`);
+  const ownSet = new Set(own);
   const sourceOf = new Map<FactKey, number>();
-  for (const m of sources)
+  for (const m of lesson.mixOf ?? [])
     for (const k of skillsOfLesson(m)) if (!sourceOf.has(k)) sourceOf.set(k, m);
   const groups = new Map<number, FactKey[]>();
-  for (const m of sources) groups.set(m, []);
+  for (const m of lesson.mixOf ?? []) groups.set(m, []);
+  const ownKeys: FactKey[] = [];
   const unassigned: FactKey[] = [];
   for (const key of keys) {
-    const src = sourceOf.get(key);
-    if (src === undefined) unassigned.push(key);
-    else groups.get(src)?.push(key);
+    if (ownSet.has(key)) ownKeys.push(key);
+    else {
+      const src = sourceOf.get(key);
+      if (src === undefined) unassigned.push(key);
+      else groups.get(src)?.push(key);
+    }
   }
-  const ordered = [...groups.values(), unassigned].filter((g) => g.length > 0);
+  const ordered = [ownKeys, ...groups.values(), unassigned].filter((g) => g.length > 0);
   const out: FactKey[] = [];
   for (let i = 0; ; i++) {
     let took = false;

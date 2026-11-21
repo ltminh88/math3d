@@ -83,32 +83,35 @@ export function topicsInOrder(): readonly KnttTopic[] {
 }
 
 /**
- * Fact keys that practise lesson `n`, in a stable order: `skills` → catalog skills
- * tagged with this lesson (`sk:<id>`, catalog order); `tables` → the mul/div fact
- * keys of the lesson's tables; `mix` → the union of its `mixOf` lessons, deduped.
+ * Fact keys that practise lesson `n`, in a stable order: the catalog skills tagged with
+ * this lesson (whatever its kind — B8 teaches pattern-add/sub, B4 practises
+ * pattern-skip-count alongside its tables), then the mul/div fact keys for a `tables`
+ * lesson, then the union of its `mixOf` lessons for a `mix` lesson; deduped. A skill
+ * tagged with a tables/mix lesson is practised there, never orphaned.
  * Throws for an unknown lesson number.
  */
 export function skillsOfLesson(n: number): FactKey[] {
   const lesson = BY_NUMBER.get(n);
   if (!lesson) throw new Error(`skillsOfLesson: unknown lesson ${n}`);
+  const keys: FactKey[] = [];
+  const seen = new Set<FactKey>();
+  const push = (k: FactKey): void => {
+    if (!seen.has(k)) {
+      seen.add(k);
+      keys.push(k);
+    }
+  };
+  for (const s of SKILL_CATALOG)
+    if (s.lessons.some((ref) => ref.book === lesson.book && ref.n.includes(n))) push(`sk:${s.id}`);
   if (lesson.kind === 'tables') {
-    const tables = lesson.tables ?? [];
-    return [...mulFactsForTables(tables), ...divFactsForTables(tables)];
+    for (const k of [
+      ...mulFactsForTables(lesson.tables ?? []),
+      ...divFactsForTables(lesson.tables ?? []),
+    ])
+      push(k);
   }
   if (lesson.kind === 'mix') {
-    const keys: FactKey[] = [];
-    const seen = new Set<FactKey>();
-    for (const m of lesson.mixOf ?? []) {
-      for (const k of skillsOfLesson(m)) {
-        if (!seen.has(k)) {
-          seen.add(k);
-          keys.push(k);
-        }
-      }
-    }
-    return keys;
+    for (const m of lesson.mixOf ?? []) for (const k of skillsOfLesson(m)) push(k);
   }
-  return SKILL_CATALOG.filter((s) =>
-    s.lessons.some((ref) => ref.book === lesson.book && ref.n.includes(n)),
-  ).map((s) => `sk:${s.id}`);
+  return keys;
 }
