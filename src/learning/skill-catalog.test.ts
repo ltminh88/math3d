@@ -97,8 +97,17 @@ describe('skill catalog', () => {
     expect(skillsOfFamily('measurement')).toHaveLength(12);
   });
 
-  it('the six new families exist but have no skills yet (phase 02 scaffolding)', () => {
-    for (const family of ['number', 'arithmetic', 'fraction', 'time', 'money', 'data'] as const)
+  it('the five remaining new families exist but have no skills yet (phase 02 scaffolding)', () => {
+    for (const family of ['number', 'arithmetic', 'time', 'money', 'data'] as const)
       expect(skillsOfFamily(family)).toEqual([]);
+    // Fraction landed in phase 12 (B14): its six skills are in the catalog.
+    expect(skillsOfFamily('fraction')).toEqual([
+      'fraction-read',
+      'fraction-shaded',
+      'fraction-pick-picture',
+      'fraction-of-set-circle',
+      'fraction-of-set-number',
+      'fraction-wp',
+    ]);
   });
 });

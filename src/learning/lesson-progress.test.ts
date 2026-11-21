@@ -5,8 +5,8 @@
 //   13/19 = 68% does not.
 //   B25 = div-rem-floor, div-rem-ceil, choose-all-correct, tf-explain.
 //   B9  = tables [6]: 9 mul (6x2..6x10) + 9 div (12/6..60/6).
-//   Topic 2 (B9-B15) has 6 playable lessons: B9, B10, B11, B12, B13, B15 (B14 has no
-//   fraction skills until phase 12).
+//   Topic 2 (B9-B15) has 7 playable lessons: B9-B15 (B14's fraction skills landed in
+//   phase 12).
 //   Next lesson with no stats is B3: B1/B2 have no skills yet, B3's unknown-add-sub is
 //   the first playable skill.
 import { describe, expect, it } from 'vitest';
@@ -53,6 +53,21 @@ describe('lessonStars', () => {
     expect(lessonStars(25, statsOf(keys, 4))).toBe(3);
   });
 
+  it('B14: 0-3 by hand (phase 12 fraction skills)', () => {
+    const keys = [
+      'sk:fraction-read',
+      'sk:fraction-shaded',
+      'sk:fraction-pick-picture',
+      'sk:fraction-of-set-circle',
+      'sk:fraction-of-set-number',
+      'sk:fraction-wp',
+    ] as const;
+    expect(lessonStars(14, {})).toBe(0);
+    expect(lessonStars(14, statsOf(keys, 2))).toBe(1); // all attempted, none >= 3
+    expect(lessonStars(14, statsOf(keys, 3))).toBe(2);
+    expect(lessonStars(14, statsOf(keys, 4))).toBe(3);
+  });
+
   it('tables B5: the 70% share decides', () => {
     const facts = [...mulFactsForTables([3]), ...divFactsForTables([3])];
     expect(facts).toHaveLength(18);
@@ -82,7 +97,8 @@ describe('nextLesson', () => {
   });
 
   it('skips lessons with nothing playable yet', () => {
-    // B14 has no fraction skills until phase 12; it is never the next lesson now.
+    // B6 is the first lesson below 3 stars (B14's fraction skills landed in phase 12,
+    // but B6 comes first in textbook order).
     const stats = statsOf(
       [
         'sk:unknown-add-sub',
@@ -106,10 +122,10 @@ describe('nextLesson', () => {
 });
 
 describe('topicProgress', () => {
-  it('topic 2 has 6 playable lessons', () => {
-    expect(topicProgress(2, {})).toEqual({ completed: 0, total: 6 });
+  it('topic 2 has 7 playable lessons', () => {
+    expect(topicProgress(2, {})).toEqual({ completed: 0, total: 7 });
     const b9 = [...mulFactsForTables([6]), ...divFactsForTables([6])];
-    expect(topicProgress(2, statsOf(b9, 4))).toEqual({ completed: 1, total: 6 });
+    expect(topicProgress(2, statsOf(b9, 4))).toEqual({ completed: 1, total: 7 });
   });
 
   it('an unknown topic is empty', () => {

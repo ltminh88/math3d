@@ -38,11 +38,10 @@ describe('familyOfSkill', () => {
 });
 
 describe('new families (phase 02 scaffolding)', () => {
-  test('no generator yet: is<F>Skill is false for every catalog id, <f>ItemForSkill throws', () => {
+  test('five families have no generator yet: is<F>Skill is false for every catalog id, <f>ItemForSkill throws', () => {
     const checks = [
       [isNumberSkill, NUMBER_SKILLS],
       [isArithmeticSkill, ARITHMETIC_SKILLS],
-      [isFractionSkill, FRACTION_SKILLS],
       [isTimeSkill, TIME_SKILLS],
       [isMoneySkill, MONEY_SKILLS],
       [isDataSkill, DATA_SKILLS],
@@ -51,6 +50,19 @@ describe('new families (phase 02 scaffolding)', () => {
       expect(skills).toEqual([]);
       for (const { id } of SKILL_CATALOG) expect(isSkill(id), id).toBe(false);
     }
+  });
+
+  test('fraction has generators (phase 12): isFractionSkill is true for its six ids', () => {
+    expect(FRACTION_SKILLS).toEqual([
+      'fraction-read',
+      'fraction-shaded',
+      'fraction-pick-picture',
+      'fraction-of-set-circle',
+      'fraction-of-set-number',
+      'fraction-wp',
+    ]);
+    for (const id of FRACTION_SKILLS) expect(isFractionSkill(id)).toBe(true);
+    expect(isFractionSkill('wp-times-then-add')).toBe(false);
   });
 });
 
@@ -66,6 +78,16 @@ describe('dialogRenderable', () => {
     // A kind without a renderer is still filtered out, never a blank picture.
     expect(dialogRenderable(geo, () => false)).toBe(false);
     expect(dialogRenderable(meas, () => false)).toBe(false);
+  });
+
+  test('fraction scene-free items render; fraction scene items wait for the phase-16 renderer', () => {
+    for (const id of ['fraction-read', 'fraction-of-set-number', 'fraction-wp'])
+      expect(dialogRenderable(itemForSkill(id, mulberry32(1), 1))).toBe(true);
+    for (const id of ['fraction-shaded', 'fraction-pick-picture', 'fraction-of-set-circle']) {
+      const item = itemForSkill(id, mulberry32(1), 1);
+      expect(dialogRenderable(item)).toBe(false);
+      expect(dialogRenderable(item, () => true)).toBe(true);
+    }
   });
 
   test('an item without a scene always renders; a scene item only with a renderer', () => {

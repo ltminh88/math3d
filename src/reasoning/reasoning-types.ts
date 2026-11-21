@@ -50,7 +50,12 @@ export type Misconception =
   | 'square-times-two'
   | 'perimeter-not-area'
   | 'area-not-perimeter'
-  | 'wrong-unit';
+  | 'wrong-unit'
+  // Fractions (src/fractions)
+  | 'unequal-parts'
+  | 'wrong-denominator'
+  | 'not-unit'
+  | 'forget-divide';
 
 export interface ChoiceOption {
   readonly id: string;

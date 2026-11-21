@@ -103,8 +103,10 @@ describe('skillsOfLesson', () => {
     expect(keys).toContain('mul:2x3');
   });
 
-  it('B7 (not practicable) still yields its tagged skill', () => {
-    expect(skillsOfLesson(7)).toEqual(['sk:pattern-skip-count']);
+  it('B7 (not practicable) yields nothing: pattern-skip-count is tables-only now', () => {
+    // Phase 12 legacy fix: pattern-skip-count is tagged only with the tables lessons
+    // (B4, B5, B6, B9-B12), not B7 (geometry review) or B8 (mixed practice).
+    expect(skillsOfLesson(7)).toEqual([]);
   });
 
   it('no catalog skill is orphaned: every skill appears in at least one practicable lesson', () => {
