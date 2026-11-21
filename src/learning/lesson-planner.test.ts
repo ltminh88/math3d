@@ -2,7 +2,8 @@
 // first, round-robin. Oracles below are computed by hand from the catalog (phase 01),
 // not by calling the helpers under test:
 //   B25 = div-rem-floor, div-rem-ceil, choose-all-correct, tf-explain (catalog lines 36-37, 49-50)
-//   B3  = unknown-add-sub only; B1/B2 have no skills yet; B7 mixes nothing; B14 =
+//   B3  = unknown-add-sub only; B1 has the six number skills (phase 07); B2 has
+//         no skills yet; B7 mixes nothing; B14 =
 //         the six fraction skills (phase 12)
 //   B5  = tables [3]: 9 mul facts (3x2..3x10) + 9 div facts (6/3..30/3), plus
 //         sk:pattern-skip-count (tagged 4, 5, 6, 9-12)
@@ -82,7 +83,7 @@ describe('planLessonRun', () => {
   });
 
   it('a lesson with no plannable skills returns [] (UI shows "Sắp có")', () => {
-    for (const n of [1, 2, 7]) expect(planLessonRun(n, {}, mulberry32(4))).toEqual([]);
+    for (const n of [2, 7]) expect(planLessonRun(n, {}, mulberry32(4))).toEqual([]);
     // B7 yields nothing again: pattern-skip-count is tables-only since the phase-12
     // legacy fix (it is not practicable, so the picker still shows "Sắp có" for it).
     // B14 plans its six fraction skills now that phase 12 landed them.
