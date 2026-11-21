@@ -20,6 +20,7 @@ import {
 import { SHIPPED_M3D3_CODE, SHIPPED_M3D3_IMPORT } from './save-code-shipped-m3d3-fixture';
 import { SHIPPED_M3D4_CODE, SHIPPED_M3D4_IMPORT } from './save-code-shipped-m3d4-fixture';
 import { M3D3_LEVELS } from './save-code-v3-payload';
+import { snapshotToCompactV5 } from './save-code-v5-payload';
 import { MAX_SKILL_TUPLES } from './save-code-v5-skills-lenient';
 import { newProfile } from './save-schema';
 
@@ -198,6 +199,45 @@ describe('M3D5 save code', () => {
     expect(records.levels.cave?.stageStars).toEqual([3, 3, 3, 3, 3]);
     expect(records.daily).toEqual({ lastDailyDay: 99999, dailyStreak: 9999 });
     expect(Object.keys(records.facts)).toHaveLength(Object.keys(s.factStats).length);
+  });
+
+  it('a code at the tuple cap (512 maxed fake skills) still fits and decodes', () => {
+    // Invariant: a code at the M3D5 tuple cap still imports. The encoder only
+    // writes catalog skills, so 512 tuples cannot come out of encodeSaveCodeV5
+    // with fake ids — the code is built at the payload level instead, the same
+    // way the tuple-cap test above builds its codes: a maxed snapshot, with its
+    // `k` replaced by 512 maxed fake tuples. Field values match the maxed-out
+    // save above; fake ids are the longest the id grammar allows (39 chars).
+    const full: FactStat = {
+      ...newFactStat(),
+      attempts: 99,
+      correct: 99,
+      totalMs: 987654,
+      box: 5,
+      streak: 12,
+      fluent: true,
+    };
+    const fakeSkillId = (i: number): string => `zz${String(i).padStart(3, '0')}${'x'.repeat(34)}`;
+    const fakeTuple = (i: number): unknown[] => [fakeSkillId(i), 99, 99, 987654, 5, 345, 0, 12, 1];
+    const s = snapshot();
+    for (let a = 1; a <= 10; a++)
+      for (let b = 1; b <= 10; b++) {
+        s.factStats[mulKey(a, b)] = { ...full, lastSeenSession: 345, errs: [81, 72, 63] };
+      }
+    for (const { id } of SKILL_CATALOG)
+      s.factStats[skillKey(id)] = { ...full, lastSeenSession: 345 };
+    for (const id of M3D3_LEVELS)
+      s.levelProgress[id] = level(id, id === 'cave' ? [3, 3, 3, 3, 3] : [3, 3, 3, 3, 3, 3]);
+    s.ownedCosmetics = Array.from({ length: 12 }, (_, i) => `cosmetic-item-${i}`);
+    s.daily = { lastDailyDay: 99999, dailyStreak: 9999 };
+    const compact = snapshotToCompactV5(s, audio);
+    compact.k = Array.from({ length: MAX_SKILL_TUPLES }, (_, i) => fakeTuple(i));
+    const text = code(5, compact);
+    expect(text.length).toBeLessThan(MAX_SAVE_CODE_CHARS);
+    const { records } = importOfDecodedSaveCode(decodeSaveCode(text), AT);
+    expect(records.facts['mul:3x7']?.attempts).toBe(99);
+    expect(Object.keys(records.facts)).toHaveLength(55);
+    expect(Object.keys(records.facts).some((k) => k.startsWith('sk:'))).toBe(false);
   });
 });
 
