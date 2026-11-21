@@ -8,6 +8,7 @@ import {
 import { defineStrings } from '../i18n/i18n';
 import { renderPrompt as renderReasoningPrompt } from '../reasoning/reasoning-strings';
 import type { PromptRef } from '../reasoning/reasoning-types';
+import { formatDigitRuns, formatNumber } from './numbers-format';
 
 const vi = {
   readWords: 'Số đọc là “{words}”.',
@@ -18,16 +19,17 @@ const vi = {
   digitAtPlace: 'Số {n} có chữ số hàng {place} là mấy?',
   expandSum: 'Viết số {n} thành tổng các hàng.',
   neighbors: 'Tìm số liền trước và số liền sau của {n}.',
-  neighborsTrio: 'Dãy ba số liên tiếp: {a}, {b}, ?.',
+  neighborsTrio: 'Dãy ba số liên tiếp: {a}, {b}, ?',
   sequence: 'Dãy số: {a}, {b}, ?, {d}.',
-  sequenceTwoGaps: 'Dãy số: {a}, ?, {c}, ?.',
+  sequenceTwoGaps: 'Dãy số: {a}, ? (ô A), {c}, ? (ô B).',
   compare: 'So sánh hai số: {a} và {b}.',
   compareExpr: 'So sánh: {a} và {expr}.',
   orderAsc: 'Sắp xếp các số sau theo thứ tự tăng dần: {list}.',
   orderDesc: 'Sắp xếp các số sau theo thứ tự giảm dần: {list}.',
   maxMin: 'Trong các số: {list}.',
   expandFill: 'Số {n} viết thành tổng: {x} + ? + {y}.',
-  expandVerdict: 'Bạn An viết số {n} thành tổng.',
+  expandVerdict: 'Bạn An viết số {n} thành tổng {sum}.',
+  isAnTrue: 'Bạn An nói đúng hay sai?',
   makeMaxMin: 'Dùng các chữ số {digits} để lập số.',
   askWrite: 'Viết số đó.',
   askReading: 'Chọn cách đọc đúng:',
@@ -36,6 +38,7 @@ const vi = {
   askPrev: 'Số liền trước là mấy?',
   askNext: 'Số liền sau là mấy?',
   askMissing: 'Số còn thiếu là mấy?',
+  askMissingLabel: 'Số ở ô {label} là mấy?',
   askCompare: 'Chọn dấu đúng:',
   askOrder: 'Số {ord} ({pos}) là?',
   askLast: 'Số cuối cùng ({pos}) là?',
@@ -72,16 +75,17 @@ const en = {
   digitAtPlace: 'In {n}, what is the digit in the {place} place?',
   expandSum: 'Write {n} as a sum of place values.',
   neighbors: 'Find the number just before and just after {n}.',
-  neighborsTrio: 'Three numbers in a row: {a}, {b}, ?.',
+  neighborsTrio: 'Three numbers in a row: {a}, {b}, ?',
   sequence: 'The sequence: {a}, {b}, ?, {d}.',
-  sequenceTwoGaps: 'The sequence: {a}, ?, {c}, ?.',
+  sequenceTwoGaps: 'The sequence: {a}, ? (box A), {c}, ? (box B).',
   compare: 'Compare the two numbers: {a} and {b}.',
   compareExpr: 'Compare: {a} and {expr}.',
   orderAsc: 'Order these numbers from smallest to largest: {list}.',
   orderDesc: 'Order these numbers from largest to smallest: {list}.',
   maxMin: 'Among these numbers: {list}.',
   expandFill: '{n} as a sum: {x} + ? + {y}.',
-  expandVerdict: 'An writes {n} as a sum.',
+  expandVerdict: 'An writes {n} as the sum {sum}.',
+  isAnTrue: 'Is An right or wrong?',
   makeMaxMin: 'Use the digits {digits} to make a number.',
   askWrite: 'Write that number.',
   askReading: 'Pick the right reading:',
@@ -90,6 +94,7 @@ const en = {
   askPrev: 'What is the number just before?',
   askNext: 'What is the number just after?',
   askMissing: 'What is the missing number?',
+  askMissingLabel: 'What is the number in box {label}?',
   askCompare: 'Pick the right sign:',
   askOrder: 'The {ord} number ({pos}) is?',
   askLast: 'The last number ({pos}) is?',
@@ -120,11 +125,29 @@ const ns = defineStrings('numbers', { vi, en });
 
 type Key = Parameters<typeof ns>[0];
 
-/** Renders a numbers prompt; 'num' comes from geometry, 'expr'/'stmtEq' from reasoning. */
+/** Display copy of a prompt: numbers ≥ 1000 render SGK-grouped, data stays plain digits. */
+function displayPrompt(prompt: PromptRef): PromptRef {
+  const params: Record<string, string | number> = {};
+  for (const [name, value] of Object.entries(prompt.params ?? {}))
+    params[name] =
+      typeof value === 'number'
+        ? formatNumber(value)
+        : typeof value === 'string'
+          ? formatDigitRuns(value)
+          : value;
+  return { ...prompt, params };
+}
+
+/**
+ * Renders a numbers prompt; 'num' comes from geometry, 'expr'/'stmtEq' from reasoning.
+ * Every number the child sees is grouped SGK-style (77 224, 70 000 + 7 000) — the
+ * params themselves stay plain, so oracles and the number pad keep comparing numbers.
+ */
 export const renderNumbersPrompt = (prompt: PromptRef): string => {
-  if (prompt.key in vi) return renderPromptWith(ns as Translator, prompt);
-  if (prompt.key === 'num') return renderGeometryPrompt(prompt);
-  return renderReasoningPrompt(prompt);
+  const shown = displayPrompt(prompt);
+  if (shown.key in vi) return renderPromptWith(ns as Translator, shown);
+  if (shown.key === 'num') return renderGeometryPrompt(shown);
+  return renderReasoningPrompt(shown);
 };
 
 export type NumbersKey = Key;

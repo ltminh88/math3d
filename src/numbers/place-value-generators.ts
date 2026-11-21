@@ -192,7 +192,10 @@ export const numSequence1000 = (rng: Rng, tier: SkillTier): PracticeItem => {
     skillId,
     3,
     ref('sequenceTwoGaps', { a, c: a + 2 * s }),
-    [numberStep(ref('askMissing'), a + s), numberStep(ref('askMissing'), a + 3 * s)],
+    [
+      numberStep(ref('askMissingLabel', { label: 'A' }), a + s),
+      numberStep(ref('askMissingLabel', { label: 'B' }), a + 3 * s),
+    ],
     numberLineScene(marks, [1, 3], s),
   );
 };

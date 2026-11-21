@@ -12,12 +12,12 @@ import type { ChoiceOption, PromptRef, ReasoningStep } from '../reasoning/reason
 import {
   expandedChoiceStep,
   expandedSumText,
-  numberChoiceStepRange,
+  numberChoiceStepFromList,
   numberItem,
   signChoiceStep,
   wrongPlaceExpansion,
 } from './numbers-distractors';
-import { digitsOf, fromDigits, RANGE_1000, RANGE_10000, RANGE_100000 } from './numbers-ranges';
+import { digitsOf, fromDigits, RANGE_100000 } from './numbers-ranges';
 import { kindFor, pickNumber } from './place-value-generators';
 
 /** A choice among the numbers still unpicked; the right one is `want`. */
@@ -71,21 +71,17 @@ function orderItem(
   );
 }
 
-/** "Which is the largest / smallest?" — one choice step among the numbers. */
+/** "Which is the largest / smallest?" — one choice step among exactly these numbers. */
 function maxMinItem(
   skillId: string,
   tier: SkillTier,
   rng: Rng,
   numbers: readonly number[],
-  range: number,
 ): PracticeItem {
   const askMax = rng() < 0.5;
   const want = askMax ? Math.max(...numbers) : Math.min(...numbers);
-  const others = numbers
-    .filter((v) => v !== want)
-    .map((v) => ({ value: v, misconception: 'near-miss' as const }));
   return numberItem(skillId, tier, ref('maxMin', { list: numbers.join(', ') }), [
-    numberChoiceStepRange(rng, ref(askMax ? 'askMax' : 'askMin'), want, others, range),
+    numberChoiceStepFromList(rng, ref(askMax ? 'askMax' : 'askMin'), numbers, want),
   ]);
 }
 
@@ -215,7 +211,7 @@ export const numOrder1000 = (rng: Rng, tier: SkillTier): PracticeItem => {
     const numbers = distinctNumbers(rng, 3, 3);
     return rng() < 0.5
       ? orderItem(skillId, 1, rng, numbers, ascending)
-      : maxMinItem(skillId, 1, rng, numbers, RANGE_1000);
+      : maxMinItem(skillId, 1, rng, numbers);
   }
   if (tier === 2) return orderItem(skillId, 2, rng, sameDigitsFour(rng), ascending);
   // The crossing form has only 4 bases, so it stays rare; the bulk is a general order
@@ -234,7 +230,6 @@ export const numOrder1000 = (rng: Rng, tier: SkillTier): PracticeItem => {
     3,
     rng,
     ones.map((o) => h * 100 + t * 10 + o),
-    RANGE_1000,
   );
 };
 
@@ -246,7 +241,7 @@ export const numOrder10000 = (rng: Rng, tier: SkillTier): PracticeItem => {
     const numbers = distinctNumbers(rng, 4, 3);
     return rng() < 0.5
       ? orderItem(skillId, 1, rng, numbers, ascending)
-      : maxMinItem(skillId, 1, rng, numbers, RANGE_10000);
+      : maxMinItem(skillId, 1, rng, numbers);
   }
   if (tier === 2) return orderItem(skillId, 2, rng, distinctNumbers(rng, 4, 4), ascending);
   // The crossing form has only 2 bases, so it stays rare; the bulk is a general order
@@ -264,7 +259,6 @@ export const numOrder10000 = (rng: Rng, tier: SkillTier): PracticeItem => {
     3,
     rng,
     ones.map((o) => prefix * 10 + o),
-    RANGE_10000,
   );
 };
 
@@ -276,7 +270,7 @@ export const numOrder100000 = (rng: Rng, tier: SkillTier): PracticeItem => {
     const numbers = distinctNumbers(rng, 5, 3);
     return rng() < 0.5
       ? orderItem(skillId, 1, rng, numbers, ascending)
-      : maxMinItem(skillId, 1, rng, numbers, RANGE_100000);
+      : maxMinItem(skillId, 1, rng, numbers);
   }
   if (tier === 2) return orderItem(skillId, 2, rng, distinctNumbers(rng, 5, 4), ascending);
   const digits = shuffle(rng, [1, 2, 3, 4, 5, 6, 7, 8, 9]).slice(0, 5);
@@ -319,7 +313,7 @@ export const numExpand100000 = (rng: Rng, tier: SkillTier): PracticeItem => {
   const claim = evalExpr(text) === n;
   const step: ReasoningStep = {
     kind: 'verdict',
-    prompt: ref('isItTrue'),
+    prompt: ref('isAnTrue'),
     statement: ref('stmtEq', { text, value: n }),
     answer: claim,
     ...(claim ? {} : { fix: { prompt: ref('askSum'), answer: evalExpr(text) } }),
@@ -327,7 +321,7 @@ export const numExpand100000 = (rng: Rng, tier: SkillTier): PracticeItem => {
   return numberItem(
     skillId,
     3,
-    ref('expandVerdict', { n }),
+    ref('expandVerdict', { n, sum: text }),
     [step],
     undefined,
     claim ? [] : [evalExpr(text)],

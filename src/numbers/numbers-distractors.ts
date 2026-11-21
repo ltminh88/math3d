@@ -90,21 +90,20 @@ export function taggedDistractors(n: number, range: number): Candidate<number>[]
   return out;
 }
 
-/** A choice of 3–4 numbers: the answer, tagged distractors, then near misses, all in range. */
-export function numberChoiceStepRange(
+/** A choice among exactly the given numbers (max/min): no near misses from outside. */
+export function numberChoiceStepFromList(
   rng: Rng,
   prompt: PromptRef,
-  answer: number,
-  candidates: readonly Candidate<number>[],
-  range: number,
+  numbers: readonly number[],
+  want: number,
 ): ReasoningStep {
-  const valid = candidates.filter((c) => c.value > 0 && c.value <= range && c.value !== answer);
-  const near: Candidate<number>[] = NEAR.map((d) => ({
-    value: answer + d,
-    misconception: 'near-miss' as const,
-  })).filter((c) => c.value > 0 && c.value <= range);
-  const label = (v: number): PromptRef => ref('num', { n: v });
-  return { kind: 'choice', prompt, options: optionsFrom(rng, answer, [...valid, ...near], label) };
+  const options: ChoiceOption[] = numbers.map((v, i) => ({
+    id: `o${i}`,
+    label: ref('num', { n: v }),
+    correct: v === want,
+    ...(v === want ? {} : { misconception: 'near-miss' as const }),
+  }));
+  return { kind: 'choice', prompt, options: shuffle(rng, options) };
 }
 
 /** A choice of 3–4 readings: the answer's words, the distractors' words, then near misses. */
