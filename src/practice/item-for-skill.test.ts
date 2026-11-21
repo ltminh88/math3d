@@ -43,7 +43,6 @@ describe('familyOfSkill', () => {
 describe('new families (phase 02 scaffolding)', () => {
   test('two families have no generator yet: is<F>Skill is false for every catalog id, <f>ItemForSkill throws', () => {
     const checks = [
-      [isNumberSkill, NUMBER_SKILLS],
       [isArithmeticSkill, ARITHMETIC_SKILLS],
     ] as const;
     for (const [isSkill, skills] of checks) {

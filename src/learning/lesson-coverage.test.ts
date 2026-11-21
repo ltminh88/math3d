@@ -82,13 +82,14 @@ describe('lesson coverage (phase 02 escape hatch)', () => {
     expect(hasGenerator('sk:not-a-skill')).toBe(false);
   });
 
-  it('the two remaining new families have no generator yet; fraction, time, money, data and the legacy families do', () => {
-    for (const family of ['number', 'arithmetic'] as const)
+  it('the one remaining new family has no generator yet; number, fraction, time, money, data and the legacy families do', () => {
+    for (const family of ['arithmetic'] as const)
       expect(familyHasNoGenerator(family)).toBe(true);
     for (const family of [
       'word-problem',
       'geometry',
       'measurement',
+      'number',
       'fraction',
       'time',
       'money',
@@ -99,6 +100,6 @@ describe('lesson coverage (phase 02 escape hatch)', () => {
 
   it('a lesson with no skills passes vacuously (its family phase has not landed)', () => {
     expect(lessonPasses([])).toBe(true);
-    expect(lessonPasses(skillsOfLesson(1))).toBe(true); // B1: no skills yet
+    expect(lessonPasses(skillsOfLesson(1))).toBe(true); // B1: six skills, all generated (phase 07)
   });
 });
