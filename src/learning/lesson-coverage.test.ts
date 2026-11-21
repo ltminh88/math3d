@@ -85,7 +85,14 @@ describe('lesson coverage (phase 02 escape hatch)', () => {
   it('the three remaining new families have no generator yet; number, fraction, time and the legacy families do', () => {
     for (const family of ['arithmetic', 'money', 'data'] as const)
       expect(familyHasNoGenerator(family)).toBe(true);
-    for (const family of ['word-problem', 'geometry', 'measurement', 'number', 'fraction', 'time'] as const)
+    for (const family of [
+      'word-problem',
+      'geometry',
+      'measurement',
+      'number',
+      'fraction',
+      'time',
+    ] as const)
       expect(familyHasNoGenerator(family)).toBe(false);
   });
 
