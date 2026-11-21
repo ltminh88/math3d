@@ -41,9 +41,7 @@ describe('familyOfSkill', () => {
 
 describe('new families (phase 02 scaffolding)', () => {
   test('two families have no generator yet: is<F>Skill is false for every catalog id, <f>ItemForSkill throws', () => {
-    const checks = [
-      [isArithmeticSkill, ARITHMETIC_SKILLS],
-    ] as const;
+    const checks = [[isArithmeticSkill, ARITHMETIC_SKILLS]] as const;
     for (const [isSkill, skills] of checks) {
       expect(skills).toEqual([]);
       for (const { id } of SKILL_CATALOG) expect(isSkill(id), id).toBe(false);
