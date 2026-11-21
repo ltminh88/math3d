@@ -34,9 +34,19 @@ const ORACLE: Record<string, (i: FractionItem, tier: SkillTier) => void> = {
   setNumberStory: (i, tier) => {
     expect(i.scene).toBeUndefined();
     const [n, total, part] = partOf(i);
-    expect(lastValue(i)).toBe(tier === 3 ? total - part : part);
-    if (tier === 3) expect(stepValue(i.steps[0])).toBe(part);
-    void n;
+    if (tier === 3) {
+      // Second step: k parts altogether (k < n; n = 2 asks for the whole set).
+      const k = Number(i.steps[1]?.prompt.params?.k);
+      expect(i.steps[0]?.prompt.key).toBe('askOnePart');
+      expect(i.steps[1]?.prompt.key).toBe('askKParts');
+      expect(k).toBeGreaterThanOrEqual(2);
+      expect(k).toBeLessThanOrEqual(n);
+      expect(stepValue(i.steps[0])).toBe(part);
+      expect(lastValue(i)).toBe(k * part);
+    } else {
+      expect(lastValue(i)).toBe(part);
+    }
+    void total;
   },
   wpShare: (i, tier) => {
     expect(i.scene).toBeUndefined();

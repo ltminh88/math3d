@@ -6,7 +6,7 @@ import { divFactsForTables, mulFactsForTables } from './curriculum-tables';
 import type { FactKey } from './fact-key';
 import type { FactStat } from './learning-types';
 import { newFactStat } from './leitner-box';
-import { SKILL_CATALOG } from './skill-catalog';
+import { SKILL_CATALOG, skillsOfFamily } from './skill-catalog';
 import {
   createEarningTracker,
   deriveStickers,
@@ -26,17 +26,26 @@ function tableStats(table: number, atBox4: number): Record<FactKey, FactStat> {
   return stats;
 }
 
-it('fresh stats: 53 stickers, none earned, 8/2/5/11/9/12/6 per page', () => {
+it('fresh stats: one sticker per catalog skill and table, none earned', () => {
   const stickers = deriveStickers({});
-  expect(stickers).toHaveLength(53);
+  expect(stickers).toHaveLength(SKILL_CATALOG.length + STICKER_TABLES.length);
   expect(stickers.filter((s) => s.earned)).toHaveLength(0);
-  expect(topicProgress(stickers, 'tables')).toEqual({ earned: 0, total: 8 });
+  expect(topicProgress(stickers, 'tables')).toEqual({ earned: 0, total: STICKER_TABLES.length });
   expect(topicProgress(stickers, 'remainder')).toEqual({ earned: 0, total: 2 });
   expect(topicProgress(stickers, 'unknown-pattern')).toEqual({ earned: 0, total: 5 });
   expect(topicProgress(stickers, 'expression-logic')).toEqual({ earned: 0, total: 11 });
   expect(topicProgress(stickers, 'geometry')).toEqual({ earned: 0, total: 9 });
   expect(topicProgress(stickers, 'measurement')).toEqual({ earned: 0, total: 12 });
-  expect(topicProgress(stickers, 'fraction')).toEqual({ earned: 0, total: 6 });
+  // New-family page totals are derived from the catalog, so the next family phase
+  // does not have to edit this test (Brian's suggestion, phase 13 onward).
+  expect(topicProgress(stickers, 'fraction')).toEqual({
+    earned: 0,
+    total: skillsOfFamily('fraction').length,
+  });
+  expect(topicProgress(stickers, 'time')).toEqual({
+    earned: 0,
+    total: skillsOfFamily('time').length,
+  });
 });
 
 it('every catalog skill has exactly one sticker, and no other skill sticker exists', () => {
@@ -125,7 +134,8 @@ it('empty family topics stay hidden until their skills exist', () => {
     'geometry',
     'measurement',
     'fraction',
+    'time',
   ]);
-  for (const topic of ['number', 'arithmetic', 'time', 'money', 'data'] as const)
+  for (const topic of ['number', 'arithmetic', 'money', 'data'] as const)
     expect(topicProgress(stickers, topic)).toEqual({ earned: 0, total: 0 });
 });

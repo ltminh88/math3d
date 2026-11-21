@@ -68,6 +68,24 @@ describe('lessonStars', () => {
     expect(lessonStars(14, statsOf(keys, 4))).toBe(3);
   });
 
+  it('B66: 0-3 by hand (phase 13 time skills)', () => {
+    const keys = [
+      'sk:clock-read-hour-half',
+      'sk:clock-read-5min',
+      'sk:clock-read-minute',
+      'sk:clock-sang-chieu-24h',
+      'sk:clock-elapsed-minutes',
+      'sk:times-order-digital',
+      'sk:months-days-count',
+      'sk:calendar-weekday',
+      'sk:calendar-days-between',
+    ] as const;
+    expect(lessonStars(66, {})).toBe(0);
+    expect(lessonStars(66, statsOf(keys, 2))).toBe(1); // all attempted, none >= 3
+    expect(lessonStars(66, statsOf(keys, 3))).toBe(2);
+    expect(lessonStars(66, statsOf(keys, 4))).toBe(3);
+  });
+
   it('tables B5: the 70% share decides', () => {
     const facts = [...mulFactsForTables([3]), ...divFactsForTables([3])];
     expect(facts).toHaveLength(18);
@@ -126,6 +144,20 @@ describe('topicProgress', () => {
     expect(topicProgress(2, {})).toEqual({ completed: 0, total: 7 });
     const b9 = [...mulFactsForTables([6]), ...divFactsForTables([6])];
     expect(topicProgress(2, statsOf(b9, 4))).toEqual({ completed: 1, total: 7 });
+  });
+
+  it('topic 8 has 2 playable lessons (B47, B49 via the Roman clock)', () => {
+    expect(topicProgress(8, {})).toEqual({ completed: 0, total: 2 });
+    // B49 mixes B45-B48, whose other skills have not landed yet, so the Roman clock
+    // alone completes both B47 and B49.
+    expect(topicProgress(8, statsOf(['sk:roman-clock-hour'], 4))).toEqual({
+      completed: 2,
+      total: 2,
+    });
+  });
+
+  it('topic 13 has 3 playable lessons (B66, B67, B69; B68 money is phase 14)', () => {
+    expect(topicProgress(13, {})).toEqual({ completed: 0, total: 3 });
   });
 
   it('an unknown topic is empty', () => {
