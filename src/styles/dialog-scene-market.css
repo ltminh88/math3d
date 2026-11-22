@@ -1,0 +1,98 @@
+/* Dialog scene pictures for the market families (phase 17): clock, calendar, money
+   notes, data table, tally, bag, dice. Own file so phase 16's numbers css never
+   conflicts with it. Labels reuse .ds-label (15 px) from dialog-scene.css. */
+
+.ds-clock-hour {
+  stroke: #5a4632;
+  stroke-width: 5;
+  stroke-linecap: round;
+}
+
+.ds-clock-minute {
+  stroke: #5a4632;
+  stroke-width: 3;
+  stroke-linecap: round;
+}
+
+.ds-clock-tick {
+  stroke: #5a4632;
+  stroke-width: 2.5;
+  stroke-linecap: round;
+}
+
+.ds-clock-tick-min {
+  stroke: #8a7a68;
+  stroke-width: 1.5;
+  stroke-linecap: round;
+}
+
+.ds-cal-cell {
+  fill: #fffdf8;
+  stroke: #b9b4aa;
+  stroke-width: 1.5;
+}
+
+.ds-note {
+  stroke: #5a4632;
+  stroke-width: 2;
+}
+
+.ds-note-value {
+  font: 800 20px var(--font);
+  fill: #5a4632;
+}
+
+.ds-note-badge {
+  fill: #5a4632;
+  stroke: #fffdf8;
+  stroke-width: 2;
+}
+
+.ds-note-badge + text {
+  fill: #fffdf8;
+}
+
+.ds-table-head {
+  fill: #d8ebcc;
+  stroke: #5a4632;
+  stroke-width: 1.5;
+}
+
+.ds-table-cell {
+  fill: #fffdf8;
+  stroke: #b9b4aa;
+  stroke-width: 1.5;
+}
+
+.ds-tally-o {
+  fill: none;
+  stroke: #2f7cf6;
+  stroke-width: 3;
+}
+
+.ds-tally-x {
+  stroke: #e05d44;
+  stroke-width: 3;
+  stroke-linecap: round;
+}
+
+.ds-marble {
+  stroke: #5a4632;
+  stroke-width: 2;
+}
+
+.ds-die {
+  fill: #fffdf8;
+  stroke: #5a4632;
+  stroke-width: 2.5;
+}
+
+.ds-die-hidden {
+  fill: #e8e2d6;
+  stroke: #8a7a68;
+  stroke-width: 2.5;
+}
+
+.ds-pip {
+  fill: #5a4632;
+}

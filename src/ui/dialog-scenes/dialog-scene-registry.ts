@@ -3,12 +3,24 @@
 // The map is built once at import time; a duplicate kind fails fast. Scenes arrive
 // as `PracticeScene` (phase 02): only `kind` is typed there — the runtime value is
 // the family's full scene object, so a registered kind hands it to its renderer.
-import type { SceneBody, SceneKind } from '../../geometry/geo-scene-types';
+// Phase 17 widens the renderer contract from geometry-only `SceneBody` to the
+// `DialogScene` union (geometry + time + money + data); phase 16 extends the union
+// with the numbers/fraction scenes. A renderer's `render` narrows on `kind`, so no
+// casts are needed inside the scene files.
+import type { DataScene } from '../../data/data-scene-types';
+import type { SceneBody } from '../../geometry/geo-scene-types';
+import type { MoneyScene } from '../../money/money-scene-types';
 import type { PracticeScene } from '../../practice/practice-scene';
+import type { TimeScene } from '../../time/time-scene-types';
+
+/** Every scene the dialog can draw: geometry/measurement plus the market families. */
+export type DialogScene = SceneBody | TimeScene | MoneyScene | DataScene;
+
+export type DialogSceneKind = DialogScene['kind'];
 
 export interface DialogSceneRenderer {
-  readonly kinds: readonly SceneKind[];
-  render(scene: SceneBody): SVGElement;
+  readonly kinds: readonly DialogSceneKind[];
+  render(scene: DialogScene): SVGElement;
 }
 
 type SceneModule = { sceneRenderer: DialogSceneRenderer };
@@ -18,7 +30,7 @@ const modules = import.meta.glob('./scenes/*-scene-svg.ts', { eager: true }) as 
   SceneModule
 >;
 
-const renderers = new Map<SceneKind, DialogSceneRenderer>();
+const renderers = new Map<DialogSceneKind, DialogSceneRenderer>();
 for (const [path, mod] of Object.entries(modules)) {
   const renderer = mod.sceneRenderer;
   if (!renderer) throw new Error(`dialog scene: ${path} does not export sceneRenderer`);
@@ -30,16 +42,16 @@ for (const [path, mod] of Object.entries(modules)) {
 }
 
 export function hasSceneRenderer(kind: string): boolean {
-  return renderers.has(kind as SceneKind);
+  return renderers.has(kind as DialogSceneKind);
 }
 
-export function registeredSceneKinds(): readonly SceneKind[] {
+export function registeredSceneKinds(): readonly DialogSceneKind[] {
   return [...renderers.keys()];
 }
 
 /** The scene drawn as SVG, or null when no renderer covers its kind (never a blank picture). */
 export function renderScene(scene: PracticeScene): SVGElement | null {
-  const renderer = renderers.get(scene.kind as SceneKind);
+  const renderer = renderers.get(scene.kind as DialogSceneKind);
   // A registered kind means the runtime scene is that kind's full scene object.
-  return renderer ? renderer.render(scene as SceneBody) : null;
+  return renderer ? renderer.render(scene as DialogScene) : null;
 }
