@@ -3,6 +3,7 @@
 // deterministic per seed. RED-first: the mul/div generators and the new strings keys
 // do not exist yet.
 import { describe, expect, it } from 'vitest';
+import { setLanguage } from '../i18n/i18n';
 import { mulberry32 } from '../learning/seeded-rng';
 import type { SkillTier } from '../learning/skill-tiers';
 import { dialogRenderable } from '../practice/item-for-skill';
@@ -10,6 +11,7 @@ import type { PracticeItem } from '../practice/practice-scene';
 import { evalExpr } from '../reasoning/reasoning-test-oracles';
 import type { ReasoningStep } from '../reasoning/reasoning-types';
 import { arithmeticItemForSkill } from './arithmetic-item-for-skill';
+import { renderArithmeticPrompt } from './arithmetic-strings';
 import {
   allNumbers,
   oracleDivBySubtraction,
@@ -82,6 +84,15 @@ function checkError(i: PracticeItem, op: '×' | ':'): void {
 }
 
 /** Independent answers per story key, from the story params. */
+function checkMulTimes(i: PracticeItem): void {
+  expect(last(i)).toBe(p(i, 'a') * p(i, 'b'));
+}
+
+function checkMulThenSub(i: PracticeItem): void {
+  expect(values(i)).toEqual([p(i, 'per') * p(i, 'n'), p(i, 'per') * p(i, 'n') - p(i, 'c')]);
+  expect(i.work).toEqual([p(i, 'per') * p(i, 'n')]);
+}
+
 const ORACLE: Record<string, (i: PracticeItem) => void> = {
   mulCalc: (i) => expect(last(i)).toBe(p(i, 'a') * p(i, 'b')),
   divCalc: (i) => {
@@ -96,11 +107,12 @@ const ORACLE: Record<string, (i: PracticeItem) => void> = {
   },
   mentalCalc: (i) => expect(last(i)).toBe(evalExpr(s(i, 'expr'))),
   wpMulGroups: (i) => expect(last(i)).toBe(p(i, 'per') * p(i, 'n')),
-  wpMulTimes: (i) => expect(last(i)).toBe(p(i, 'a') * p(i, 'b')),
-  wpMulThenSub: (i) => {
-    expect(values(i)).toEqual([p(i, 'per') * p(i, 'n'), p(i, 'per') * p(i, 'n') - p(i, 'c')]);
-    expect(i.work).toEqual([p(i, 'per') * p(i, 'n')]);
-  },
+  wpMulTimesRice: checkMulTimes,
+  wpMulTimesBooks: checkMulTimes,
+  wpMulTimesStudents: checkMulTimes,
+  wpMulThenSubRice: checkMulThenSub,
+  wpMulThenSubBooks: checkMulThenSub,
+  wpMulThenSubSchool: checkMulThenSub,
   wpDivShare: (i) => {
     const { q, r } = oracleDivBySubtraction(p(i, 'a'), p(i, 'b'));
     expect(r).toBe(0);
@@ -224,7 +236,7 @@ function tierCheck(skillId: string, item: PracticeItem, tier: SkillTier): void {
     return;
   }
   if (skillId === 'mul-3d-1d-wp') {
-    if (key === 'wpMulThenSub') {
+    if (key.startsWith('wpMulThenSub')) {
       const total =
         oracleMulCarries(p(item, 'per'), p(item, 'n')) +
         oracleSubBorrows(p(item, 'per') * p(item, 'n'), p(item, 'c'));
@@ -374,5 +386,76 @@ describe('arithmetic mul/div generators', () => {
       if (step.kind !== 'verdict') throw new Error('not a verdict');
       expect(verdictTruth(step)).toBe(step.answer);
     }
+  });
+});
+
+/** Big-number word-problem contexts (le, 22/11): counts in the hundreds belong to a
+ *  warehouse, a library or a school — never to one child's marbles or sweets. Small
+ *  counts (≤ 99) keep the personal nouns. */
+const BIG_MARKERS = ['Kho', 'Thư viện', 'Trường'];
+const PERSONAL_NOUNS = ['viên bi', 'cái kẹo', 'bông hoa', 'quả táo', 'con cá'];
+const ALL_NOUNS = [...PERSONAL_NOUNS, 'quyển sách'];
+
+/** The numbers in a rendered story (SGK grouping spaces stripped first). */
+function renderedNumbers(text: string): number[] {
+  return text.replace(/[  ]/g, '').match(/\d+/g)?.map(Number) ?? [];
+}
+
+describe('arithmetic mul/div word-problem contexts', () => {
+  it('3-digit word problems use a big-number context, never a personal noun', () => {
+    setLanguage('vi');
+    for (const tier of [1, 2, 3] as SkillTier[])
+      for (let seed = 0; seed < 40; seed++) {
+        const item = arithmeticItemForSkill('mul-3d-1d-wp', mulberry32(seed), tier);
+        const story = renderArithmeticPrompt(item.story);
+        expect(
+          BIG_MARKERS.some((m) => story.includes(m)),
+          `${story}: no big-number context`,
+        ).toBe(true);
+        for (const noun of PERSONAL_NOUNS)
+          expect(story, `${story}: personal noun ${noun}`).not.toContain(noun);
+      }
+  });
+
+  it('a two-step word problem names the state after the first purchase in step 1', () => {
+    setLanguage('vi');
+    for (const tier of [1, 2, 3] as SkillTier[])
+      for (let seed = 0; seed < 40; seed++) {
+        const item = arithmeticItemForSkill('mul-3d-1d-wp', mulberry32(seed), tier);
+        if (item.steps.length !== 2) continue;
+        const first = renderArithmeticPrompt(stepAt(item, 0).prompt);
+        expect(first, `step 1: ${first}`).toContain('Sau lần mua thứ nhất');
+      }
+  });
+
+  it('2-digit word problems keep the small personal contexts', () => {
+    setLanguage('vi');
+    for (const id of ['mul-2d-1d-wp', 'div-2d-1d-wp'] as const)
+      for (const tier of [1, 2, 3] as SkillTier[])
+        for (let seed = 0; seed < 40; seed++) {
+          const story = renderArithmeticPrompt(
+            arithmeticItemForSkill(id, mulberry32(seed), tier).story,
+          );
+          expect(
+            ALL_NOUNS.some((n) => story.includes(n)),
+            `${story}: no personal noun`,
+          ).toBe(true);
+        }
+  });
+
+  it('any word-problem number ≥ 1000 comes with a big-number context', () => {
+    setLanguage('vi');
+    for (const id of ['mul-2d-1d-wp', 'mul-3d-1d-wp', 'div-2d-1d-wp'] as const)
+      for (const tier of [1, 2, 3] as SkillTier[])
+        for (let seed = 0; seed < 40; seed++) {
+          const story = renderArithmeticPrompt(
+            arithmeticItemForSkill(id, mulberry32(seed), tier).story,
+          );
+          if (renderedNumbers(story).some((n) => n >= 1000))
+            expect(
+              BIG_MARKERS.some((m) => story.includes(m)),
+              `${story}: number ≥ 1000 without a big-number context`,
+            ).toBe(true);
+        }
   });
 });

@@ -2,14 +2,32 @@
 // 2-digit WPs (B23, B26) stay one step; 3-digit mul WPs (B36) add a two-step form
 // (multiply, then use some up); div WPs ask "cần ít nhất bao nhiêu hộp?" and round
 // up when there is a remainder.
-import { type Rng, randInt } from '../learning/seeded-rng';
+// Big-number contexts (le, 22/11): counts in the hundreds belong to a warehouse, a
+// library or a school — never to one child's marbles or sweets. The 2-digit forms
+// keep the personal nouns.
+import { pick, type Rng, randInt } from '../learning/seeded-rng';
 import type { SkillTier } from '../learning/skill-tiers';
-import { pickName, pickNames, pickNoun } from '../reasoning/reasoning-distractors';
+import { pickName, pickNoun } from '../reasoning/reasoning-distractors';
 import type { ReasoningGenerator } from '../reasoning/reasoning-types';
 import { arithmeticItem, numberStep, ref } from './arithmetic-distractors';
 import { RANGE_99, RANGE_999 } from './arithmetic-ranges';
 import { countMulCarries, countSubBorrows } from './carry-count';
 import { pickMulPair } from './mul-generators';
+
+/** A big-number two-step context: the story key, the step-1 key (which names the
+ *  state after the first purchase), and the `i:` item for the generic final step. */
+const BIG_THEN_SUB = [
+  { story: 'wpMulThenSubRice', askFirst: 'askAfterFirstBuyRice', item: 'i:riceKg' },
+  { story: 'wpMulThenSubBooks', askFirst: 'askAfterFirstBuyBooks', item: 'i:book' },
+  { story: 'wpMulThenSubSchool', askFirst: 'askAfterFirstBuySchool', item: 'i:book' },
+] as const;
+
+/** A big-number "gấp n lần" context: the story key and its step key. */
+const BIG_TIMES = [
+  { story: 'wpMulTimesRice', ask: 'askTotalRice' },
+  { story: 'wpMulTimesBooks', ask: 'askTotalBooks' },
+  { story: 'wpMulTimesStudents', ask: 'askTotalStudents' },
+] as const;
 
 /** One step: n boxes with the same count in each (2-digit product ≤ 99). */
 const mulWp2d: ReasoningGenerator = (rng, tier) => {
@@ -21,10 +39,10 @@ const mulWp2d: ReasoningGenerator = (rng, tier) => {
   ]);
 };
 
-/** Two steps: n boxes with the same count, then use c up. */
+/** Two steps: a warehouse / library / school buys n boxes with the same count, then
+ *  uses c up. Step 1 names the state after the first purchase. */
 function mulThenSub(rng: Rng, tier: SkillTier, wantZero: boolean) {
-  const name = pickName(rng);
-  const item = pickNoun(rng);
+  const ctx = pick(rng, BIG_THEN_SUB);
   for (let t = 0; t < 500; t++) {
     const per = randInt(rng, 101, 999);
     const n = randInt(rng, 2, 9);
@@ -37,10 +55,10 @@ function mulThenSub(rng: Rng, tier: SkillTier, wantZero: boolean) {
     return arithmeticItem(
       'mul-3d-1d-wp',
       tier,
-      ref('wpMulThenSub', { name, item, per, n, c }),
+      ref(ctx.story, { per, n, c }),
       [
-        numberStep(ref('askAfterBuy', { name, item }), total),
-        numberStep(ref('askFinalLeft', { name, item }), total - c),
+        numberStep(ref(ctx.askFirst), total),
+        numberStep(ref('askFinalLeftBig', { item: ctx.item }), total - c),
       ],
       [total],
     );
@@ -52,22 +70,21 @@ function mulThenSub(rng: Rng, tier: SkillTier, wantZero: boolean) {
   return arithmeticItem(
     'mul-3d-1d-wp',
     tier,
-    ref('wpMulThenSub', { name, item, per, n, c }),
+    ref(ctx.story, { per, n, c }),
     [
-      numberStep(ref('askAfterBuy', { name, item }), total),
-      numberStep(ref('askFinalLeft', { name, item }), total - c),
+      numberStep(ref(ctx.askFirst), total),
+      numberStep(ref('askFinalLeftBig', { item: ctx.item }), total - c),
     ],
     [total],
   );
 }
 
-/** One step: one child has a, another has b times as many ("gấp b lần"). */
+/** One step: one warehouse / library / school has a, another has b times as many. */
 function mulTimes(rng: Rng, tier: SkillTier) {
   const [a, b] = pickMulPair(rng, RANGE_999, tier);
-  const [name, name2] = pickNames(rng);
-  const item = pickNoun(rng);
-  return arithmeticItem('mul-3d-1d-wp', tier, ref('wpMulTimes', { name, name2, item, a, b }), [
-    numberStep(ref('askTotal', { name: name2, item }), a * b),
+  const ctx = pick(rng, BIG_TIMES);
+  return arithmeticItem('mul-3d-1d-wp', tier, ref(ctx.story, { a, b }), [
+    numberStep(ref(ctx.ask), a * b),
   ]);
 }
 

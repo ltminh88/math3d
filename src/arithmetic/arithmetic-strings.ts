@@ -23,8 +23,15 @@ const vi = {
   divCalc: 'Tính: {a} : {b}.',
   divRemainderCalc: 'Tính: {a} : {b}.',
   wpMulGroups: '{name} có {n} hộp, mỗi hộp có {per} {item}.',
-  wpMulTimes: '{name} có {a} {item}. {name2} có gấp {b} lần số {item} của {name}.',
-  wpMulThenSub: '{name} có {n} hộp, mỗi hộp có {per} {item}. {name} dùng hết {c} {item}.',
+  wpMulTimesRice: 'Kho A có {a} kg gạo. Kho B có gấp {b} lần số gạo của kho A.',
+  wpMulTimesBooks:
+    'Thư viện A có {a} quyển sách. Thư viện B có gấp {b} lần số sách của thư viện A.',
+  wpMulTimesStudents: 'Trường A có {a} học sinh. Trường B có gấp {b} lần số học sinh của trường A.',
+  wpMulThenSubRice: 'Kho mua {n} bao, mỗi bao có {per} kg gạo. Kho xuất đi {c} kg gạo.',
+  wpMulThenSubBooks:
+    'Thư viện mua {n} thùng, mỗi thùng có {per} quyển sách. Thư viện cho mượn {c} quyển sách.',
+  wpMulThenSubSchool:
+    'Trường mua {n} thùng, mỗi thùng có {per} quyển sách. Trường phát cho học sinh {c} quyển sách.',
   wpDivShare: '{name} có {a} {item}. {name} chia đều cho {b} bạn.',
   wpDivBoxes: '{name} có {a} {item}. Mỗi hộp đựng được {b} {item}.',
   wpReduceTimes: '{name} có {a} {unit}. {name} giảm số đó đi {b} lần.',
@@ -38,6 +45,13 @@ const vi = {
   askLeft: 'Hỏi {name} còn lại bao nhiêu {item}?',
   askMore: 'Hỏi {name} có nhiều hơn {name2} bao nhiêu {item}?',
   askAfterBuy: 'Sau khi mua thêm, {name} có tất cả bao nhiêu {item}?',
+  askAfterFirstBuyRice: 'Sau lần mua thứ nhất, kho có tất cả bao nhiêu kg gạo?',
+  askAfterFirstBuyBooks: 'Sau lần mua thứ nhất, thư viện có tất cả bao nhiêu quyển sách?',
+  askAfterFirstBuySchool: 'Sau lần mua thứ nhất, trường có tất cả bao nhiêu quyển sách?',
+  askFinalLeftBig: 'Cuối cùng còn lại bao nhiêu {item}?',
+  askTotalRice: 'Hỏi kho B có tất cả bao nhiêu kg gạo?',
+  askTotalBooks: 'Hỏi thư viện B có tất cả bao nhiêu quyển sách?',
+  askTotalStudents: 'Hỏi trường B có tất cả bao nhiêu học sinh?',
   askFinalTotal: 'Cuối cùng {name} có tất cả bao nhiêu {item}?',
   askFinalLeft: 'Cuối cùng {name} còn lại bao nhiêu {item}?',
   askMissingDigit: 'Chữ số còn thiếu là mấy?',
@@ -60,6 +74,7 @@ const vi = {
   item_meter: 'm',
   item_ml: 'ml',
   item_gram: 'g',
+  item_riceKg: 'kg gạo',
 };
 
 const en = {
@@ -80,8 +95,17 @@ const en = {
   divCalc: 'Work out: {a} : {b}.',
   divRemainderCalc: 'Work out: {a} : {b}.',
   wpMulGroups: '{name} has {n} boxes with {per} {item} in each box.',
-  wpMulTimes: '{name} has {a} {item}. {name2} has {b} times as many {item} as {name}.',
-  wpMulThenSub: '{name} has {n} boxes with {per} {item} in each box. {name} uses {c} {item}.',
+  wpMulTimesRice:
+    'Warehouse A has {a} kg of rice. Warehouse B has {b} times as much rice as warehouse A.',
+  wpMulTimesBooks: 'Library A has {a} books. Library B has {b} times as many books as library A.',
+  wpMulTimesStudents:
+    'School A has {a} students. School B has {b} times as many students as school A.',
+  wpMulThenSubRice:
+    'The warehouse buys {n} sacks with {per} kg of rice in each. The warehouse ships out {c} kg of rice.',
+  wpMulThenSubBooks:
+    'The library buys {n} crates with {per} books in each. The library lends out {c} books.',
+  wpMulThenSubSchool:
+    'The school buys {n} crates with {per} books in each. The school gives {c} books to its students.',
   wpDivShare: '{name} has {a} {item}. {name} shares them equally among {b} friends.',
   wpDivBoxes: '{name} has {a} {item}. Each box holds {b} {item}.',
   wpReduceTimes: '{name} has {a} {unit}. {name} reduces that number {b} times.',
@@ -95,6 +119,14 @@ const en = {
   askLeft: 'How many {item} does {name} have left?',
   askMore: 'How many more {item} does {name} have than {name2}?',
   askAfterBuy: 'After buying more, how many {item} does {name} have in all?',
+  askAfterFirstBuyRice:
+    'After the first purchase, how many kg of rice does the warehouse have in all?',
+  askAfterFirstBuyBooks: 'After the first purchase, how many books does the library have in all?',
+  askAfterFirstBuySchool: 'After the first purchase, how many books does the school have in all?',
+  askFinalLeftBig: 'In the end, how many {item} are left?',
+  askTotalRice: 'How many kg of rice does warehouse B have in all?',
+  askTotalBooks: 'How many books does library B have in all?',
+  askTotalStudents: 'How many students does school B have in all?',
   askFinalTotal: 'In the end, how many {item} does {name} have in all?',
   askFinalLeft: 'In the end, how many {item} does {name} have left?',
   askMissingDigit: 'What is the missing digit?',
@@ -117,6 +149,7 @@ const en = {
   item_meter: 'm',
   item_ml: 'ml',
   item_gram: 'g',
+  item_riceKg: 'kg of rice',
 };
 
 const ns = defineStrings('arithmetic', { vi, en });
