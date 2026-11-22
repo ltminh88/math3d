@@ -97,13 +97,37 @@ describe('dialogRenderable', () => {
     expect(dialogRenderable(meas, () => false)).toBe(false);
   });
 
-  test('fraction scene-free items render; fraction scene items wait for the phase-16 renderer', () => {
+  test('fraction scene-free items render; fraction scene items render now (phase 16)', () => {
     for (const id of ['fraction-read', 'fraction-of-set-number', 'fraction-wp'])
       expect(dialogRenderable(itemForSkill(id, mulberry32(1), 1))).toBe(true);
     for (const id of ['fraction-shaded', 'fraction-pick-picture', 'fraction-of-set-circle']) {
       const item = itemForSkill(id, mulberry32(1), 1);
-      expect(dialogRenderable(item)).toBe(false);
-      expect(dialogRenderable(item, () => true)).toBe(true);
+      expect(dialogRenderable(item)).toBe(true);
+      expect(dialogRenderable(item, () => false)).toBe(false);
+    }
+  });
+
+  test('numbers scene-free items render; numbers scene items render now (phase 16)', () => {
+    for (const id of [
+      'num-read-write-1000',
+      'num-neighbors-1000',
+      'num-compare-1000',
+      'num-order-1000',
+      'num-read-write-10000',
+      'num-compare-10000',
+      'num-order-10000',
+      'num-read-write-100000',
+      'num-expand-100000',
+      'num-compare-100000',
+      'num-order-100000',
+    ])
+      expect(dialogRenderable(itemForSkill(id, mulberry32(1), 1))).toBe(true);
+    // Tier 1 place-value / sequence carry no scene; tier 2+ draws one.
+    for (const id of ['num-place-value-1000', 'num-place-value-10000', 'num-sequence-1000']) {
+      expect(dialogRenderable(itemForSkill(id, mulberry32(1), 1))).toBe(true);
+      const item = itemForSkill(id, mulberry32(1), 2);
+      expect(dialogRenderable(item)).toBe(true);
+      expect(dialogRenderable(item, () => false)).toBe(false);
     }
   });
 

@@ -1,0 +1,41 @@
+/* Dialog scene pictures for the numbers/fraction families (phase 16): place-value
+   blocks, number line, fraction shapes, object sets. Own file so phase 17's
+   market css never conflicts with it. Labels reuse .ds-label (15 px) from
+   dialog-scene.css. */
+
+.ds-block {
+  fill: #d8ebcc;
+  stroke: #5a4632;
+  stroke-width: 2;
+}
+
+.ds-block-frame {
+  fill: none;
+  stroke: #b9b4aa;
+  stroke-width: 1.5;
+  stroke-dasharray: 4 3;
+}
+
+.ds-frac-part {
+  fill: #fffdf8;
+  stroke: #5a4632;
+  stroke-width: 2;
+}
+
+.ds-frac-shaded {
+  fill: #2f7cf6;
+  stroke: #5a4632;
+  stroke-width: 2;
+}
+
+.ds-set-item {
+  fill: #fffdf8;
+  stroke: #5a4632;
+  stroke-width: 2;
+}
+
+.ds-set-marked {
+  fill: #2f7cf6;
+  stroke: #5a4632;
+  stroke-width: 2;
+}
