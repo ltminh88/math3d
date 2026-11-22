@@ -51,7 +51,7 @@ async function expectFullProgress(page: Page): Promise<void> {
   for (const id of LEVELS) expect(snap?.levelProgress[id]?.completedAt, id).toBeGreaterThan(0);
   expect(snap?.levelProgress.bridge?.progress).toBe(6);
   expect(snap?.ownedCosmetics).toEqual([ITEM]);
-  expect(snap?.profile.settings.equipped['vlm-outfit']).toBe(ITEM);
+  expect(snap?.profile.settings.equipped.vlm.neck).toBe(ITEM);
   expect(snap?.wallet.coins).toBe(100);
   await expect(page.locator('#coins')).toHaveText('100');
 }
@@ -85,7 +85,7 @@ test('export after all levels and a purchase -> fresh context import restores ev
   await page.locator('#settings').click();
   await page.locator('#export-save-code').click();
   const code = await page.locator('#save-code-output').inputValue();
-  expect(code).toMatch(/^M3D5-[A-Za-z0-9_-]+-[0-9a-f]{8}$/);
+  expect(code).toMatch(/^M3D6-[A-Za-z0-9_-]+-[0-9a-f]{8}$/);
   await first.close();
 
   const fresh = await browser.newContext({ locale: 'vi-VN' });

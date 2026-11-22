@@ -43,8 +43,21 @@ function schemaFrom(migrations: readonly Migration[]): Map<string, StoreSchema> 
       };
     },
   };
-  for (const m of [...migrations].sort((a, b) => a.version - b.version))
-    void m.up(recorder as never, undefined as never);
+  // Data migrations (phase 23 v2 rewrites profiles) run against an empty stub: a fresh
+  // memory DB has no rows to transform, so getAll returns [] and put is a no-op. The
+  // real migration is covered by save-migrations.test.ts against fake-indexeddb.
+  const emptyTx = {
+    objectStore(_name: string) {
+      return {
+        getAll: async (): Promise<Row[]> => [],
+        put: async (): Promise<void> => undefined,
+      };
+    },
+  };
+  for (const m of [...migrations].sort((a, b) => a.version - b.version)) {
+    const result = m.up(recorder as never, emptyTx as never);
+    if (result instanceof Promise) result.catch(() => undefined);
+  }
   return schema;
 }
 

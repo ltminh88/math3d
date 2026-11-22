@@ -2,11 +2,15 @@
 // JSON with short keys and defaults omitted:
 //   x xp · c coins · a avatar id · g [table, combo, started] · s [sound, music]
 //   n committed sessions · l {levelId: [stars, bestScore, completedSec, progress, acceptedSec]}
-//   o owned cosmetic ids · e {slot: equipped id} · f fact tuples (save-code-v2-facts.ts)
+//   o owned cosmetic ids · e equipped (M3D6 shape {vlm, avatar, decor}; M3D2–M3D5 codes carry
+//   the old {slot: id} map, which decodes to the same model — phase 23) · f fact tuples
+//   (save-code-v2-facts.ts)
 // Decoding is strict (unknown key, wrong type or out-of-range value -> null): a code is pasted
 // text, so nothing in it reaches the store unchecked. M3D3 (save-code-v3-payload.ts) reuses the
 // same fields with its own level set and adds skills; M3D2 itself never changes.
 import { isSkillKey } from '../learning/fact-key';
+import { PLACEMENT_BY_ID } from '../shop/cosmetic-anchors';
+import { migrateEquippedV1 } from '../shop/equipped-cosmetics';
 import { BRIDGE_LEVEL_ID } from './legacy-save-import';
 import type { ProgressRecords } from './profile-replacement';
 import type { GameSnapshot } from './progress-repository';
@@ -17,7 +21,12 @@ import {
   toEpochSec,
   tuplesToFacts,
 } from './save-code-v2-facts';
-import { DEFAULT_GAME_META } from './save-schema';
+import {
+  type CharacterAnchor,
+  DEFAULT_GAME_META,
+  type EquippedCosmetics,
+  isEquippedEmpty,
+} from './save-schema';
 
 export interface SaveCodeAudio {
   sound: boolean;
@@ -84,7 +93,7 @@ export function snapshotToCompactFields(
     );
   if (snapshot.ownedCosmetics.length) out.o = [...snapshot.ownedCosmetics];
   const equipped = profile.settings.equipped;
-  if (Object.keys(equipped).length) out.e = { ...equipped };
+  if (!isEquippedEmpty(equipped)) out.e = { ...equipped };
   const facts = Object.entries(snapshot.factStats).filter(
     ([key, s]) => s.attempts > 0 && !isSkillKey(key),
   );
@@ -142,11 +151,56 @@ function decodeCosmetics(owned: unknown, equipped: unknown): ProgressRecords['co
   if (!Array.isArray(o) || o.length > MAX_COSMETICS) return null;
   if (!o.every((id) => typeof id === 'string' && ID_PATTERN.test(id))) return null;
   if (new Set(o).size !== o.length || !isPlainObject(e)) return null;
+  // New shape (M3D6): {vlm, avatar, decor} — every version's decoder accepts it, so a
+  // code round-trips whatever the snapshot wears.
+  if ('vlm' in e || 'avatar' in e || 'decor' in e) {
+    const decoded = decodeEquippedV6(e);
+    if (!decoded) return null;
+    return { owned: [...(o as string[])], equipped: decoded };
+  }
+  // Old shape (M3D2–M3D5): {slot: id} — maps to the multi-equip model on import
+  // (phase 23): the same items stay worn, the 'none' sentinel and unknown ids drop.
   const slots = Object.entries(e);
   if (slots.length > MAX_SLOTS) return null;
   if (!slots.every(([k, v]) => ID_PATTERN.test(k) && typeof v === 'string' && ID_PATTERN.test(v)))
     return null;
-  return { owned: [...(o as string[])], equipped: { ...(e as Record<string, string>) } };
+  return { owned: [...(o as string[])], equipped: migrateEquippedV1(e as Record<string, string>) };
+}
+
+/**
+ * The M3D6 `e` field ({vlm, avatar, decor}) -> the multi-equip model, or null for
+ * anything malformed. A well-formed unknown id, or a known item in the wrong spot,
+ * is dropped (M3D5 leniency), never a reason to reject the whole code.
+ */
+export function decodeEquippedV6(raw: unknown): EquippedCosmetics | null {
+  if (!isPlainObject(raw)) return null;
+  if (!Object.keys(raw).every((k) => k === 'vlm' || k === 'avatar' || k === 'decor')) return null;
+  const vlm: Partial<Record<CharacterAnchor, string>> = {};
+  const avatar: Partial<Record<CharacterAnchor, string>> = {};
+  const decor: string[] = [];
+  for (const owner of ['vlm', 'avatar'] as const) {
+    const spots = raw[owner];
+    if (spots === undefined) continue;
+    if (!isPlainObject(spots)) return null;
+    for (const [anchor, id] of Object.entries(spots)) {
+      if (anchor !== 'head' && anchor !== 'neck' && anchor !== 'back') return null;
+      if (typeof id !== 'string' || !ID_PATTERN.test(id)) return null;
+      const placement = PLACEMENT_BY_ID[id];
+      if (!placement || placement.owner !== owner || placement.anchor !== anchor) continue;
+      (owner === 'vlm' ? vlm : avatar)[anchor] = id;
+    }
+  }
+  const rawDecor = raw.decor;
+  if (rawDecor !== undefined) {
+    if (!Array.isArray(rawDecor) || rawDecor.length > MAX_COSMETICS) return null;
+    if (!rawDecor.every((id) => typeof id === 'string' && ID_PATTERN.test(id))) return null;
+    if (new Set(rawDecor).size !== rawDecor.length) return null;
+    for (const id of rawDecor as string[]) {
+      if (PLACEMENT_BY_ID[id]?.owner !== 'decor') continue;
+      decor.push(id);
+    }
+  }
+  return { vlm, avatar, decor };
 }
 
 /**

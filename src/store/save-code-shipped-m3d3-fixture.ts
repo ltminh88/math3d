@@ -86,7 +86,7 @@ export const SHIPPED_M3D3_IMPORT = {
     },
     cosmetics: {
       owned: [],
-      equipped: {},
+      equipped: { vlm: {}, avatar: {}, decor: [] },
     },
     sessionCount: 3,
   },

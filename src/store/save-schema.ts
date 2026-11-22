@@ -3,12 +3,38 @@ import type { FactStat, SessionDelta } from '../learning/learning-types';
 
 export type { FactLocalState, FactStat, SessionDelta } from '../learning/learning-types';
 
-export const SCHEMA_VERSION = 1;
+export const SCHEMA_VERSION = 2;
 export const DB_NAME = 'math3d';
 
+/** A body spot on a character (phase 23: one item per spot, per character). */
+export type CharacterAnchor = 'head' | 'neck' | 'back';
+
+/**
+ * What a profile wears (phase 23): one item per body spot per character, plus every
+ * placed village decoration. Replaces the old slot -> id map (`Record<string, string>`,
+ * one item per slot) — see migrateEquippedV1 in shop/equipped-cosmetics.ts.
+ */
+export interface EquippedCosmetics {
+  readonly vlm: Partial<Record<CharacterAnchor, string>>;
+  readonly avatar: Partial<Record<CharacterAnchor, string>>;
+  readonly decor: readonly string[];
+}
+
+export const EMPTY_EQUIPPED: Readonly<EquippedCosmetics> = {
+  vlm: {},
+  avatar: {},
+  decor: [],
+};
+
+/** Nothing worn and nothing placed. */
+export const isEquippedEmpty = (equipped: EquippedCosmetics): boolean =>
+  Object.keys(equipped.vlm).length === 0 &&
+  Object.keys(equipped.avatar).length === 0 &&
+  equipped.decor.length === 0;
+
 export interface ProfileSettings {
-  /** slot -> equipped cosmetic id */
-  equipped: Record<string, string>;
+  /** What the profile wears (phase 23 model). */
+  equipped: EquippedCosmetics;
 }
 
 export interface Profile {
@@ -113,6 +139,6 @@ export function newProfile(id: string, kind: Profile['kind'] = 'guest'): Profile
     nickname: '',
     avatarId: 'default',
     unlockFailures: 0,
-    settings: { equipped: {} },
+    settings: { equipped: { vlm: {}, avatar: {}, decor: [] } },
   };
 }

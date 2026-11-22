@@ -1,10 +1,11 @@
-// Keeps the world in step with the store: one mesh per filled slot, attached to VLM, the player
-// or the village decor slot. A slot whose item changed drops its old mesh (geometry disposed;
-// the shared material stays), so equip/unequip cycles never leak GPU geometry. Nothing is built
-// while nothing is equipped, so the world is untouched then.
+// Keeps the world in step with the store: one mesh per worn item, attached to VLM, the
+// player or its own village spot. A worn item that changed drops its old mesh (geometry
+// disposed; the shared material stays), so equip/unequip cycles never leak GPU geometry.
+// Nothing is built while nothing is equipped, so the world is untouched then.
 import type { Mesh, Object3D } from 'three';
 import { VILLAGE_DECOR_SLOT } from '../config/regions';
 import type { GameSnapshot } from '../store/progress-repository';
+import type { EquippedCosmetics } from '../store/save-schema';
 import {
   type AnchorPoint,
   type CharacterAnchors,
@@ -13,8 +14,9 @@ import {
 } from '../world/characters-milo-avatar';
 import type { ObstacleCircle } from '../world/world-build-context';
 import type { WorldPublicApi } from '../world/world-public-api';
-import { COSMETIC_SLOTS, type CosmeticItem, type CosmeticSlot } from './cosmetic-catalog';
-import { equippedItem } from './shop-purchase-flow';
+import { type CosmeticItem, cosmeticById } from './cosmetic-catalog';
+import { equippedIds } from './equipped-cosmetics';
+import { equippedOf } from './shop-purchase-flow';
 import { partsMesh } from './vertex-color-parts';
 
 /** Collision circle of a placed decoration (all fit inside it). */
@@ -26,59 +28,71 @@ interface Worn {
   readonly obstacle?: ObstacleCircle;
 }
 
+/** Every worn item of a snapshot, in wear order (VLM spots, avatar spots, decor). */
+const wornItems = (snapshot: GameSnapshot): CosmeticItem[] => {
+  const equipped: EquippedCosmetics = equippedOf(snapshot);
+  const items: CosmeticItem[] = [];
+  for (const id of equippedIds(equipped)) {
+    const item = cosmeticById(id);
+    if (item) items.push(item);
+  }
+  return items;
+};
+
 export class EquippedCosmeticsApplier {
-  private readonly worn = new Map<CosmeticSlot, Worn>();
+  private readonly worn = new Map<string, Worn>();
 
   constructor(private readonly world: WorldPublicApi) {}
 
   // No redraw request here: equipping while the shop dialog is open would pay one full 3D render per swap (shop:143 times out on tablet-portrait); the card flips immediately and the scene refreshes when the dialog closes.
   apply(snapshot: GameSnapshot): void {
-    for (const slot of COSMETIC_SLOTS) {
-      const item = equippedItem(snapshot, slot);
-      const current = this.worn.get(slot);
-      if (current?.item === item) continue;
-      if (current) this.detach(slot, current);
-      if (item) this.attach(slot, item);
+    const wanted = new Map(wornItems(snapshot).map((item) => [item.id, item]));
+    for (const [id, current] of [...this.worn]) {
+      if (wanted.get(id) === current.item) continue;
+      this.detach(id, current);
+    }
+    for (const item of wanted.values()) {
+      if (!this.worn.has(item.id)) this.attach(item);
     }
   }
 
-  /** The mesh worn in `slot` (tests and the debug hook read the scene through it). */
-  meshIn(slot: CosmeticSlot): Mesh | undefined {
-    return this.worn.get(slot)?.mesh;
+  /** The mesh of a worn item (tests and the debug hook read the scene through it). */
+  meshOf(itemId: string): Mesh | undefined {
+    return this.worn.get(itemId)?.mesh;
   }
 
-  private mount(slot: CosmeticSlot, item: CosmeticItem): { parent: Object3D; at: AnchorPoint } {
-    if (slot === 'village-decor' || item.anchor === 'ground') {
-      const [x, z] = VILLAGE_DECOR_SLOT.position;
+  private mount(item: CosmeticItem): { parent: Object3D; at: AnchorPoint } {
+    if (item.anchor === 'ground') {
+      const [x, z] = item.spot ?? VILLAGE_DECOR_SLOT.position;
       return { parent: this.world.scene, at: [x, 0, z] };
     }
-    const anchors: CharacterAnchors = slot === 'vlm-outfit' ? GUIDE_ANCHORS : PLAYER_ANCHORS;
-    const parent = slot === 'vlm-outfit' ? this.world.milo : this.world.player;
+    const anchors: CharacterAnchors = item.slot === 'vlm-outfit' ? GUIDE_ANCHORS : PLAYER_ANCHORS;
+    const parent = item.slot === 'vlm-outfit' ? this.world.milo : this.world.player;
     return { parent, at: anchors[item.anchor] };
   }
 
-  private attach(slot: CosmeticSlot, item: CosmeticItem): void {
-    const { parent, at } = this.mount(slot, item);
+  private attach(item: CosmeticItem): void {
+    const { parent, at } = this.mount(item);
     const mesh = partsMesh(`cosmetic:${item.id}`, item.buildParts());
     mesh.position.set(...at);
     if (parent === this.world.scene) mesh.rotation.y = VILLAGE_DECOR_SLOT.facing;
-    mesh.userData.cosmeticSlot = slot;
+    mesh.userData.cosmeticSlot = item.slot;
     parent.add(mesh);
     let obstacle: ObstacleCircle | undefined;
-    if (slot === 'village-decor') {
+    if (item.anchor === 'ground') {
       obstacle = { x: at[0], z: at[2], radius: DECOR_RADIUS };
       this.world.obstacles.push(obstacle);
     }
-    this.worn.set(slot, { item, mesh, obstacle });
+    this.worn.set(item.id, { item, mesh, obstacle });
   }
 
-  private detach(slot: CosmeticSlot, worn: Worn): void {
+  private detach(id: string, worn: Worn): void {
     worn.mesh.removeFromParent();
     worn.mesh.geometry.dispose();
     if (worn.obstacle) {
       const index = this.world.obstacles.indexOf(worn.obstacle);
       if (index >= 0) this.world.obstacles.splice(index, 1);
     }
-    this.worn.delete(slot);
+    this.worn.delete(id);
   }
 }

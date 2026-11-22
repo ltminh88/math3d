@@ -182,16 +182,18 @@ export async function openGameStore(options: OpenStoreOptions = {}): Promise<Gam
       });
     },
 
-    equipCosmetic(slot, cosmeticId) {
+    setEquipped(equipped) {
       return write(async () => {
-        if (slot === '' || cosmeticId === '')
-          throw new Error('equipCosmetic: slot and id are required');
         const { profile: current } = snapshot;
         await saveHeldProfile({
           ...current,
           settings: {
             ...current.settings,
-            equipped: { ...current.settings.equipped, [slot]: cosmeticId },
+            equipped: {
+              vlm: { ...equipped.vlm },
+              avatar: { ...equipped.avatar },
+              decor: [...equipped.decor],
+            },
           },
         });
       });

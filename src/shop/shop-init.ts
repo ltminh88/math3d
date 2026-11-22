@@ -6,7 +6,6 @@ import { SHOP_STALL } from '../config/regions';
 import type { GameStore } from '../store/game-store-api';
 import { gameState } from '../ui/game-state';
 import { connectedStore } from '../ui/progress-sync';
-import type { CosmeticSlot } from './cosmetic-catalog';
 import { EquippedCosmeticsApplier } from './equipped-cosmetics-applier';
 import { openShop } from './shop-panel';
 import { buildShopStall, STALL_REACH } from './shop-stall-builder';
@@ -38,6 +37,6 @@ export function initShop(): void {
   }
 }
 
-/** Name of the mesh worn in `slot` (test hook and e2e read the scene through it). */
-export const wornCosmeticName = (slot: CosmeticSlot): string | undefined =>
-  applier?.meshIn(slot)?.name;
+/** Name of the mesh of a worn item (test hook and e2e read the scene through it). */
+export const wornCosmeticName = (itemId: string): string | undefined =>
+  applier?.meshOf(itemId)?.name;

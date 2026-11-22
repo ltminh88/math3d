@@ -1,16 +1,15 @@
 // Pure shop rules over the game store: what an item's state is, and buy/equip/unequip calls that
 // refuse early (no store write) when the rule says no. The store stays the only writer.
+// Phase 23: VLM and the avatar each wear one item per body spot (head/neck/back); village
+// decor is an open list. The equipped value is computed by the reducer in
+// equipped-cosmetics.ts and written wholesale with setEquipped.
 import type { GameStore } from '../store/game-store-api';
 import type { GameSnapshot } from '../store/progress-repository';
-import { type CosmeticItem, type CosmeticSlot, cosmeticById } from './cosmetic-catalog';
+import type { CharacterAnchor, EquippedCosmetics } from '../store/save-schema';
+import { type CosmeticItem, cosmeticById } from './cosmetic-catalog';
+import { isEquipped, unwearItem, wearItem } from './equipped-cosmetics';
 
-/**
- * Equipped value of an empty slot. The store requires a non-empty id and has no "unequip", so an
- * emptied slot stores this sentinel (never a catalog id).
- */
-export const UNEQUIPPED = 'none';
-
-export type ShopStore = Pick<GameStore, 'getSnapshot' | 'purchaseCosmetic' | 'equipCosmetic'>;
+export type ShopStore = Pick<GameStore, 'getSnapshot' | 'purchaseCosmetic' | 'setEquipped'>;
 export type ItemState = 'equipped' | 'owned' | 'affordable' | 'too-expensive';
 export type BuyResult =
   | { ok: true }
@@ -21,10 +20,38 @@ export type EquipResult = { ok: true } | { ok: false; reason: 'not-owned' };
 const owns = (snapshot: GameSnapshot, item: CosmeticItem): boolean =>
   snapshot.ownedCosmetics.includes(item.id);
 
-/** The owned catalog item worn in `slot`, if any (stale, unknown or foreign ids are ignored). */
-export function equippedItem(snapshot: GameSnapshot, slot: CosmeticSlot): CosmeticItem | undefined {
-  const item = cosmeticById(snapshot.profile.settings.equipped[slot] ?? UNEQUIPPED);
-  return item && item.slot === slot && owns(snapshot, item) ? item : undefined;
+const isCharacterAnchor = (a: string): a is CharacterAnchor =>
+  a === 'head' || a === 'neck' || a === 'back';
+
+/** The equipped value of a snapshot (never the raw stored map: stale ids are ignored). */
+export function equippedOf(snapshot: GameSnapshot): EquippedCosmetics {
+  const raw = snapshot.profile.settings.equipped;
+  const vlm: Partial<Record<CharacterAnchor, string>> = {};
+  const avatar: Partial<Record<CharacterAnchor, string>> = {};
+  const decor: string[] = [];
+  for (const [owner, spots] of [
+    ['vlm', vlm],
+    ['avatar', avatar],
+  ] as const) {
+    const slot = owner === 'vlm' ? 'vlm-outfit' : 'avatar-outfit';
+    for (const [anchor, id] of Object.entries(raw[owner])) {
+      const item = id && cosmeticById(id);
+      if (
+        item &&
+        item.slot === slot &&
+        isCharacterAnchor(anchor) &&
+        item.anchor === anchor &&
+        owns(snapshot, item)
+      )
+        spots[anchor] = id;
+    }
+  }
+  for (const id of raw.decor) {
+    const item = cosmeticById(id);
+    if (item && item.slot === 'village-decor' && owns(snapshot, item) && !decor.includes(id))
+      decor.push(id);
+  }
+  return { vlm, avatar, decor };
 }
 
 /** Coins still needed to buy `item` (0 when affordable). */
@@ -32,7 +59,7 @@ export const missingCoins = (item: CosmeticItem, snapshot: GameSnapshot): number
   Math.max(0, item.price - snapshot.wallet.coins);
 
 export function itemState(item: CosmeticItem, snapshot: GameSnapshot): ItemState {
-  if (equippedItem(snapshot, item.slot) === item) return 'equipped';
+  if (isEquipped(equippedOf(snapshot), item)) return 'equipped';
   if (owns(snapshot, item)) return 'owned';
   return missingCoins(item, snapshot) > 0 ? 'too-expensive' : 'affordable';
 }
@@ -53,10 +80,12 @@ export async function buyCosmetic(store: ShopStore, item: CosmeticItem): Promise
 }
 
 export async function equipCosmetic(store: ShopStore, item: CosmeticItem): Promise<EquipResult> {
-  if (!owns(store.getSnapshot(), item)) return { ok: false, reason: 'not-owned' };
-  await store.equipCosmetic(item.slot, item.id);
+  const snapshot = store.getSnapshot();
+  if (!owns(snapshot, item)) return { ok: false, reason: 'not-owned' };
+  await store.setEquipped(wearItem(equippedOf(snapshot), item));
   return { ok: true };
 }
 
-export const unequipSlot = (store: ShopStore, slot: CosmeticSlot): Promise<void> =>
-  store.equipCosmetic(slot, UNEQUIPPED);
+/** Takes `item` off (a no-op when it is not worn); other worn items stay on. */
+export const unequipItem = (store: ShopStore, item: CosmeticItem): Promise<void> =>
+  store.setEquipped(unwearItem(equippedOf(store.getSnapshot()), item));

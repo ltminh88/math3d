@@ -93,7 +93,9 @@ export const SHIPPED_M3D2_IMPORT = {
     cosmetics: {
       owned: ['avatar-gold-crown'],
       equipped: {
-        'avatar-outfit': 'avatar-gold-crown',
+        vlm: {},
+        avatar: { head: 'avatar-gold-crown' },
+        decor: [],
       },
     },
     sessionCount: 12,

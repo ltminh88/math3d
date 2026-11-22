@@ -5,7 +5,8 @@ import { MIGRATIONS, type Migration } from './save-migrations';
 
 let n = 0;
 const name = () => `open-db-${++n}`;
-const withV2: Migration[] = [...MIGRATIONS, { version: 2, up() {} }];
+/** A version past the shipped schema (phase 23 ships v2). */
+const withV3: Migration[] = [...MIGRATIONS, { version: 3, up() {} }];
 
 function openRawIgnoringVersionChange(dbName: string): Promise<IDBDatabase> {
   return new Promise((resolve, reject) => {
@@ -20,7 +21,7 @@ describe('openGameDb connection lifecycle', () => {
     const dbName = name();
     const stale = await openRawIgnoringVersionChange(dbName);
     await expect(
-      openGameDb({ name: dbName, migrations: withV2, blockedTimeoutMs: 20 }),
+      openGameDb({ name: dbName, migrations: withV3, blockedTimeoutMs: 20 }),
     ).rejects.toBeInstanceOf(DbBlockedError);
     stale.close();
   });
@@ -28,8 +29,13 @@ describe('openGameDb connection lifecycle', () => {
   it('closes its own connection when a newer version needs to upgrade, and reports it', async () => {
     const dbName = name();
     const onVersionChange = vi.fn();
-    const old = await openGameDb({ name: dbName, onVersionChange });
-    const upgraded = await openGameDb({ name: dbName, migrations: withV2, blockedTimeoutMs: 500 });
+    const old = await openGameDb({
+      name: dbName,
+      migrations: MIGRATIONS.slice(0, 1),
+      onVersionChange,
+    });
+    expect(old.version).toBe(1);
+    const upgraded = await openGameDb({ name: dbName, blockedTimeoutMs: 500 });
     expect(upgraded.version).toBe(2);
     expect(onVersionChange).toHaveBeenCalledTimes(1);
     expect(() => old.transaction('meta')).toThrow();
