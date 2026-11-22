@@ -134,6 +134,57 @@ async function playLessonRun(page: Page, touch: boolean): Promise<number> {
   return items;
 }
 
+// Hotfix P0 (22/11): the profile id is pinned (crypto.randomUUID stubbed) so a fresh
+// B2 run is deterministic — its mental-round item is "700 + 300" = 1000 (verified
+// offline with lessonSeed + planLessonRun; the profile id is the only seed input a
+// fresh run has). Without the pin, the B2 seed varies per run and the 4-digit answer
+// only shows up by luck (that is how it slipped past #51's green CI and only failed
+// on #52's tablet-landscape shard).
+const PINNED_PROFILE_UUID = '00000000-0000-4000-8000-000000000005';
+
+async function pinProfileUuid(page: Page): Promise<void> {
+  await page.addInitScript((uuid: string) => {
+    Object.defineProperty(Crypto.prototype, 'randomUUID', {
+      value: () => uuid,
+      configurable: true,
+    });
+  }, PINNED_PROFILE_UUID);
+}
+
+/** Like playLessonRun, but also reports whether a number step with a ≥ 1000 answer was solved. */
+async function playLessonRunTracked(
+  page: Page,
+  touch: boolean,
+): Promise<{ items: number; sawThousand: boolean }> {
+  let items = 0;
+  let sawThousand = false;
+  for (;;) {
+    const state = await page.evaluate(() => window.__lesson?.state() ?? null);
+    if (!state) throw new Error('lesson hook missing');
+    if (state.index >= state.total) break;
+    items += 1;
+    if (state.kind === 'quiz') await solveQuizItem(page, touch);
+    else {
+      const steps = await page.evaluate(() => {
+        const h = window.__lesson;
+        return h ? (h.steps() as PlannedStep[] | null) : null;
+      });
+      if (steps?.some((s) => s.kind === 'number' && s.answer >= 1000)) sawThousand = true;
+      await solveSkillItem(page, touch);
+    }
+    const nextQuiz = page.locator('#dialog-content #next-question');
+    const nextSkill = page.locator('#dialog-content .daily-next');
+    if (await nextQuiz.isVisible()) {
+      if (touch) await nextQuiz.tap();
+      else await nextQuiz.click();
+    } else if (await nextSkill.isVisible()) {
+      if (touch) await nextSkill.tap();
+      else await nextSkill.click();
+    } else throw new Error('no next button after solving an item');
+  }
+  return { items, sawThousand };
+}
+
 async function openTopic(page: Page, topic: number, touch: boolean): Promise<void> {
   const summary = page.locator(`details.lesson-topic[data-topic="${topic}"] summary`);
   const details = page.locator(`details.lesson-topic[data-topic="${topic}"]`);
@@ -280,6 +331,103 @@ test('run B2: answer all 6, stars before/after show, coins in store, picker star
   await waitDialogSettled(page);
   await page.locator('#close-dialog').click();
   await expect(page.locator('#dialog')).not.toHaveAttribute('open', '');
+});
+
+test('B2 four-digit answer: 700 + 300 types 1000 and completes the step', async ({
+  page,
+}, info) => {
+  const touch = isTouch(info);
+  await pinProfileUuid(page);
+  await boot(page);
+  await openPicker(page, touch);
+  await pickLesson(page, 2, touch);
+  await expect(page.locator('#dialog-content')).toContainText(
+    'Bài 2 · Cộng, trừ trong phạm vi 1 000 · Câu 1/6',
+  );
+  const { items, sawThousand } = await playLessonRunTracked(page, touch);
+  expect(items).toBe(6);
+  expect(sawThousand, 'the run contains a 4-digit answer step').toBe(true);
+  const content = page.locator('#dialog-content');
+  await expect(content).toContainText('Xong bài 2!');
+  await expect(content).toContainText('☆☆☆ → ★☆☆');
+  await waitDialogSettled(page);
+  await page.locator('#close-dialog').click();
+  await expect(page.locator('#dialog')).not.toHaveAttribute('open', '');
+});
+
+test('B2 pad fits six digits: typing 100000 shows all six, keys stay ≥ 44 px, no overflow', async ({
+  page,
+}, info) => {
+  const touch = isTouch(info);
+  await pinProfileUuid(page);
+  await boot(page);
+  await openPicker(page, touch);
+  await pickLesson(page, 2, touch);
+  // Play until the item whose number step answers 1000, then check the pad there.
+  for (;;) {
+    const state = await page.evaluate(() => window.__lesson?.state() ?? null);
+    if (!state) throw new Error('lesson hook missing');
+    if (state.index >= state.total) throw new Error('1000-answer item not found in B2 run');
+    if (state.kind === 'quiz') await solveQuizItem(page, touch);
+    else {
+      const steps = await page.evaluate(() => {
+        const h = window.__lesson;
+        return h ? (h.steps() as PlannedStep[] | null) : null;
+      });
+      const bigIndex = steps?.findIndex((s) => s.kind === 'number' && s.answer >= 1000) ?? -1;
+      if (bigIndex >= 0) {
+        const panel = page.locator('#dialog-content');
+        const row = panel.locator('.daily-steps .kit-step').nth(bigIndex);
+        const pad = row.locator('.kit-pad');
+        await expect(pad).toBeVisible();
+        // Type six digits without submitting: the display must show all six.
+        if (touch) {
+          for (const digit of '100000')
+            await pad.getByRole('button', { name: digit, exact: true }).tap();
+        } else {
+          await blur(page);
+          await page.keyboard.type('100000');
+        }
+        await expect(pad.locator('.kit-pad__display')).toHaveText('100000');
+        // The pad stays inside the dialog and its keys stay tappable (≥ 44 px).
+        const padBox = await pad.boundingBox();
+        const dialogBox = await panel.boundingBox();
+        if (!padBox || !dialogBox) throw new Error('pad/dialog have no box');
+        expect(padBox.x, 'pad inside dialog (left)').toBeGreaterThanOrEqual(dialogBox.x - 1);
+        expect(padBox.x + padBox.width, 'pad inside dialog (right)').toBeLessThanOrEqual(
+          dialogBox.x + dialogBox.width + 1,
+        );
+        const keys = pad.locator('.kit-pad__key');
+        expect(await keys.count()).toBe(12);
+        for (let i = 0; i < 12; i++) {
+          const keyBox = await keys.nth(i).boundingBox();
+          if (!keyBox) throw new Error('pad key has no box');
+          expect(keyBox.width, `pad key ${i} width`).toBeGreaterThanOrEqual(44);
+          expect(keyBox.height, `pad key ${i} height`).toBeGreaterThanOrEqual(44);
+        }
+        // Clear the six digits, then answer the step correctly.
+        if (touch) {
+          for (let i = 0; i < 6; i++) await pad.locator('.kit-pad__key', { hasText: '⌫' }).tap();
+        } else {
+          for (let i = 0; i < 6; i++) await page.keyboard.press('Backspace');
+        }
+        await expect(pad.locator('.kit-pad__display')).toHaveText('');
+        await typeNumber(page, pad, 1000, touch);
+        await expect(row).toHaveClass(/kit-step--done/);
+        return;
+      }
+      await solveSkillItem(page, touch);
+    }
+    const nextQuiz = page.locator('#dialog-content #next-question');
+    const nextSkill = page.locator('#dialog-content .daily-next');
+    if (await nextQuiz.isVisible()) {
+      if (touch) await nextQuiz.tap();
+      else await nextQuiz.click();
+    } else if (await nextSkill.isVisible()) {
+      if (touch) await nextSkill.tap();
+      else await nextSkill.click();
+    } else throw new Error('no next button after solving an item');
+  }
 });
 
 test('run B26: answer all 6, remainder two-step by tap, stars before/after show, coins in store, picker stars update', async ({

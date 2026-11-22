@@ -51,6 +51,8 @@ class FakeElement {
 const created: FakeElement[] = [];
 const fakeDocument = {
   body: new FakeElement(),
+  // The number pad listens for physical keys on the document; the fake ignores them.
+  addEventListener: (): void => {},
   createElement: (tag: string) => {
     const element = new FakeElement();
     element.tagName = tag;
@@ -130,5 +132,83 @@ describe('createStepCard double finish', () => {
     expect(() => buttons[0]?.click()).not.toThrow();
     expect(card.currentStep()).toBe(1);
     expect(completed).toHaveLength(1);
+  });
+});
+
+// Hotfix P0 (22/11): the dialog number pad capped answers at 3 digits, so a 1 000
+// answer could never be entered (the pad kept "100" and the step was marked wrong).
+// The pad's limit is a fixed 6 (enough for 100 000), never derived from the answer:
+// deriving it would leak the answer's digit count.
+function oneNumberItem(answer: number): ReasoningItem {
+  return {
+    skillId: 'sk:test',
+    tier: 1,
+    story: { key: 'story' },
+    steps: [{ kind: 'number', prompt: { key: 'prompt' }, answer }],
+    work: [],
+  } as unknown as ReasoningItem;
+}
+
+function mountNumber(answer: number): {
+  card: StepCard;
+  completed: number[];
+  answers: Array<{ stepIndex: number; correct: boolean; answer: unknown }>;
+  buttons: FakeElement[];
+} {
+  vi.stubGlobal('requestAnimationFrame', (callback: () => void) => {
+    callback();
+    return 0;
+  });
+  const completed: number[] = [];
+  const answers: Array<{ stepIndex: number; correct: boolean; answer: unknown }> = [];
+  const card = createStepCard(
+    oneNumberItem(answer),
+    {
+      render: () => 'x',
+      onAnswer: (event) => {
+        answers.push({ stepIndex: event.stepIndex, correct: event.correct, answer: event.answer });
+      },
+      onComplete: () => {
+        completed.push(1);
+      },
+    },
+    fakeDocument as unknown as Document,
+  );
+  const buttons = created.filter((element) => element.tagName === 'button');
+  return { card, completed, answers, buttons };
+}
+
+function tapDigits(buttons: FakeElement[], digits: string): void {
+  for (const digit of digits) {
+    const button = buttons.find((b) => b.textContent === digit);
+    expect(button).toBeDefined();
+    button?.click();
+  }
+  const ok = buttons.find((b) => b.textContent === '✓');
+  expect(ok).toBeDefined();
+  ok?.click();
+}
+
+describe('createStepCard number pad digit limit', () => {
+  it('accepts a 4-digit answer (1000)', () => {
+    const { card, completed, answers, buttons } = mountNumber(1000);
+    tapDigits(buttons, '1000');
+    expect(answers).toEqual([{ stepIndex: 0, correct: true, answer: 1000 }]);
+    expect(card.currentStep()).toBe(1);
+    expect(completed).toHaveLength(1);
+  });
+
+  it('accepts a 6-digit answer (100000)', () => {
+    const { card, completed, answers, buttons } = mountNumber(100000);
+    tapDigits(buttons, '100000');
+    expect(answers).toEqual([{ stepIndex: 0, correct: true, answer: 100000 }]);
+    expect(card.currentStep()).toBe(1);
+    expect(completed).toHaveLength(1);
+  });
+
+  it('allows 6 digits even when the answer is small (the limit is fixed, never derived from the answer)', () => {
+    const { answers, buttons } = mountNumber(5);
+    tapDigits(buttons, '123456');
+    expect(answers).toEqual([{ stepIndex: 0, correct: false, answer: 123456 }]);
   });
 });
