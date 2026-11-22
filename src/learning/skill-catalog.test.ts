@@ -97,8 +97,23 @@ describe('skill catalog', () => {
     expect(skillsOfFamily('measurement')).toHaveLength(12);
   });
 
-  it('the one remaining new family exists but has no skills yet (phase 02 scaffolding)', () => {
-    for (const family of ['arithmetic'] as const) expect(skillsOfFamily(family)).toEqual([]);
+  it('every new family has skills now (arithmetic landed in phase 09)', () => {
+    // Arithmetic landed in phase 09 (B2, B54-55, B63-64): its twelve skills are in
+    // the catalog, in entries order.
+    expect(skillsOfFamily('arithmetic')).toEqual([
+      'add-sub-mental-round',
+      'add-sub-1000',
+      'add-sub-1000-wp',
+      'add-sub-1000-chain',
+      'add-4digit',
+      'sub-4digit',
+      'add-sub-10000-wp',
+      'add-5digit',
+      'sub-5digit',
+      'add-sub-100000-wp',
+      'add-sub-find-error',
+      'add-missing-digit',
+    ]);
     // Fraction landed in phase 12 (B14): its six skills are in the catalog.
     expect(skillsOfFamily('fraction')).toEqual([
       'fraction-read',

@@ -3,6 +3,7 @@
 // item — no scene always renders, a scene renders only when its kind has a renderer.
 import { describe, expect, test } from 'vitest';
 import { ARITHMETIC_SKILLS, isArithmeticSkill } from '../arithmetic/arithmetic-item-for-skill';
+import { ARITHMETIC_ENTRIES } from '../arithmetic/arithmetic-skill-entries';
 import { DATA_SKILLS, isDataSkill } from '../data/data-item-for-skill';
 import { DATA_ENTRIES } from '../data/data-skill-entries';
 import { FRACTION_SKILLS, isFractionSkill } from '../fractions/fraction-item-for-skill';
@@ -40,12 +41,11 @@ describe('familyOfSkill', () => {
 });
 
 describe('new families (phase 02 scaffolding)', () => {
-  test('two families have no generator yet: is<F>Skill is false for every catalog id, <f>ItemForSkill throws', () => {
-    const checks = [[isArithmeticSkill, ARITHMETIC_SKILLS]] as const;
-    for (const [isSkill, skills] of checks) {
-      expect(skills).toEqual([]);
-      for (const { id } of SKILL_CATALOG) expect(isSkill(id), id).toBe(false);
-    }
+  test('arithmetic has generators (phase 09): every arithmetic catalog entry has a generator', () => {
+    // Derived from the entries file: the exact ids are pinned in skill-catalog.test.ts.
+    expect(ARITHMETIC_SKILLS).toEqual(ARITHMETIC_ENTRIES.map((e) => e.id));
+    for (const id of ARITHMETIC_SKILLS) expect(isArithmeticSkill(id)).toBe(true);
+    expect(isArithmeticSkill('wp-times-then-add')).toBe(false);
   });
 
   test('fraction has generators (phase 12): isFractionSkill is true for its six ids', () => {

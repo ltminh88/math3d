@@ -146,11 +146,15 @@ it('empty family topics stay hidden until their skills exist', () => {
     'geometry',
     'measurement',
     'number',
+    'arithmetic',
     'fraction',
     'time',
     'money',
     'data',
   ]);
-  for (const topic of ['arithmetic'] as const)
-    expect(topicProgress(stickers, topic)).toEqual({ earned: 0, total: 0 });
+  // Arithmetic landed in phase 09: twelve stickers, none earned yet.
+  expect(topicProgress(stickers, 'arithmetic')).toEqual({
+    earned: 0,
+    total: skillsOfFamily('arithmetic').length,
+  });
 });

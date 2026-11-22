@@ -135,6 +135,17 @@ describe('skillsOfLesson', () => {
     ]);
   });
 
+  it('returns the six arithmetic skills for B2 (phase 09)', () => {
+    expect(skillsOfLesson(2)).toEqual([
+      'sk:add-sub-mental-round',
+      'sk:add-sub-1000',
+      'sk:add-sub-1000-wp',
+      'sk:add-sub-1000-chain',
+      'sk:add-sub-find-error',
+      'sk:add-missing-digit',
+    ]);
+  });
+
   it('throws for unknown lesson numbers', () => {
     expect(() => skillsOfLesson(0)).toThrow();
     expect(() => skillsOfLesson(82)).toThrow();

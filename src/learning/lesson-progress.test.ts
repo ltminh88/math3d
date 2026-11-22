@@ -123,6 +123,34 @@ describe('lessonStars', () => {
     expect(lessonStars(74, statsOf(keys, 4))).toBe(3);
   });
 
+  it('B2: 0-3 by hand (phase 09 arithmetic skills)', () => {
+    const keys = [
+      'sk:add-sub-mental-round',
+      'sk:add-sub-1000',
+      'sk:add-sub-1000-wp',
+      'sk:add-sub-1000-chain',
+      'sk:add-sub-find-error',
+      'sk:add-missing-digit',
+    ] as const;
+    expect(lessonStars(2, {})).toBe(0);
+    expect(lessonStars(2, statsOf(keys, 2))).toBe(1); // all attempted, none >= 3
+    expect(lessonStars(2, statsOf(keys, 3))).toBe(2);
+    expect(lessonStars(2, statsOf(keys, 4))).toBe(3);
+  });
+
+  it('B54: 0-3 by hand (phase 09 4-digit skills)', () => {
+    const keys = [
+      'sk:add-4digit',
+      'sk:add-sub-10000-wp',
+      'sk:add-sub-find-error',
+      'sk:add-missing-digit',
+    ] as const;
+    expect(lessonStars(54, {})).toBe(0);
+    expect(lessonStars(54, statsOf(keys, 2))).toBe(1); // all attempted, none >= 3
+    expect(lessonStars(54, statsOf(keys, 3))).toBe(2);
+    expect(lessonStars(54, statsOf(keys, 4))).toBe(3);
+  });
+
   it('tables B5: the 70% share decides', () => {
     const facts = [...mulFactsForTables([3]), ...divFactsForTables([3])];
     expect(facts).toHaveLength(18);
@@ -148,8 +176,8 @@ describe('nextLesson', () => {
   });
 
   it('moves on once B3 is at 3 stars', () => {
-    // B1's six number skills are at box 4 too, so B1 is done; B3 at 3 stars
-    // (box 4) moves the pointer to B4.
+    // B1's six number skills and B2's six arithmetic skills are at box 4 too, so B1
+    // and B2 are done; B3 at 3 stars (box 4) moves the pointer to B4.
     const stats = statsOf(
       [
         'sk:num-read-write-1000',
@@ -158,6 +186,12 @@ describe('nextLesson', () => {
         'sk:num-compare-1000',
         'sk:num-order-1000',
         'sk:num-sequence-1000',
+        'sk:add-sub-mental-round',
+        'sk:add-sub-1000',
+        'sk:add-sub-1000-wp',
+        'sk:add-sub-1000-chain',
+        'sk:add-sub-find-error',
+        'sk:add-missing-digit',
         'sk:unknown-add-sub',
       ] as const,
       4,
@@ -166,8 +200,8 @@ describe('nextLesson', () => {
   });
 
   it('skips lessons with nothing playable yet', () => {
-    // B6 is the first lesson below 3 stars (B14's fraction skills landed in phase 12,
-    // but B6 comes first in textbook order). B1's six number skills are at box 4 too.
+    // B2 is the first lesson below 3 stars (its arithmetic skills landed in phase 09,
+    // but none are practised yet). B1's six number skills are at box 4 too.
     const stats = statsOf(
       [
         'sk:num-read-write-1000',
@@ -184,7 +218,7 @@ describe('nextLesson', () => {
       ],
       4,
     );
-    expect(nextLesson(stats)).toBe(6);
+    expect(nextLesson(stats)).toBe(2);
   });
 
   it('is undefined when every playable lesson is at 3 stars', () => {
@@ -221,8 +255,8 @@ describe('topicProgress', () => {
     expect(topicProgress(15, {})).toEqual({ completed: 0, total: 3 });
   });
 
-  it('topic 16 has 4 playable lessons (B76 via the Roman clock, B79, B80, B81; B77-B78 wait for numbers/arithmetic)', () => {
-    expect(topicProgress(16, {})).toEqual({ completed: 0, total: 4 });
+  it('topic 16 has 5 playable lessons (B76 via the Roman clock, B77 via phase 09 arithmetic, B79, B80, B81; B78 waits for phase 10/11)', () => {
+    expect(topicProgress(16, {})).toEqual({ completed: 0, total: 5 });
   });
 
   it('an unknown topic is empty', () => {

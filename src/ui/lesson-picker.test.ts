@@ -37,7 +37,7 @@ const B1_SKILLS: readonly FactKey[] = [
 ];
 
 describe('lessonPickerHtml', () => {
-  it('empty stats: continue is B1, 81 rows, 16 topics, topic 1 open at 0/6', () => {
+  it('empty stats: continue is B1, 81 rows, 16 topics, topic 1 open at 0/7', () => {
     const html = lessonPickerHtml({}, () => true);
     expect(html).toContain('id="lesson-continue"');
     expect(html).toContain('Học tiếp: Bài 1');
@@ -45,16 +45,16 @@ describe('lessonPickerHtml', () => {
     expect((html.match(/<button type="button" class="lesson-row"/g) ?? []).length).toBe(81);
     expect((html.match(/<details class="lesson-topic"/g) ?? []).length).toBe(16);
     expect(html).toContain('data-topic="1" open');
-    expect(html).toContain('>0/6<');
+    expect(html).toContain('>0/7<');
     expect(rowOf(html, 1)).toContain('data-stars="0"');
     expect(rowOf(html, 1)).not.toContain('disabled');
   });
 
   it('no-content lessons are disabled and show "Sắp có"', () => {
     const html = lessonPickerHtml({}, () => true);
-    // B2 has no skills yet (arithmetic lands in phase 09); B7 mixes nothing.
-    expect(rowOf(html, 2)).toContain('disabled');
-    expect(rowOf(html, 2)).toContain('Sắp có');
+    // B2 is playable now (arithmetic landed in phase 09); B7 mixes nothing.
+    expect(rowOf(html, 2)).not.toContain('disabled');
+    expect(rowOf(html, 2)).toContain('Cộng, trừ trong phạm vi 1 000');
     expect(rowOf(html, 7)).toContain('disabled');
     expect(rowOf(html, 7)).toContain('Sắp có');
     // B25 (division with remainder) is playable.
@@ -62,12 +62,12 @@ describe('lessonPickerHtml', () => {
     expect(rowOf(html, 25)).toContain('Phép chia hết, phép chia có dư');
   });
 
-  it('B1 at box 4: 3 stars, continue moves on to B3 (B2 still has nothing)', () => {
+  it('B1 at box 4: 3 stars, continue moves on to B2 (its arithmetic skills landed in phase 09)', () => {
     const stats: Record<FactKey, FactStat> = {};
     for (const key of B1_SKILLS) stats[key] = stat(4);
     const html = lessonPickerHtml(stats, () => true);
     expect(rowOf(html, 1)).toContain('data-stars="3"');
-    expect(html).toContain('Học tiếp: Bài 3');
-    expect(html).toContain('>1/6<');
+    expect(html).toContain('Học tiếp: Bài 2');
+    expect(html).toContain('>1/7<');
   });
 });

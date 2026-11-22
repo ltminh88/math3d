@@ -3,7 +3,7 @@
 // not by calling the helpers under test:
 //   B25 = div-rem-floor, div-rem-ceil, choose-all-correct, tf-explain (catalog lines 36-37, 49-50)
 //   B3  = unknown-add-sub only; B1 has the six number skills (phase 07); B2 has
-//         no skills yet; B7 mixes nothing; B14 =
+//         the six arithmetic skills (phase 09); B7 mixes nothing; B14 =
 //         the six fraction skills (phase 12)
 //   B5  = tables [3]: 9 mul facts (3x2..3x10) + 9 div facts (6/3..30/3), plus
 //         sk:pattern-skip-count (tagged 4, 5, 6, 9-12)
@@ -83,7 +83,7 @@ describe('planLessonRun', () => {
   });
 
   it('a lesson with no plannable skills returns [] (UI shows "Sắp có")', () => {
-    for (const n of [2, 7]) expect(planLessonRun(n, {}, mulberry32(4))).toEqual([]);
+    for (const n of [7]) expect(planLessonRun(n, {}, mulberry32(4))).toEqual([]);
     // B7 yields nothing again: pattern-skip-count is tables-only since the phase-12
     // legacy fix (it is not practicable, so the picker still shows "Sắp có" for it).
     // B14 plans its six fraction skills now that phase 12 landed them.
@@ -132,6 +132,59 @@ describe('planLessonRun', () => {
       const run = planLessonRun(n, {}, mulberry32(4));
       expect(run).toHaveLength(6);
       expect(run.every((k) => /^(sk:tally-|sk:table-|sk:chance-)/.test(k))).toBe(true);
+    }
+    // B2 plans its six arithmetic skills now that phase 09 landed them.
+    const b2 = planLessonRun(2, {}, mulberry32(4));
+    expect(b2).toHaveLength(6);
+    expect(new Set(b2).size).toBe(6);
+    expect(b2.every((k) => /^(sk:add-|sk:sub-)/.test(k))).toBe(true);
+    // B54/B55/B63/B64 plan their four arithmetic skills each: six items, four distinct.
+    const B54_SKILLS = [
+      'sk:add-4digit',
+      'sk:add-sub-10000-wp',
+      'sk:add-sub-find-error',
+      'sk:add-missing-digit',
+    ] as const;
+    const B55_SKILLS = [
+      'sk:sub-4digit',
+      'sk:add-sub-10000-wp',
+      'sk:add-sub-find-error',
+      'sk:add-missing-digit',
+    ] as const;
+    const B63_SKILLS = [
+      'sk:add-5digit',
+      'sk:add-sub-100000-wp',
+      'sk:add-sub-find-error',
+      'sk:add-missing-digit',
+    ] as const;
+    const B64_SKILLS = [
+      'sk:sub-5digit',
+      'sk:add-sub-100000-wp',
+      'sk:add-sub-find-error',
+      'sk:add-missing-digit',
+    ] as const;
+    for (const [n, skills] of [
+      [54, B54_SKILLS],
+      [55, B55_SKILLS],
+      [63, B63_SKILLS],
+      [64, B64_SKILLS],
+    ] as const) {
+      const run = planLessonRun(n, {}, mulberry32(4));
+      expect(run).toHaveLength(6);
+      expect(new Set(run).size).toBe(4);
+      for (const key of run) expect(skills).toContain(key);
+    }
+    // B58/B65/B77 mix the 4-digit and 5-digit lessons: six items, five distinct skills
+    // for B58/B65, six distinct for B77 (eight skills in its pool).
+    for (const [n, distinct] of [
+      [58, 5],
+      [65, 5],
+      [77, 6],
+    ] as const) {
+      const run = planLessonRun(n, {}, mulberry32(4));
+      expect(run).toHaveLength(6);
+      expect(new Set(run).size).toBe(distinct);
+      expect(run.every((k) => /^(sk:add-|sk:sub-)/.test(k))).toBe(true);
     }
   });
 
