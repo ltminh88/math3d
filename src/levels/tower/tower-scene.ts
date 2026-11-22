@@ -4,6 +4,8 @@
 import { Scene } from 'three';
 import { LEVEL_COMPLETE_BONUS } from '../shared/level-run-result';
 import type { LevelContext, LevelModule, LevelSession } from '../shared/level-types';
+import { attachLevelZoom } from '../shared/level-zoom';
+import '../shared/level-zoom.css';
 import { showTowerCelebration } from './tower-celebration';
 import { TowerClimbCamera } from './tower-climb-camera';
 import { buildTowerDiorama } from './tower-diorama-builder';
@@ -30,6 +32,19 @@ function start(ctx: LevelContext): LevelSession {
   const { sun } = buildTowerDiorama(scene, ctx.stage);
   const floors = new TowerFloorView(scene, ctx.reducedMotion);
   const climb = new TowerClimbCamera(ctx.reducedMotion);
+  // Phase 25b: pinch + wheel + +/− buttons zoom the camera around the auto-fit distance.
+  // The tower has no drag input, so there is nothing for a pinch to cancel.
+  const zoomHandle = attachLevelZoom(ctx.canvas, {
+    container: ctx.ui,
+    onFactor: (factor) => {
+      climb.setZoomFactor(factor);
+      ctx.ui.dataset.zoomFactor = String(factor);
+    },
+    zoomInLabel: ts('zoomIn'),
+    zoomOutLabel: ts('zoomOut'),
+  });
+  const zoom = zoomHandle.zoom;
+  ctx.ui.dataset.zoomFactor = '1';
   const towerRun = planTowerRun(ctx.learning, ctx.definition, ctx.stage);
   const flow = new TowerRoundFlow(towerRun.questions, () => performance.now(), towerRun.total);
   let reasoned = false;
@@ -61,6 +76,7 @@ function start(ctx: LevelContext): LevelSession {
   const c = new TowerRoundController(ctx, ts, flow, panel, card, {
     onFloorDone(floor) {
       floors.light(floor);
+      zoom.reset();
       climb.climbTo(floor + 1);
     },
     onLevelDone(earned, stars) {
@@ -128,6 +144,7 @@ function start(ctx: LevelContext): LevelSession {
       frame();
     },
     dispose() {
+      zoomHandle.dispose();
       sun.shadow.dispose();
       panel.destroy();
     },

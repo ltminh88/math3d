@@ -5,6 +5,8 @@
 import { Scene } from 'three';
 import { LEVEL_COMPLETE_BONUS } from '../shared/level-run-result';
 import type { LevelContext, LevelModule, LevelSession } from '../shared/level-types';
+import { attachLevelZoom } from '../shared/level-zoom';
+import '../shared/level-zoom.css';
 import { GardenBalanceView } from './garden-balance-view';
 import { GardenCamera } from './garden-camera';
 import { showGardenCelebration } from './garden-celebration';
@@ -37,6 +39,19 @@ function start(ctx: LevelContext): LevelSession {
   };
   scene.add(views.row.group, views.balance.group, views.bags.group);
   const view = new GardenCamera();
+  // Phase 25b: pinch + wheel + +/− buttons zoom the camera around the auto-fit distance.
+  // The garden has no drag input, so there is nothing for a pinch to cancel; its frame
+  // never changes between rounds, so the zoom is kept across rounds on purpose.
+  const zoomHandle = attachLevelZoom(ctx.canvas, {
+    container: ctx.ui,
+    onFactor: (factor) => {
+      view.setZoomFactor(factor);
+      ctx.ui.dataset.zoomFactor = String(factor);
+    },
+    zoomInLabel: gs('zoomIn'),
+    zoomOutLabel: gs('zoomOut'),
+  });
+  ctx.ui.dataset.zoomFactor = '1';
   const plan = planGardenRun(ctx.learning, ctx.definition, ctx.stage);
   const flow = new GardenRoundFlow(plan, () => performance.now());
   const controller: { current?: GardenRoundController } = {};
@@ -112,6 +127,7 @@ function start(ctx: LevelContext): LevelSession {
       frame();
     },
     dispose() {
+      zoomHandle.dispose();
       sun.shadow.dispose();
       c.destroy();
       panel.destroy();

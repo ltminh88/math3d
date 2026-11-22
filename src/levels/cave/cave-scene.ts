@@ -4,6 +4,8 @@
 import { Scene } from 'three';
 import { LEVEL_COMPLETE_BONUS } from '../shared/level-run-result';
 import type { LevelContext, LevelModule, LevelSession } from '../shared/level-types';
+import { attachLevelZoom } from '../shared/level-zoom';
+import '../shared/level-zoom.css';
 import { showCaveCelebration } from './cave-celebration';
 import { CaveChamberCamera } from './cave-chamber-camera';
 import { CaveCrystalView } from './cave-crystal-view';
@@ -28,6 +30,19 @@ function start(ctx: LevelContext): LevelSession {
   buildCaveDiorama(scene);
   const crystals = new CaveCrystalView(scene, ctx.reducedMotion, ctx.stage);
   const walk = new CaveChamberCamera(ctx.reducedMotion);
+  // Phase 25b: pinch + wheel + +/− buttons zoom the camera around the auto-fit distance.
+  // The cave has no drag input, so there is nothing for a pinch to cancel.
+  const zoomHandle = attachLevelZoom(ctx.canvas, {
+    container: ctx.ui,
+    onFactor: (factor) => {
+      walk.setZoomFactor(factor);
+      ctx.ui.dataset.zoomFactor = String(factor);
+    },
+    zoomInLabel: cs('zoomIn'),
+    zoomOutLabel: cs('zoomOut'),
+  });
+  const zoom = zoomHandle.zoom;
+  ctx.ui.dataset.zoomFactor = '1';
   const run = planCaveRun(ctx.learning, ctx.definition, ctx.stage);
   const flow = new CaveRoundFlow(run.chambers, () => performance.now());
   const controller: { current?: CaveRoundController } = {};
@@ -53,6 +68,7 @@ function start(ctx: LevelContext): LevelSession {
 
   const c = new CaveRoundController(ctx, cs, flow, panel, {
     onChamberDone(i) {
+      zoom.reset();
       crystals.light(i);
       walk.goTo(i + 1 < flow.chambers.length ? i + 1 : TREASURE_INDEX);
     },
@@ -103,6 +119,7 @@ function start(ctx: LevelContext): LevelSession {
       frame();
     },
     dispose() {
+      zoomHandle.dispose();
       c.destroy();
       panel.destroy();
     },

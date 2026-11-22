@@ -4,6 +4,8 @@
 import { Scene } from 'three';
 import { LEVEL_COMPLETE_BONUS } from '../shared/level-run-result';
 import type { LevelContext, LevelModule, LevelSession } from '../shared/level-types';
+import { attachLevelZoom } from '../shared/level-zoom';
+import '../shared/level-zoom.css';
 import { WorkshopBenchProps } from './workshop-bench-props';
 import { WorkshopCamera } from './workshop-camera';
 import { showWorkshopCelebration } from './workshop-celebration';
@@ -30,6 +32,20 @@ function start(ctx: LevelContext): LevelSession {
   const { sun } = buildWorkshopDiorama(scene, ctx.stage);
   const props = new WorkshopBenchProps(scene, ctx.reducedMotion);
   const view = new WorkshopCamera(ctx.reducedMotion);
+  // Phase 25b: pinch + wheel + +/− buttons zoom the camera around the bench. The workshop
+  // has no drag input — the ruler is a static picture in the answer panel, every action is
+  // a button or a key — so there is nothing for a pinch to cancel.
+  const zoomHandle = attachLevelZoom(ctx.canvas, {
+    container: ctx.ui,
+    onFactor: (factor) => {
+      view.setZoomFactor(factor);
+      ctx.ui.dataset.zoomFactor = String(factor);
+    },
+    zoomInLabel: ws('zoomIn'),
+    zoomOutLabel: ws('zoomOut'),
+  });
+  const zoom = zoomHandle.zoom;
+  ctx.ui.dataset.zoomFactor = '1';
   const stats = ctx.learning.stats();
   const skills = planWorkshopSkills(stats, ctx.learning.rng, ctx.definition.rounds, ctx.stage);
   const flow = new WorkshopRoundFlow(planWorkshopRounds(skills, stats, ctx.learning.rng), () =>
@@ -57,6 +73,7 @@ function start(ctx: LevelContext): LevelSession {
 
   const c = new WorkshopRoundController(ctx, ws, hs, flow, panel, {
     onRound(round) {
+      zoom.reset();
       props.setStation(round.station, round.item.scene);
       view.focus(round.station);
     },
@@ -116,6 +133,7 @@ function start(ctx: LevelContext): LevelSession {
       frame();
     },
     dispose() {
+      zoomHandle.dispose();
       sun.shadow.dispose();
       c.clear();
       panel.destroy();

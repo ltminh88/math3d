@@ -1,7 +1,9 @@
 // Camera over the street. VLM's line covers the top and the answer panel part of the canvas
 // (right side on wide or short screens, bottom on narrow ones), so the view is shifted into the free area and pulled back
-// until the round's subject (the street, or the building) fits there.
+// until the round's subject (the street, or the building) fits there. Phase 25b: the zoom factor
+// scales that auto-fit distance (0.6×–1.6×); the free-area shift is untouched by zooming.
 import { PerspectiveCamera, Vector3 } from 'three';
+import { clampZoomFactor } from '../shared/level-zoom';
 
 const FOV = 40;
 const DIRECTION = new Vector3(0, 0.5, 1).normalize();
@@ -42,6 +44,23 @@ export class CityCamera {
   readonly camera = new PerspectiveCamera(FOV, 1, 0.5, 150);
   private frame: CityFrame = STREET_FRAME;
   private area: FreeArea = { width: 1, height: 1, coverTop: 0, coverRight: 0, coverBottom: 0 };
+  private zoomFactorValue = 1;
+
+  /** Current zoom factor (1 = the auto-fit distance). */
+  get zoomFactor(): number {
+    return this.zoomFactorValue;
+  }
+
+  /** Scales the auto-fit distance, clamped to 0.6×–1.6×. */
+  setZoomFactor(factor: number): void {
+    this.zoomFactorValue = clampZoomFactor(factor);
+    this.apply();
+  }
+
+  /** Back to the auto-fit distance (a new round starts unzoomed). */
+  resetZoom(): void {
+    this.setZoomFactor(1);
+  }
 
   setFrame(frame: CityFrame): void {
     this.frame = frame;
@@ -64,7 +83,7 @@ export class CityCamera {
     const tanHalf = Math.tan((FOV * Math.PI) / 360);
     const fitWidth = this.frame.halfWidth / (tanHalf * camera.aspect * (freeW / w));
     const fitHeight = this.frame.halfHeight / (tanHalf * (freeH / h));
-    const distance = Math.max(MIN_DISTANCE, fitWidth, fitHeight);
+    const distance = Math.max(MIN_DISTANCE, fitWidth, fitHeight) * this.zoomFactorValue;
     camera.position.copy(this.frame.target).addScaledVector(DIRECTION, distance);
     camera.lookAt(this.frame.target);
     // Centre of the view = centre of the uncovered part of the canvas (below VLM's line).

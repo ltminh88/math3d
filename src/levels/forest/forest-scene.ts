@@ -55,6 +55,8 @@ function start(ctx: LevelContext): LevelSession {
       ctx.ui.dataset.zoomFactor = String(factor);
     },
     onPinchStart: () => interaction.cancelDrag(),
+    zoomInLabel: ts('zoomIn'),
+    zoomOutLabel: ts('zoomOut'),
   });
   const zoom = zoomHandle.zoom;
   ctx.ui.dataset.zoomFactor = '1';

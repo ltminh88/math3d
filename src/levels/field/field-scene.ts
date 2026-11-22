@@ -4,6 +4,8 @@
 // level disposer's signal, in the capture phase so planting keys never reach the 3D tap layer.
 import { Box3, Vector3 } from 'three';
 import type { LevelContext, LevelSession } from '../shared/level-types';
+import { attachLevelZoom } from '../shared/level-zoom';
+import '../shared/level-zoom.css';
 import { buildFieldDiorama } from './field-diorama-builder';
 import { createFieldGame, type FieldGame } from './field-game';
 import { createFieldHud } from './field-hud';
@@ -68,6 +70,20 @@ export function start(ctx: LevelContext): LevelSession {
   const view = createGridView(material, ctx.reducedMotion);
   stage.scene.add(diorama.group, view.group);
   const interaction = ctx.input.createInteraction(stage.camera);
+  // Phase 25b: pinch + wheel + +/− buttons zoom the camera around the fitted distance.
+  // A pinch that starts mid-drag cancels the drag, so it can never plant by accident.
+  const zoomHandle = attachLevelZoom(ctx.canvas, {
+    container: ctx.ui,
+    onFactor: (factor) => {
+      stage.setZoomFactor(factor);
+      ctx.ui.dataset.zoomFactor = String(factor);
+    },
+    onPinchStart: () => interaction.cancelDrag(),
+    zoomInLabel: tf('zoomIn'),
+    zoomOutLabel: tf('zoomOut'),
+  });
+  const zoom = zoomHandle.zoom;
+  ctx.ui.dataset.zoomFactor = '1';
   let game: FieldGame | undefined;
   const hud = createFieldHud(ctx.ui, {
     rotate: () => void game?.rotate(),
@@ -115,6 +131,7 @@ export function start(ctx: LevelContext): LevelSession {
       if (x !== size.x || z !== size.z) {
         // A new plot or phase: reframe (turning the plot keeps the framing, so no camera jump).
         Object.assign(size, { x, z });
+        zoom.reset();
         frame(size.width, size.height);
       }
       view.update(dt);
@@ -131,6 +148,7 @@ export function start(ctx: LevelContext): LevelSession {
     },
     resize: frame,
     dispose() {
+      zoomHandle.dispose();
       fieldGame.dispose();
       stage.dispose();
       hud.root.remove();

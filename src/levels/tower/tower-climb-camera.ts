@@ -1,8 +1,10 @@
 // Camera that climbs the tower: it looks at the current floor and rises one floor per finished
 // floor (eased; instant with reduced motion), then shows the roof and beacon for the
 // celebration. The answer panel covers the right side (wide) or the bottom (narrow), so the view
-// is shifted into the free area and pulled back until the tower fits there.
+// is shifted into the free area and pulled back until the tower fits there. Phase 25b: the zoom
+// factor scales that auto-fit distance (0.6×–1.6×); the free-area shift is untouched by zooming.
 import { PerspectiveCamera, Vector3 } from 'three';
+import { clampZoomFactor } from '../shared/level-zoom';
 import { BEACON_Y, FLOOR_COUNT, floorMid } from './tower-layout';
 
 const FOV = 45;
@@ -31,8 +33,25 @@ export class TowerClimbCamera {
   private readonly target = new Vector3();
   /** Floor the camera is at (or climbing to); FLOOR_COUNT = the top. */
   floor = 0;
+  private zoomFactorValue = 1;
 
   constructor(private readonly reducedMotion: boolean) {}
+
+  /** Current zoom factor (1 = the auto-fit distance). */
+  get zoomFactor(): number {
+    return this.zoomFactorValue;
+  }
+
+  /** Scales the auto-fit distance, clamped to 0.6×–1.6×. */
+  setZoomFactor(factor: number): void {
+    this.zoomFactorValue = clampZoomFactor(factor);
+    this.apply();
+  }
+
+  /** Back to the auto-fit distance (a new floor starts unzoomed). */
+  resetZoom(): void {
+    this.setZoomFactor(1);
+  }
 
   /** Climbs to `floor` (0-6), or to the roof and beacon for `FLOOR_COUNT`. */
   climbTo(floor: number): void {
@@ -67,7 +86,7 @@ export class TowerClimbCamera {
     const tanHalf = Math.tan((FOV * Math.PI) / 360);
     const fitWidth = HALF_WIDTH / (tanHalf * camera.aspect * (freeW / w));
     const fitHeight = this.halfHeight / (tanHalf * (freeH / h));
-    const distance = Math.max(MIN_DISTANCE, fitWidth, fitHeight);
+    const distance = Math.max(MIN_DISTANCE, fitWidth, fitHeight) * this.zoomFactorValue;
     const target = this.target.set(0, this.y, 0);
     camera.position.copy(target).addScaledVector(DIRECTION, distance);
     camera.lookAt(target);
