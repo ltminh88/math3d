@@ -111,6 +111,11 @@ export class DragController {
     if (state.kind === 'dragging') this.config.emit({ type: 'cancel', itemId: state.itemId });
   }
 
+  /** Abort a press/drag as if the pointer was cancelled (a pinch took over). */
+  cancel(): void {
+    this.onCancel();
+  }
+
   reset(): void {
     this.state = { kind: 'idle' };
   }

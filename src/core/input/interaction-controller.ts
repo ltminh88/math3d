@@ -88,6 +88,14 @@ export class InteractionController {
     this.snapRadius = Math.max(radius, MIN_SNAP_RADIUS);
   }
 
+  /**
+   * Abort an in-progress press/drag without touching pickables/zones (a pinch took over):
+   * the scene sees 'cancel' and puts the item back, so a pinch can never drop an answer.
+   */
+  cancelDrag(): void {
+    this.drag.cancel();
+  }
+
   /** Called between scenes: forget everything registered by the previous scene. */
   reset(): void {
     this.zones = [];

@@ -1,10 +1,13 @@
 // Camera over the clearing. The answer panel covers part of the canvas (right side on wide
 // screens, bottom on narrow ones), so the view is shifted into the free area and pulled back
-// until the round's friends/baskets fit there.
+// until the round's friends/baskets fit there. Phase 25a: the zoom factor scales that
+// auto-fit distance (0.6×–1.6×); the free-area shift is untouched by zooming.
 import { PerspectiveCamera, Vector3 } from 'three';
+import { clampZoomFactor } from '../shared/level-zoom';
 
 const FOV = 42;
-const TARGET = new Vector3(0, 0, -0.5);
+export const FOREST_TARGET = new Vector3(0, 0, -0.5);
+const TARGET = FOREST_TARGET;
 const DIRECTION = new Vector3(0, 0.74, 0.67).normalize();
 const MIN_DISTANCE = 15;
 /** Depth (half, world units) that must stay visible: from the trees behind to the pile in front. */
@@ -23,6 +26,23 @@ export class ForestCamera {
   readonly camera = new PerspectiveCamera(FOV, 1, 0.5, 120);
   private halfWidth = 5;
   private area: FreeArea = { width: 1, height: 1, coverRight: 0, coverBottom: 0 };
+  private zoomFactorValue = 1;
+
+  /** Current zoom factor (1 = the auto-fit distance). */
+  get zoomFactor(): number {
+    return this.zoomFactorValue;
+  }
+
+  /** Scales the auto-fit distance, clamped to 0.6×–1.6×. */
+  setZoomFactor(factor: number): void {
+    this.zoomFactorValue = clampZoomFactor(factor);
+    this.apply();
+  }
+
+  /** Back to the auto-fit distance (a new round starts unzoomed). */
+  resetZoom(): void {
+    this.setZoomFactor(1);
+  }
 
   /** Half-width (world units) the current round needs on screen. */
   setExtent(halfWidth: number): void {
@@ -46,7 +66,7 @@ export class ForestCamera {
     const tanHalf = Math.tan((FOV * Math.PI) / 360);
     const fitWidth = this.halfWidth / (tanHalf * camera.aspect * (freeW / w));
     const fitDepth = HALF_DEPTH / (tanHalf * (freeH / h));
-    const distance = Math.max(MIN_DISTANCE, fitWidth, fitDepth);
+    const distance = Math.max(MIN_DISTANCE, fitWidth, fitDepth) * this.zoomFactorValue;
     camera.position.copy(TARGET).addScaledVector(DIRECTION, distance);
     camera.lookAt(TARGET);
     // Shift the picture into the free area: centre of the view = centre of the uncovered part.
