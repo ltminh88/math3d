@@ -5,6 +5,7 @@ import { migrateLevelProgress } from './save-migrations';
 import {
   type DailyProgress,
   DEFAULT_GAME_META,
+  type EquippedCosmetics,
   type GameMeta,
   type LegacyImportMarker,
   type LevelProgress,
@@ -24,8 +25,8 @@ export interface ProgressRecords {
   levels: Record<string, Omit<LevelProgress, 'profileId' | 'levelId'>>;
   facts: Record<FactKey, FactStat>;
   gameMeta: GameMeta;
-  /** Shop items owned and worn (save code M3D2); absent = none. */
-  cosmetics?: { owned: string[]; equipped: Record<string, string> };
+  /** Shop items owned and worn (save code M3D2); absent = none. `equipped` is the phase-23 model. */
+  cosmetics?: { owned: string[]; equipped: EquippedCosmetics };
   /** Committed session counter (keeps `lastSeenSession` spacing meaningful); absent = 0. */
   sessionCount?: number;
   /** Daily-practice progress (M3D4 `d` field); absent = no daily run counted yet. */
@@ -64,7 +65,11 @@ export async function writeReplacementProfile(
   options: ReplaceOptions = {},
 ): Promise<Profile> {
   const base = newProfile(profileId, 'guest');
-  const equipped = { ...(records.cosmetics?.equipped ?? {}) };
+  const equipped: EquippedCosmetics = records.cosmetics?.equipped ?? {
+    vlm: {},
+    avatar: {},
+    decor: [],
+  };
   const profile: Profile = { ...base, avatarId: records.avatarId, settings: { equipped } };
   await tx.objectStore('profiles').put(profile);
   await tx.objectStore('wallet').put({ profileId, ...records.wallet });

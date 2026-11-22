@@ -96,7 +96,7 @@ export const SHIPPED_M3D4_IMPORT = {
     },
     cosmetics: {
       owned: [],
-      equipped: {},
+      equipped: { vlm: {}, avatar: {}, decor: [] },
     },
     sessionCount: 3,
     daily: {

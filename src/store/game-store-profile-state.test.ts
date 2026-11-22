@@ -106,13 +106,17 @@ describe.each(backends)('profile state on %s', (_label, open) => {
       },
       cosmetics: {
         owned: ['avatar-gold-crown', 'decor-fountain'],
-        equipped: { 'avatar-outfit': 'avatar-gold-crown' },
+        equipped: { vlm: {}, avatar: { head: 'avatar-gold-crown' }, decor: [] },
       },
       sessionCount: 12,
     });
     const snap = store.getSnapshot();
     expect([...snap.ownedCosmetics].sort()).toEqual(['avatar-gold-crown', 'decor-fountain']);
-    expect(snap.profile.settings.equipped).toEqual({ 'avatar-outfit': 'avatar-gold-crown' });
+    expect(snap.profile.settings.equipped).toEqual({
+      vlm: {},
+      avatar: { head: 'avatar-gold-crown' },
+      decor: [],
+    });
     expect(snap.sessionCount).toBe(12);
     expect(snap.levelProgress.tower).toMatchObject({ stars: 2, completedAt: 6 });
     expect(store.nextSessionNo()).toBe(13);

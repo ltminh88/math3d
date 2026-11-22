@@ -14,7 +14,6 @@ import {
   encodeSaveCodeV5,
   importOfDecodedSaveCode,
   MAX_SAVE_CODE_CHARS,
-  SAVE_CODE_VERSION,
   SaveCodeError,
 } from './save-code-codec';
 import { SHIPPED_M3D3_CODE, SHIPPED_M3D3_IMPORT } from './save-code-shipped-m3d3-fixture';
@@ -78,8 +77,7 @@ const code = (version: number, payload: unknown): string => {
 const tuple = (id: string): unknown[] => [id, 1, 1, 100, 2, 1, 0];
 
 describe('M3D5 save code', () => {
-  it('is the version export writes', () => {
-    expect(SAVE_CODE_VERSION).toBe(5);
+  it('still encodes M3D5 (kept for tests and fixtures; export writes M3D6)', () => {
     expect(encodeSaveCodeV5(snapshot(), audio)).toMatch(/^M3D5-[A-Za-z0-9_-]+-[0-9a-f]{8}$/);
   });
 
@@ -288,8 +286,8 @@ describe('M3D1/M3D3/M3D4 still decode exactly as shipped', () => {
     ).not.toBe('no error');
   });
 
-  it('a version 6 code is rejected', () => {
-    expect(reason(() => decodeSaveCode(code(6, {})))).toBe('version');
+  it('a version 7 code is rejected', () => {
+    expect(reason(() => decodeSaveCode(code(7, {})))).toBe('version');
   });
 
   it('knows every level a gate opens (a new gate needs no new version now)', () => {

@@ -36,7 +36,7 @@ function snapshot(): GameSnapshot {
     profile: {
       ...newProfile('p1'),
       avatarId: 'girl',
-      settings: { equipped: { 'avatar-outfit': 'avatar-gold-crown', 'vlm-outfit': 'none' } },
+      settings: { equipped: { vlm: {}, avatar: { head: 'avatar-gold-crown' }, decor: [] } },
     },
     factStats: {
       'mul:3x7': {
@@ -103,7 +103,7 @@ describe('M3D2 save code', () => {
     }
     expect(records.cosmetics).toEqual({
       owned: ['avatar-gold-crown', 'decor-fountain'],
-      equipped: { 'avatar-outfit': 'avatar-gold-crown', 'vlm-outfit': 'none' },
+      equipped: { vlm: {}, avatar: { head: 'avatar-gold-crown' }, decor: [] },
     });
     expect(records.facts['mul:3x7']).toEqual({
       ...snapshot().factStats['mul:3x7'],

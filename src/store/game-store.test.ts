@@ -187,14 +187,26 @@ describe('game store', () => {
     store.close();
   });
 
-  it('equipCosmetic persists in profile settings across reload', async () => {
+  it('setEquipped persists in profile settings across reload', async () => {
     const name = freshName();
     const store = await openGameStore({ dbName: name, newId: ids() });
-    await store.equipCosmetic('hat', 'hat-red');
-    expect(store.getSnapshot().profile.settings.equipped).toEqual({ hat: 'hat-red' });
+    await store.setEquipped({
+      vlm: { head: 'vlm-star-band', neck: 'vlm-red-scarf' },
+      avatar: {},
+      decor: ['decor-fountain'],
+    });
+    expect(store.getSnapshot().profile.settings.equipped).toEqual({
+      vlm: { head: 'vlm-star-band', neck: 'vlm-red-scarf' },
+      avatar: {},
+      decor: ['decor-fountain'],
+    });
     store.close();
     const reopened = await openGameStore({ dbName: name });
-    expect(reopened.getSnapshot().profile.settings.equipped).toEqual({ hat: 'hat-red' });
+    expect(reopened.getSnapshot().profile.settings.equipped).toEqual({
+      vlm: { head: 'vlm-star-band', neck: 'vlm-red-scarf' },
+      avatar: {},
+      decor: ['decor-fountain'],
+    });
     reopened.close();
   });
 

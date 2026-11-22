@@ -12,7 +12,7 @@ import { connectedStore, flushProgress } from '../ui/progress-sync';
 import { showToast } from '../ui/toast-and-persist';
 import { COSMETIC_SLOTS, type CosmeticSlot, cosmeticById } from './cosmetic-catalog';
 import { type ShopView, shopPanelHtml, useVerb } from './shop-panel-markup';
-import { buyCosmetic, equipCosmetic, type ShopStore, unequipSlot } from './shop-purchase-flow';
+import { buyCosmetic, equipCosmetic, type ShopStore, unequipItem } from './shop-purchase-flow';
 import { cosmeticName, tshop } from './shop-strings';
 import './shop-panel.css';
 
@@ -79,7 +79,7 @@ async function run(store: ShopStore, action: string, id: string): Promise<void> 
     return setView(store, { confirming: undefined, message }, cardFocus(id));
   }
   if (action === 'equip') await equipCosmetic(store, item);
-  if (action === 'unequip') await unequipSlot(store, item.slot);
+  if (action === 'unequip') await unequipItem(store, item);
   const message = action === 'equip' ? tshop('worn', { name }) : tshop('removed', { name });
   setView(store, { message }, cardFocus(id));
 }

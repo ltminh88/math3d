@@ -1,11 +1,11 @@
 import { describe, expect, it } from 'vitest';
+import { PLACEMENT_BY_ID } from './cosmetic-anchors';
 import {
   COSMETIC_CATALOG,
   COSMETIC_ID_PATTERN,
   COSMETIC_SLOTS,
   cosmeticById,
 } from './cosmetic-catalog';
-import { UNEQUIPPED } from './shop-purchase-flow';
 import { cosmeticName } from './shop-strings';
 import { mergeParts } from './vertex-color-parts';
 
@@ -19,10 +19,33 @@ describe('cosmetic catalog', () => {
     expect(new Set(ids).size).toBe(ids.length);
     for (const id of ids) {
       expect(id).toMatch(COSMETIC_ID_PATTERN);
-      expect(id).not.toBe(UNEQUIPPED);
       expect(cosmeticById(id)?.id).toBe(id);
     }
     expect(cosmeticById('unknown')).toBeUndefined();
+  });
+
+  it('agrees with the placement table the save code and migration read (phase 23)', () => {
+    expect(Object.keys(PLACEMENT_BY_ID).sort()).toEqual(
+      COSMETIC_CATALOG.map((item) => item.id).sort(),
+    );
+    for (const item of COSMETIC_CATALOG) {
+      const placement = PLACEMENT_BY_ID[item.id];
+      expect(placement?.anchor).toBe(item.anchor);
+      expect(placement?.owner).toBe(
+        item.slot === 'village-decor' ? 'decor' : item.slot === 'vlm-outfit' ? 'vlm' : 'avatar',
+      );
+    }
+  });
+
+  it('every decor item has its own village spot; outfits have none', () => {
+    const spots = COSMETIC_CATALOG.filter((item) => item.slot === 'village-decor').map(
+      (item) => item.spot,
+    );
+    expect(spots).toHaveLength(4);
+    expect(spots.every(Boolean)).toBe(true);
+    expect(new Set(spots.map((s) => s?.join(','))).size).toBe(4);
+    for (const item of COSMETIC_CATALOG.filter((item) => item.slot !== 'village-decor'))
+      expect(item.spot).toBeUndefined();
   });
 
   it('prices are whole coins between 20 and 60 (one item every 1-2 runs)', () => {

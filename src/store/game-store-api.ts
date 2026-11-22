@@ -4,7 +4,7 @@ import type { PurchaseResult } from './cosmetic-purchase-transaction';
 import type { OpenDbOrMemoryOptions } from './open-game-db-with-memory-fallback';
 import type { ProgressRecords, ReplaceOptions } from './profile-replacement';
 import type { GameSnapshot } from './progress-repository';
-import type { DailyProgress, GameMeta } from './save-schema';
+import type { DailyProgress, EquippedCosmetics, GameMeta } from './save-schema';
 
 /** Fired after the outbox gained an item (session finished or cosmetic bought). Phase 09 flushes on it. */
 export interface SessionCommittedEvent {
@@ -42,8 +42,11 @@ export interface GameStore {
   commitDailyRun(today: number): Promise<DailyRunCommit>;
   /** Atomic debit + ownership + outbox record. Price semantics live in src/shop. */
   purchaseCosmetic(cosmeticId: string, price: number): Promise<PurchaseResult>;
-  /** Stored in profile settings; ownership is the shop's concern (default items are never "purchased"). */
-  equipCosmetic(slot: string, cosmeticId: string): Promise<void>;
+  /**
+   * Stores the whole multi-equip value (phase 23). The caller computes it with the
+   * shop reducer; ownership is the shop's concern (default items are never "purchased").
+   */
+  setEquipped(equipped: EquippedCosmetics): Promise<void>;
   setAvatar(avatarId: string): Promise<void>;
   updateGameMeta(patch: Partial<GameMeta>): Promise<void>;
   /** Marks a level's quest as accepted (first call wins). */

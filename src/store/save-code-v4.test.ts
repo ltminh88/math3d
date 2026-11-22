@@ -182,7 +182,7 @@ describe('M3D1/M3D2/M3D3 still decode exactly as shipped', () => {
     expect(importOfDecodedSaveCode(decoded, 0)).toEqual(SHIPPED_M3D3_IMPORT);
   });
 
-  it('a version 6 code is rejected', () => {
-    expect(reason(() => decodeSaveCode(code(6, {})))).toBe('version');
+  it('a version 7 code is rejected', () => {
+    expect(reason(() => decodeSaveCode(code(7, {})))).toBe('version');
   });
 });

@@ -1,4 +1,5 @@
 import type { DBSchema, IDBPDatabase, IDBPTransaction, StoreNames } from 'idb';
+import { isEquippedV2, migrateEquippedV1 } from '../shop/equipped-cosmetics';
 import type {
   FactStatRecord,
   LevelProgress,
@@ -58,6 +59,27 @@ export const MIGRATIONS: readonly Migration[] = [
           unique: true,
         },
       );
+    },
+  },
+  {
+    version: 2,
+    /**
+     * Phase 23: profiles wear the multi-equip model ({vlm, avatar, decor}) instead of the
+     * old slot -> id map. A profile already on the new shape is left untouched.
+     */
+    async up(_db, tx) {
+      const store = tx.objectStore('profiles');
+      for (const profile of await store.getAll()) {
+        const equipped = (profile.settings as { equipped?: unknown }).equipped;
+        if (isEquippedV2(equipped)) continue;
+        await store.put({
+          ...profile,
+          settings: {
+            ...profile.settings,
+            equipped: migrateEquippedV1((equipped ?? {}) as Record<string, string>),
+          },
+        });
+      }
     },
   },
 ];

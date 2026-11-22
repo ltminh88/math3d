@@ -6,11 +6,10 @@ import { COSMETIC_CATALOG, type CosmeticItem } from './cosmetic-catalog';
 import {
   buyCosmetic,
   equipCosmetic,
-  equippedItem,
+  equippedOf,
   itemState,
   missingCoins,
-  UNEQUIPPED,
-  unequipSlot,
+  unequipItem,
 } from './shop-purchase-flow';
 
 let dbCounter = 0;
@@ -67,33 +66,40 @@ describe('shop purchase flow', () => {
     store.close();
   });
 
-  it('equips only owned items, one per slot, and unequips the slot', async () => {
+  it('equips only owned items, several spots at once, and unequips one at a time', async () => {
     const store = await storeWithCoins(200);
     expect(await equipCosmetic(store, scarf)).toEqual({ ok: false, reason: 'not-owned' });
-    expect(equippedItem(store.getSnapshot(), 'vlm-outfit')).toBeUndefined();
+    expect(equippedOf(store.getSnapshot())).toEqual({ vlm: {}, avatar: {}, decor: [] });
 
     await buyCosmetic(store, scarf);
     await buyCosmetic(store, cape);
     expect(await equipCosmetic(store, scarf)).toEqual({ ok: true });
     expect(itemState(scarf, store.getSnapshot())).toBe('equipped');
     await equipCosmetic(store, cape);
-    expect(equippedItem(store.getSnapshot(), 'vlm-outfit')).toBe(cape);
-    expect(itemState(scarf, store.getSnapshot())).toBe('owned');
-    expect(equippedItem(store.getSnapshot(), 'avatar-outfit')).toBeUndefined();
+    expect(equippedOf(store.getSnapshot()).vlm).toEqual({
+      neck: 'vlm-red-scarf',
+      back: 'vlm-starry-cape',
+    });
+    expect(itemState(scarf, store.getSnapshot())).toBe('equipped');
+    expect(equippedOf(store.getSnapshot()).avatar).toEqual({});
 
-    await unequipSlot(store, 'vlm-outfit');
-    expect(store.getSnapshot().profile.settings.equipped['vlm-outfit']).toBe(UNEQUIPPED);
-    expect(equippedItem(store.getSnapshot(), 'vlm-outfit')).toBeUndefined();
+    await unequipItem(store, cape);
+    expect(store.getSnapshot().profile.settings.equipped.vlm).toEqual({
+      neck: 'vlm-red-scarf',
+    });
+    expect(equippedOf(store.getSnapshot()).vlm).toEqual({ neck: 'vlm-red-scarf' });
     expect(itemState(cape, store.getSnapshot())).toBe('owned');
     store.close();
   });
 
   it('ignores an equipped id that is not owned, unknown, or in the wrong slot', async () => {
     const store = await storeWithCoins(0);
-    await store.equipCosmetic('vlm-outfit', scarf.id);
-    expect(equippedItem(store.getSnapshot(), 'vlm-outfit')).toBeUndefined();
-    await store.equipCosmetic('avatar-outfit', 'retired-item');
-    expect(equippedItem(store.getSnapshot(), 'avatar-outfit')).toBeUndefined();
+    await store.setEquipped({
+      vlm: { neck: scarf.id }, // not owned
+      avatar: { head: 'retired-item' }, // unknown
+      decor: ['vlm-red-scarf'], // a VLM item placed as decor
+    });
+    expect(equippedOf(store.getSnapshot())).toEqual({ vlm: {}, avatar: {}, decor: [] });
     store.close();
   });
 });
