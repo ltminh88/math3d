@@ -8,13 +8,21 @@
 // with the numbers/fraction scenes. A renderer's `render` narrows on `kind`, so no
 // casts are needed inside the scene files.
 import type { DataScene } from '../../data/data-scene-types';
+import type { FractionScene } from '../../fractions/fraction-scene-types';
 import type { SceneBody } from '../../geometry/geo-scene-types';
 import type { MoneyScene } from '../../money/money-scene-types';
+import type { NumberScene } from '../../numbers/numbers-scene-types';
 import type { PracticeScene } from '../../practice/practice-scene';
 import type { TimeScene } from '../../time/time-scene-types';
 
-/** Every scene the dialog can draw: geometry/measurement plus the market families. */
-export type DialogScene = SceneBody | TimeScene | MoneyScene | DataScene;
+/** Every scene the dialog can draw: geometry/measurement plus the market, numbers and fraction families. */
+export type DialogScene =
+  | SceneBody
+  | TimeScene
+  | MoneyScene
+  | DataScene
+  | NumberScene
+  | FractionScene;
 
 export type DialogSceneKind = DialogScene['kind'];
 

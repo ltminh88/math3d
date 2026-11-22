@@ -4,10 +4,12 @@
 
 import { describe, expect, test } from 'vitest';
 import { DATA_SKILLS } from '../../data/data-item-for-skill';
+import { FRACTION_SKILLS } from '../../fractions/fraction-item-for-skill';
 import { GEOMETRY_SKILLS } from '../../geometry/geometry-item-for-skill';
 import { mulberry32 } from '../../learning/seeded-rng';
 import { MEASUREMENT_SKILLS } from '../../measurement/measurement-item-for-skill';
 import { MONEY_SKILLS } from '../../money/money-item-for-skill';
+import { NUMBER_SKILLS } from '../../numbers/number-item-for-skill';
 import { dialogRenderable, itemForSkill } from '../../practice/item-for-skill';
 import { TIME_SKILLS } from '../../time/time-item-for-skill';
 import {
@@ -39,6 +41,11 @@ const ALL_KINDS: readonly DialogSceneKind[] = [
   'tally',
   'bag',
   'dice',
+  'place-value',
+  'number-line',
+  'fraction-shape',
+  'fraction-set',
+  'fraction-pick',
 ];
 
 describe('dialog scene registry', () => {
@@ -61,6 +68,17 @@ describe('dialog scene registry', () => {
 
   test('every time/money/data skill x tier sample has a renderable scene (phase 17)', () => {
     for (const id of [...TIME_SKILLS, ...MONEY_SKILLS, ...DATA_SKILLS]) {
+      for (const tier of [1, 2, 3] as const) {
+        const item = itemForSkill(id, mulberry32(0), tier);
+        if (item.scene === undefined) continue;
+        expect(hasSceneRenderer(item.scene.kind)).toBe(true);
+        expect(dialogRenderable(item)).toBe(true);
+      }
+    }
+  });
+
+  test('every numbers/fraction skill x tier sample has a renderable scene (phase 16)', () => {
+    for (const id of [...NUMBER_SKILLS, ...FRACTION_SKILLS]) {
       for (const tier of [1, 2, 3] as const) {
         const item = itemForSkill(id, mulberry32(0), tier);
         if (item.scene === undefined) continue;

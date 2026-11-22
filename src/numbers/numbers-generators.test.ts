@@ -170,13 +170,14 @@ describe('numbers generators', () => {
         }
     });
 
-  it('dialog filter: T1 always renderable; T2/T3 scene skills filtered until phase 16', () => {
+  it('dialog filter: every num-* skill renders now (phase 16)', () => {
     for (const skillId of NUMBER_SKILLS)
       for (const tier of [1, 2, 3] as SkillTier[]) {
         const item = numberItemForSkill(skillId, mulberry32(0), tier);
-        // No renderer for 'place-value' / 'number-line' exists yet (phase 16), so a scene
-        // item is not renderable; the filter drops exactly those (skill, tier) pairs.
-        expect(dialogRenderable(item)).toBe(!(tier > 1 && skillId in SCENE_SKILLS));
+        // Phase 16 ships the 'place-value' / 'number-line' renderers, so scene
+        // items render too; the filter drops nothing.
+        expect(dialogRenderable(item)).toBe(true);
+        if (tier > 1 && skillId in SCENE_SKILLS) expect(item.scene).toBeDefined();
       }
   });
 
