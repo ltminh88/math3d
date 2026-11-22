@@ -33,6 +33,48 @@ export const GUIDE_ANCHORS: CharacterAnchors = {
   back: [0, 0.8, -0.62],
 };
 
+/** One body volume a worn cosmetic must stay (mostly) outside of (phase 22). */
+export type BodyPrimitive =
+  | {
+      readonly kind: 'cone';
+      readonly center: readonly [x: number, z: number];
+      readonly baseY: number;
+      readonly topY: number;
+      readonly bottomR: number;
+      readonly topR: number;
+    }
+  | {
+      readonly kind: 'sphere';
+      readonly center: AnchorPoint;
+      readonly r: number;
+      readonly yScale?: number;
+    }
+  | { readonly kind: 'box'; readonly center: AnchorPoint; readonly size: AnchorPoint };
+
+/**
+ * Body volumes of VLM and the player, mirroring buildMiloModel / buildPlayerModel above
+ * (robe cone, head, beard / shirt, head, hair, backpack, arms, legs). Update both together.
+ * The phase-22 visibility test reads these; nothing at runtime uses them.
+ */
+export const GUIDE_BODY: readonly BodyPrimitive[] = [
+  { kind: 'cone', center: [0, 0], baseY: 0.025, topY: 1.275, bottomR: 0.7, topR: 0.45 },
+  { kind: 'sphere', center: [0, 1.58, 0], r: 0.48 },
+  { kind: 'sphere', center: [0, 1.28, 0.33], r: 0.22 },
+  { kind: 'cone', center: [0, 0], baseY: 1.675, topY: 2.625, bottomR: 0.58, topR: 0.08 },
+  { kind: 'cone', center: [0, 0], baseY: 1.76, topY: 1.88, bottomR: 0.75, topR: 0.75 },
+];
+
+export const PLAYER_BODY: readonly BodyPrimitive[] = [
+  { kind: 'box', center: [0, 0.93, 0], size: [0.7, 0.8, 0.47] },
+  { kind: 'sphere', center: [0, 1.67, 0], r: 0.45 },
+  { kind: 'sphere', center: [0, 1.93, -0.035], r: 0.43, yScale: 0.65 },
+  { kind: 'box', center: [0, 1, -0.36], size: [0.52, 0.65, 0.3] },
+  { kind: 'box', center: [-0.48, 0.94, 0], size: [0.2, 0.65, 0.23] },
+  { kind: 'box', center: [0.48, 0.94, 0], size: [0.2, 0.65, 0.23] },
+  { kind: 'box', center: [-0.16, 0.3, 0], size: [0.25, 0.55, 0.28] },
+  { kind: 'box', center: [0.16, 0.3, 0], size: [0.25, 0.55, 0.28] },
+];
+
 /** Player parts the avatar switch and the walk cycle touch. */
 export interface PlayerModelParts {
   shirt: Mesh;
