@@ -4,6 +4,20 @@
 // tops out near 2.2; his backpack ends at z -0.59.
 import { box, cylinder, type Part, ring, sphere } from './vertex-color-parts';
 
+// Phase 24 items live in their own builders file (this file must stay under 200 lines).
+export {
+  avatarFlowerLei,
+  avatarRaincoat,
+  avatarStrawHat,
+  decorChickenCoop,
+  decorPeachTree,
+  decorRainbowArch,
+  vlmBookBag,
+  vlmRoundGlasses,
+  vlmStarPendant,
+  vlmWizardHat,
+} from './cosmetic-mesh-builders-new-items';
+
 const GOLD = 0xffd064;
 const WOOD = 0x8c6947;
 const RED = 0xe8562f;
