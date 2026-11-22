@@ -32,13 +32,17 @@ export const vlmStarBand = (): Part[] => [
 ];
 
 export const vlmRedScarf = (): Part[] => [
-  ring(0.44, 0.1, RED),
-  box(0.2, 0.5, 0.08, RED, [0.24, -0.25, 0.42], [0.15, 0, 0.2]),
-  box(0.21, 0.08, 0.09, CREAM, [0.27, -0.47, 0.44], [0.15, 0, 0.2]),
+  // Ring above the robe top (robe ends y 1.275, r 0.45) and wide enough to clear the
+  // head (r 0.39 at y 1.3); the front dips under the beard, as a scarf should.
+  ring(0.55, 0.1, RED, [0, 0.1, 0]),
+  // Tail hangs from the ring front, outside the robe (robe r 0.50–0.55 at y 0.75–1.0).
+  box(0.2, 0.5, 0.08, RED, [0.22, -0.2, 0.55], [0.15, 0, 0.2]),
+  box(0.21, 0.08, 0.09, CREAM, [0.24, -0.42, 0.57], [0.15, 0, 0.2]),
 ];
 
 export const vlmFlowerGarland = (): Part[] => [
-  ring(0.64, 0.05, LEAF, [0, 0.02, 0]),
+  // Ring rests on the hat brim (brim top y 1.88): tube bottom tangent to it.
+  ring(0.64, 0.05, LEAF, [0, 0.05, 0]),
   ...around(8, 0.64, 0.07, (x, z, i) => sphere(0.1, i % 2 ? YELLOW : PINK, [x, 0, z])),
 ];
 
@@ -52,14 +56,19 @@ export const vlmStarryCape = (): Part[] => [
 
 // --- Player avatar (anchors: head = above the hair, neck, back) ----------------------------
 export const avatarBlueCap = (): Part[] => [
-  cylinder(0.36, 0.45, 0.2, 0x4d95a3, [0, 0, 0]),
-  sphere(0.06, CREAM, [0, 0.12, 0]),
-  box(0.55, 0.05, 0.36, 0x3b7f8c, [0, -0.08, 0.42]),
+  // Cap sits on the hair dome (hair top y 2.21): rim overlaps the dome top, not sunk in.
+  cylinder(0.36, 0.45, 0.2, 0x4d95a3, [0, 0.12, 0]),
+  sphere(0.06, CREAM, [0, 0.24, 0]),
+  box(0.55, 0.05, 0.36, 0x3b7f8c, [0, 0.04, 0.42]),
 ];
 
 export const avatarStripedScarf = (): Part[] => [
-  ring(0.33, 0.1, 0x599989),
-  ring(0.335, 0.104, CREAM, [0, 0.02, 0], [Math.PI / 2, 0, Math.PI / 7]),
+  // Slim rings (inner edge 0.44) clear the shirt corners (0.42) and the head
+  // (0.37 at the rings' top): the old 0.4 rings sat half inside the body.
+  // Both rings are flat — a tilt is a no-op on a torus (it is symmetric under
+  // rotation about its own axis), so the cream ring lost its tilted rotation.
+  ring(0.5, 0.06, 0x599989),
+  ring(0.505, 0.06, CREAM, [0, 0.02, 0]),
   box(0.18, 0.42, 0.08, 0x599989, [-0.2, -0.22, 0.38], [0.2, 0, -0.15]),
 ];
 
