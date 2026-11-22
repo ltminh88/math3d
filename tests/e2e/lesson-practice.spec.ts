@@ -247,7 +247,9 @@ test('run B25: answer all 6, stars before/after show, coins in store, picker sta
   await openPicker(page, touch);
   await openTopic(page, 4, touch);
   await pickLesson(page, 25, touch);
-  await expect(page.locator('#dialog-content')).toContainText('Bài 25 · Câu 1/6');
+  await expect(page.locator('#dialog-content')).toContainText(
+    'Bài 25 · Phép chia hết, phép chia có dư · Câu 1/6',
+  );
   expect(await playLessonRun(page, touch)).toBe(6);
   const content = page.locator('#dialog-content');
   await expect(content).toContainText('Xong bài 25!');
@@ -305,7 +307,9 @@ test('tables lesson B5: quiz items play through the same run loop', async ({ pag
   await boot(page);
   await openPicker(page, touch);
   await pickLesson(page, 5, touch);
-  await expect(page.locator('#dialog-content')).toContainText('Bài 5 · Câu 1/6');
+  await expect(page.locator('#dialog-content')).toContainText(
+    'Bài 5 · Bảng nhân 3, bảng chia 3 · Câu 1/6',
+  );
   expect(await playLessonRun(page, touch)).toBe(6);
   await expect(page.locator('#dialog-content')).toContainText('Xong bài 5!');
   await expect(coins(page)).toHaveText('30');
