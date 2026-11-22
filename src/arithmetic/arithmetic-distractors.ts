@@ -45,3 +45,10 @@ export function wrongBySlip(correct: number, rng: Rng): number {
   const d = deltas[Math.floor(rng() * deltas.length)] as number;
   return correct + d;
 }
+
+/** Wrong product from "forgot the carry": each digit × b, mod 10, no carry propagates. */
+export function wrongMulByForgotCarry(a: number, b: number): number {
+  const out: number[] = [];
+  for (const d of digitsOf(a)) out.push((d * b) % 10);
+  return fromDigits(out);
+}

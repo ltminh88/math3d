@@ -2,13 +2,15 @@
 // (carries are the tier axis), ranges, deterministic per seed. RED-first: the
 // generators, strings and ranges do not exist yet.
 import { describe, expect, it } from 'vitest';
+import { setLanguage } from '../i18n/i18n';
 import { mulberry32 } from '../learning/seeded-rng';
 import type { SkillTier } from '../learning/skill-tiers';
 import { dialogRenderable } from '../practice/item-for-skill';
 import type { PracticeItem } from '../practice/practice-scene';
 import { evalExpr } from '../reasoning/reasoning-test-oracles';
 import type { ReasoningStep } from '../reasoning/reasoning-types';
-import { ARITHMETIC_SKILLS, arithmeticItemForSkill } from './arithmetic-item-for-skill';
+import { arithmeticItemForSkill } from './arithmetic-item-for-skill';
+import { renderArithmeticPrompt } from './arithmetic-strings';
 import {
   equationMissingDigit,
   equationOperands,
@@ -19,6 +21,22 @@ import {
   verdictTruth,
 } from './arithmetic-test-oracles';
 import { sweepArithmeticItem } from './arithmetic-test-sweep';
+
+/** The phase-09 add/sub skills (the mul/div skills of phase 10 have their own test). */
+const ADD_SUB_SKILLS = [
+  'add-sub-mental-round',
+  'add-sub-1000',
+  'add-sub-1000-wp',
+  'add-sub-1000-chain',
+  'add-4digit',
+  'sub-4digit',
+  'add-sub-10000-wp',
+  'add-5digit',
+  'sub-5digit',
+  'add-sub-100000-wp',
+  'add-sub-find-error',
+  'add-missing-digit',
+] as const;
 
 const p = (i: PracticeItem, k: string): number => Number(i.story.params?.[k]);
 const s = (i: PracticeItem, k: string): string => String(i.story.params?.[k]);
@@ -50,6 +68,23 @@ const ORACLE: Record<string, (i: PracticeItem) => void> = {
     expect(i.work).toEqual([p(i, 'a') + p(i, 'b')]);
   },
   wpTwoStepLeft: (i) => {
+    expect(values(i)).toEqual([p(i, 'a') + p(i, 'b'), p(i, 'a') + p(i, 'b') - p(i, 'c')]);
+    expect(i.work).toEqual([p(i, 'a') + p(i, 'b')]);
+  },
+  // Big-number "give away" variants (warehouse / library / school): same maths as
+  // wpSubGive / wpTwoStepLeft, only the wording changes.
+  wpSubGiveOut: (i) => expect(last(i)).toBe(p(i, 'a') - p(i, 'b')),
+  wpSubGiveLend: (i) => expect(last(i)).toBe(p(i, 'a') - p(i, 'b')),
+  wpSubGiveHandout: (i) => expect(last(i)).toBe(p(i, 'a') - p(i, 'b')),
+  wpTwoStepLeftOut: (i) => {
+    expect(values(i)).toEqual([p(i, 'a') + p(i, 'b'), p(i, 'a') + p(i, 'b') - p(i, 'c')]);
+    expect(i.work).toEqual([p(i, 'a') + p(i, 'b')]);
+  },
+  wpTwoStepLeftLend: (i) => {
+    expect(values(i)).toEqual([p(i, 'a') + p(i, 'b'), p(i, 'a') + p(i, 'b') - p(i, 'c')]);
+    expect(i.work).toEqual([p(i, 'a') + p(i, 'b')]);
+  },
+  wpTwoStepLeftHandout: (i) => {
     expect(values(i)).toEqual([p(i, 'a') + p(i, 'b'), p(i, 'a') + p(i, 'b') - p(i, 'c')]);
     expect(i.work).toEqual([p(i, 'a') + p(i, 'b')]);
   },
@@ -93,7 +128,13 @@ function carriesOf(i: PracticeItem): number {
     return (
       oracleAddCarries(p(i, 'a'), p(i, 'b')) + oracleSubBorrows(p(i, 'a') + p(i, 'b'), p(i, 'c'))
     );
+  if (key === 'wpTwoStepLeftOut' || key === 'wpTwoStepLeftLend' || key === 'wpTwoStepLeftHandout')
+    return (
+      oracleAddCarries(p(i, 'a'), p(i, 'b')) + oracleSubBorrows(p(i, 'a') + p(i, 'b'), p(i, 'c'))
+    );
   if (key === 'wpSubGive' || key === 'wpCompare') return oracleSubBorrows(p(i, 'a'), p(i, 'b'));
+  if (key === 'wpSubGiveOut' || key === 'wpSubGiveLend' || key === 'wpSubGiveHandout')
+    return oracleSubBorrows(p(i, 'a'), p(i, 'b'));
   if (key === 'chainCalc') {
     const first = applyOp(p(i, 'a'), s(i, 'op1'), p(i, 'b'));
     const c1 =
@@ -179,7 +220,7 @@ function tierCheck(skillId: string, item: PracticeItem, tier: SkillTier): void {
     const isSub =
       item.story.key === 'subCalc' ||
       item.story.key === 'errorSub' ||
-      (item.story.key === 'missingDigit' && (s(item, 'equation').includes('−') ? true : false));
+      (item.story.key === 'missingDigit' && s(item, 'equation').includes('−'));
     const pair =
       item.story.key === 'missingDigit'
         ? equationOperands(s(item, 'equation'))
@@ -216,7 +257,7 @@ function tierCheck(skillId: string, item: PracticeItem, tier: SkillTier): void {
 
 describe('arithmetic generators', () => {
   it('every skill generates a swept, oracle-checked item at every tier', () => {
-    for (const id of ARITHMETIC_SKILLS) {
+    for (const id of ADD_SUB_SKILLS) {
       for (const tier of [1, 2, 3] as SkillTier[]) {
         for (let seed = 0; seed < 40; seed++) {
           const item = arithmeticItemForSkill(id, mulberry32(seed), tier);
@@ -231,7 +272,7 @@ describe('arithmetic generators', () => {
   });
 
   it('is deterministic per seed', () => {
-    for (const id of ARITHMETIC_SKILLS)
+    for (const id of ADD_SUB_SKILLS)
       for (const tier of [1, 2, 3] as SkillTier[])
         expect(arithmeticItemForSkill(id, mulberry32(7), tier)).toEqual(
           arithmeticItemForSkill(id, mulberry32(7), tier),
@@ -239,7 +280,7 @@ describe('arithmetic generators', () => {
   });
 
   it('renders in the dialog at every tier (scene-free items always render)', () => {
-    for (const id of ARITHMETIC_SKILLS)
+    for (const id of ADD_SUB_SKILLS)
       for (const tier of [1, 2, 3] as SkillTier[])
         expect(dialogRenderable(arithmeticItemForSkill(id, mulberry32(3), tier))).toBe(true);
   });
@@ -251,5 +292,57 @@ describe('arithmetic generators', () => {
       if (step.kind !== 'verdict') throw new Error('not a verdict');
       expect(verdictTruth(step)).toBe(step.answer);
     }
+  });
+});
+
+/** Big-number word-problem contexts (le, 22/11, review of #51): a word problem with
+ *  any number ≥ 1000 belongs to a warehouse, a library or a school — never to one
+ *  child's marbles, sweets or fish. Small numbers keep the personal nouns. */
+const WP_SKILLS = ['add-sub-1000-wp', 'add-sub-10000-wp', 'add-sub-100000-wp'] as const;
+const BIG_MARKERS = ['Kho', 'Thư viện', 'Trường'];
+const PERSONAL_NOUNS = ['viên bi', 'cái kẹo', 'bông hoa', 'quả táo', 'con cá'];
+
+/** The numbers in a rendered story (SGK grouping spaces stripped first). */
+function renderedNumbers(text: string): number[] {
+  return text.replace(/[  ]/g, '').match(/\d+/g)?.map(Number) ?? [];
+}
+
+describe('arithmetic add/sub word-problem contexts', () => {
+  it('a word problem with any number ≥ 1000 uses a big-number context, never a personal noun', () => {
+    setLanguage('vi');
+    for (const id of WP_SKILLS)
+      for (const tier of [1, 2, 3] as SkillTier[])
+        for (let seed = 0; seed < 40; seed++) {
+          const item = arithmeticItemForSkill(id, mulberry32(seed), tier);
+          const story = renderArithmeticPrompt(item.story);
+          const hasBig = renderedNumbers(story).some((n) => n >= 1000);
+          // The answers are numbers the child sees too: a big result needs the
+          // big context even when every number printed in the story is small.
+          const bigAnswer = stepValues(item).some((v) => v >= 1000);
+          if (hasBig || bigAnswer) {
+            expect(
+              BIG_MARKERS.some((m) => story.includes(m)),
+              `${story}: number ≥ 1000 without a big-number context`,
+            ).toBe(true);
+            for (const noun of PERSONAL_NOUNS)
+              expect(story, `${story}: personal noun ${noun}`).not.toContain(noun);
+          }
+        }
+  });
+
+  it('a word problem with a personal noun shows only numbers < 1000', () => {
+    setLanguage('vi');
+    for (const id of WP_SKILLS)
+      for (const tier of [1, 2, 3] as SkillTier[])
+        for (let seed = 0; seed < 40; seed++) {
+          const item = arithmeticItemForSkill(id, mulberry32(seed), tier);
+          const story = renderArithmeticPrompt(item.story);
+          if (PERSONAL_NOUNS.some((n) => story.includes(n))) {
+            for (const n of renderedNumbers(story))
+              expect(n, `${story}: personal noun with ${n} ≥ 1000`).toBeLessThan(1000);
+            for (const v of stepValues(item))
+              expect(v, `${story}: personal noun with answer ${v} ≥ 1000`).toBeLessThan(1000);
+          }
+        }
   });
 });

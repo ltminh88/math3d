@@ -10,35 +10,58 @@ import { arithmeticItem, numberStep, ref } from './arithmetic-distractors';
 import { RANGE_1000, RANGE_10000, RANGE_100000 } from './arithmetic-ranges';
 import { countAddCarries, countSubBorrows } from './carry-count';
 
+/** A big-number context (le, 22/11): counts ≥ 1000 belong to a warehouse, a library
+ *  or a school — never to one child's marbles or sweets. `give` / `giveTwoStep` are
+ *  the story keys for giving some away: a warehouse ships out, a library lends, a
+ *  school hands out to its students. */
+const BIG_CONTEXTS = [
+  { name: 'Kho', item: 'i:riceKg', give: 'wpSubGiveOut', giveTwoStep: 'wpTwoStepLeftOut' },
+  { name: 'Thư viện', item: 'i:book', give: 'wpSubGiveLend', giveTwoStep: 'wpTwoStepLeftLend' },
+  {
+    name: 'Trường',
+    item: 'i:book',
+    give: 'wpSubGiveHandout',
+    giveTwoStep: 'wpTwoStepLeftHandout',
+  },
+] as const;
+
+/** A sub pair with a ≠ b (the compare frame needs two different counts). */
+function pickSubPairNoEqual(rng: Rng, maxSum: number, tier: SkillTier): [number, number] {
+  let [a, b] = pickSubPair(rng, maxSum, tier);
+  for (let t = 0; t < 20 && a === b; t++) [a, b] = pickSubPair(rng, maxSum, tier);
+  return [a, b];
+}
+
 /** One step: has a, buys b more / gives b away / has more than a friend. */
 function oneStep(rng: Rng, tier: SkillTier, maxSum: number, skillId: string) {
   const frame = pick(rng, ['add', 'sub', 'compare'] as const);
-  const item = pickNoun(rng);
+  // Numbers first: the context follows the numbers — any number ≥ 1000 (operands
+  // or result) takes a big-number context; small numbers keep the personal nouns.
+  const [a, b] =
+    frame === 'add' ? pickAddPair(rng, maxSum, tier) : pickSubPairNoEqual(rng, maxSum, tier);
+  const result = frame === 'add' ? a + b : a - b;
+  const big = a >= 1000 || b >= 1000 || result >= 1000;
+  const ctx = big ? pick(rng, BIG_CONTEXTS) : null;
+  const name = ctx?.name ?? pickName(rng);
+  const item = ctx?.item ?? pickNoun(rng);
   if (frame === 'add') {
-    const [a, b] = pickAddPair(rng, maxSum, tier);
-    const name = pickName(rng);
     return arithmeticItem(skillId, tier, ref('wpAddHave', { name, item, a, b }), [
       numberStep(ref('askTotal', { name, item }), a + b),
     ]);
   }
-  let [a, b] = pickSubPair(rng, maxSum, tier);
-  for (let t = 0; t < 20 && a === b; t++) [a, b] = pickSubPair(rng, maxSum, tier);
   if (frame === 'sub') {
-    const name = pickName(rng);
-    return arithmeticItem(skillId, tier, ref('wpSubGive', { name, item, a, b }), [
+    return arithmeticItem(skillId, tier, ref(ctx?.give ?? 'wpSubGive', { name, item, a, b }), [
       numberStep(ref('askLeft', { name, item }), a - b),
     ]);
   }
-  const [name, name2] = pickNames(rng);
-  return arithmeticItem(skillId, tier, ref('wpCompare', { name, name2, item, a, b }), [
-    numberStep(ref('askMore', { name, name2, item }), a - b),
+  const [name1, name2] = ctx ? [`${name} A`, `${name} B`] : pickNames(rng);
+  return arithmeticItem(skillId, tier, ref('wpCompare', { name: name1, name2, item, a, b }), [
+    numberStep(ref('askMore', { name: name1, name2, item }), a - b),
   ]);
 }
 
 /** Two steps: has a, buys b, then buys c more / gives c away. */
 function twoStep(rng: Rng, tier: SkillTier, maxSum: number, skillId: string) {
-  const name = pickName(rng);
-  const item = pickNoun(rng);
   const isAdd = rng() < 0.5;
   const minOperand = maxSum >= RANGE_100000 ? 10000 : maxSum >= RANGE_10000 ? 1000 : 10;
   for (let t = 0; t < 500; t++) {
@@ -53,6 +76,11 @@ function twoStep(rng: Rng, tier: SkillTier, maxSum: number, skillId: string) {
     if (tier === 2 && total !== 0) continue;
     if (tier === 3 && total < 1) continue;
     const final = isAdd ? first + c : first - c;
+    // The context follows the numbers: any number ≥ 1000 takes a big-number context.
+    const big = a >= 1000 || b >= 1000 || c >= 1000 || first >= 1000 || final >= 1000;
+    const ctx = big ? pick(rng, BIG_CONTEXTS) : null;
+    const name = ctx?.name ?? pickName(rng);
+    const item = ctx?.item ?? pickNoun(rng);
     if (isAdd)
       return arithmeticItem(
         skillId,
@@ -67,7 +95,7 @@ function twoStep(rng: Rng, tier: SkillTier, maxSum: number, skillId: string) {
     return arithmeticItem(
       skillId,
       tier,
-      ref('wpTwoStepLeft', { name, item, a, b, c }),
+      ref(ctx?.giveTwoStep ?? 'wpTwoStepLeft', { name, item, a, b, c }),
       [
         numberStep(ref('askAfterBuy', { name, item }), first),
         numberStep(ref('askFinalLeft', { name, item }), final),
@@ -75,6 +103,8 @@ function twoStep(rng: Rng, tier: SkillTier, maxSum: number, skillId: string) {
       [first],
     );
   }
+  const name = pickName(rng);
+  const item = pickNoun(rng);
   return arithmeticItem(
     skillId,
     tier,

@@ -38,7 +38,11 @@ export function sweepArithmeticItem(
   expect(item.tier).toBe(tier);
   expect(item.scene, where).toBeUndefined();
   expect(item.steps.length, where).toBeGreaterThanOrEqual(1);
-  expect(item.steps.length, where).toBeLessThanOrEqual(2);
+  // div-2d-1d-wp T3 is the one three-step form (full boxes → leftover → boxes
+  // needed); every other arithmetic item has at most two steps.
+  expect(item.steps.length, where).toBeLessThanOrEqual(
+    skillId === 'div-2d-1d-wp' && tier === 3 ? 3 : 2,
+  );
   const cap = rangeCapOfSkill(skillId, tier);
   for (const n of allNumbers(item)) {
     expect(Number.isInteger(n), `${where}: ${n}`).toBe(true);

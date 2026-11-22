@@ -10,6 +10,8 @@ import { entry, t1, t2 } from '../learning/skill-entry';
  * Arithmetic skills, in catalog order. The two cross-range skills (find-error,
  * missing-digit) scale range by tier — T1 ≤ 1 000, T2 ≤ 10 000, T3 ≤ 100 000 —
  * so a fresh skill always starts within 1 000 and a B2 run never goes over-scope.
+ * Phase 10 appends the mul/div skills (B23, B26, B36, B37); mul-div-find-error
+ * spans the 2-digit (B26) and 3-digit (B37) lessons, T1 ≤ 99, T2–T3 ≤ 999.
  */
 export const ARITHMETIC_ENTRIES: readonly SkillEntry[] = Object.freeze([
   entry('add-sub-mental-round', 'arithmetic', [t1(2)]),
@@ -24,4 +26,19 @@ export const ARITHMETIC_ENTRIES: readonly SkillEntry[] = Object.freeze([
   entry('add-sub-100000-wp', 'arithmetic', [t2(63), t2(64)]),
   entry('add-sub-find-error', 'arithmetic', [t1(2), t2(54), t2(55), t2(63), t2(64)]),
   entry('add-missing-digit', 'arithmetic', [t1(2), t2(54), t2(55), t2(63), t2(64)]),
+  entry('mul-2d-1d', 'arithmetic', [t1(23)]),
+  entry('mul-tens-mental', 'arithmetic', [t1(23)]),
+  entry('mul-2d-1d-wp', 'arithmetic', [t1(23)]),
+  entry('div-2d-1d', 'arithmetic', [t1(26)]),
+  entry('div-2d-1d-remainder', 'arithmetic', [t1(26)]),
+  entry('div-tens-mental', 'arithmetic', [t1(26)]),
+  entry('div-2d-1d-wp', 'arithmetic', [t1(26)]),
+  entry('mul-3d-1d', 'arithmetic', [t1(36)]),
+  entry('mul-hundreds-mental', 'arithmetic', [t1(36)]),
+  entry('mul-3d-1d-wp', 'arithmetic', [t1(36)]),
+  entry('div-3d-1d', 'arithmetic', [t1(37)]),
+  entry('div-3d-1d-remainder', 'arithmetic', [t1(37)]),
+  entry('div-hundreds-mental', 'arithmetic', [t1(37)]),
+  entry('div-reduce-times', 'arithmetic', [t1(37)]),
+  entry('mul-div-find-error', 'arithmetic', [t1(26), t1(37)]),
 ]);

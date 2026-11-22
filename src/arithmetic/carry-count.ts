@@ -50,3 +50,20 @@ export function hasBorrowAcrossZero(a: number, b: number): boolean {
   }
   return false;
 }
+
+/** Carry count of a × b (b a single digit): positions where digit × b plus the incoming carry reaches 10. */
+export function countMulCarries(a: number, b: number): number {
+  const da = digitsOf(a);
+  let carry = 0;
+  let count = 0;
+  for (const d of da) {
+    const v = d * b + carry;
+    if (v >= 10) {
+      count++;
+      carry = Math.floor(v / 10);
+    } else {
+      carry = 0;
+    }
+  }
+  return count;
+}

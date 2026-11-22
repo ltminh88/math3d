@@ -282,6 +282,45 @@ test('run B2: answer all 6, stars before/after show, coins in store, picker star
   await expect(page.locator('#dialog')).not.toHaveAttribute('open', '');
 });
 
+test('run B26: answer all 6, remainder two-step by tap, stars before/after show, coins in store, picker stars update', async ({
+  page,
+}, info) => {
+  const touch = isTouch(info);
+  await boot(page);
+  await openPicker(page, touch);
+  await openTopic(page, 4, touch);
+  await pickLesson(page, 26, touch);
+  await expect(page.locator('#dialog-content')).toContainText(
+    'Bài 26 · Chia số hai chữ số cho số một chữ số · Câu 1/6',
+  );
+  expect(await playLessonRun(page, touch)).toBe(6);
+  const content = page.locator('#dialog-content');
+  await expect(content).toContainText('Xong bài 26!');
+  await expect(content).toContainText('☆☆☆ → ★☆☆');
+  await expect(content).toContainText('+30 xu');
+  await expect(coins(page)).toHaveText('30');
+  const snap = await page.evaluate(() => window.__game?.snapshot());
+  for (const id of [
+    'div-2d-1d',
+    'div-2d-1d-remainder',
+    'div-tens-mental',
+    'div-2d-1d-wp',
+    'mul-div-find-error',
+  ])
+    expect(snap?.factStats[`sk:${id}`]?.attempts ?? 0).toBeGreaterThanOrEqual(1);
+  // Back to the picker: B26 now shows 1 star.
+  const back = page.locator('#lesson-back');
+  if (touch) await back.tap();
+  else await back.click();
+  await expect(page.locator('#dialog-content')).toContainText('Chọn bài để luyện');
+  await expect(
+    page.locator('button.lesson-row[data-lesson="26"] .lesson-row__stars'),
+  ).toHaveAttribute('data-stars', '1');
+  await waitDialogSettled(page);
+  await page.locator('#close-dialog').click();
+  await expect(page.locator('#dialog')).not.toHaveAttribute('open', '');
+});
+
 test('run B25: answer all 6, stars before/after show, coins in store, picker stars update', async ({
   page,
 }, info) => {
