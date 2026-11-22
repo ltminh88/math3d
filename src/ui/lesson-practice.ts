@@ -4,7 +4,7 @@
 // and a way back to the picker or straight into a replay.
 import { getLanguage } from '../i18n/i18n';
 import type { FactKey } from '../learning/fact-key';
-import { lessonByNumber } from '../learning/kntt-lesson-index';
+import { lessonByNumber, skillsOfLesson } from '../learning/kntt-lesson-index';
 import { planLessonRun } from '../learning/lesson-planner';
 import { lessonStars } from '../learning/lesson-progress';
 import { COINS_PER_CORRECT } from '../learning/scoring';
@@ -21,10 +21,12 @@ import { destroyPracticeRun, isKeyRenderable, startPracticeRun } from './practic
 import { connectedStore } from './progress-sync';
 import { showToast } from './toast-and-persist';
 
-/** Deterministic run seed per (lesson, profile): a replay plans the same items. */
-function lessonSeed(lessonN: number, profileId: string): number {
+/** Deterministic run seed per (lesson, profile, total attempts on the lesson's
+ * skills): a replay re-plans once the previous round's attempts are recorded,
+ * so "Luyện lại bài này" never deals the same 6 items back-to-back. */
+export function lessonSeed(lessonN: number, profileId: string, totalAttempts: number): number {
   let h = 0x811c9dc5;
-  const s = `${profileId}:lesson:${lessonN}`;
+  const s = `${profileId}:lesson:${lessonN}:attempts:${totalAttempts}`;
   for (let i = 0; i < s.length; i++) {
     h ^= s.charCodeAt(i);
     h = Math.imul(h, 0x01000193);
@@ -50,7 +52,13 @@ export function startLessonRun(lessonN: number): void {
   const snapshot = store.getSnapshot();
   const stats = snapshot.factStats;
   const renderable = (key: FactKey): boolean => isKeyRenderable(key, stats[key]?.box ?? 1);
-  const seed = lessonSeed(lessonN, snapshot.profile.id);
+  // The seed mixes in the total attempts on this lesson's skills, so a replay
+  // after a round plans different items instead of the same 6 questions.
+  const totalAttempts = skillsOfLesson(lessonN).reduce(
+    (sum, key) => sum + (stats[key]?.attempts ?? 0),
+    0,
+  );
+  const seed = lessonSeed(lessonN, snapshot.profile.id, totalAttempts);
   const keys = planLessonRun(lessonN, stats, mulberry32(seed), { renderable });
   if (keys.length === 0) {
     // Nothing playable (yet): back to the picker, where the lesson shows "Sắp có".
