@@ -1,16 +1,21 @@
 // One entry point for the arithmetic family (phase 09): an arithmetic-family skill id + rng
-// + tier -> item. Empty until phase 09 adds the first generator; the dispatcher already
-// consults it.
+// + tier -> item. The dispatcher already consults it.
 import type { Rng } from '../learning/seeded-rng';
 import type { SkillTier } from '../learning/skill-tiers';
 import type { PracticeItem } from '../practice/practice-scene';
+import { ADD_SUB_GENERATORS } from './add-sub-generators';
+import { WORD_PROBLEM_GENERATORS } from './add-sub-word-problems';
+import { ARITHMETIC_ENTRIES } from './arithmetic-skill-entries';
 
 export type ArithmeticGenerator = (rng: Rng, tier: SkillTier) => PracticeItem;
 
-const GENERATORS: Readonly<Record<string, ArithmeticGenerator>> = {};
+const GENERATORS: Readonly<Record<string, ArithmeticGenerator>> = {
+  ...ADD_SUB_GENERATORS,
+  ...WORD_PROBLEM_GENERATORS,
+};
 
-/** The arithmetic skills (catalog order) that have a generator (none yet). */
-export const ARITHMETIC_SKILLS: readonly string[] = Object.keys(GENERATORS);
+/** The arithmetic skills, in catalog order (the entries list is the order). */
+export const ARITHMETIC_SKILLS: readonly string[] = ARITHMETIC_ENTRIES.map((e) => e.id);
 
 export const isArithmeticSkill = (id: string): boolean => id in GENERATORS;
 

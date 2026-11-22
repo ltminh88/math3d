@@ -1,8 +1,8 @@
 // The lesson-mode HUD button (phase 06): "Ôn theo bài" in the top bar, right after the
 // daily button. Created once, like the shop button; hidden with the whole HUD while a
-// level runs. On touch screens the label hides (icon only, aria-label kept): full-width
-// the button would reach the settled VLM label's top touch point (see
-// lesson-practice.css).
+// level runs. On touch screens the label stays but the button shrinks to fit its
+// content (icon-only collided with the "Sổ cửu chương" book icon; full-width it would
+// reach the settled VLM label's top touch point — see lesson-practice.css).
 
 import { byId } from './icons';
 import { openLessonPicker } from './lesson-practice';

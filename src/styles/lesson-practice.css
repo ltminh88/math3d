@@ -39,6 +39,14 @@
   font-size: 16px;
   font-weight: 800;
   cursor: pointer;
+  /* Tapping a topic title must not flash the blue tap frame (review #43); keyboard
+     focus keeps the same orange outline buttons use. */
+  -webkit-tap-highlight-color: transparent;
+}
+
+.lesson-topic summary:focus-visible {
+  outline: 3px solid #e99231;
+  outline-offset: 3px;
 }
 
 .lesson-topic__progress {
@@ -112,18 +120,14 @@
   flex: 1;
 }
 
-@media (max-width: 380px) {
-  #open-lesson span {
-    display: none;
-  }
-}
-
-/* Touch screens: the lesson button is icon-only and 44 px wide. Full-width it
-   reaches y 331-375 in the left column, where the settled VLM label's top
-   touch point sits (phone-touch-hit-areas: the point just above #milo-label
-   must hit the label, not this button). Icon-only keeps the button right
-   after the daily button at 44 px, clear of the label; the full label stays
-   in the VLM dialog entry and in aria-label.
+/* Touch screens: the lesson button keeps its "Ôn theo bài" label (review #43: the
+   icon alone collides with the "Sổ cửu chương" book icon) but shrinks to fit its
+   content instead of stretching the column: full-width it reaches y 331-375 in the
+   left column, where the settled VLM label's top touch point sits
+   (phone-touch-hit-areas: the point just above #milo-label must hit the label, not
+   this button). Shrink-to-fit ends the button well left of that point (measured by
+   the probe spec before landing this — see the PR body); the full label stays in
+   the VLM dialog entry and in aria-label.
    The column itself also blocks that point: .hud-left has pointer-events auto
    and its box stretches to the lesson button's bottom (y 375), so the empty
    space right of the icon still covers the label's top point. On touch the
@@ -133,11 +137,9 @@
 @media (pointer: coarse) {
   #open-lesson {
     align-self: flex-start;
-    width: 44px;
-    padding: 9px 0;
-  }
-  #open-lesson span {
-    display: none;
+    width: auto;
+    padding: 9px 12px;
+    white-space: nowrap;
   }
   .hud-left {
     pointer-events: none;

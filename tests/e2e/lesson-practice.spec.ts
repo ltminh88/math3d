@@ -201,14 +201,18 @@ test('picker: 81 lessons in 16 topics, "Học tiếp" points at B1, no-content l
   await expect(page.locator('#lesson-continue')).toContainText('Học tiếp: Bài 1');
   await expect(page.locator('details.lesson-topic')).toHaveCount(16);
   await expect(page.locator('button.lesson-row')).toHaveCount(81);
-  // Topic 1 (B1's topic) is open; B1 is playable at 0 stars, B2 has no content yet.
+  // Topic 1 (B1's topic) is open; B1 and B2 are playable at 0 stars.
   await expect(page.locator('details.lesson-topic[data-topic="1"]')).toHaveAttribute('open', '');
   const b1 = page.locator('button.lesson-row[data-lesson="1"]');
   await expect(b1).toBeEnabled();
   await expect(b1.locator('.lesson-row__stars')).toHaveAttribute('data-stars', '0');
   const b2 = page.locator('button.lesson-row[data-lesson="2"]');
-  await expect(b2).toBeDisabled();
-  await expect(b2).toContainText('Sắp có');
+  await expect(b2).toBeEnabled();
+  await expect(b2).toContainText('Cộng, trừ trong phạm vi 1 000');
+  // B7 mixes nothing, so it is the no-content example now that B2 landed (phase 09).
+  const b7 = page.locator('button.lesson-row[data-lesson="7"]');
+  await expect(b7).toBeDisabled();
+  await expect(b7).toContainText('Sắp có');
   // Topic 4 opens on tap; B25 is playable there.
   await openTopic(page, 4, touch);
   const b25 = page.locator('button.lesson-row[data-lesson="25"]');
@@ -234,6 +238,45 @@ test('VLM entry: the Milo dialog opens the picker by tap', async ({ page }, info
   else await button.click();
   await expect(page.locator('#dialog-content')).toContainText('Chọn bài để luyện');
   await expect(page.locator('#lesson-continue')).toContainText('Học tiếp: Bài 1');
+  await waitDialogSettled(page);
+  await page.locator('#close-dialog').click();
+  await expect(page.locator('#dialog')).not.toHaveAttribute('open', '');
+});
+
+test('run B2: answer all 6, stars before/after show, coins in store, picker stars update', async ({
+  page,
+}, info) => {
+  const touch = isTouch(info);
+  await boot(page);
+  await openPicker(page, touch);
+  await pickLesson(page, 2, touch);
+  await expect(page.locator('#dialog-content')).toContainText(
+    'Bài 2 · Cộng, trừ trong phạm vi 1 000 · Câu 1/6',
+  );
+  expect(await playLessonRun(page, touch)).toBe(6);
+  const content = page.locator('#dialog-content');
+  await expect(content).toContainText('Xong bài 2!');
+  await expect(content).toContainText('☆☆☆ → ★☆☆');
+  await expect(content).toContainText('+30 xu');
+  await expect(coins(page)).toHaveText('30');
+  const snap = await page.evaluate(() => window.__game?.snapshot());
+  for (const id of [
+    'add-sub-mental-round',
+    'add-sub-1000',
+    'add-sub-1000-wp',
+    'add-sub-1000-chain',
+    'add-sub-find-error',
+    'add-missing-digit',
+  ])
+    expect(snap?.factStats[`sk:${id}`]?.attempts ?? 0).toBeGreaterThanOrEqual(1);
+  // Back to the picker: B2 now shows 1 star.
+  const back = page.locator('#lesson-back');
+  if (touch) await back.tap();
+  else await back.click();
+  await expect(page.locator('#dialog-content')).toContainText('Chọn bài để luyện');
+  await expect(
+    page.locator('button.lesson-row[data-lesson="2"] .lesson-row__stars'),
+  ).toHaveAttribute('data-stars', '1');
   await waitDialogSettled(page);
   await page.locator('#close-dialog').click();
   await expect(page.locator('#dialog')).not.toHaveAttribute('open', '');

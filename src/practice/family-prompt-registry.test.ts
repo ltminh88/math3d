@@ -26,8 +26,9 @@ function promptsOfStep(step: ReasoningStep): PromptRef[] {
 }
 
 describe('family prompt registry', () => {
-  it('registers geometry, measurement, number, fraction, time, money and data', () => {
+  it('registers geometry, measurement, number, arithmetic, fraction, time, money and data', () => {
     expect([...registeredPromptFamilies()].sort()).toEqual([
+      'arithmetic',
       'data',
       'fraction',
       'geometry',
@@ -39,8 +40,7 @@ describe('family prompt registry', () => {
   });
 
   it('falls back to the same reasoning renderer for unregistered families', () => {
-    expect(renderPromptFor('arithmetic')).toBe(renderPromptFor('word-problem'));
-    expect(renderPromptFor('arithmetic')).toBe(renderPromptFor(undefined));
+    expect(renderPromptFor('word-problem')).toBe(renderPromptFor(undefined));
   });
 
   it('renders every prompt of every generated item (no raw key)', () => {
