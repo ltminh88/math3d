@@ -1,0 +1,33 @@
+/* In-level zoom buttons (phase 25): left edge, vertically centred, clear of the answer
+   panel (right on wide screens, bottom on narrow ones) and of the leave button. */
+.level-zoom {
+  position: absolute;
+  left: max(12px, env(safe-area-inset-left));
+  top: 50%;
+  translate: 0 -50%;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  z-index: 7;
+}
+
+.level-zoom__button {
+  width: 44px;
+  min-height: 44px;
+  padding: 0;
+  border: 0;
+  border-radius: 12px;
+  background: var(--paper);
+  box-shadow: var(--shadow);
+  color: var(--ink);
+  font-family: var(--font-display);
+  font-size: 26px;
+  font-weight: 800;
+  line-height: 1;
+  cursor: pointer;
+}
+
+.level-zoom__button:disabled {
+  opacity: 0.45;
+  cursor: default;
+}

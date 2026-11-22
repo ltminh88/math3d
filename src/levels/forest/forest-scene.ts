@@ -4,6 +4,8 @@ import { Scene } from 'three';
 import type { InteractionEvent } from '../../core/input/interaction-types';
 import { LEVEL_COMPLETE_BONUS } from '../shared/level-run-result';
 import type { LevelContext, LevelModule, LevelSession } from '../shared/level-types';
+import { attachLevelZoom } from '../shared/level-zoom';
+import '../shared/level-zoom.css';
 import { createAnimalMaterial } from './animal-friend-factory';
 import { FactFamilyCard } from './fact-family-card';
 import { ForestCamera } from './forest-camera';
@@ -44,6 +46,18 @@ function start(ctx: LevelContext): LevelSession {
   // Enter first (it leaves Enter to the pad unless a fruit or friend has 3D focus).
   const interaction = ctx.input.createInteraction(view.camera);
   interaction.setPlaneY(FRUIT_Y);
+  // Phase 25a: pinch + wheel + +/− buttons zoom the camera around the auto-fit distance.
+  // A pinch that starts mid-drag cancels the drag, so it can never drop an answer.
+  const zoomHandle = attachLevelZoom(ctx.canvas, {
+    container: ctx.ui,
+    onFactor: (factor) => {
+      view.setZoomFactor(factor);
+      ctx.ui.dataset.zoomFactor = String(factor);
+    },
+    onPinchStart: () => interaction.cancelDrag(),
+  });
+  const zoom = zoomHandle.zoom;
+  ctx.ui.dataset.zoomFactor = '1';
   const panel = new ForestPanel(ctx.ui, ts, {
     onDeal: run((c) => c.deal()),
     onCheck: run((c) => c.check()),
@@ -79,6 +93,7 @@ function start(ctx: LevelContext): LevelSession {
     labels,
     {
       onTableChanged(snap) {
+        if (snap) zoom.reset();
         const active = c.interactive;
         interaction.setPickables(active ? table.props.pickables() : []);
         interaction.setZones(active ? table.zones(c.sharing) : []);
@@ -182,6 +197,7 @@ function start(ctx: LevelContext): LevelSession {
       frame();
     },
     dispose() {
+      zoomHandle.dispose();
       sun.shadow.dispose();
       panel.destroy();
       labels.root.remove();
