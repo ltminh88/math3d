@@ -59,9 +59,7 @@ const wornInScene = () => {
 
 /** World positions of the placed decor meshes. */
 const decorPositions = () =>
-  (
-    window.__parity as unknown as { scene: import('three').Scene }
-  ).scene.children
+  (window.__parity as unknown as { scene: import('three').Scene }).scene.children
     .filter((c) => c.name.startsWith('cosmetic:decor-'))
     .map((c) => [c.name, c.position.x, c.position.z]);
 
