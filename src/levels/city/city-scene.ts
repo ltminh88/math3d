@@ -4,6 +4,8 @@
 import { Scene } from 'three';
 import { LEVEL_COMPLETE_BONUS } from '../shared/level-run-result';
 import type { LevelContext, LevelModule, LevelSession } from '../shared/level-types';
+import { attachLevelZoom } from '../shared/level-zoom';
+import '../shared/level-zoom.css';
 import { CityBuildingView } from './city-building-view';
 import { buildingFrame, CityCamera, STREET_FRAME } from './city-camera';
 import { showCityCelebration } from './city-celebration';
@@ -41,6 +43,20 @@ function start(ctx: LevelContext): LevelSession {
   // Created before the number pad: both listen on document, and the 3D keyboard layer must see
   // Enter first (it leaves Enter to the pad unless a parcel, house or floor has 3D focus).
   const interaction = ctx.input.createInteraction(view.camera);
+  // Phase 25b: pinch + wheel + +/− buttons zoom the camera around the auto-fit distance.
+  // A pinch that starts mid-drag cancels the drag, so it can never drop a parcel by accident.
+  const zoomHandle = attachLevelZoom(ctx.canvas, {
+    container: ctx.ui,
+    onFactor: (factor) => {
+      view.setZoomFactor(factor);
+      ctx.ui.dataset.zoomFactor = String(factor);
+    },
+    onPinchStart: () => interaction.cancelDrag(),
+    zoomInLabel: ts('zoomIn'),
+    zoomOutLabel: ts('zoomOut'),
+  });
+  const zoom = zoomHandle.zoom;
+  ctx.ui.dataset.zoomFactor = '1';
   const controller: { current?: CityRoundController } = {};
   const run = (fn: (c: CityRoundController) => void) => () => {
     if (controller.current) fn(controller.current);
@@ -77,6 +93,7 @@ function start(ctx: LevelContext): LevelSession {
     onChanged(newRound) {
       refresh();
       if (newRound) {
+        zoom.reset();
         const windows = c.round?.kind === 'windows';
         view.setFrame(windows ? buildingFrame(building.width, building.height) : STREET_FRAME);
       }
@@ -155,6 +172,7 @@ function start(ctx: LevelContext): LevelSession {
       frame();
     },
     dispose() {
+      zoomHandle.dispose();
       sun.shadow.dispose();
       panel.destroy();
       labels.destroy();

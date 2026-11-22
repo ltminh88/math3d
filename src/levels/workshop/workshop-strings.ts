@@ -47,6 +47,8 @@ const vi = {
   bonusLine: 'Thưởng lần đầu hoàn thành: +{xp} XP · +{coins} xu',
   stars: '{n}/3 sao',
   stageLine: 'Chặng {n}/{m} · {stars} sao',
+  zoomIn: 'Phóng to',
+  zoomOut: 'Thu nhỏ',
   backToGate: 'Về cổng',
 };
 
@@ -96,6 +98,8 @@ const en: Record<keyof typeof vi, string> = {
   bonusLine: 'First completion bonus: +{xp} XP · +{coins} coins',
   stars: '{n}/3 stars',
   stageLine: 'Stage {n}/{m} · {stars} stars',
+  zoomIn: 'Zoom in',
+  zoomOut: 'Zoom out',
   backToGate: 'Back to the gate',
 };
 

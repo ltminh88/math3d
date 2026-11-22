@@ -40,6 +40,60 @@ function expectInside(camera: CityCamera, area: FreeArea, points: Vector3[]) {
   }
 }
 
+describe('city camera zoom (phase 25b)', () => {
+  const distance = (view: CityCamera): number => {
+    const p = view.camera.position;
+    const t = STREET_FRAME.target;
+    return Math.hypot(p.x - t.x, p.y - t.y, p.z - t.z);
+  };
+  const fitted = (): CityCamera => {
+    const view = new CityCamera();
+    view.setFrame(STREET_FRAME);
+    view.setArea(PHONE);
+    return view;
+  };
+
+  it('scales the auto-fit distance by the zoom factor', () => {
+    const view = fitted();
+    const base = distance(view);
+    view.setZoomFactor(0.8);
+    expect(distance(view)).toBeCloseTo(base * 0.8, 6);
+    view.setZoomFactor(1.25);
+    expect(distance(view)).toBeCloseTo(base * 1.25, 6);
+  });
+
+  it('clamps the factor to 0.6×–1.6×', () => {
+    const view = fitted();
+    const base = distance(view);
+    view.setZoomFactor(0.5);
+    expect(view.zoomFactor).toBe(0.6);
+    expect(distance(view)).toBeCloseTo(base * 0.6, 6);
+    view.setZoomFactor(2);
+    expect(view.zoomFactor).toBe(1.6);
+    expect(distance(view)).toBeCloseTo(base * 1.6, 6);
+  });
+
+  it('keeps the free-area view offset when zooming', () => {
+    const view = fitted();
+    const before = { ...view.camera.view };
+    view.setZoomFactor(0.7);
+    const after = view.camera.view;
+    expect(after?.enabled).toBe(true);
+    expect(after?.offsetX).toBe(before?.offsetX);
+    expect(after?.offsetY).toBe(before?.offsetY);
+    expect(after?.fullWidth).toBe(before?.fullWidth);
+    expect(after?.fullHeight).toBe(before?.fullHeight);
+  });
+
+  it('resetZoom returns to the unzoomed distance', () => {
+    const view = fitted();
+    const base = distance(view);
+    view.setZoomFactor(1.4);
+    view.resetZoom();
+    expect(view.zoomFactor).toBe(1);
+    expect(distance(view)).toBeCloseTo(base, 6);
+  });
+});
 describe('city camera framing', () => {
   it('a 10-floor building of 9 windows fits between VLM and the panel on a phone', () => {
     const width = buildingWidth(MAX_WINDOWS_PER_FLOOR);

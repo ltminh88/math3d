@@ -1,7 +1,8 @@
 // Scene, lights and camera of the field level, tuned like the world (sky horizon colour, fog,
 // hemisphere fill + shadow-casting sun). The renderer's global state is never touched: the sky is
 // the scene background. The camera frames the plot as large as the canvas area the HUD leaves
-// free allows (measured, so phone cells stay finger-sized; QA M-5).
+// free allows (measured, so phone cells stay finger-sized; QA M-5). Phase 25b: the zoom factor
+// scales the fitted distance (0.6×–1.6×); the free-area shift is untouched by zooming.
 import {
   Box3,
   Color,
@@ -14,6 +15,7 @@ import {
 } from 'three';
 import { SKY_HORIZON_COLOR } from '../../config/world-constants';
 import { WORLD_LIGHTING } from '../../world/world-lighting-tuning';
+import { clampZoomFactor } from '../shared/level-zoom';
 
 const FOV = 40;
 const ELEVATION = (54 * Math.PI) / 180;
@@ -41,6 +43,12 @@ export interface FieldStage {
    * equation label and is seen more steeply on phones; the celebration's meadow is not.
    */
   fit(view: FieldViewport, box: Box3, plot: boolean): void;
+  /** Current zoom factor (1 = the fitted distance). */
+  readonly zoomFactor: number;
+  /** Scales the fitted distance, clamped to 0.6×–1.6× (re-frames with the last fit). */
+  setZoomFactor(factor: number): void;
+  /** Back to the fitted distance. */
+  resetZoom(): void;
   /** Frees the sun's shadow map (a render target the scene disposer never reaches; QA M-3). */
   dispose(): void;
 }
@@ -80,6 +88,9 @@ export function createFieldStage(lowPower: boolean): FieldStage {
   scene.add(sun, sun.target);
   const camera = new PerspectiveCamera(FOV, 1, 0.5, 120);
   const corner = new Vector3();
+  let zoomFactorValue = 1;
+  /** Last fit, so setZoomFactor can re-frame without a new plot or phase. */
+  let lastFit: { view: FieldViewport; box: Box3; plot: boolean } | undefined;
 
   let elevation = ELEVATION;
   const place = (target: Vector3, distance: number) => {
@@ -95,9 +106,22 @@ export function createFieldStage(lowPower: boolean): FieldStage {
   return {
     scene,
     camera,
+    get zoomFactor(): number {
+      return zoomFactorValue;
+    },
+    setZoomFactor(factor: number): void {
+      const next = clampZoomFactor(factor);
+      if (next === zoomFactorValue) return;
+      zoomFactorValue = next;
+      if (lastFit) this.fit(lastFit.view, lastFit.box, lastFit.plot);
+    },
+    resetZoom(): void {
+      this.setZoomFactor(1);
+    },
     fit(view, box, plot) {
       const { width, height } = view;
       if (width <= 0 || height <= 0) return;
+      lastFit = { view, box, plot };
       const free = {
         left: EDGE_PX,
         right: Math.max(width - view.right - EDGE_PX, width * 0.4),
@@ -138,7 +162,7 @@ export function createFieldStage(lowPower: boolean): FieldStage {
         if (fits(mid)) far = mid;
         else near = mid;
       }
-      place(target, far);
+      place(target, far * zoomFactorValue);
     },
     dispose: () => sun.shadow.dispose(),
   };

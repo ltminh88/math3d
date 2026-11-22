@@ -1,7 +1,10 @@
 // Camera over the garden's work spot. VLM's line covers the top and the answer panel part of the
 // canvas (right side when wide, bottom when narrow), so the view is shifted into the free area
 // and pulled back until the pots, the balance or the bags (with VLM beside them) fit there.
+// Phase 25b: the zoom factor scales that auto-fit distance (0.6×–1.6×); the free-area shift is
+// untouched by zooming.
 import { PerspectiveCamera, Vector3 } from 'three';
+import { clampZoomFactor } from '../shared/level-zoom';
 
 const FOV = 40;
 const DIRECTION = new Vector3(0, 0.45, 1).normalize();
@@ -20,15 +23,38 @@ export interface FreeArea {
 
 export class GardenCamera {
   readonly camera = new PerspectiveCamera(FOV, 1, 0.5, 150);
+  private area: FreeArea = { width: 1, height: 1, coverTop: 0, coverRight: 0, coverBottom: 0 };
+  private zoomFactorValue = 1;
 
   constructor() {
-    this.setArea({ width: 1, height: 1, coverTop: 0, coverRight: 0, coverBottom: 0 });
+    this.apply();
+  }
+
+  /** Current zoom factor (1 = the auto-fit distance). */
+  get zoomFactor(): number {
+    return this.zoomFactorValue;
+  }
+
+  /** Scales the auto-fit distance, clamped to 0.6×–1.6×. */
+  setZoomFactor(factor: number): void {
+    this.zoomFactorValue = clampZoomFactor(factor);
+    this.apply();
+  }
+
+  /** Back to the auto-fit distance. */
+  resetZoom(): void {
+    this.setZoomFactor(1);
   }
 
   setArea(area: FreeArea): void {
-    const { coverTop, coverRight, coverBottom } = area;
-    const w = Math.max(1, area.width);
-    const h = Math.max(1, area.height);
+    this.area = area;
+    this.apply();
+  }
+
+  private apply(): void {
+    const { coverTop, coverRight, coverBottom } = this.area;
+    const w = Math.max(1, this.area.width);
+    const h = Math.max(1, this.area.height);
     const freeW = Math.max(w * 0.35, w - coverRight);
     const freeH = Math.max(h * 0.2, h - coverBottom - coverTop);
     const camera = this.camera;
@@ -36,7 +62,7 @@ export class GardenCamera {
     const tanHalf = Math.tan((FOV * Math.PI) / 360);
     const fitWidth = HALF_WIDTH / (tanHalf * camera.aspect * (freeW / w));
     const fitHeight = HALF_HEIGHT / (tanHalf * (freeH / h));
-    const distance = Math.max(MIN_DISTANCE, fitWidth, fitHeight);
+    const distance = Math.max(MIN_DISTANCE, fitWidth, fitHeight) * this.zoomFactorValue;
     camera.position.copy(TARGET).addScaledVector(DIRECTION, distance);
     camera.lookAt(TARGET);
     // Centre of the view = centre of the uncovered part of the canvas (below VLM's line).

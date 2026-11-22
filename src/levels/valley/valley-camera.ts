@@ -5,8 +5,10 @@
 // when wide, bottom when narrow): the view is shifted into the free area (a view offset keeps the
 // axis perpendicular) and pulled back until the figure fits. The ⟲/⟳ buttons (R key) turn the
 // view in 45° steps: top-down that spins the board in its own plane, so angles stay true. Turns
-// and tilts are eased (instant with reduced motion).
+// and tilts are eased (instant with reduced motion). Phase 25b: the zoom factor scales that
+// auto-fit distance (0.6×–1.6×); the free-area shift is untouched by zooming.
 import { PerspectiveCamera, Vector3 } from 'three';
+import { clampZoomFactor } from '../shared/level-zoom';
 
 const FOV = 40;
 /** Elevation of the 3/4 view (solids): steep, the blocks' tops and sides both show. */
@@ -42,8 +44,25 @@ export class ValleyCamera {
   private flat = 1;
   private flatGoal = 1;
   private readonly target = new Vector3(0, 0.3, 0);
+  private zoomFactorValue = 1;
 
   constructor(private readonly reducedMotion: boolean) {}
+
+  /** Current zoom factor (1 = the auto-fit distance). */
+  get zoomFactor(): number {
+    return this.zoomFactorValue;
+  }
+
+  /** Scales the auto-fit distance, clamped to 0.6×–1.6×. */
+  setZoomFactor(factor: number): void {
+    this.zoomFactorValue = clampZoomFactor(factor);
+    this.apply();
+  }
+
+  /** Back to the auto-fit distance (a new round starts unzoomed). */
+  resetZoom(): void {
+    this.setZoomFactor(1);
+  }
 
   /** View turn in whole steps (test hook / announcements). */
   get steps(): number {
@@ -102,7 +121,7 @@ export class ValleyCamera {
     const tanHalf = Math.tan((FOV * Math.PI) / 360);
     const fitWidth = halfX / (tanHalf * camera.aspect * (freeW / w));
     const fitHeight = halfY / (tanHalf * (freeH / h));
-    const distance = Math.max(MIN_DISTANCE, fitWidth, fitHeight) + 1.5;
+    const distance = (Math.max(MIN_DISTANCE, fitWidth, fitHeight) + 1.5) * this.zoomFactorValue;
     const pitch = SOLID_PITCH + (FLAT_PITCH - SOLID_PITCH) * this.flat;
     const [sinT, cosT] = [Math.sin(this.turn), Math.cos(this.turn)];
     const direction = scratchDirection.set(

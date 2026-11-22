@@ -4,6 +4,8 @@
 import { Scene } from 'three';
 import { LEVEL_COMPLETE_BONUS } from '../shared/level-run-result';
 import type { LevelContext, LevelModule, LevelSession } from '../shared/level-types';
+import { attachLevelZoom } from '../shared/level-zoom';
+import '../shared/level-zoom.css';
 import { ValleyBoardViews } from './valley-board-views';
 import { ValleyCamera } from './valley-camera';
 import { showValleyCelebration } from './valley-celebration';
@@ -35,6 +37,20 @@ function start(ctx: LevelContext): LevelSession {
   scene.name = 'valley';
   const { sun } = buildValleyDiorama(scene, ctx.stage);
   const camera = new ValleyCamera(ctx.reducedMotion);
+  // Phase 25b: pinch + wheel + +/− buttons zoom the camera around the auto-fit distance.
+  // The valley has no drag input (board answers are taps), so there is nothing for a
+  // pinch to cancel.
+  const zoomHandle = attachLevelZoom(ctx.canvas, {
+    container: ctx.ui,
+    onFactor: (factor) => {
+      camera.setZoomFactor(factor);
+      ctx.ui.dataset.zoomFactor = String(factor);
+    },
+    zoomInLabel: vs('zoomIn'),
+    zoomOutLabel: vs('zoomOut'),
+  });
+  const zoom = zoomHandle.zoom;
+  ctx.ui.dataset.zoomFactor = '1';
   const flow = new ValleyRoundFlow(buildValleyRounds(planRounds(ctx), ctx.learning.rng), () =>
     performance.now(),
   );
@@ -73,6 +89,7 @@ function start(ctx: LevelContext): LevelSession {
 
   const controller = new ValleyRoundController(ctx, vs, flow, panel, board, {
     onRoundDone(index) {
+      zoom.reset();
       garden.setCount(index + 1);
     },
     onLevelDone(earned, stars) {
@@ -129,6 +146,7 @@ function start(ctx: LevelContext): LevelSession {
       frame();
     },
     dispose() {
+      zoomHandle.dispose();
       sun.shadow.dispose();
       controller.destroy();
       board.dispose();

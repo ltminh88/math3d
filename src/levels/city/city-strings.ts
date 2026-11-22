@@ -54,6 +54,8 @@ const define = (defineFn: typeof defineStrings) =>
       bonusLine: 'Thưởng lần đầu hoàn thành: +{xp} XP · +{coins} xu',
       stars: '{n}/3 sao',
       stageLine: 'Chặng {n}/{m} · {stars} sao',
+      zoomIn: 'Phóng to',
+      zoomOut: 'Thu nhỏ',
       backToGate: 'Về cổng',
       keysHelp: 'Mũi tên chọn gói hàng hoặc tầng, Enter để đặt. Phím 1–4 chọn nhà, H xem gợi ý.',
       reward: '+{xp} XP',
@@ -107,6 +109,8 @@ const define = (defineFn: typeof defineStrings) =>
       bonusLine: 'First-clear bonus: +{xp} XP · +{coins} coins',
       stars: '{n}/3 stars',
       stageLine: 'Stage {n}/{m} · {stars} stars',
+      zoomIn: 'Zoom in',
+      zoomOut: 'Zoom out',
       backToGate: 'Back to the gate',
       keysHelp:
         'Arrow keys pick the parcel or a floor, Enter places it. Keys 1–4 pick a house, H for a hint.',

@@ -2,7 +2,10 @@
 // moves to the next one after each riddle (eased; instant with reduced motion), then to the
 // treasure chest for the celebration. The answer panel covers the right side (wide) or the bottom
 // (narrow), so the view is shifted into the free area and pulled back until the chamber fits.
+// Phase 25b: the zoom factor scales that auto-fit distance (0.6×–1.6×); the free-area shift is
+// untouched by zooming.
 import { PerspectiveCamera, Vector3 } from 'three';
+import { clampZoomFactor } from '../shared/level-zoom';
 import { chamberCenter, TREASURE_INDEX } from './cave-layout';
 
 const FOV = 45;
@@ -29,8 +32,25 @@ export class CaveChamberCamera {
   private readonly goal = new Vector3(0, LOOK_Y, 0);
   /** Chamber the camera is at (or walking to); TREASURE_INDEX = the chest. */
   chamber = 0;
+  private zoomFactorValue = 1;
 
   constructor(private readonly reducedMotion: boolean) {}
+
+  /** Current zoom factor (1 = the auto-fit distance). */
+  get zoomFactor(): number {
+    return this.zoomFactorValue;
+  }
+
+  /** Scales the auto-fit distance, clamped to 0.6×–1.6×. */
+  setZoomFactor(factor: number): void {
+    this.zoomFactorValue = clampZoomFactor(factor);
+    this.apply();
+  }
+
+  /** Back to the auto-fit distance (a new chamber starts unzoomed). */
+  resetZoom(): void {
+    this.setZoomFactor(1);
+  }
 
   /** Walks to chamber `i` (0-6), or to the treasure chest for `TREASURE_INDEX`. */
   goTo(i: number): void {
@@ -64,7 +84,7 @@ export class CaveChamberCamera {
     const tanHalf = Math.tan((FOV * Math.PI) / 360);
     const fitWidth = HALF_WIDTH / (tanHalf * camera.aspect * (freeW / w));
     const fitHeight = HALF_HEIGHT / (tanHalf * (freeH / h));
-    const distance = Math.max(MIN_DISTANCE, fitWidth, fitHeight);
+    const distance = Math.max(MIN_DISTANCE, fitWidth, fitHeight) * this.zoomFactorValue;
     camera.position.copy(this.at).addScaledVector(DIRECTION, distance);
     camera.lookAt(this.at);
     camera.setViewOffset(w, h, (w - freeW) / 2, (h - freeH) / 2, w, h);

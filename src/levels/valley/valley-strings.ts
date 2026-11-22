@@ -68,6 +68,8 @@ const define = (defineFn: typeof defineStrings) =>
       bonusLine: 'Thưởng lần đầu hoàn thành: +{xp} XP · +{coins} xu',
       stars: '{n}/3 sao',
       stageLine: 'Chặng {n}/{m} · {stars} sao',
+      zoomIn: 'Phóng to',
+      zoomOut: 'Thu nhỏ',
       backToGate: 'Về cổng',
       keysHelp:
         'Mũi tên chọn điểm, Enter để chạm. Phím 1-4 chọn thẻ, gõ số rồi Enter, H gợi ý, R xoay.',
@@ -139,6 +141,8 @@ const define = (defineFn: typeof defineStrings) =>
       bonusLine: 'First-clear bonus: +{xp} XP · +{coins} coins',
       stars: '{n}/3 stars',
       stageLine: 'Stage {n}/{m} · {stars} stars',
+      zoomIn: 'Zoom in',
+      zoomOut: 'Zoom out',
       backToGate: 'Back to the gate',
       keysHelp:
         'Arrows pick a point, Enter taps it. Keys 1-4 pick a card, type a number and Enter, H for a hint, R to turn.',
