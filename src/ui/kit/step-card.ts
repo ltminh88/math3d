@@ -111,6 +111,10 @@ export function createStepCard(
       const pad = createNumberPad(
         {
           activeInput: true,
+          // Fixed 6 (enough for 100 000, the game's number ceiling) — never
+          // derived from the answer's length: that would leak how many digits
+          // the answer has. (Hotfix P0 22/11: the default 3 cut "1000" to "100".)
+          maxDigits: 6,
           signal: options.signal,
           onSubmit: (value) => {
             submit(value);
