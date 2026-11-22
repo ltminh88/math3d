@@ -117,3 +117,32 @@
     display: none;
   }
 }
+
+/* Touch screens: the lesson button is icon-only and 44 px wide. Full-width it
+   reaches y 331-375 in the left column, where the settled VLM label's top
+   touch point sits (phone-touch-hit-areas: the point just above #milo-label
+   must hit the label, not this button). Icon-only keeps the button right
+   after the daily button at 44 px, clear of the label; the full label stays
+   in the VLM dialog entry and in aria-label.
+   The column itself also blocks that point: .hud-left has pointer-events auto
+   and its box stretches to the lesson button's bottom (y 375), so the empty
+   space right of the icon still covers the label's top point. On touch the
+   column's gaps are dead space (no handler lives on .hud-left itself, only
+   on its button children), so the gaps pass touches through to the world
+   while every child keeps its own hit area. */
+@media (pointer: coarse) {
+  #open-lesson {
+    align-self: flex-start;
+    width: 44px;
+    padding: 9px 0;
+  }
+  #open-lesson span {
+    display: none;
+  }
+  .hud-left {
+    pointer-events: none;
+  }
+  .hud-left > * {
+    pointer-events: auto;
+  }
+}
