@@ -3,7 +3,7 @@ title: SGK Toán 3 KNTT full coverage — practise every lesson B1–B81 in text
 description: Fix the daily-practice crash, add structured lesson metadata + an "Ôn theo bài" lesson mode, six new skill families (numbers, arithmetic, fractions, time, money, data), one lenient save-code bump, and two chapter-3 regions for HK2.
 status: in-progress
 priority: P1
-effort: 125h
+effort: 130h
 branch: main
 tags: [learning, curriculum, kntt, lesson-mode, skills, save-code, regions, muse]
 created: 2026-11-21
@@ -51,6 +51,7 @@ Author: "con tôi cần thực hành hết tất cả từ đầu đến cuối"
 | 22 | [Shop: VLM red scarf visible](phase-22-shop-red-scarf-visible.md) | muse-min | — | 2h | pending |
 | 23 | [Shop: wear many items (per body spot) + save code M3D6](phase-23-shop-multi-equip-and-save-code-m3d6.md) | muse-min | 22 | 6h | pending |
 | 24 | [Shop: 8–12 new items](phase-24-shop-new-items.md) | muse-min | 23 | 5h | pending |
+| 25 | [Level pinch/wheel/button zoom](phase-25-level-pinch-zoom.md) | first free Muse | — | 5h | pending |
 | 21 | [Close-out: coverage, docs, e2e, parity, staging](phase-21-close-out-coverage-docs-parity-staging.md) | reviewer | all | 6h | pending |
 
 ## Lanes / order (child is around B23–B30 now → HK1 gaps first)
