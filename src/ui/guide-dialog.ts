@@ -7,6 +7,7 @@ import { gameState, getWorld } from './game-state';
 import { refreshHud } from './hud';
 import { byId, icon } from './icons';
 import { interactWithNearest } from './interact-target';
+import { lessonGuideSection, wireLessonGuideButton } from './lesson-practice-guide-section';
 import { saveQuestAccepted } from './progress-sync';
 import { chainGuideLine, currentQuestStage } from './quest-chain';
 import { openQuiz } from './quiz-dialog';
@@ -24,7 +25,7 @@ function afterQuestLine(): string {
 
 function miloBodyHtml(bridgeDone: boolean): string {
   const questComplete = gameState.progress.questComplete;
-  return `<div class="dialog-eyebrow">NGƯỜI DẪN ĐƯỜNG CỦA BẠN</div>${dailyGuideSection()}<p class="dialog-copy">${bridgeDone ? `Cây cầu của chúng mình thật đẹp! ${questComplete ? afterQuestLine() : 'Bạn hãy đi qua cầu đến khu vườn bên kia nhé. Mình cũng luôn sẵn sàng luyện tập cùng bạn!'}` : 'Khu vườn bên kia sông đang chờ chúng mình. Hãy giúp mình xây <strong>6 đoạn cầu</strong> bằng những viên đá phép thuật nhé!'}</p><div class="milo-tip"><span>✦</span><p>${bridgeDone ? 'Cứ thong thả, không cần vội. Mỗi lần thử là một lần bạn tiến bộ!' : 'Chọn phép nhân cho đúng số viên đá. Mỗi câu đúng: <b>+10 XP, +5 xu</b>. Nếu chưa đúng, chúng mình cùng đếm lại!'}</p></div><button id="accept-quest" class="primary wide">${bridgeDone ? 'Cùng luyện tập' : 'Cùng xây cầu nào!'} ${icon('arrow')}</button>${stickerGuideSectionHtml()}`;
+  return `<div class="dialog-eyebrow">NGƯỜI DẪN ĐƯỜNG CỦA BẠN</div>${dailyGuideSection()}${lessonGuideSection()}<p class="dialog-copy">${bridgeDone ? `Cây cầu của chúng mình thật đẹp! ${questComplete ? afterQuestLine() : 'Bạn hãy đi qua cầu đến khu vườn bên kia nhé. Mình cũng luôn sẵn sàng luyện tập cùng bạn!'}` : 'Khu vườn bên kia sông đang chờ chúng mình. Hãy giúp mình xây <strong>6 đoạn cầu</strong> bằng những viên đá phép thuật nhé!'}</p><div class="milo-tip"><span>✦</span><p>${bridgeDone ? 'Cứ thong thả, không cần vội. Mỗi lần thử là một lần bạn tiến bộ!' : 'Chọn phép nhân cho đúng số viên đá. Mỗi câu đúng: <b>+10 XP, +5 xu</b>. Nếu chưa đúng, chúng mình cùng đếm lại!'}</p></div><button id="accept-quest" class="primary wide">${bridgeDone ? 'Cùng luyện tập' : 'Cùng xây cầu nào!'} ${icon('arrow')}</button>${stickerGuideSectionHtml()}`;
 }
 
 /** Opens VLM's dialog when playing and near him; otherwise nudges the player toward him. */
@@ -45,6 +46,7 @@ export function talkToGuide(): void {
     openQuiz(bridgeDone ? 'practice' : 'bridge');
   };
   wireDailyGuideButton();
+  wireLessonGuideButton();
   wireStickerGuideSection();
 }
 

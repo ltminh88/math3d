@@ -14,6 +14,7 @@ export type DialogKind =
   | 'milo'
   | 'quiz'
   | 'daily'
+  | 'lesson'
   | 'book'
   | 'help'
   | 'settings'

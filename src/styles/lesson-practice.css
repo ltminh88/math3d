@@ -1,0 +1,148 @@
+/* Lesson mode "Ôn theo bài" (phase 06): the HUD button next to the daily button, the
+   Milo dialog entry, and the picker dialog's own pieces (the quiz dialog and the step
+   kit bring their own styles). Every row and button is at least 44 px tall. */
+.lesson-button {
+  min-height: 44px;
+  justify-content: center;
+}
+
+/* Milo dialog entry (guide-dialog.ts adds two lines): button on top, like the daily one. */
+.lesson-guide-section {
+  margin: 12px 0;
+}
+
+#lesson-guide-button {
+  min-height: 44px;
+}
+
+/* Picker: "Học tiếp" on top, then one collapsible section per topic. */
+.lesson-continue {
+  margin-bottom: 12px;
+}
+
+.lesson-all-done {
+  margin: 0 0 12px;
+  font-size: 15px;
+  font-weight: 700;
+}
+
+.lesson-topic {
+  margin-bottom: 8px;
+}
+
+.lesson-topic summary {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  min-height: 44px;
+  padding: 6px 4px;
+  font-size: 16px;
+  font-weight: 800;
+  cursor: pointer;
+}
+
+.lesson-topic__progress {
+  margin-left: auto;
+  font-size: 14px;
+  font-weight: 700;
+  color: var(--muted);
+}
+
+.lesson-rows {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  padding: 4px 0 8px;
+}
+
+.lesson-row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  width: 100%;
+  min-height: 44px;
+  padding: 8px 12px;
+  border: 1px solid var(--glass-border);
+  border-radius: 12px;
+  background: #ffffff59;
+  font: inherit;
+  font-size: 15px;
+  text-align: left;
+  cursor: pointer;
+}
+
+.lesson-row:disabled {
+  opacity: 0.55;
+  cursor: default;
+}
+
+.lesson-row__num {
+  font-weight: 800;
+  white-space: nowrap;
+}
+
+.lesson-row__title {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.lesson-row__stars {
+  margin-left: auto;
+  letter-spacing: 2px;
+  white-space: nowrap;
+}
+
+.lesson-row__coming {
+  margin-left: auto;
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--muted);
+  white-space: nowrap;
+}
+
+/* Finish screen: stars before/after, coins, then replay / back to picker. */
+.lesson-finish-buttons {
+  display: flex;
+  gap: 12px;
+  margin-top: 12px;
+}
+
+.lesson-finish-buttons .primary {
+  flex: 1;
+}
+
+@media (max-width: 380px) {
+  #open-lesson span {
+    display: none;
+  }
+}
+
+/* Touch screens: the lesson button is icon-only and 44 px wide. Full-width it
+   reaches y 331-375 in the left column, where the settled VLM label's top
+   touch point sits (phone-touch-hit-areas: the point just above #milo-label
+   must hit the label, not this button). Icon-only keeps the button right
+   after the daily button at 44 px, clear of the label; the full label stays
+   in the VLM dialog entry and in aria-label.
+   The column itself also blocks that point: .hud-left has pointer-events auto
+   and its box stretches to the lesson button's bottom (y 375), so the empty
+   space right of the icon still covers the label's top point. On touch the
+   column's gaps are dead space (no handler lives on .hud-left itself, only
+   on its button children), so the gaps pass touches through to the world
+   while every child keeps its own hit area. */
+@media (pointer: coarse) {
+  #open-lesson {
+    align-self: flex-start;
+    width: 44px;
+    padding: 9px 0;
+  }
+  #open-lesson span {
+    display: none;
+  }
+  .hud-left {
+    pointer-events: none;
+  }
+  .hud-left > * {
+    pointer-events: auto;
+  }
+}

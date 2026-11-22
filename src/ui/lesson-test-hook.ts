@@ -1,0 +1,59 @@
+// Test builds only: `window.__lesson` tells e2e specs which lesson item is on screen and
+// what the current `sk:` item's steps expect, so a spec can solve it by taps. Installed by
+// the lesson run behind `import.meta.env.MODE === 'test'`, removed with it. Mirrors
+// daily-test-hook.ts (same shape, other window key); keep the two in step.
+import { type FactKey, isSkillKey, parseKey } from '../learning/fact-key';
+import { playableSteps } from '../reasoning/reasoning-step-answers';
+import { renderPrompt } from '../reasoning/reasoning-strings';
+import type { PracticeRunState } from './practice-run';
+
+export type LessonPlannedStep =
+  | { kind: 'number'; answer: number }
+  | { kind: 'choice'; label: string }
+  | { kind: 'multi'; ids: string[] }
+  | { kind: 'verdict'; answer: boolean };
+
+export interface LessonTestHook {
+  state(): {
+    index: number;
+    total: number;
+    kind: 'quiz' | 'skill';
+    factKey: string;
+    skillId?: string;
+  };
+  steps(): LessonPlannedStep[] | null;
+}
+
+declare global {
+  interface Window {
+    __lesson?: LessonTestHook;
+  }
+}
+
+export function installLessonTestHook(getRun: () => PracticeRunState | null): void {
+  window.__lesson = {
+    state: () => {
+      const r = getRun();
+      const key = (r?.keys[r.index] ?? '') as FactKey;
+      const parsed = parseKey(key);
+      return {
+        index: r?.index ?? 0,
+        total: r?.keys.length ?? 0,
+        kind: isSkillKey(key) ? 'skill' : 'quiz',
+        factKey: key,
+        skillId: parsed?.op === 'skill' ? parsed.id : undefined,
+      };
+    },
+    steps: () => {
+      const r = getRun();
+      if (!r?.plan) return null;
+      return playableSteps(r.plan.item).map((step): LessonPlannedStep => {
+        if (step.kind === 'number') return { kind: 'number', answer: step.answer };
+        if (step.kind === 'verdict') return { kind: 'verdict', answer: step.answer };
+        const right = step.options.filter((o) => o.correct);
+        if (step.kind === 'multi') return { kind: 'multi', ids: right.map((o) => o.id) };
+        return { kind: 'choice', label: right.map((o) => renderPrompt(o.label)).join(', ') };
+      });
+    },
+  };
+}
