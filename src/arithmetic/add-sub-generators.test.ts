@@ -8,7 +8,7 @@ import { dialogRenderable } from '../practice/item-for-skill';
 import type { PracticeItem } from '../practice/practice-scene';
 import { evalExpr } from '../reasoning/reasoning-test-oracles';
 import type { ReasoningStep } from '../reasoning/reasoning-types';
-import { ARITHMETIC_SKILLS, arithmeticItemForSkill } from './arithmetic-item-for-skill';
+import { arithmeticItemForSkill } from './arithmetic-item-for-skill';
 import {
   equationMissingDigit,
   equationOperands,
@@ -19,6 +19,22 @@ import {
   verdictTruth,
 } from './arithmetic-test-oracles';
 import { sweepArithmeticItem } from './arithmetic-test-sweep';
+
+/** The phase-09 add/sub skills (the mul/div skills of phase 10 have their own test). */
+const ADD_SUB_SKILLS = [
+  'add-sub-mental-round',
+  'add-sub-1000',
+  'add-sub-1000-wp',
+  'add-sub-1000-chain',
+  'add-4digit',
+  'sub-4digit',
+  'add-sub-10000-wp',
+  'add-5digit',
+  'sub-5digit',
+  'add-sub-100000-wp',
+  'add-sub-find-error',
+  'add-missing-digit',
+] as const;
 
 const p = (i: PracticeItem, k: string): number => Number(i.story.params?.[k]);
 const s = (i: PracticeItem, k: string): string => String(i.story.params?.[k]);
@@ -179,7 +195,7 @@ function tierCheck(skillId: string, item: PracticeItem, tier: SkillTier): void {
     const isSub =
       item.story.key === 'subCalc' ||
       item.story.key === 'errorSub' ||
-      (item.story.key === 'missingDigit' && (s(item, 'equation').includes('−') ? true : false));
+      (item.story.key === 'missingDigit' && s(item, 'equation').includes('−'));
     const pair =
       item.story.key === 'missingDigit'
         ? equationOperands(s(item, 'equation'))
@@ -216,7 +232,7 @@ function tierCheck(skillId: string, item: PracticeItem, tier: SkillTier): void {
 
 describe('arithmetic generators', () => {
   it('every skill generates a swept, oracle-checked item at every tier', () => {
-    for (const id of ARITHMETIC_SKILLS) {
+    for (const id of ADD_SUB_SKILLS) {
       for (const tier of [1, 2, 3] as SkillTier[]) {
         for (let seed = 0; seed < 40; seed++) {
           const item = arithmeticItemForSkill(id, mulberry32(seed), tier);
@@ -231,7 +247,7 @@ describe('arithmetic generators', () => {
   });
 
   it('is deterministic per seed', () => {
-    for (const id of ARITHMETIC_SKILLS)
+    for (const id of ADD_SUB_SKILLS)
       for (const tier of [1, 2, 3] as SkillTier[])
         expect(arithmeticItemForSkill(id, mulberry32(7), tier)).toEqual(
           arithmeticItemForSkill(id, mulberry32(7), tier),
@@ -239,7 +255,7 @@ describe('arithmetic generators', () => {
   });
 
   it('renders in the dialog at every tier (scene-free items always render)', () => {
-    for (const id of ARITHMETIC_SKILLS)
+    for (const id of ADD_SUB_SKILLS)
       for (const tier of [1, 2, 3] as SkillTier[])
         expect(dialogRenderable(arithmeticItemForSkill(id, mulberry32(3), tier))).toBe(true);
   });

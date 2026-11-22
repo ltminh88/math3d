@@ -4,7 +4,8 @@
 //   B25 = div-rem-floor, div-rem-ceil, choose-all-correct, tf-explain (catalog lines 36-37, 49-50)
 //   B3  = unknown-add-sub only; B1 has the six number skills (phase 07); B2 has
 //         the six arithmetic skills (phase 09); B7 mixes nothing; B14 =
-//         the six fraction skills (phase 12)
+//         the six fraction skills (phase 12); B23/B26/B36/B37 have the
+//         mul/div arithmetic skills (phase 10)
 //   B5  = tables [3]: 9 mul facts (3x2..3x10) + 9 div facts (6/3..30/3), plus
 //         sk:pattern-skip-count (tagged 4, 5, 6, 9-12)
 //   B44 = mix of [8, 15, 22, 29, 35, 40, 41, 42, 43]: facts (via B8) and skills (via B13/B15)
@@ -185,6 +186,34 @@ describe('planLessonRun', () => {
       expect(run).toHaveLength(6);
       expect(new Set(run).size).toBe(distinct);
       expect(run.every((k) => /^(sk:add-|sk:sub-)/.test(k))).toBe(true);
+    }
+    // B23/B26/B36/B37 plan their mul/div arithmetic skills now that phase 10 landed them.
+    const B23_SKILLS = ['sk:mul-2d-1d', 'sk:mul-tens-mental', 'sk:mul-2d-1d-wp'] as const;
+    const B26_SKILLS = [
+      'sk:div-2d-1d',
+      'sk:div-2d-1d-remainder',
+      'sk:div-tens-mental',
+      'sk:div-2d-1d-wp',
+      'sk:mul-div-find-error',
+    ] as const;
+    const B36_SKILLS = ['sk:mul-3d-1d', 'sk:mul-hundreds-mental', 'sk:mul-3d-1d-wp'] as const;
+    const B37_SKILLS = [
+      'sk:div-3d-1d',
+      'sk:div-3d-1d-remainder',
+      'sk:div-hundreds-mental',
+      'sk:div-reduce-times',
+      'sk:mul-div-find-error',
+    ] as const;
+    for (const [n, skills, distinct] of [
+      [23, B23_SKILLS, 3],
+      [26, B26_SKILLS, 5],
+      [36, B36_SKILLS, 3],
+      [37, B37_SKILLS, 5],
+    ] as const) {
+      const run = planLessonRun(n, {}, mulberry32(4));
+      expect(run).toHaveLength(6);
+      expect(new Set(run).size).toBe(distinct);
+      for (const key of run) expect(skills).toContain(key);
     }
   });
 

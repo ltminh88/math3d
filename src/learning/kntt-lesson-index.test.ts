@@ -146,6 +146,29 @@ describe('skillsOfLesson', () => {
     ]);
   });
 
+  it('returns the mul/div arithmetic skills for B23/B26/B36/B37 (phase 10)', () => {
+    expect(skillsOfLesson(23)).toEqual(['sk:mul-2d-1d', 'sk:mul-tens-mental', 'sk:mul-2d-1d-wp']);
+    expect(skillsOfLesson(26)).toEqual([
+      'sk:div-2d-1d',
+      'sk:div-2d-1d-remainder',
+      'sk:div-tens-mental',
+      'sk:div-2d-1d-wp',
+      'sk:mul-div-find-error',
+    ]);
+    expect(skillsOfLesson(36)).toEqual([
+      'sk:mul-3d-1d',
+      'sk:mul-hundreds-mental',
+      'sk:mul-3d-1d-wp',
+    ]);
+    expect(skillsOfLesson(37)).toEqual([
+      'sk:div-3d-1d',
+      'sk:div-3d-1d-remainder',
+      'sk:div-hundreds-mental',
+      'sk:div-reduce-times',
+      'sk:mul-div-find-error',
+    ]);
+  });
+
   it('throws for unknown lesson numbers', () => {
     expect(() => skillsOfLesson(0)).toThrow();
     expect(() => skillsOfLesson(82)).toThrow();

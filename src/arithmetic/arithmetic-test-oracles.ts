@@ -56,6 +56,37 @@ export function oracleBorrowAcrossZero(a: number, b: number): boolean {
   return false;
 }
 
+/** True when the quotient's decimal form contains a zero digit. */
+export const oracleZeroInQuotient = (q: number): boolean => String(q).includes('0');
+
+/** Quotient and remainder of a ÷ b by repeated subtraction (oracle-local, never / or %). */
+export function oracleDivBySubtraction(a: number, b: number): { q: number; r: number } {
+  let q = 0;
+  let r = a;
+  while (r >= b) {
+    r -= b;
+    q++;
+  }
+  return { q, r };
+}
+
+/** Carry count of a × b (b a single digit): positions where digit × b plus the incoming carry reaches 10. */
+export function oracleMulCarries(a: number, b: number): number {
+  const da = digitsOf(a).reverse();
+  let carry = 0;
+  let count = 0;
+  for (const d of da) {
+    const v = d * b + carry;
+    if (v >= 10) {
+      count++;
+      carry = Math.floor(v / 10);
+    } else {
+      carry = 0;
+    }
+  }
+  return count;
+}
+
 /** The numeric value of a number step, or of a verdict step's fix. */
 export function stepNumber(step: ReasoningStep): number {
   if (step.kind === 'number') return step.answer;
