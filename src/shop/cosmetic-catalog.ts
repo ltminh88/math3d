@@ -46,10 +46,17 @@ export const COSMETIC_CATALOG: readonly CosmeticItem[] = [
   item('vlm-star-band', 'vlm-outfit', 25, 'head', build.vlmStarBand),
   item('vlm-flower-garland', 'vlm-outfit', 35, 'head', build.vlmFlowerGarland),
   item('vlm-starry-cape', 'vlm-outfit', 50, 'back', build.vlmStarryCape),
+  item('vlm-wizard-hat', 'vlm-outfit', 60, 'head', build.vlmWizardHat),
+  item('vlm-round-glasses', 'vlm-outfit', 30, 'head', build.vlmRoundGlasses),
+  item('vlm-star-pendant', 'vlm-outfit', 25, 'neck', build.vlmStarPendant),
+  item('vlm-book-bag', 'vlm-outfit', 40, 'back', build.vlmBookBag),
   item('avatar-blue-cap', 'avatar-outfit', 20, 'head', build.avatarBlueCap),
   item('avatar-striped-scarf', 'avatar-outfit', 25, 'neck', build.avatarStripedScarf),
   item('avatar-gold-crown', 'avatar-outfit', 45, 'head', build.avatarGoldCrown),
   item('avatar-butterfly-wings', 'avatar-outfit', 55, 'back', build.avatarButterflyWings),
+  item('avatar-straw-hat', 'avatar-outfit', 30, 'head', build.avatarStrawHat),
+  item('avatar-flower-lei', 'avatar-outfit', 35, 'neck', build.avatarFlowerLei),
+  item('avatar-raincoat', 'avatar-outfit', 45, 'back', build.avatarRaincoat),
   item('decor-flower-pots', 'village-decor', 20, 'ground', build.decorFlowerPots, [-3.6, -4.4]),
   item('decor-star-lantern', 'village-decor', 30, 'ground', build.decorStarLantern, [-6.8, -7.6]),
   item(
@@ -61,6 +68,9 @@ export const COSMETIC_CATALOG: readonly CosmeticItem[] = [
     [-1.0, -7.8],
   ),
   item('decor-fountain', 'village-decor', 60, 'ground', build.decorFountain, [-6.9, -1.8]),
+  item('decor-peach-tree', 'village-decor', 55, 'ground', build.decorPeachTree, [-2.0, -2.5]),
+  item('decor-chicken-coop', 'village-decor', 45, 'ground', build.decorChickenCoop, [-8.8, -5.8]),
+  item('decor-rainbow-arch', 'village-decor', 50, 'ground', build.decorRainbowArch, [-4.5, -8.5]),
 ];
 
 const byId = new Map(COSMETIC_CATALOG.map((c) => [c.id, c]));
