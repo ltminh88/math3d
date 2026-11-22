@@ -10,7 +10,8 @@
     "localVsLocalPhase19": "phases 14/15/19 merge (field, forest, shop): npm run parity:baselines, then npm run test:parity: canvas PNGs, shot JSON, traces and scene dumps exact; one new DOM-noise shot (mobile quiz-hint-1, 221 px, two-state raster)",
     "localVsLocalP03": "chapter 2 map expansion (phase 03): npm run parity:baselines, then npm run test:parity x3 + menus/playthrough repeats, 2026-11-01: canvas PNGs, shot JSON, traces and scene dumps exact; new DOM noise on desktop quest-complete (third off-edge label, structural ceiling 0.009), desktop map-region-forest 3 px, mobile book-table-7 155 px + map-open 2 px (two-state)",
     "localVsLocalP09": "chapter 2 phase 09 (merged main + touch hit areas): npm run parity:baselines, then npm run test:parity x2, 2026-11-02: canvas PNGs, shot JSON, traces and scene dumps exact; DOM noise: the four p03 shots re-observed (kept), mobile language-en book/play/settings 6-12 px (two-state, also seen in the pre-rebaseline run), mobile after-quest region-badge layer 3.6% once (structural ceiling 0.035 -> 0.073)",
-    "localVsLocalSignposts": "world signposts + HUD touch fixes: npm run parity:baselines, then capture-live-baselines.mjs --origin local x2 (0 differ) and npm run test:parity, 2026-11-09: canvas PNGs, shot JSON, traces and scene dumps exact; DOM noise: desktop menus--play-settled 3 px (new listing) and tap-to-milo--walk-0_5s 155 px (off-edge label, tolerance 1e-4 -> 4e-4); test:parity runs 2-3 on a loaded machine (load ~9, other sessions): desktop welcome t0/t2s/t6s/t12s 27 px (the p09 two-state, now listed at 1e-4) and mobile top-left top-bar glass 59 px (off-by-one blur values, x 1-97 y 21-93) on tap-to-milo, walk-to-bridge and bridge-0/3/6 shots (tolerance 4e-4); JSON byte-exact in every case"
+    "localVsLocalSignposts": "world signposts + HUD touch fixes: npm run parity:baselines, then capture-live-baselines.mjs --origin local x2 (0 differ) and npm run test:parity, 2026-11-09: canvas PNGs, shot JSON, traces and scene dumps exact; DOM noise: desktop menus--play-settled 3 px (new listing) and tap-to-milo--walk-0_5s 155 px (off-edge label, tolerance 1e-4 -> 4e-4); test:parity runs 2-3 on a loaded machine (load ~9, other sessions): desktop welcome t0/t2s/t6s/t12s 27 px (the p09 two-state, now listed at 1e-4) and mobile top-left top-bar glass 59 px (off-by-one blur values, x 1-97 y 21-93) on tap-to-milo, walk-to-bridge and bridge-0/3/6 shots (tolerance 4e-4); JSON byte-exact in every case",
+    "ciMainMenusFirstFrame": "CI parity on main 2026-11-21/22 (runs 115, 132, 133, 137): mobile menus--first-frame 5 px (ratio 1.45e-05) where base and head render the same UI; a rerun went green — DOM-overlay noise, shot JSON exact."
   },
   "policy": {
     "canvasPng": 0,
@@ -200,6 +201,13 @@
       }
     },
     "mobile-pixel": {
+      "menus--first-frame.dom.png": {
+        "ciMainMenusFirstFrame": {
+          "diffPixels": 5,
+          "ratio": 1.45e-05
+        },
+        "tolerance": 0.0001
+      },
       "menus--book-table-7.dom.png": {
         "localVsLocalP03": {
           "diffPixels": 155,
