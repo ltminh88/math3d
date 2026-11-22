@@ -204,7 +204,7 @@
       "menus--first-frame.dom.png": {
         "ciMainMenusFirstFrame": {
           "diffPixels": 5,
-          "ratio": 1.45e-05
+          "ratio": 1.45e-5
         },
         "tolerance": 0.0001
       },
