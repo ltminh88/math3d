@@ -6,7 +6,7 @@
 - `plans/261031-1933-reasoning-geometry-and-map-expansion/` (how chapter 2 was placed)
 
 ## Overview
-P2. Effort 6h. Lane muse-88; reviewer recaptures parity (world/map visuals). Deps 03. Branch `muse/chapter3-regions`.
+P2. Effort 6h. Lane muse-min (moved from muse-88 on 2026-11-23); reviewer recaptures parity (world/map visuals). Deps 03. Branch `muse-min/chapter3-regions`.
 
 ## Key Insights
 - World bounds x −50..70, z −44..44. Taken: village (−13,0 34×40), garden, meadow, forest, city, tower, valley (40,−37), workshop (45,38), cave (−32,32). Candidates to probe: west bank north (≈ −38,−32, mirror of cave) and east bank between city and tower (≈ 60,−2) — roads may block the latter; run the footprint probe used in chapter 2 before choosing.

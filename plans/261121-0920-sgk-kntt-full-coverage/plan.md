@@ -45,7 +45,7 @@ Author: "con tôi cần thực hành hết tất cả từ đầu đến cuối"
 | 15 | [Data + chance](phase-15-data-tables-and-chance.md) | muse-min | 02 | 4h | done (#41) |
 | 16 | [Scenes: blocks, number line, fractions](phase-16-dialog-scenes-numbers-and-fractions.md) | muse-min | 04,07,12 | 6h | in progress (in progress) |
 | 17 | [Scenes: clock, calendar, money, data](phase-17-dialog-scenes-clock-calendar-money-data.md) | muse-min | 04,13,14,15 | 6h | done (#42) |
-| 18 | [Chapter-3 regions config](phase-18-chapter-3-regions-config.md) | muse-88 + reviewer | 03 | 6h | pending |
+| 18 | [Chapter-3 regions config](phase-18-chapter-3-regions-config.md) | muse-min + reviewer | 03 | 6h | pending |
 | 19 | [Level: Chợ Phiên Tí Hon](phase-19-level-market-cho-phien.md) | muse-min | 17,18 | 8h | pending |
 | 20 | [Level: Lâu Đài Số](phase-20-level-number-fort-lau-dai-so.md) | muse-88 | 08,11,16,18 | 8h | pending |
 | 22 | [Shop: VLM red scarf visible](phase-22-shop-red-scarf-visible.md) | muse-min | — | 2h | pending |
