@@ -4,7 +4,6 @@
 // enforced by construction. Zero in the quotient is the T3 trap.
 import { pick, type Rng, randInt } from '../learning/seeded-rng';
 import type { SkillTier } from '../learning/skill-tiers';
-import { pickName } from '../reasoning/reasoning-distractors';
 import type { ReasoningGenerator } from '../reasoning/reasoning-types';
 import { arithmeticItem, numberStep, ref } from './arithmetic-distractors';
 import { RANGE_99, RANGE_999 } from './arithmetic-ranges';
@@ -193,9 +192,10 @@ export const divHundredsMental: ReasoningGenerator = (rng, tier) => {
 };
 
 /** "Giảm n lần": a quantity divided by n. T1 a round hundred, T2 a 3-digit exact
- *  division, T3 a zero in the quotient. The unit is a translated `i:` param. */
+ *  division, T3 a zero in the quotient. The unit is a translated `i:` param. The
+ *  story is the question itself ("Giảm … đi n lần thì được bao nhiêu …?") — reducing
+ *  is a division, never "còn lại". */
 export const divReduceTimes: ReasoningGenerator = (rng, tier) => {
-  const name = pickName(rng);
   const unit = pick(rng, ['i:minute', 'i:meter', 'i:ml', 'i:gram'] as const);
   for (let t = 0; t < 500; t++) {
     const b = randInt(rng, 2, 9);
@@ -211,13 +211,13 @@ export const divReduceTimes: ReasoningGenerator = (rng, tier) => {
     if (tier !== 1 && (a < 102 || a > RANGE_999)) continue;
     if (tier === 2 && hasZero(q)) continue;
     if (tier === 3 && !hasZero(q)) continue;
-    return arithmeticItem('div-reduce-times', tier, ref('wpReduceTimes', { name, a, unit, b }), [
-      numberStep(ref('askReduced', { unit }), q),
+    return arithmeticItem('div-reduce-times', tier, ref('wpReduceTimes', { a, unit, b }), [
+      numberStep(ref('askResult'), q),
     ]);
   }
   const [a, b] = tier === 1 ? [400, 4] : tier === 2 ? [252, 6] : [804, 4];
-  return arithmeticItem('div-reduce-times', tier, ref('wpReduceTimes', { name, a, unit, b }), [
-    numberStep(ref('askReduced', { unit }), a / b),
+  return arithmeticItem('div-reduce-times', tier, ref('wpReduceTimes', { a, unit, b }), [
+    numberStep(ref('askResult'), a / b),
   ]);
 };
 

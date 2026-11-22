@@ -14,12 +14,13 @@ import { RANGE_99, RANGE_999 } from './arithmetic-ranges';
 import { countMulCarries, countSubBorrows } from './carry-count';
 import { pickMulPair } from './mul-generators';
 
-/** A big-number two-step context: the story key, the step-1 key (which names the
- *  state after the first purchase), and the `i:` item for the generic final step. */
+/** A big-number two-step context: the story key, the step-1 key (which asks how much
+ *  was bought in all — one purchase only, so never "Sau lần mua thứ nhất"), and the
+ *  `i:` item for the generic final step. */
 const BIG_THEN_SUB = [
-  { story: 'wpMulThenSubRice', askFirst: 'askAfterFirstBuyRice', item: 'i:riceKg' },
-  { story: 'wpMulThenSubBooks', askFirst: 'askAfterFirstBuyBooks', item: 'i:book' },
-  { story: 'wpMulThenSubSchool', askFirst: 'askAfterFirstBuySchool', item: 'i:book' },
+  { story: 'wpMulThenSubRice', askFirst: 'askTotalBoughtRice', item: 'i:riceKg' },
+  { story: 'wpMulThenSubBooks', askFirst: 'askTotalBoughtBooks', item: 'i:book' },
+  { story: 'wpMulThenSubSchool', askFirst: 'askTotalBoughtSchool', item: 'i:book' },
 ] as const;
 
 /** A big-number "gấp n lần" context: the story key and its step key. */
@@ -40,7 +41,7 @@ const mulWp2d: ReasoningGenerator = (rng, tier) => {
 };
 
 /** Two steps: a warehouse / library / school buys n boxes with the same count, then
- *  uses c up. Step 1 names the state after the first purchase. */
+ *  uses c up. Step 1 asks how much was bought in all (a single purchase). */
 function mulThenSub(rng: Rng, tier: SkillTier, wantZero: boolean) {
   const ctx = pick(rng, BIG_THEN_SUB);
   for (let t = 0; t < 500; t++) {
@@ -117,8 +118,10 @@ function divShare(rng: Rng, tier: SkillTier) {
   );
 }
 
-/** One or two steps: a items, b per box — "cần ít nhất bao nhiêu hộp?" (round up),
- *  then the leftover when the remainder matters (T3). */
+/** One or two steps: a items, b per box. T2 asks "cần ít nhất bao nhiêu hộp?"
+ *  (round up). T3 asks three steps in order — full boxes, leftover, boxes needed
+ *  to hold them all — because the leftover only makes sense once the full boxes
+ *  are counted. */
 function divBoxes(rng: Rng, tier: SkillTier) {
   const name = pickName(rng);
   const item = pickNoun(rng);
@@ -137,19 +140,26 @@ function divBoxes(rng: Rng, tier: SkillTier) {
       'div-2d-1d-wp',
       tier,
       ref('wpDivBoxes', { name, item, a, b }),
-      [numberStep(ref('askBoxes'), boxes), numberStep(ref('askLeftover', { item }), r)],
-      [boxes],
+      [
+        numberStep(ref('askFullBoxes'), q),
+        numberStep(ref('askLeftover', { item }), r),
+        numberStep(ref('askBoxes'), boxes),
+      ],
+      [q, r],
     );
   }
   return arithmeticItem(
     'div-2d-1d-wp',
     tier,
     ref('wpDivBoxes', { name, item, a: 50, b: 4 }),
-    [
-      numberStep(ref('askBoxes'), 13),
-      ...(tier === 2 ? [] : [numberStep(ref('askLeftover', { item }), 2)]),
-    ],
-    tier === 2 ? [] : [13],
+    tier === 2
+      ? [numberStep(ref('askBoxes'), 13)]
+      : [
+          numberStep(ref('askFullBoxes'), 12),
+          numberStep(ref('askLeftover', { item }), 2),
+          numberStep(ref('askBoxes'), 13),
+        ],
+    tier === 2 ? [] : [12, 2],
   );
 }
 

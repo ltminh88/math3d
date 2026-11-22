@@ -119,12 +119,13 @@ const ORACLE: Record<string, (i: PracticeItem) => void> = {
     expect(last(i)).toBe(q);
   },
   wpDivBoxes: (i) => {
-    const { r } = oracleDivBySubtraction(p(i, 'a'), p(i, 'b'));
+    const { q, r } = oracleDivBySubtraction(p(i, 'a'), p(i, 'b'));
     expect(r).toBeGreaterThan(0);
     if (i.steps.length === 1) expect(last(i)).toBe(ceilDiv(p(i, 'a'), p(i, 'b')));
     else {
-      expect(values(i)).toEqual([ceilDiv(p(i, 'a'), p(i, 'b')), r]);
-      expect(i.work).toEqual([ceilDiv(p(i, 'a'), p(i, 'b'))]);
+      // T3, three steps in order: full boxes, leftover, boxes needed to hold them all.
+      expect(values(i)).toEqual([q, r, ceilDiv(p(i, 'a'), p(i, 'b'))]);
+      expect(i.work).toEqual([q, r]);
     }
   },
   wpReduceTimes: (i) => {
@@ -298,7 +299,7 @@ function tierCheck(skillId: string, item: PracticeItem, tier: SkillTier): void {
       expect(item.steps.length, where).toBe(1);
     } else {
       expect(key, where).toBe('wpDivBoxes');
-      expect(item.steps.length, where).toBe(2);
+      expect(item.steps.length, where).toBe(3);
     }
     return;
   }
@@ -417,14 +418,15 @@ describe('arithmetic mul/div word-problem contexts', () => {
       }
   });
 
-  it('a two-step word problem names the state after the first purchase in step 1', () => {
+  it('a two-step word problem asks in step 1 how much was bought in all — never "Sau lần mua thứ nhất" (that phrase is only for stories with ≥ 2 purchases, and phase 10 has none)', () => {
     setLanguage('vi');
     for (const tier of [1, 2, 3] as SkillTier[])
       for (let seed = 0; seed < 40; seed++) {
         const item = arithmeticItemForSkill('mul-3d-1d-wp', mulberry32(seed), tier);
         if (item.steps.length !== 2) continue;
         const first = renderArithmeticPrompt(stepAt(item, 0).prompt);
-        expect(first, `step 1: ${first}`).toContain('Sau lần mua thứ nhất');
+        expect(first, `step 1: ${first}`).toContain('mua về tất cả');
+        expect(first, `step 1: ${first}`).not.toContain('Sau lần mua thứ nhất');
       }
   });
 
@@ -457,5 +459,40 @@ describe('arithmetic mul/div word-problem contexts', () => {
               `${story}: number ≥ 1000 without a big-number context`,
             ).toBe(true);
         }
+  });
+
+  it('div-2d-1d-wp T3 asks full boxes, then the leftover, then the boxes needed (đầy → dư → cần ít nhất)', () => {
+    setLanguage('vi');
+    for (let seed = 0; seed < 40; seed++) {
+      const item = arithmeticItemForSkill('div-2d-1d-wp', mulberry32(seed), 3);
+      expect(item.steps.length).toBe(3);
+      const a = p(item, 'a');
+      const b = p(item, 'b');
+      const [q, r, boxes] = values(item) as [number, number, number];
+      expect(q, `full boxes: ${a} : ${b}`).toBe(Math.floor(a / b));
+      expect(r, `leftover: ${a} : ${b}`).toBe(a - q * b);
+      expect(r).toBeGreaterThan(0);
+      expect(boxes, `boxes needed: ${a} : ${b}`).toBe(q + 1);
+      expect(q * b + r).toBe(a);
+      const prompts = item.steps.map((st) =>
+        st.kind === 'number' ? renderArithmeticPrompt(st.prompt) : '',
+      );
+      expect(prompts[0], `step 1: ${prompts[0]}`).toContain('đầy');
+      expect(prompts[1], `step 2: ${prompts[1]}`).toContain('dư');
+      expect(prompts[2], `step 3: ${prompts[2]}`).toContain('ít nhất');
+    }
+  });
+
+  it('a reduce-times item never says "còn lại" (giảm n lần = chia n, not what is left)', () => {
+    setLanguage('vi');
+    for (const tier of [1, 2, 3] as SkillTier[])
+      for (let seed = 0; seed < 40; seed++) {
+        const item = arithmeticItemForSkill('div-reduce-times', mulberry32(seed), tier);
+        const story = renderArithmeticPrompt(item.story);
+        const step = renderArithmeticPrompt(stepAt(item, 0).prompt);
+        expect(story, `story: ${story}`).toContain('được bao nhiêu');
+        expect(story, `story: ${story}`).not.toContain('còn lại');
+        expect(step, `step: ${step}`).not.toContain('còn lại');
+      }
   });
 });
