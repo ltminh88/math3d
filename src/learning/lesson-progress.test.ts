@@ -237,14 +237,24 @@ describe('topicProgress', () => {
     expect(topicProgress(2, statsOf(b9, 4))).toEqual({ completed: 1, total: 7 });
   });
 
-  it('topic 8 has 4 playable lessons (B45, B46, B47, B49; B45/B46 via phase 07 numbers)', () => {
-    expect(topicProgress(8, {})).toEqual({ completed: 0, total: 4 });
+  it('topic 8 has 5 playable lessons (B45, B46, B47, B48, B49; B45/B46 via phase 07 numbers, B48 via phase 08 rounding)', () => {
+    expect(topicProgress(8, {})).toEqual({ completed: 0, total: 5 });
     // B49 mixes B45-B48. B45/B46 now have skills (phase 07 numbers), so the
-    // Roman clock alone completes only B47.
+    // Roman clock alone no longer completes B47 (phase 08 added three Roman skills).
     expect(topicProgress(8, statsOf(['sk:roman-clock-hour'], 4))).toEqual({
-      completed: 1,
-      total: 4,
+      completed: 0,
+      total: 5,
     });
+    // All four B47 skills at box 4 complete B47.
+    expect(
+      topicProgress(
+        8,
+        statsOf(
+          ['sk:roman-clock-hour', 'sk:roman-to-number', 'sk:number-to-roman', 'sk:roman-sequence'],
+          4,
+        ),
+      ),
+    ).toEqual({ completed: 1, total: 5 });
   });
 
   it('topic 13 has 4 playable lessons (B66, B67, B68, B69)', () => {

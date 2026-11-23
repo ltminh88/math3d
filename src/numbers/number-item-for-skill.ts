@@ -21,6 +21,14 @@ import {
   numReadWrite100000,
   numSequence1000,
 } from './place-value-generators';
+import { numberToRoman, romanSequence, romanToNumber } from './roman-numeral-generators';
+import {
+  roundHundreds,
+  roundTens,
+  roundTenThousands,
+  roundThousands,
+  roundWhichPlace,
+} from './rounding-generators';
 
 export type NumberGenerator = (rng: Rng, tier: SkillTier) => PracticeItem;
 
@@ -39,6 +47,14 @@ const GENERATORS: Readonly<Record<string, NumberGenerator>> = {
   'num-expand-100000': numExpand100000,
   'num-compare-100000': numCompare100000,
   'num-order-100000': numOrder100000,
+  'round-tens': roundTens,
+  'round-hundreds': roundHundreds,
+  'round-thousands': roundThousands,
+  'round-ten-thousands': roundTenThousands,
+  'round-which-place': roundWhichPlace,
+  'roman-to-number': romanToNumber,
+  'number-to-roman': numberToRoman,
+  'roman-sequence': romanSequence,
 };
 
 /** The number skills (catalog order) that have a generator. */
