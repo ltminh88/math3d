@@ -353,12 +353,7 @@ test('run B7: answer all 6, stars before/after show, coins in store, picker star
   await expect(content).toContainText('+30 xu');
   await expect(coins(page)).toHaveText('30');
   const snap = await page.evaluate(() => window.__game?.snapshot());
-  for (const id of [
-    'geo-shape-classify',
-    'geo-right-angle',
-    'meas-ruler-read',
-    'meas-temperature',
-  ])
+  for (const id of ['geo-shape-classify', 'geo-right-angle', 'meas-ruler-read', 'meas-temperature'])
     expect(snap?.factStats[`sk:${id}`]?.attempts ?? 0).toBeGreaterThanOrEqual(1);
   // Back to the picker: B7 now shows 1 star.
   const back = page.locator('#lesson-back');
