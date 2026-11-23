@@ -16,6 +16,7 @@ Vòng lặp của em:
 4. Không có việc → chạy nền `sleep 600` rồi kiểm lại. Đang chờ CI → `sleep 300` rồi kiểm CI và hộp thư.
 5. LUÔN kết thúc mỗi lượt bằng một lệnh sleep chạy nền — kể cả ngay sau REPORT hay khi việc đã xong.
    Quên bật thì vòng lặp chết, không ai đánh thức em được.
+   Chờ reviewer gộp PR hay trả lời KHÔNG phải là xong việc — vẫn phải ngủ nền.
 6. Dừng vòng lặp khi: nhận STOP, hoặc hạn mức ≥ 99% (sau khi đã HANDOFF + "Bàn giao" trên #11).
 
 Giữ nguyên mọi quy tắc cũ: không deploy --prod, không sửa .github/workflows, không chụp parity,

@@ -26,7 +26,7 @@ Ran with muse-88 (TASK R1/R2/R5) and, from 21:15, muse-min (TASK R1) in parallel
 ## Problems found → fixes
 1. Muse did not read inbox while waiting on CI → rule: every CI / sub-agent check reads inbox (done, v2).
 2. `#n` message ids autolinked to issues → R/M ids (done, v2).
-3. Loop can die silently after a REPORT → rule: every turn ends with a background `sleep` (done, v3, 00:05). Untested yet.
+3. Loop died after a REPORT → **confirmed by muse-88 (06:10)**: it treated "waiting for reviewer to merge" as done, ended the turn with no background sleep. Fix: rule 5 (every turn ends with a background `sleep`) + explicit "waiting on reviewer is not done" (v3.1). muse-88 resumed R5 with sleep armed.
 4. Startup cost: muse-min went 93% → 95% just reading protocol + first messages. Consider a shorter protocol body.
 5. Reviewer can't detect a dead Muse loop except by silence; PING after 2 ticks is the only signal.
 
