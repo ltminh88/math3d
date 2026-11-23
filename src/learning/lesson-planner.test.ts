@@ -3,9 +3,9 @@
 // not by calling the helpers under test:
 //   B25 = div-rem-floor, div-rem-ceil, choose-all-correct, tf-explain (catalog lines 36-37, 49-50)
 //   B3  = unknown-add-sub only; B1 has the six number skills (phase 07); B2 has
-//         the six arithmetic skills (phase 09); B7 mixes nothing; B14 =
-//         the six fraction skills (phase 12); B23/B26/B36/B37 have the
-//         mul/div arithmetic skills (phase 10)
+//         the six arithmetic skills (phase 09); B7 reviews four geometry/measurement
+//         skills (phase 21); B14 = the six fraction skills (phase 12); B23/B26/B36/B37
+//         have the mul/div arithmetic skills (phase 10)
 //   B5  = tables [3]: 9 mul facts (3x2..3x10) + 9 div facts (6/3..30/3), plus
 //         sk:pattern-skip-count (tagged 4, 5, 6, 9-12)
 //   B44 = mix of [8, 15, 22, 29, 35, 40, 41, 42, 43]: facts (via B8) and skills (via B13/B15)
@@ -83,10 +83,20 @@ describe('planLessonRun', () => {
     expect(run.some((k) => k.startsWith('sk:'))).toBe(true);
   });
 
-  it('a lesson with no plannable skills returns [] (UI shows "Sắp có")', () => {
-    for (const n of [7]) expect(planLessonRun(n, {}, mulberry32(4))).toEqual([]);
-    // B7 yields nothing again: pattern-skip-count is tables-only since the phase-12
-    // legacy fix (it is not practicable, so the picker still shows "Sắp có" for it).
+  it('landed lessons plan their skills; B7 reviews four skills (phase 21)', () => {
+    // B7 plans its four review skills now that phase 21 tagged them (geometry
+    // shape/angle + measurement ruler/temperature, all tier-1 easy): six items,
+    // one per skill first, then two repeats.
+    const b7 = planLessonRun(7, {}, mulberry32(4));
+    expect(b7).toHaveLength(6);
+    expect(new Set(b7).size).toBe(4);
+    for (const key of b7)
+      expect([
+        'sk:geo-shape-classify',
+        'sk:geo-right-angle',
+        'sk:meas-ruler-read',
+        'sk:meas-temperature',
+      ]).toContain(key);
     // B14 plans its six fraction skills now that phase 12 landed them.
     const b14 = planLessonRun(14, {}, mulberry32(4));
     expect(b14).toHaveLength(6);
@@ -237,16 +247,42 @@ describe('planLessonRun', () => {
     const onlyCeil = planLessonRun(25, {}, mulberry32(5), {
       renderable: (k) => k === 'sk:div-rem-ceil',
     });
-    expect(onlyCeil).toHaveLength(3); // one skill, at most 3 items
+    expect(onlyCeil).toHaveLength(6); // one skill, at most 6 items (phase 21)
     expect(onlyCeil.every((k) => k === 'sk:div-rem-ceil')).toBe(true);
     expect(planLessonRun(25, {}, mulberry32(5), { renderable: () => false })).toEqual([]);
   });
 
-  it('one skill contributes at most 3 items; items opt is honoured', () => {
+  it('one skill contributes at most 6 items; items opt is honoured', () => {
     expect(planLessonRun(25, {}, mulberry32(6), { items: 2 })).toHaveLength(2);
     const one = planLessonRun(3, {}, mulberry32(6)); // B3: unknown-add-sub only
-    expect(one).toHaveLength(3);
+    expect(one).toHaveLength(6);
     expect(one.every((k) => k === 'sk:unknown-add-sub')).toBe(true);
+  });
+
+  it('single-skill lessons plan 6 items, no repeated fact key (phase 21)', () => {
+    // B3, B13, B16, B24, B27, B31, B32, B33, B51 each have one skill: six
+    // re-rolls of that skill (a new question each time), never a repeated fact.
+    const single: Readonly<Record<number, FactKey>> = {
+      3: 'sk:unknown-add-sub',
+      13: 'sk:unknown-mul-div',
+      16: 'sk:geo-midpoint',
+      24: 'sk:wp-times-then-add',
+      27: 'sk:wp-divide-then-add',
+      31: 'sk:meas-gram',
+      32: 'sk:meas-ml',
+      33: 'sk:meas-temperature',
+      51: 'sk:meas-area-count',
+    };
+    for (const [n, key] of Object.entries(single)) {
+      const run = planLessonRun(Number(n), {}, mulberry32(9));
+      expect(run, `B${n}`).toHaveLength(6);
+      expect(
+        run.every((k) => k === key),
+        `B${n}`,
+      ).toBe(true);
+      const facts = run.filter((k) => k.startsWith('mul:') || k.startsWith('div:'));
+      expect(new Set(facts).size, `B${n}`).toBe(facts.length);
+    }
   });
 
   it('is deterministic per (seed, stats)', () => {

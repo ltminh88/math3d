@@ -3,9 +3,9 @@
 // new question with different numbers. Pure, node-only.
 //   Order: weakest box first (unseen = box 1, so lesson mode *introduces* skills),
 //   ties broken by a seeded shuffle — deterministic per (seed, stats).
-//   Round-robin: one item per key, then up to two more rounds over skill keys only (a fact
+//   Round-robin: one item per key, then up to five more rounds over skill keys only (a fact
 //   repeated is the same question; a skill re-rolled is a new one). So a lesson with one
-//   skill gives at most 3 items, and a run never repeats a fact key.
+//   skill gives at most 6 items, and a run never repeats a fact key.
 //   A key is plannable when it has a generator and passes `renderable` (phase 06 passes
 //   dialogRenderable; the default renders everything). A lesson with no plannable keys
 //   plans [] — the UI shows "Sắp có".
@@ -27,8 +27,9 @@ import { SKILL_CATALOG, type SkillFamily, skillEntry } from './skill-catalog';
 
 /** Default items in a lesson run (phase 06). */
 export const LESSON_RUN_ITEMS = 6;
-/** One skill contributes at most this many items to a run. */
-export const MAX_ITEMS_PER_SKILL = 3;
+/** One skill contributes at most this many items to a run (phase 21: six, so a
+ * single-skill lesson still fills a 6-item run with re-rolls). */
+export const MAX_ITEMS_PER_SKILL = 6;
 
 export interface PlanLessonRunOpts {
   /** Items in the run (default 6); capped by what the lesson can supply. */
@@ -100,7 +101,7 @@ export function planLessonRun(
   const ordered = shuffle(rng, keys).sort((a, b) => boxOf(a) - boxOf(b));
   const spread = lesson.kind === 'mix' ? spreadBySource(ordered, lesson) : ordered;
   const skills = spread.filter(isSkillKey);
-  // Round-robin: one item per key, then up to two more rounds over skill keys only (a
+  // Round-robin: one item per key, then up to five more rounds over skill keys only (a
   // fact repeated is the same question; a skill re-rolled is a new one).
   const rounds: FactKey[] = [...spread];
   for (let round = 1; round < MAX_ITEMS_PER_SKILL; round++) rounds.push(...skills);

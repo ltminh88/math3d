@@ -17,7 +17,7 @@ export const KNTT_LESSONS_TAP1: readonly KnttLesson[] = Object.freeze([
   { n: 4, book: 1, topic: 1, titleVi: 'Bảng nhân 2, 5 và bảng chia 2, 5', titleEn: 'Times tables 2 and 5', kind: 'tables', tables: [2, 5], practicable: true },
   { n: 5, book: 1, topic: 1, titleVi: 'Bảng nhân 3, bảng chia 3', titleEn: 'Times table 3', kind: 'tables', tables: [3], practicable: true },
   { n: 6, book: 1, topic: 1, titleVi: 'Bảng nhân 4, bảng chia 4', titleEn: 'Times table 4', kind: 'tables', tables: [4], practicable: true },
-  { n: 7, book: 1, topic: 1, titleVi: 'Ôn tập hình học và đo lường', titleEn: 'Review shapes and measurement', kind: 'mix', mixOf: [], practicable: false },
+  { n: 7, book: 1, topic: 1, titleVi: 'Ôn tập hình học và đo lường', titleEn: 'Review shapes and measurement', kind: 'mix', mixOf: [], practicable: true },
   { n: 8, book: 1, topic: 1, titleVi: 'Luyện tập chung', titleEn: 'Mixed practice', kind: 'mix', mixOf: [1, 2, 3, 4, 5, 6, 7], practicable: true },
   { n: 9, book: 1, topic: 2, titleVi: 'Bảng nhân 6, bảng chia 6', titleEn: 'Times table 6', kind: 'tables', tables: [6], practicable: true },
   { n: 10, book: 1, topic: 2, titleVi: 'Bảng nhân 7, bảng chia 7', titleEn: 'Times table 7', kind: 'tables', tables: [7], practicable: true },

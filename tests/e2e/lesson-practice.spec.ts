@@ -1,7 +1,8 @@
 // Lesson mode (phase 06): the "Ôn theo bài" picker — 81 lessons in 16 topics, stars 1-3,
 // "Học tiếp" points at the first unfinished lesson, a 6-item run through the extracted
 // daily run loop, coins +5 per correct answer, no streak/daily-finish reward. Entry is the
-// HUD button by tap, plus the VLM dialog entry. Lessons with no content yet show "Sắp có".
+// HUD button by tap, plus the VLM dialog entry. All 81 lessons are playable since
+// phase 21 (B7 reviews).
 // Lesson mode is open from day one (no field stage 1 needed) and introduces untaught
 // skills (unlike daily), so the spec seeds no facts.
 import { type Locator, type Page, type TestInfo, test } from '@playwright/test';
@@ -243,7 +244,7 @@ test('HUD button: at least 44 px, inside the HUD, right after the daily button, 
   await page.screenshot({ path: info.outputPath(`hud-${info.project.name}.png`) });
 });
 
-test('picker: 81 lessons in 16 topics, "Học tiếp" points at B1, no-content lessons show "Sắp có"', async ({
+test('picker: 81 lessons in 16 topics, "Học tiếp" points at B1, all lessons playable', async ({
   page,
 }, info) => {
   const touch = isTouch(info);
@@ -260,10 +261,12 @@ test('picker: 81 lessons in 16 topics, "Học tiếp" points at B1, no-content l
   const b2 = page.locator('button.lesson-row[data-lesson="2"]');
   await expect(b2).toBeEnabled();
   await expect(b2).toContainText('Cộng, trừ trong phạm vi 1 000');
-  // B7 mixes nothing, so it is the no-content example now that B2 landed (phase 09).
+  // B7 reviews now (phase 21): four geometry/measurement skills, playable.
   const b7 = page.locator('button.lesson-row[data-lesson="7"]');
-  await expect(b7).toBeDisabled();
-  await expect(b7).toContainText('Sắp có');
+  await expect(b7).toBeEnabled();
+  await expect(b7).toContainText('Ôn tập hình học và đo lường');
+  // No lesson is "Sắp có" any more: all 81 rows are enabled.
+  await expect(page.locator('button.lesson-row:disabled')).toHaveCount(0);
   // Topic 4 opens on tap; B25 is playable there.
   await openTopic(page, 4, touch);
   const b25 = page.locator('button.lesson-row[data-lesson="25"]');
