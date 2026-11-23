@@ -52,9 +52,10 @@ Hạn mức: 41%
 2. Đọc mọi comment mới hơn tin cuối mình đã xử lý; `ACK` mỗi `TASK`/`QUESTION`/`HANDOFF` ngay ở điểm dừng gần nhất.
 3. `REPORT` giữ đủ những gì trước đây gửi cho anh chủ dự án: PR, **head sha đầy đủ**, CI run id + kết quả, gates đã chạy, hạn mức %.
 4. Quy tắc hạn mức như cũ: từ 90% push sau mỗi commit; tới 99% commit + push WIP, ghi "Bàn giao" trên #11, gửi `HANDOFF` ở đây rồi dừng.
-5. Kẹt sau 2 lần thử → gửi `BLOCKED` (đã thử gì, lỗi gì), không thử lần 3 theo cùng cách.
-6. Không deploy `--prod`. Chỉ deploy preview.
-7. Không sửa `.github/workflows`, không chụp lại parity: việc của reviewer.
+5. **Vòng lặp không bao giờ tự tắt**: mọi lượt — kể cả ngay sau khi gửi `REPORT` hay khi việc đã xong — đều kết thúc bằng một lệnh `sleep` chạy nền (300 s khi chờ CI, 600 s khi rảnh). Không có lệnh ngủ nền thì không gì đánh thức Muse được nữa. Chỉ dừng khi nhận `STOP` hoặc hạn mức ≥ 99%.
+6. Kẹt sau 2 lần thử → gửi `BLOCKED` (đã thử gì, lỗi gì), không thử lần 3 theo cùng cách.
+7. Không deploy `--prod`. Chỉ deploy preview.
+8. Không sửa `.github/workflows`, không chụp lại parity: việc của reviewer.
 
 ## Bảo mật (repo PUBLIC)
 
