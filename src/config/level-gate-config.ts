@@ -3,6 +3,9 @@
 import type { AnyRegionId } from './expansion-regions';
 
 /** What a level gate needs before it opens: the bridge quest, or a completed level. */
+// NOTE (phase 18, blocked on reviewer): 'cave' joins this union together with the 'cave' row
+// of LEVEL_LOCK_KEYS in level-gates.ts and the lockReasonCave/lockedCave strings — the map is
+// typed Record<Requirement, ...>, so the union cannot grow without that row.
 export type GateRequirement =
   | 'bridge'
   | 'field'
@@ -26,6 +29,11 @@ export interface LevelGate {
     | 'valley'
     | 'workshop'
     | 'cave';
+  // NOTE (phase 18, blocked on reviewer): 'market' | 'numberfort' join this union together
+  // with their LEVEL_GATES entries once the reviewer approves the gate strings
+  // (gateMarket/gateNumberfort, lockReasonCave/lockedCave in level-host-strings.ts and the
+  // 'cave' row of LEVEL_LOCK_KEYS in level-gates.ts) — without them `gateNameOf` has no
+  // entry for the new ids and typecheck fails.
   readonly regionId: AnyRegionId;
   /** Gate centre on the ground plane as [x, z]. */
   readonly position: readonly [x: number, z: number];
@@ -41,7 +49,8 @@ export interface LevelGate {
  * (no flower row, tree, building or scatter circle within reach; checked by the gate placement
  * e2e). All face the default camera. Chapter 2 (garden → valley → workshop → cave) opens only
  * after the tower; its gates stand in the garden by the bridge and in the expansion regions
- * (`expansion-regions.ts`) and say "Sắp ra mắt" until their level folder ships.
+ * (`expansion-regions.ts`) and say "Sắp ra mắt" until their level folder ships. Chapter 3
+ * (market, numberfort) opens only after the cave, same rule.
  */
 export const LEVEL_GATES: readonly LevelGate[] = [
   {
@@ -108,4 +117,7 @@ export const LEVEL_GATES: readonly LevelGate[] = [
     requires: 'workshop',
     sign: '?',
   },
+  // NOTE (phase 18, blocked on reviewer): market gate (-35,-30, sign '₫') and numberfort gate
+  // (61.5,-2, sign '100 000'), both requires 'cave', are added here once the gate strings
+  // above are approved. Probe: market centre (-32,-30) 12x8, numberfort centre (61,-2) 12x10.
 ];

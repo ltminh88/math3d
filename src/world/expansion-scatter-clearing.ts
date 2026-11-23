@@ -1,5 +1,5 @@
-// Clears the seeded scatter (trees, rocks, flower triplets) off the chapter 2 regions and roads
-// AFTER the scatter pass. The scatter itself never sees the expansion data: feeding it to
+// Clears the seeded scatter (trees, rocks, flower triplets) off the chapter 2 and 3 regions and
+// roads AFTER the scatter pass. The scatter itself never sees the expansion data: feeding it to
 // `isBlocked` would shift every later draw of its seeded stream (and the golden-checked layout).
 // Removal only compacts instance buffers and the obstacle list, so it draws no random number and
 // creates no three object (no UUID draw from `Math.random`).

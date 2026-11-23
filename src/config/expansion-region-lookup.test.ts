@@ -32,12 +32,14 @@ const overlaps = (
     ((a.size[1] ?? 0) + (b.size[1] ?? 0)) / 2 + pad;
 
 describe('expansion regions', () => {
-  it('lists the original regions untouched, then valley, workshop, cave', () => {
+  it('lists the original regions untouched, then valley, workshop, cave, market, numberfort', () => {
     expect(allRegions().map((r) => r.id)).toEqual([
       ...REGIONS.map((r) => r.id),
       'valley',
       'workshop',
       'cave',
+      'market',
+      'numberfort',
     ]);
   });
 
@@ -95,6 +97,8 @@ describe('expansion regions', () => {
     expect(areaAt(40, -37).id).toBe('valley');
     expect(areaAt(45, 38).id).toBe('workshop');
     expect(areaAt(-32, 32).id).toBe('cave');
+    expect(areaAt(-32, -30).id).toBe('market');
+    expect(areaAt(61, -2).id).toBe('numberfort');
   });
 
   it('open once the bridge quest is complete', () => {
@@ -111,4 +115,6 @@ describe('expansion regions', () => {
       expect(expansionRegionAt(gate.position[0], gate.position[1])?.id).toBe(gate.regionId);
     }
   });
+  // NOTE (phase 18, blocked on reviewer): extends to market/numberfort (5 gates) once the
+  // gate strings are approved and the two gates are added to LEVEL_GATES.
 });
