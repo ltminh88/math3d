@@ -1,6 +1,8 @@
 // Roads to the chapter 2 regions, as [x, z] polylines starting on an original road. Kept apart
 // from ROADS (golden, and the scatter's `nearRoad` test reads ROADS during its seeded draws);
 // scatter instances on these roads are removed after the scatter pass instead.
+// Order matches EXPANSION_REGIONS (checked by expansion-region-lookup.test.ts): valley,
+// workshop, cave, market, numberfort.
 import type { RoadPoint } from './roads';
 
 export const EXPANSION_ROADS: readonly (readonly RoadPoint[])[] = [
@@ -18,5 +20,18 @@ export const EXPANSION_ROADS: readonly (readonly RoadPoint[])[] = [
   [
     [-36.5, 6.5],
     [-30, 26.5],
+  ],
+  // Market (west bank north): from the pond road's end, north past the pond's east edge
+  // (the road end sits at the pond's rim, as the original road does), then into the market.
+  [
+    [-36, -7],
+    [-36, -5],
+    [-31, -5],
+    [-31, -28],
+  ],
+  // Numberfort (east bank, between city and tower): from the tower diagonal, into the fort.
+  [
+    [53, -9.55],
+    [57, -2],
   ],
 ];

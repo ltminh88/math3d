@@ -1,8 +1,10 @@
 // M3D3 save-code payload (written by export since chapter 2): every M3D2 field
 // (save-code-v2-payload.ts) for the chapter-2 level set, plus
 //   k skill tuples (save-code-v3-skills.ts)
-// The level set and the skill catalog are frozen for M3D3: a new level gate or skill id needs
-// M3D4, or older clients would reject the code. Decoding is strict, like M3D2.
+// The level set below is shared by every version (v3–v6) and grows with new gates: chapter 3
+// added market and numberfort. That is safe because export always writes the newest version,
+// whose decoder has been lenient since M3D5, and no v3/v4 code written before chapter 3 can
+// contain the new levels. Decoding of the old versions stays strict, like M3D2.
 import { BRIDGE_LEVEL_ID } from './legacy-save-import';
 import type { GameSnapshot } from './progress-repository';
 import {
@@ -16,7 +18,7 @@ import {
 } from './save-code-v2-payload';
 import { skillStatsToTuples, tuplesToSkillStats } from './save-code-v3-skills';
 
-/** Bridge + every level gate of chapters 1 and 2. */
+/** Bridge + every level gate of chapters 1–3. */
 export const M3D3_LEVELS: readonly string[] = [
   BRIDGE_LEVEL_ID,
   'field',
@@ -27,6 +29,8 @@ export const M3D3_LEVELS: readonly string[] = [
   'valley',
   'workshop',
   'cave',
+  'market',
+  'numberfort',
 ];
 const LEVEL_SET: ReadonlySet<string> = new Set(M3D3_LEVELS);
 

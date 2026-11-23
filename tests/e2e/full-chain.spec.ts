@@ -123,6 +123,15 @@ async function enterAndLeave(page: Page, press: Press, touch: boolean, stage: St
   expect(await page.evaluate((id) => window.__game?.gateStatus(id), stage.levelId)).toBe('open');
 }
 
+async function expectChainGatesWithoutComingSoon(page: Page): Promise<void> {
+  // The chain's gates never say "Sắp ra mắt" — only the chapter 3 gates (market, numberfort)
+  // do, and they are not part of this walk (phase 18: no levels yet). The blanket `body`
+  // check used to hold before chapter 3 existed.
+  for (const id of CHAIN) {
+    await expect(page.locator(`#gate-${id}-label small`)).not.toHaveText('Sắp ra mắt');
+  }
+}
+
 test('the 9-stage chain: each stage opens the next gate, every level loads and exits', async ({
   page,
 }, info) => {
@@ -157,7 +166,7 @@ test('the 9-stage chain: each stage opens the next gate, every level loads and e
     await expect(page.locator(`#gate-${stage.levelId}-label small`)).toHaveText(
       gateLine(stage.levelId),
     );
-    await expect(page.locator('body')).not.toContainText('Sắp ra mắt');
+    await expectChainGatesWithoutComingSoon(page);
 
     await expectVlmPointsAt(page, press, stage.gate);
     await expectMapWithoutComingSoon(page, press, stage);
@@ -189,6 +198,6 @@ test('the 9-stage chain: each stage opens the next gate, every level loads and e
     expect(all?.[id]?.stars).toBe(1);
     expect(all?.[id]?.stageStars).toEqual([1]);
   }
-  await expect(page.locator('body')).not.toContainText('Sắp ra mắt');
+  await expectChainGatesWithoutComingSoon(page);
   expect(errors).toEqual([]);
 });

@@ -32,12 +32,14 @@ const overlaps = (
     ((a.size[1] ?? 0) + (b.size[1] ?? 0)) / 2 + pad;
 
 describe('expansion regions', () => {
-  it('lists the original regions untouched, then valley, workshop, cave', () => {
+  it('lists the original regions untouched, then valley, workshop, cave, market, numberfort', () => {
     expect(allRegions().map((r) => r.id)).toEqual([
       ...REGIONS.map((r) => r.id),
       'valley',
       'workshop',
       'cave',
+      'market',
+      'numberfort',
     ]);
   });
 
@@ -95,6 +97,8 @@ describe('expansion regions', () => {
     expect(areaAt(40, -37).id).toBe('valley');
     expect(areaAt(45, 38).id).toBe('workshop');
     expect(areaAt(-32, 32).id).toBe('cave');
+    expect(areaAt(-32, -30).id).toBe('market');
+    expect(areaAt(61, -2).id).toBe('numberfort');
   });
 
   it('open once the bridge quest is complete', () => {
@@ -104,10 +108,12 @@ describe('expansion regions', () => {
     }
   });
 
-  it('every chapter 2 gate stands inside its region', () => {
-    const chapter2 = LEVEL_GATES.filter((g) => ['valley', 'workshop', 'cave'].includes(g.levelId));
-    expect(chapter2).toHaveLength(3);
-    for (const gate of chapter2) {
+  it('every chapter 2 and 3 gate stands inside its region', () => {
+    const chapter23 = LEVEL_GATES.filter((g) =>
+      ['valley', 'workshop', 'cave', 'market', 'numberfort'].includes(g.levelId),
+    );
+    expect(chapter23).toHaveLength(5);
+    for (const gate of chapter23) {
       expect(expansionRegionAt(gate.position[0], gate.position[1])?.id).toBe(gate.regionId);
     }
   });

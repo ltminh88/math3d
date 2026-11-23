@@ -1,10 +1,12 @@
 // Chapter 2 scenery: ground pads + roads, geometry valley, measurement workshop and puzzle cave.
-// Built where the level gates are built (after the world, outside the static merge): three draws
-// `Math.random` for every object UUID, so building earlier would shift the clouds/mountains and
-// every seeded draw after them. Builders write into scratch groups with their own materials; the
-// groups are baked into 3 meshes (ground, solid scenery, unlit glow), i.e. +4 world draw calls
-// with the solid mesh's shadow pass, plus the signpost text faces (one atlas mesh, no shadow:
-// +1). Collision circles are appended to the obstacle list (signposts add none).
+// Chapter 3 adds the tiny market fair and the number castle, baked into the same three meshes
+// (no new draw calls). Built where the level gates are built (after the world, outside the
+// static merge): three draws `Math.random` for every object UUID, so building earlier would
+// shift the clouds/mountains and every seeded draw after them. Builders write into scratch
+// groups with their own materials; the groups are baked into 3 meshes (ground, solid scenery,
+// unlit glow), i.e. +4 world draw calls with the solid mesh's shadow pass, plus the signpost
+// text faces (one atlas mesh, no shadow: +1). Collision circles are appended to the obstacle
+// list (signposts add none).
 import {
   type BufferGeometry,
   Group,
@@ -17,7 +19,9 @@ import { bakeVertexColoredGeometry } from '../levels/shared/bake-vertex-colored-
 import { buildExpansionGround } from './expansion-road-builder';
 import { buildExpansionSignposts } from './expansion-signpost-builder';
 import { buildGeometryValley } from './regions/geometry-valley-builder';
+import { buildTinyMarket } from './regions/market-region-builder';
 import { buildMeasurementWorkshop } from './regions/measurement-workshop-builder';
+import { buildNumberCastle } from './regions/numberfort-region-builder';
 import { buildPuzzleCave } from './regions/puzzle-cave-builder';
 import type { WorldBuildContext } from './world-build-context';
 import { WORLD_LIGHTING } from './world-lighting-tuning';
@@ -54,6 +58,8 @@ export function buildExpansionWorld(world: WorldBuildContext): ExpansionWorldVie
   buildGeometryValley(scratch, solidRoot);
   buildMeasurementWorkshop(scratch, solidRoot);
   buildPuzzleCave(scratch, solidRoot, glowRoot);
+  buildTinyMarket(scratch, solidRoot, glowRoot);
+  buildNumberCastle(scratch, solidRoot);
   const signText = buildExpansionSignposts(scratch, solidRoot);
   const ground = bakedMesh('expansion-ground', groundRoot, litMaterial());
   ground.receiveShadow = true;

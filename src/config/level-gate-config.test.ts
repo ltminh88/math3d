@@ -14,7 +14,7 @@ const statuses = (bridge: boolean, completed: string[]) =>
   );
 
 describe('level gates', () => {
-  it('chain nine stages: bridge → field → forest → city → tower → garden → valley → workshop → cave', () => {
+  it('chain eleven stages: bridge → field → forest → city → tower → garden → valley → workshop → cave → market, numberfort', () => {
     expect(LEVEL_GATES.map((g) => [g.levelId, g.regionId, g.requires])).toEqual([
       ['field', 'meadow', 'bridge'],
       ['forest', 'forest', 'field'],
@@ -24,6 +24,8 @@ describe('level gates', () => {
       ['valley', 'valley', 'garden'],
       ['workshop', 'workshop', 'valley'],
       ['cave', 'cave', 'workshop'],
+      ['market', 'market', 'cave'],
+      ['numberfort', 'numberfort', 'cave'],
     ]);
   });
 

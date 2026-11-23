@@ -47,6 +47,7 @@ const LEVEL_LOCK_KEYS = {
   garden: ['lockReasonGarden', 'lockedGarden'],
   valley: ['lockReasonValley', 'lockedValley'],
   workshop: ['lockReasonWorkshop', 'lockedWorkshop'],
+  cave: ['lockReasonCave', 'lockedCave'],
 } as const satisfies Record<Requirement, readonly Parameters<typeof tl>[0][]>;
 
 export const gateName = (gate: LevelGate): string => gateNameOf(gate.levelId);

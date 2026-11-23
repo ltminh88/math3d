@@ -1,11 +1,12 @@
-// Chapter 2 regions (geometry valley, measurement workshop, puzzle cave). Kept apart from REGIONS,
+// Chapter 2 regions (geometry valley, measurement workshop, puzzle cave) and chapter 3
+// (tiny market fair, number castle). Kept apart from REGIONS,
 // which stays byte-equal to the original bundle (golden traces run the original code): nothing
 // here feeds the scatter's exclusion test, the original map hit test or `regionAtPoint`.
 // Coordinates come from the footprint probe (phase 03): free ground clear of every original
 // region, road, hill and gate. "North" is the top of the world map (−z).
 import type { Region, RegionId } from './regions';
 
-export type ExpansionRegionId = 'valley' | 'workshop' | 'cave';
+export type ExpansionRegionId = 'valley' | 'workshop' | 'cave' | 'market' | 'numberfort';
 export type AnyRegionId = RegionId | ExpansionRegionId;
 
 /** Same shape as an original region; `unlock: 'bridge'` (walkable once the bridge is crossed). */
@@ -53,6 +54,32 @@ export const EXPANSION_REGIONS: readonly ExpansionRegion[] = [
     labelHeight: 6,
     color: '#a9a39a',
     icon: '🧩',
+    unlock: 'bridge',
+  },
+  {
+    id: 'market',
+    blurb: 'Chợ phiên tí hon với những sạp hàng, đồng hồ và bảng số liệu.',
+    name: 'Chợ Phiên Tí Hon',
+    subtitle: 'THẾ GIỚI 10',
+    world: 10,
+    center: [-32, -30],
+    size: [12, 8],
+    labelHeight: 5,
+    color: '#e07856',
+    icon: '🏮',
+    unlock: 'bridge',
+  },
+  {
+    id: 'numberfort',
+    blurb: 'Lâu đài của các số lớn, làm tròn và số La Mã.',
+    name: 'Lâu Đài Số',
+    subtitle: 'THẾ GIỚI 11',
+    world: 11,
+    center: [61, -2],
+    size: [12, 10],
+    labelHeight: 5,
+    color: '#8fa8e8',
+    icon: '🏰',
     unlock: 'bridge',
   },
 ];

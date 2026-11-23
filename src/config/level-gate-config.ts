@@ -12,6 +12,7 @@ export type GateRequirement =
   | 'garden'
   | 'valley'
   | 'workshop'
+  | 'cave'
   | null;
 
 /** A level gate standing in a region (placed after the scatter pass, so no RNG shift). */
@@ -25,7 +26,9 @@ export interface LevelGate {
     | 'garden'
     | 'valley'
     | 'workshop'
-    | 'cave';
+    | 'cave'
+    | 'market'
+    | 'numberfort';
   readonly regionId: AnyRegionId;
   /** Gate centre on the ground plane as [x, z]. */
   readonly position: readonly [x: number, z: number];
@@ -41,7 +44,8 @@ export interface LevelGate {
  * (no flower row, tree, building or scatter circle within reach; checked by the gate placement
  * e2e). All face the default camera. Chapter 2 (garden → valley → workshop → cave) opens only
  * after the tower; its gates stand in the garden by the bridge and in the expansion regions
- * (`expansion-regions.ts`) and say "Sắp ra mắt" until their level folder ships.
+ * (`expansion-regions.ts`) and say "Sắp ra mắt" until their level folder ships. Chapter 3
+ * (market, numberfort) opens only after the cave, same rule.
  */
 export const LEVEL_GATES: readonly LevelGate[] = [
   {
@@ -107,5 +111,21 @@ export const LEVEL_GATES: readonly LevelGate[] = [
     facing: 0,
     requires: 'workshop',
     sign: '?',
+  },
+  {
+    levelId: 'market',
+    regionId: 'market',
+    position: [-35, -30],
+    facing: 0,
+    requires: 'cave',
+    sign: '₫',
+  },
+  {
+    levelId: 'numberfort',
+    regionId: 'numberfort',
+    position: [61.5, -2],
+    facing: 0,
+    requires: 'cave',
+    sign: '100 000',
   },
 ];

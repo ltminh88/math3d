@@ -115,7 +115,7 @@ test('the area badge and the world map know the new regions', async ({ page }) =
 
   await page.locator('#open-map').click();
   await expect(page.locator('#world-map')).toBeVisible();
-  await expect(page.locator('[data-region]')).toHaveCount(9);
+  await expect(page.locator('[data-region]')).toHaveCount(11);
   await page.locator('[data-region="valley"]').click();
   await expect(page.locator('#map-detail strong')).toHaveText('📐 Thung Lũng Hình Học');
   await expect(page.locator('#map-detail .map-gate')).toHaveText(

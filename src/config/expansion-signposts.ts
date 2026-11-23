@@ -65,6 +65,18 @@ export const EXPANSION_SIGNPOSTS: readonly Signpost[] = [
     position: [-30.2, 17.2],
     boards: [{ target: 'cave', heading: [0.15, 1] }],
   },
+  // Beside the market road's north leg, east of it.
+  {
+    id: 'market-road',
+    position: [-28, -14],
+    boards: [{ target: 'market', heading: [-0.25, -1] }],
+  },
+  // Between the two east diagonals, where the numberfort road leaves the tower diagonal.
+  {
+    id: 'numberfort-road',
+    position: [50, 0],
+    boards: [{ target: 'numberfort', heading: [1, -0.18] }],
+  },
 ];
 
 /** The post the floating "Hang Đố Vui" world label stands over. */

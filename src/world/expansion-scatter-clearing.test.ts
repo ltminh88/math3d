@@ -26,6 +26,8 @@ function positions(m: InstancedMesh): number[][] {
 }
 
 // Free ground (kept), valley centre (40,-37), workshop road (46,20), cave centre (-32,32).
+// The east free points sit clear of the workshop road (x=46) and the numberfort (x>=55);
+// phase 18 moved them here from (60,0)/(60.5,0.2)/(55,-5), which the numberfort covers.
 const FREE: [number, number] = [20, 30];
 const FREE2: [number, number] = [-20, -30];
 const VALLEY: [number, number] = [40, -37];
@@ -34,12 +36,12 @@ const CAVE: [number, number] = [-32, 32];
 
 function scatter(): ScatterMeshes {
   // Trees 0 (pine: 2 cones), 1 and 2 (leafy: 2 blobs each), 3 (pine), 4 (leafy).
-  const trees: [number, number][] = [FREE, VALLEY, FREE2, ROAD, [60, 0]];
+  const trees: [number, number][] = [FREE, VALLEY, FREE2, ROAD, [42, 8]];
   return {
     trunks: mesh(trees),
     cones: mesh([FREE, FREE, ROAD, ROAD], true),
-    blobs: mesh([VALLEY, [41, -36.5], FREE2, FREE2, [60, 0], [60.5, 0.2]], true),
-    rocks: mesh([CAVE, FREE, [55, -5]]),
+    blobs: mesh([VALLEY, [41, -36.5], FREE2, FREE2, [42, 8], [42.5, 8.2]], true),
+    rocks: mesh([CAVE, FREE, [40, 0]]),
     stems: mesh([FREE, CAVE, [46.5, 30]]),
     blossoms: mesh([FREE, CAVE, [46.5, 30]], true),
     tufts: mesh([
@@ -63,10 +65,10 @@ describe('clearExpansionGround', () => {
     expect(random).not.toHaveBeenCalled();
     random.mockRestore();
 
-    expect(positions(meshes.trunks)).toEqual([FREE, FREE2, [60, 0]]);
+    expect(positions(meshes.trunks)).toEqual([FREE, FREE2, [42, 8]]);
     expect(positions(meshes.cones)).toEqual([FREE, FREE]);
-    expect(positions(meshes.blobs)).toEqual([FREE2, FREE2, [60, 0], [60.5, 0.2]]);
-    expect(positions(meshes.rocks)).toEqual([FREE, [55, -5]]);
+    expect(positions(meshes.blobs)).toEqual([FREE2, FREE2, [42, 8], [42.5, 8.2]]);
+    expect(positions(meshes.rocks)).toEqual([FREE, [40, 0]]);
     expect(positions(meshes.stems)).toEqual([FREE]);
     expect(positions(meshes.blossoms)).toEqual([FREE]);
     expect(positions(meshes.tufts)).toEqual([[21, 31]]);
