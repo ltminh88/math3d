@@ -1,14 +1,31 @@
-/* In-level zoom buttons (phase 25): left edge, vertically centred, clear of the answer
-   panel (right on wide screens, bottom on narrow ones) and of the leave button. */
+/* In-level zoom buttons (phase 25): a small +/- group in the top bar, clear of the
+   3D scene. It used to sit at the left edge, vertically centred — there a tap on a
+   pickable near the plot's left edge (e.g. the field's bottom stake on a phone)
+   landed within Chrome's touch-adjustment radius of the group and was swallowed
+   by it, so the canvas never saw the tap (issue #57). The top bar is above the
+   speech bubble and above every level's answer panel, and each level frames its
+   3D content below those, so no pickable can ever sit under the buttons here. */
 .level-zoom {
   position: absolute;
-  left: max(12px, env(safe-area-inset-left));
-  top: 50%;
-  translate: 0 -50%;
+  top: max(16px, env(safe-area-inset-top));
+  /* Right of the leave button ("Về thế giới" / "Back to the world", ~180px wide
+     incl. its left offset); the speech bubble is centred, so on the tested
+     landscape viewports (>=1180px wide) the gap to it is >=130px. */
+  left: 210px;
   display: flex;
-  flex-direction: column;
+  flex-direction: row;
   gap: 8px;
   z-index: 7;
+}
+
+@media (max-aspect-ratio: 21 / 20) {
+  /* Portrait: the panel sits at the bottom (field) or below the top bar (other
+     levels), and the speech below the top bar, so the top bar's right end is
+     free — and this does not depend on the leave button's width. */
+  .level-zoom {
+    left: auto;
+    right: max(12px, env(safe-area-inset-right));
+  }
 }
 
 .level-zoom__button {
