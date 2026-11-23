@@ -176,7 +176,7 @@ export class MarketRoundController {
 
   next(): void {
     const flow = this.flow;
-    if (!flow || !flow.done) return;
+    if (!flow?.done) return;
     this.index += 1;
     if (this.done) {
       this.card?.destroy();
