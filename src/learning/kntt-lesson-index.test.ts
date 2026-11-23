@@ -104,14 +104,16 @@ describe('skillsOfLesson', () => {
   });
 
   it('B7 yields its four review skills (phase 21, catalog order)', () => {
-    // The easiest geometry/measurement skills at tier 1: shape classify, right
-    // angle, ruler read, temperature read. pattern-skip-count stays tables-only
-    // (phase-12 legacy fix).
+    // B7 is a grade-2 review, so it uses only what a child learned before B7:
+    // shape classify/count, solid identify, ruler read — all tier-1 easy.
+    // geo-right-angle (B18) and meas-temperature (B33) are new grade-3
+    // content (TASK #2). pattern-skip-count stays tables-only (phase-12
+    // legacy fix).
     expect(skillsOfLesson(7)).toEqual([
-      'sk:geo-right-angle',
       'sk:geo-shape-classify',
+      'sk:geo-shape-count',
+      'sk:geo-solid-identify',
       'sk:meas-ruler-read',
-      'sk:meas-temperature',
     ]);
   });
 

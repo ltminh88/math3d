@@ -85,17 +85,19 @@ describe('planLessonRun', () => {
 
   it('landed lessons plan their skills; B7 reviews four skills (phase 21)', () => {
     // B7 plans its four review skills now that phase 21 tagged them (geometry
-    // shape/angle + measurement ruler/temperature, all tier-1 easy): six items,
-    // one per skill first, then two repeats.
+    // shape classify/count + solid identify, measurement ruler read — all
+    // tier-1 easy, all learned before B7; TASK #2 dropped geo-right-angle and
+    // meas-temperature, new grade-3 content): six items, one per skill first,
+    // then two repeats.
     const b7 = planLessonRun(7, {}, mulberry32(4));
     expect(b7).toHaveLength(6);
     expect(new Set(b7).size).toBe(4);
     for (const key of b7)
       expect([
         'sk:geo-shape-classify',
-        'sk:geo-right-angle',
+        'sk:geo-shape-count',
+        'sk:geo-solid-identify',
         'sk:meas-ruler-read',
-        'sk:meas-temperature',
       ]).toContain(key);
     // B14 plans its six fraction skills now that phase 12 landed them.
     const b14 = planLessonRun(14, {}, mulberry32(4));
