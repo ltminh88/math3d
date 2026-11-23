@@ -13,15 +13,15 @@ Start in the reviewer Claude Code session (repo root) with:
 2. **Inboxes**: read comments on #63 (muse-88) and #64 (muse-min) newer than the last seen id
    (kept in `.relay/inbox-state.json`). ACK every TASK-for-me / QUESTION / HANDOFF / BLOCKED.
 3. **GitHub state**: open PRs, their CI, main CI, board #11.
-4. **Act** per the table below. Write replies in the inbox as `[reviewer→muse-x] TYPE #n`.
+4. **Act** per the table below. Write replies in the inbox as `[reviewer→muse-x] TYPE R<n>` (message ids R1, R2… for reviewer, M1, M2… for Muses — never `#n`, GitHub autolinks it).
 5. **Daily summary** at the first tick after 21:00 (once per day) via `telegram-relay.py send`.
-6. **Re-ping**: a TASK with no ACK after 2 ticks → one reminder; still nothing → note in summary.
+6. **Re-ping**: a TASK with no ACK after 2 ticks → one `PING` (own id, not a new TASK); still nothing → note in summary.
 7. **Schedule** next wake: 600–900 s if a CI run or Muse task is in flight, 1800 s when idle.
+   Quiet hours 22:00–07:00: only urgent Telegram messages; the rest go into the morning line.
 8. **Fast answers**: while any Qn is open, keep `python3 scripts/relay/telegram-relay.py wait 3600`
    running in the background (Bash `run_in_background`). Its exit wakes this session within seconds;
    handle the printed rows, then restart it if a Qn is still open. Exit code 3 = an hour passed quietly.
    While it runs, `poll` steps aside (one reader only), so step 1 is skipped.
-   Quiet hours 22:00–07:00: only urgent Telegram messages; the rest go into the morning line.
 
 ## Decide alone vs ask the user
 

@@ -8,40 +8,47 @@ Bảng điều phối chung vẫn là issue #11 (trạng thái phase, chỗ CI, 
 Dòng đầu mỗi comment:
 
 ```
-[người gửi→người nhận] LOẠI #số
+[người gửi→người nhận] LOẠI Mã
 ```
 
 - Người gửi/nhận: `reviewer`, `muse-88`, `muse-min`.
-- `#số`: số thứ tự tăng dần **của người gửi** trong hộp thư này (reviewer đếm riêng, Muse đếm riêng).
+- **Mã tin** = chữ cái của người gửi + số tăng dần trong hộp thư này: reviewer dùng `R1, R2, …`, Muse dùng `M1, M2, …`. **Không dùng dấu `#`** cho mã tin — trên GitHub `#2` tự thành đường dẫn tới issue/PR số 2. Dấu `#` chỉ dùng khi thật sự nói về issue/PR (vd "PR #65").
+- Mọi tin đều có mã, để bên kia nhắc lại được.
 - LOẠI:
 
 | LOẠI | Dùng khi |
 |---|---|
 | `TASK` | reviewer giao việc |
-| `ACK` | bên nhận xác nhận đã đọc `TASK`/`QUESTION`/`HANDOFF`, ghi `ACK #số-của-tin-đó` |
+| `ACK` | bên nhận xác nhận đã đọc `TASK`/`QUESTION`/`HANDOFF`/`PING`; dòng 2 ghi `đã đọc R5` (mã tin được ACK) |
 | `REPORT` | Muse báo tiến độ ở một điểm dừng |
 | `QUESTION` | hỏi bên kia, đang chờ trả lời |
-| `ANSWER` | trả lời `QUESTION #số` |
+| `ANSWER` | trả lời một `QUESTION` (ghi mã tin hỏi) |
 | `HANDOFF` | bàn giao việc (hạn mức ≥ 99% hoặc đổi người) |
 | `BLOCKED` | kẹt, cần reviewer quyết |
+| `PING` | reviewer nhắc một tin chưa được ACK (không phải việc mới) |
 | `STOP` | reviewer yêu cầu dừng vòng lặp |
 
 Ví dụ:
 
 ```
-[reviewer→muse-min] TASK #3
+[reviewer→muse-min] TASK R3
 Phase 22: ... (nhánh, file sở hữu, tiêu chí xong)
 ```
 
 ```
-[muse-min→reviewer] REPORT #7
-PR #63 head abc1234 (sha đủ 40 ký tự ở dòng dưới), CI run 4514..., trạng thái: đang chạy / xanh / đỏ (lý do)
+[muse-min→reviewer] ACK M6
+đã đọc R3
+```
+
+```
+[muse-min→reviewer] REPORT M7
+PR #70 head abc1234 (sha đủ 40 ký tự ở dòng dưới), CI run 4514..., trạng thái: đang chạy / xanh / đỏ (lý do)
 Hạn mức: 41%
 ```
 
 ## Quy tắc
 
-1. Chỉ đọc hộp thư ở **điểm dừng**: vừa push, vừa mở PR, CI vừa bắt đầu/xong, đang chờ, hoặc kẹt. Không bỏ dở việc giữa chừng để đọc thư.
+1. Đọc hộp thư ở **điểm dừng**: vừa push, vừa mở PR, CI vừa bắt đầu/xong, kẹt — **và mỗi lần kiểm CI hay kiểm tiến trình tác nhân con** (đang chờ cũng là điểm dừng). Không bỏ dở việc đang code giữa chừng để đọc thư.
 2. Đọc mọi comment mới hơn tin cuối mình đã xử lý; `ACK` mỗi `TASK`/`QUESTION`/`HANDOFF` ngay ở điểm dừng gần nhất.
 3. `REPORT` giữ đủ những gì trước đây gửi cho anh chủ dự án: PR, **head sha đầy đủ**, CI run id + kết quả, gates đã chạy, hạn mức %.
 4. Quy tắc hạn mức như cũ: từ 90% push sau mỗi commit; tới 99% commit + push WIP, ghi "Bàn giao" trên #11, gửi `HANDOFF` ở đây rồi dừng.
