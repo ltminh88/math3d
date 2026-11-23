@@ -1,5 +1,53 @@
 # Project changelog
 
+## 2026-11-23 — SGK KNTT full coverage: summary of the batch (PRs #31–#62)
+
+Plan: `plans/261121-0920-sgk-kntt-full-coverage/` (phases 00–25). The game now
+covers all 81 lessons of SGK Toán 3 Kết nối tri thức: an 81-row lesson table
+drives practice, six new skill families (numbers, arithmetic, fractions,
+time, money, data) sit beside the legacy ones, lesson mode ("Ôn theo bài")
+runs 6 items per lesson, and two chapter-3 regions (market, numberfort) hold
+two new levels. Save code went M3D5 (lenient) → M3D6 (multi-equip).
+
+### What merged (#31–#62)
+
+- #31 phase 00: daily dispatcher hotfix — geo/meas skills dispatch, scene
+  items without a renderer are skipped, not thrown.
+- #32 phase 01: structured lesson metadata + the 81-lesson table.
+- #33 phase 02: six-family scaffolding + registries.
+- #34 phase 04: dialog scene registry; geo/meas scenes in daily.
+- #35 phase 03: save code M3D5, lenient decoder.
+- #36 phase 05: lesson planner + progress (pure).
+- #37 phase 12: unit fractions 1/2–1/9 (B14).
+- #38 phase 13: clock + calendar (B66/B67), Roman clock (B47).
+- #39 phase 07: place value, compare, order to 100 000.
+- #40 phase 14: Vietnamese money notes (B68).
+- #41 phase 15: data tables, tally, chance (B73/B74).
+- #42 phase 17: dialog scenes — clock, calendar, money, data.
+- #43 phase 06: lesson mode "Ôn theo bài" picker + 6-item runs.
+- #44 phase 16: dialog scenes — numbers, fractions.
+- #47 phase 25a: pinch/wheel/button zoom in the forest level.
+- #48 phase 09: add/sub to 100 000.
+- #49 phase 22: worn shop cosmetics stay visible (visibility test).
+- #50 phase 23: wear many items at once + save code M3D6.
+- #51 phase 10: mul/div ≤ 1 000.
+- #52 phase 24: 10 new shop items (12 → 22).
+- #53 hotfix P0: number pad accepts 6-digit answers.
+- #54 phase 25b: zoom for the other 7 levels.
+- #55 phase 08: rounding + Roman numerals (B47, B48, B61).
+- #56 phase 18: chapter-3 regions — market + numberfort config, gates.
+- #58 phase 11: mul/div ≤ 100 000 (B56, B57, B70, B71).
+- #59 phase 19: market level Chợ Phiên Tí Hon (5 stages).
+- #60 fix: level zoom buttons into the top bar (issue #57).
+- #61 phase 20: numberfort level Lâu Đài Số.
+- #62 phase 21 (part 1): lesson-coverage audit — 80/81 lessons playable,
+  only B7 missing.
+
+### Still open
+
+- Phase 21 in progress (#65): B7 in lesson mode, 6 items per single-skill
+  lesson; then docs, full e2e, parity, staging, author review.
+
 ## 2026-11-18 — More practice: summary of the batch (PRs #13–#26)
 
 Plan: `plans/261113-1951-more-practice-content-for-muse/` (phases 01–14). The

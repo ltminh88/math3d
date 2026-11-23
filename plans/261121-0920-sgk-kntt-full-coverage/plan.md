@@ -33,26 +33,26 @@ Author: "con tôi cần thực hành hết tất cả từ đầu đến cuối"
 | 03 | [Save code M3D5 lenient](phase-03-save-code-m3d5-lenient-decoder.md) | muse-min | — | 4h | done (#35) |
 | 04 | [Dialog scene registry + geo/meas in daily](phase-04-dialog-scene-registry-geo-meas-in-daily.md) | muse-88 | 00 | 6h | done (#34) |
 | 05 | [Lesson planner (pure)](phase-05-lesson-planner-pure.md) | muse-min | 02 | 3h | done (#36) |
-| 06 | [Ôn theo bài UI](phase-06-lesson-mode-ui-on-theo-bai.md) | muse-88 | 04,05 | 6h | in progress (PR #43) |
+| 06 | [Ôn theo bài UI](phase-06-lesson-mode-ui-on-theo-bai.md) | muse-88 | 04,05 | 6h | done (#43) |
 | 07 | [Numbers: place value, compare, order](phase-07-numbers-place-value-compare-order.md) | muse-88 | 02 | 5h | done (#39) |
-| 08 | [Numbers: rounding, Roman](phase-08-numbers-rounding-and-roman.md) | muse-88 | 07 | 4h | pending |
-| 09 | [Arithmetic: add/sub](phase-09-arithmetic-add-sub.md) | muse-88 | 02 | 5h | pending |
-| 10 | [Arithmetic: mul/div ≤1000](phase-10-arithmetic-mul-div-to-1000.md) | muse-88 | 09 | 6h | pending |
-| 11 | [Arithmetic: mul/div ≤100 000](phase-11-arithmetic-mul-div-large-numbers.md) | muse-88 | 10 | 4h | pending |
+| 08 | [Numbers: rounding, Roman](phase-08-numbers-rounding-and-roman.md) | muse-88 | 07 | 4h | done (#55) |
+| 09 | [Arithmetic: add/sub](phase-09-arithmetic-add-sub.md) | muse-88 | 02 | 5h | done (#48) |
+| 10 | [Arithmetic: mul/div ≤1000](phase-10-arithmetic-mul-div-to-1000.md) | muse-88 | 09 | 6h | done (#51) |
+| 11 | [Arithmetic: mul/div ≤100 000](phase-11-arithmetic-mul-div-large-numbers.md) | muse-88 | 10 | 4h | done (#58) |
 | 12 | [Fractions 1/2..1/9](phase-12-fractions-unit-fractions.md) | muse-min | 02 | 4h | done (#37) |
 | 13 | [Time + calendar](phase-13-time-clock-and-calendar.md) | muse-min | 02 | 5h | done (#38) |
 | 14 | [Money (VND)](phase-14-money-vietnamese-notes.md) | muse-min | 02 | 4h | done (#40) |
 | 15 | [Data + chance](phase-15-data-tables-and-chance.md) | muse-min | 02 | 4h | done (#41) |
-| 16 | [Scenes: blocks, number line, fractions](phase-16-dialog-scenes-numbers-and-fractions.md) | muse-min | 04,07,12 | 6h | in progress (in progress) |
+| 16 | [Scenes: blocks, number line, fractions](phase-16-dialog-scenes-numbers-and-fractions.md) | muse-min | 04,07,12 | 6h | done (#44) |
 | 17 | [Scenes: clock, calendar, money, data](phase-17-dialog-scenes-clock-calendar-money-data.md) | muse-min | 04,13,14,15 | 6h | done (#42) |
-| 18 | [Chapter-3 regions config](phase-18-chapter-3-regions-config.md) | muse-min + reviewer | 03 | 6h | pending |
-| 19 | [Level: Chợ Phiên Tí Hon](phase-19-level-market-cho-phien.md) | muse-min | 17,18 | 8h | pending |
-| 20 | [Level: Lâu Đài Số](phase-20-level-number-fort-lau-dai-so.md) | muse-88 | 08,11,16,18 | 8h | pending |
-| 22 | [Shop: VLM red scarf visible](phase-22-shop-red-scarf-visible.md) | muse-min | — | 2h | pending |
-| 23 | [Shop: wear many items (per body spot) + save code M3D6](phase-23-shop-multi-equip-and-save-code-m3d6.md) | muse-min | 22 | 6h | pending |
-| 24 | [Shop: 8–12 new items](phase-24-shop-new-items.md) | muse-min | 23 | 5h | pending |
-| 25 | [Level pinch/wheel/button zoom](phase-25-level-pinch-zoom.md) | first free Muse | — | 5h | pending |
-| 21 | [Close-out: coverage, docs, e2e, parity, staging](phase-21-close-out-coverage-docs-parity-staging.md) | reviewer | all | 6h | pending |
+| 18 | [Chapter-3 regions config](phase-18-chapter-3-regions-config.md) | muse-min + reviewer | 03 | 6h | done (#56) |
+| 19 | [Level: Chợ Phiên Tí Hon](phase-19-level-market-cho-phien.md) | muse-min | 17,18 | 8h | done (#59) |
+| 20 | [Level: Lâu Đài Số](phase-20-level-number-fort-lau-dai-so.md) | muse-88 | 08,11,16,18 | 8h | done (#61) |
+| 22 | [Shop: VLM red scarf visible](phase-22-shop-red-scarf-visible.md) | muse-min | — | 2h | done (#49) |
+| 23 | [Shop: wear many items (per body spot) + save code M3D6](phase-23-shop-multi-equip-and-save-code-m3d6.md) | muse-min | 22 | 6h | done (#50) |
+| 24 | [Shop: 8–12 new items](phase-24-shop-new-items.md) | muse-min | 23 | 5h | done (#52) |
+| 25 | [Level pinch/wheel/button zoom](phase-25-level-pinch-zoom.md) | first free Muse | — | 5h | done (#47, #54) |
+| 21 | [Close-out: coverage, docs, e2e, parity, staging](phase-21-close-out-coverage-docs-parity-staging.md) | reviewer | all | 6h | in progress (#65) |
 
 ## Lanes / order (child is around B23–B30 now → HK1 gaps first)
 Split by file ownership + deps only (both agents same machine, both run e2e); ~53h each.
