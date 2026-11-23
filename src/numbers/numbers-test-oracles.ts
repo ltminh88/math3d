@@ -82,6 +82,50 @@ export function digitAtPlace(n: number, place: string): number {
   return Math.floor(n / div) % 10;
 }
 
+/**
+ * Rounding, recomputed from the digit just below the place (5 rounds up) — independent
+ * of the generator's `roundTo`, which divides and rounds. `place` is 'tens' /
+ * 'hundreds' / 'thousands' / 'tenThousands', with an optional 'i:' prefix.
+ */
+export function roundToOracle(n: number, place: string): number {
+  const div = PLACE_DIV[place.replace(/^i:/, '')];
+  if (div === undefined || div < 10) throw new Error(`unknown rounding place ${place}`);
+  const below = Math.floor(n / (div / 10)) % 10;
+  const base = Math.floor(n / div) * div;
+  return below >= 5 ? base + div : base;
+}
+
+/** Hand table: every Roman numeral I..XX (phase 08 oracle, independent of the converter). */
+export const ROMAN_TABLE: Readonly<Record<string, number>> = Object.freeze({
+  I: 1,
+  II: 2,
+  III: 3,
+  IV: 4,
+  V: 5,
+  VI: 6,
+  VII: 7,
+  VIII: 8,
+  IX: 9,
+  X: 10,
+  XI: 11,
+  XII: 12,
+  XIII: 13,
+  XIV: 14,
+  XV: 15,
+  XVI: 16,
+  XVII: 17,
+  XVIII: 18,
+  XIX: 19,
+  XX: 20,
+});
+
+/** The value of a Roman numeral from the hand table (throws for anything outside I..XX). */
+export function romanToNumberOracle(roman: string): number {
+  const v = ROMAN_TABLE[roman];
+  if (v === undefined) throw new Error(`unknown roman ${roman}`);
+  return v;
+}
+
 /** The correct option's label of a choice / multi step. */
 export function correctLabel(step: ReasoningStep): PromptRef {
   if (step.kind !== 'choice' && step.kind !== 'multi') throw new Error('step has no options');

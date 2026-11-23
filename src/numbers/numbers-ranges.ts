@@ -8,10 +8,13 @@ export const RANGE_1000 = 1000;
 export const RANGE_10000 = 10000;
 export const RANGE_100000 = 100000;
 
-/** Range from the skill id ('100000' first: '10000' is a substring of it). */
+/** Range from the skill id ('100000' first: '10000' is a substring of it). Phase-08 ids
+ * carry no digits, so the rounding skills map by name (their numbers reach the range). */
 export function rangeOfSkill(skillId: string): number {
   if (skillId.includes('100000')) return RANGE_100000;
   if (skillId.includes('10000')) return RANGE_10000;
+  if (skillId === 'round-ten-thousands' || skillId === 'round-which-place') return RANGE_100000;
+  if (skillId === 'round-thousands') return RANGE_10000;
   return RANGE_1000;
 }
 

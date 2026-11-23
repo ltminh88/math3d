@@ -99,10 +99,24 @@ describe('planLessonRun', () => {
     expect(
       b66.every((k) => /^(sk:clock-|sk:times-|sk:roman-|sk:months-|sk:calendar-)/.test(k)),
     ).toBe(true);
-    // B47 has one time skill (roman-clock-hour): three items of it.
+    // B47 has one time skill (roman-clock-hour) plus three number skills now that
+    // phase 08 landed Roman numerals: six items, the four unique, two repeats.
     const b47 = planLessonRun(47, {}, mulberry32(4));
-    expect(b47).toHaveLength(3);
-    expect(b47.every((k) => k === 'sk:roman-clock-hour')).toBe(true);
+    expect(b47).toHaveLength(6);
+    expect(new Set(b47).size).toBe(4);
+    expect(b47.every((k) => /^(sk:roman-|sk:number-to-roman)/.test(k))).toBe(true);
+    // B48 plans its two rounding skills now that phase 08 landed them: six items,
+    // three rounds of the two.
+    const b48 = planLessonRun(48, {}, mulberry32(4));
+    expect(b48).toHaveLength(6);
+    expect(new Set(b48).size).toBe(2);
+    expect(b48.every((k) => k.startsWith('sk:round-'))).toBe(true);
+    // B61 plans its three rounding skills now that phase 08 landed them: six items,
+    // two rounds of the three.
+    const b61 = planLessonRun(61, {}, mulberry32(4));
+    expect(b61).toHaveLength(6);
+    expect(new Set(b61).size).toBe(3);
+    expect(b61.every((k) => k.startsWith('sk:round-'))).toBe(true);
     // B68 plans its six money skills now that phase 14 landed them.
     const b68 = planLessonRun(68, {}, mulberry32(4));
     expect(b68).toHaveLength(6);

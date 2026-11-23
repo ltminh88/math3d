@@ -120,6 +120,14 @@ describe('dialogRenderable', () => {
       'num-expand-100000',
       'num-compare-100000',
       'num-order-100000',
+      'round-tens',
+      'round-hundreds',
+      'round-thousands',
+      'round-ten-thousands',
+      'round-which-place',
+      'roman-to-number',
+      'number-to-roman',
+      'roman-sequence',
     ])
       expect(dialogRenderable(itemForSkill(id, mulberry32(1), 1))).toBe(true);
     // Tier 1 place-value / sequence carry no scene; tier 2+ draws one.

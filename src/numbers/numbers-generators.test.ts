@@ -17,6 +17,8 @@ import { renderNumbersPrompt } from './numbers-strings';
 import {
   correctLabel,
   digitAtPlace,
+  romanToNumberOracle,
+  roundToOracle,
   stepNumber,
   stepSign,
   stepValues,
@@ -149,6 +151,43 @@ const ORACLE: Record<string, (i: PracticeItem) => void> = {
     const desc = [...digits].sort((x, y) => y - x);
     const asc = [...digits].sort((x, y) => x - y);
     expect(values(i)).toEqual([fromDigits(desc), fromDigits(asc)]);
+  },
+  // Phase 08: rounding (number pad or MCQ) and the "which place" question.
+  roundAsk: (i) => {
+    const want = roundToOracle(p(i, 'n'), String(i.story.params?.place));
+    const step = stepAt(i, 0);
+    if (step.kind === 'number') expect(last(i)).toBe(want);
+    else expect(stepNumber(step)).toBe(want);
+  },
+  roundWhichPlace: (i) => {
+    const step = stepAt(i, 0);
+    if (step.kind !== 'choice') throw new Error('roundWhichPlace needs a choice step');
+    const place = String(correctLabel(step).key).replace(/^item_/, '');
+    expect(roundToOracle(p(i, 'n'), place)).toBe(p(i, 'r'));
+    for (const o of step.options) {
+      if (o.correct) continue;
+      expect(roundToOracle(p(i, 'n'), String(o.label.key).replace(/^item_/, ''))).not.toBe(
+        p(i, 'r'),
+      );
+    }
+  },
+  romanToNumber: (i) => {
+    expect(stepNumber(stepAt(i, 0))).toBe(romanToNumberOracle(String(i.story.params?.roman)));
+  },
+  numberToRoman: (i) => {
+    const label = correctLabel(stepAt(i, 0));
+    expect(label.key).toBe('romanText');
+    expect(romanToNumberOracle(String(label.params?.r))).toBe(p(i, 'n'));
+  },
+  romanSequence: (i) => {
+    const shown = String(i.story.params?.seq).split(', ');
+    const missing = shown.indexOf('?');
+    const nums = shown.map((s) => (s === '?' ? Number.NaN : romanToNumberOracle(s)));
+    const want = ((nums[missing - 1] as number) + (nums[missing + 1] as number)) / 2;
+    expect(Number.isInteger(want)).toBe(true);
+    const step = stepAt(i, 0);
+    if (step.kind === 'number') expect(last(i)).toBe(want);
+    else expect(romanToNumberOracle(String(correctLabel(step).params?.r))).toBe(want);
   },
 };
 
