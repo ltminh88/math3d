@@ -108,13 +108,13 @@ describe('expansion regions', () => {
     }
   });
 
-  it('every chapter 2 gate stands inside its region', () => {
-    const chapter2 = LEVEL_GATES.filter((g) => ['valley', 'workshop', 'cave'].includes(g.levelId));
-    expect(chapter2).toHaveLength(3);
-    for (const gate of chapter2) {
+  it('every chapter 2 and 3 gate stands inside its region', () => {
+    const chapter23 = LEVEL_GATES.filter((g) =>
+      ['valley', 'workshop', 'cave', 'market', 'numberfort'].includes(g.levelId),
+    );
+    expect(chapter23).toHaveLength(5);
+    for (const gate of chapter23) {
       expect(expansionRegionAt(gate.position[0], gate.position[1])?.id).toBe(gate.regionId);
     }
   });
-  // NOTE (phase 18, blocked on reviewer): extends to market/numberfort (5 gates) once the
-  // gate strings are approved and the two gates are added to LEVEL_GATES.
 });

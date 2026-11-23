@@ -3,9 +3,6 @@
 import type { AnyRegionId } from './expansion-regions';
 
 /** What a level gate needs before it opens: the bridge quest, or a completed level. */
-// NOTE (phase 18, blocked on reviewer): 'cave' joins this union together with the 'cave' row
-// of LEVEL_LOCK_KEYS in level-gates.ts and the lockReasonCave/lockedCave strings — the map is
-// typed Record<Requirement, ...>, so the union cannot grow without that row.
 export type GateRequirement =
   | 'bridge'
   | 'field'
@@ -15,6 +12,7 @@ export type GateRequirement =
   | 'garden'
   | 'valley'
   | 'workshop'
+  | 'cave'
   | null;
 
 /** A level gate standing in a region (placed after the scatter pass, so no RNG shift). */
@@ -28,12 +26,9 @@ export interface LevelGate {
     | 'garden'
     | 'valley'
     | 'workshop'
-    | 'cave';
-  // NOTE (phase 18, blocked on reviewer): 'market' | 'numberfort' join this union together
-  // with their LEVEL_GATES entries once the reviewer approves the gate strings
-  // (gateMarket/gateNumberfort, lockReasonCave/lockedCave in level-host-strings.ts and the
-  // 'cave' row of LEVEL_LOCK_KEYS in level-gates.ts) — without them `gateNameOf` has no
-  // entry for the new ids and typecheck fails.
+    | 'cave'
+    | 'market'
+    | 'numberfort';
   readonly regionId: AnyRegionId;
   /** Gate centre on the ground plane as [x, z]. */
   readonly position: readonly [x: number, z: number];
@@ -117,7 +112,20 @@ export const LEVEL_GATES: readonly LevelGate[] = [
     requires: 'workshop',
     sign: '?',
   },
-  // NOTE (phase 18, blocked on reviewer): market gate (-35,-30, sign '₫') and numberfort gate
-  // (61.5,-2, sign '100 000'), both requires 'cave', are added here once the gate strings
-  // above are approved. Probe: market centre (-32,-30) 12x8, numberfort centre (61,-2) 12x10.
+  {
+    levelId: 'market',
+    regionId: 'market',
+    position: [-35, -30],
+    facing: 0,
+    requires: 'cave',
+    sign: '₫',
+  },
+  {
+    levelId: 'numberfort',
+    regionId: 'numberfort',
+    position: [61.5, -2],
+    facing: 0,
+    requires: 'cave',
+    sign: '100 000',
+  },
 ];

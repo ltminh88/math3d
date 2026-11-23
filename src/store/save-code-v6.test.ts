@@ -81,6 +81,24 @@ describe('M3D6 save code', () => {
     expect(records.cosmetics?.owned).toEqual(snapshot().ownedCosmetics);
   });
 
+  it('round-trips chapter 3 level stars (market)', () => {
+    const snap = snapshot();
+    snap.levelProgress = {
+      market: {
+        profileId: 'p1',
+        levelId: 'market',
+        stars: 2,
+        bestScore: 0,
+        completedAt: AT,
+        progress: 1,
+        acceptedAt: AT,
+        stageStars: [2],
+      },
+    };
+    const { records } = importOfDecodedSaveCode(decodeSaveCode(encodeSaveCodeV6(snap, audio)), AT);
+    expect(records.levels.market).toMatchObject({ stars: 2, progress: 1 });
+  });
+
   it('an M3D5 code imports with the same items worn (old e maps to the new model)', () => {
     const payload = {
       o: ['vlm-red-scarf', 'avatar-gold-crown', 'decor-fountain'],
