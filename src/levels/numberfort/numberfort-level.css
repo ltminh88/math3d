@@ -131,11 +131,73 @@
     display: none;
   }
 }
-/* Narrow screens: the guide shrinks to the free strip instead of the desktop 440px offset,
-   so it never pushes the panel sideways. */
-@media (max-width: 760px) {
+/* The finished castle wall: a card at the panel's place on wide screens (the cave
+   pattern — never a static full-width band at the top of the overlay, which the
+   guide and the zoom group would paint over). */
+.numberfort-done {
+  position: absolute;
+  top: 76px;
+  right: max(16px, env(safe-area-inset-right));
+  width: 360px;
+  max-height: calc(100% - 92px);
+  overflow: auto;
+  padding: 22px 24px;
+  border-radius: var(--radius-lg);
+  background: var(--paper);
+  text-align: center;
+  animation: pop 0.5s;
+}
+.numberfort-done h2 {
+  margin: 0 0 6px;
+  font-family: var(--font-display);
+  font-size: 26px;
+}
+.numberfort-stars {
+  margin: 0;
+  color: var(--gold);
+  font-size: 30px;
+  letter-spacing: 6px;
+}
+.numberfort-done__line {
+  color: var(--muted);
+  line-height: 1.6;
+}
+.numberfort-done .primary {
+  width: 100%;
+  min-height: 48px;
+  margin-top: 14px;
+}
+/* Narrow screens (tower pattern): the guide goes below the top bar (top: 70px) so it
+   never covers the leave button, the progress or the zoom group; the panel and the
+   done card dock at the bottom instead of the right side. */
+@media (max-width: 760px), (max-height: 520px) and (max-width: 1000px) {
   .numberfort-guide {
-    width: min(560px, calc(100% - 32px));
+    top: 70px;
+    width: calc(100% - 32px);
+    font-size: 13px;
+  }
+  .numberfort-progress {
+    top: auto;
+    bottom: calc(56% + 20px);
+    padding: 6px 10px;
+  }
+  .numberfort-panel {
+    top: auto;
+    left: 12px;
+    right: 12px;
+    bottom: max(12px, env(safe-area-inset-bottom));
+    width: auto;
+    max-height: 56%;
+    padding: 12px 14px;
+  }
+  .numberfort-done {
+    top: auto;
+    left: 12px;
+    right: 12px;
+    bottom: max(12px, env(safe-area-inset-bottom));
+    width: auto;
+    max-height: 60%;
+    padding: 16px 18px;
   }
 }
 .numberfort-panel .reward-pop {
