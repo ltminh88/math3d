@@ -1,8 +1,8 @@
 // Market level "Chợ Phiên Tí Hon" (chapter 3 phase 19): seed chapter 1 and 2, enter through
 // the market gate, play six rounds of clock skills (stage 1), come back with the level
 // completed, `sk:` skills stored and the stage-1 stars. Uses `window.__market`/`__game`.
-// TODO (chain decision, awaiting Brian): assert the quest card after market — the closing card
-// when the chain stays at the cave, the numberfort quest when market joins the chain.
+// The chain stays at the cave in this PR — chapter 3 joins the quest chain in phase 21
+// (reviewer-owned), so no quest-card assertion for market here.
 import { type Page, test } from '@playwright/test';
 import { expect, SLOW_TEST_MS, waitForStoreBoot } from './legacy-live-save-fixtures';
 

@@ -1,8 +1,9 @@
 // Chapter 3 (phase 18): the tiny market fair and the number castle show on the HUD area badge
 // and the world map, and the baked regions add no new draw calls (they bake into the same
-// expansion meshes as chapter 2). Their gates stay locked until the cave is done, then say
-// "Sắp ra mắt" until their level ships. Uses the test-build hooks `window.__game` and
-// `window.__parity`.
+// expansion meshes as chapter 2). Their gates stay locked until the cave is done; then the
+// numberfort gate says "Sắp ra mắt" until its level ships, while the market gate is open
+// (phase 19 shipped its level) and entering starts it. Uses the test-build hooks
+// `window.__game` and `window.__parity`.
 import { type Page, test } from '@playwright/test';
 import { expect, SLOW_TEST_MS, waitForStoreBoot } from './legacy-live-save-fixtures';
 
@@ -41,7 +42,7 @@ async function useGate(page: Page, levelId: keyof typeof AREAS, touch: boolean):
   else await page.keyboard.press('e');
 }
 
-test('chapter 3 gates stay locked until the cave is done, then say "Sắp ra mắt"', async ({
+test('chapter 3 gates stay locked until the cave is done, then numberfort says "Sắp ra mắt" and market opens', async ({
   page,
 }, testInfo) => {
   const touch = !!testInfo.project.use.hasTouch;
@@ -64,15 +65,22 @@ test('chapter 3 gates stay locked until the cave is done, then say "Sắp ra m�
   }
 
   await page.evaluate(() => window.__game?.seedProgress({ completedLevels: ['cave'] }));
-  expect(await statuses(page)).toEqual(['coming-soon', 'coming-soon']);
-  for (const id of CHAPTER3) {
-    await expect(page.locator(`#gate-${id}-label small`)).toHaveText('Sắp ra mắt');
-    await useGate(page, id, touch);
-    await expect(page.locator('#interact')).toContainText(`${NAMES[id]} · Sắp ra mắt`);
-    await expect(page.locator('#toast')).toHaveText(
-      'Màn chơi này sắp ra mắt. Hẹn bạn quay lại nhé!',
-    );
-  }
+  expect(await statuses(page)).toEqual(['open', 'coming-soon']);
+  // Numberfort has no level yet: it still says "Sắp ra mắt".
+  await expect(page.locator('#gate-numberfort-label small')).toHaveText('Sắp ra mắt');
+  await useGate(page, 'numberfort', touch);
+  await expect(page.locator('#interact')).toContainText(`${NAMES.numberfort} · Sắp ra mắt`);
+  await expect(page.locator('#toast')).toHaveText('Màn chơi này sắp ra mắt. Hẹn bạn quay lại nhé!');
+  // Market has a level now (phase 19): its gate is open and using it starts the level.
+  // (The gate text is checked before using it — once the level starts, #interact no longer
+  // shows the gate text.)
+  await expect(page.locator('#gate-market-label small')).not.toHaveText('Sắp ra mắt');
+  await page.evaluate(() => window.__game?.teleportToGate('market'));
+  await expect(page.locator('#interact')).toContainText('Vào Cổng Chợ Phiên Tí Hon');
+  await expect(page.locator('#area-name')).toHaveText(AREAS.market);
+  if (touch) await page.locator('#interact').tap();
+  else await page.keyboard.press('e');
+  await expect(page.locator('.market-panel')).toBeVisible();
   expect(errors).toEqual([]);
 });
 
