@@ -265,8 +265,8 @@ describe('topicProgress', () => {
     expect(topicProgress(15, {})).toEqual({ completed: 0, total: 3 });
   });
 
-  it('topic 16 has 5 playable lessons (B76 via the Roman clock, B77 via phase 09 arithmetic, B79, B80, B81; B78 waits for phase 10/11)', () => {
-    expect(topicProgress(16, {})).toEqual({ completed: 0, total: 5 });
+  it('topic 16 has 6 playable lessons (B76 via the Roman clock, B77 via phase 09 arithmetic, B78 via phase 11 arithmetic, B79, B80, B81)', () => {
+    expect(topicProgress(16, {})).toEqual({ completed: 0, total: 6 });
   });
 
   it('an unknown topic is empty', () => {

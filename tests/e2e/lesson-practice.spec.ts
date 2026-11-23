@@ -577,6 +577,112 @@ test('run B61: answer all 6, rounding to thousands/ten-thousands, 6-digit pad', 
   await expect(page.locator('#dialog')).not.toHaveAttribute('open', '');
 });
 
+test('run B56: answer all 6, mul 4-digit by 1-digit, stars before/after show, coins in store', async ({
+  page,
+}, info) => {
+  const touch = isTouch(info);
+  await boot(page);
+  await openPicker(page, touch);
+  await openTopic(page, 10, touch);
+  await pickLesson(page, 56, touch);
+  await expect(page.locator('#dialog-content')).toContainText(
+    'Bài 56 · Nhân số bốn chữ số với số một chữ số · Câu 1/6',
+  );
+  expect(await playLessonRun(page, touch)).toBe(6);
+  const content = page.locator('#dialog-content');
+  await expect(content).toContainText('Xong bài 56!');
+  await expect(content).toContainText('☆☆☆ → ★☆☆');
+  await expect(content).toContainText('+30 xu');
+  await expect(coins(page)).toHaveText('30');
+  const snap = await page.evaluate(() => window.__game?.snapshot());
+  for (const id of ['mul-4d-1d', 'mul-thousands-mental', 'mul-div-large-wp', 'mul-chain-operators'])
+    expect(snap?.factStats[`sk:${id}`]?.attempts ?? 0).toBeGreaterThanOrEqual(1);
+  await waitDialogSettled(page);
+  await page.locator('#close-dialog').click();
+  await expect(page.locator('#dialog')).not.toHaveAttribute('open', '');
+});
+
+test('run B57: answer all 6, div 4-digit by 1-digit, stars before/after show, coins in store', async ({
+  page,
+}, info) => {
+  const touch = isTouch(info);
+  await boot(page);
+  await openPicker(page, touch);
+  await openTopic(page, 10, touch);
+  await pickLesson(page, 57, touch);
+  await expect(page.locator('#dialog-content')).toContainText(
+    'Bài 57 · Chia số bốn chữ số cho số một chữ số · Câu 1/6',
+  );
+  expect(await playLessonRun(page, touch)).toBe(6);
+  const content = page.locator('#dialog-content');
+  await expect(content).toContainText('Xong bài 57!');
+  await expect(content).toContainText('☆☆☆ → ★☆☆');
+  await expect(content).toContainText('+30 xu');
+  await expect(coins(page)).toHaveText('30');
+  const snap = await page.evaluate(() => window.__game?.snapshot());
+  for (const id of [
+    'div-4d-1d',
+    'div-4d-1d-remainder',
+    'div-thousands-mental',
+    'mul-div-large-wp',
+    'mul-chain-operators',
+  ])
+    expect(snap?.factStats[`sk:${id}`]?.attempts ?? 0).toBeGreaterThanOrEqual(1);
+  await waitDialogSettled(page);
+  await page.locator('#close-dialog').click();
+  await expect(page.locator('#dialog')).not.toHaveAttribute('open', '');
+});
+
+test('run B70: answer all 6, mul 5-digit by 1-digit, stars before/after show, coins in store', async ({
+  page,
+}, info) => {
+  const touch = isTouch(info);
+  await boot(page);
+  await openPicker(page, touch);
+  await openTopic(page, 14, touch);
+  await pickLesson(page, 70, touch);
+  await expect(page.locator('#dialog-content')).toContainText(
+    'Bài 70 · Nhân số năm chữ số với số một chữ số · Câu 1/6',
+  );
+  expect(await playLessonRun(page, touch)).toBe(6);
+  const content = page.locator('#dialog-content');
+  await expect(content).toContainText('Xong bài 70!');
+  await expect(content).toContainText('☆☆☆ → ★☆☆');
+  await expect(content).toContainText('+30 xu');
+  await expect(coins(page)).toHaveText('30');
+  const snap = await page.evaluate(() => window.__game?.snapshot());
+  for (const id of ['mul-5d-1d', 'mul-div-large-wp', 'mul-chain-operators'])
+    expect(snap?.factStats[`sk:${id}`]?.attempts ?? 0).toBeGreaterThanOrEqual(1);
+  await waitDialogSettled(page);
+  await page.locator('#close-dialog').click();
+  await expect(page.locator('#dialog')).not.toHaveAttribute('open', '');
+});
+
+test('run B71: answer all 6, div 5-digit by 1-digit, stars before/after show, coins in store', async ({
+  page,
+}, info) => {
+  const touch = isTouch(info);
+  await boot(page);
+  await openPicker(page, touch);
+  await openTopic(page, 14, touch);
+  await pickLesson(page, 71, touch);
+  await expect(page.locator('#dialog-content')).toContainText(
+    'Bài 71 · Chia số năm chữ số cho số một chữ số · Câu 1/6',
+  );
+  expect(await playLessonRun(page, touch)).toBe(6);
+  const content = page.locator('#dialog-content');
+  await expect(content).toContainText('Xong bài 71!');
+  await expect(content).toContainText('☆☆☆ → ★☆☆');
+  await expect(content).toContainText('+30 xu');
+  await expect(coins(page)).toHaveText('30');
+  const snap = await page.evaluate(() => window.__game?.snapshot());
+  for (const id of ['div-5d-1d', 'div-5d-1d-remainder', 'mul-div-large-wp', 'mul-chain-operators'])
+    expect(snap?.factStats[`sk:${id}`]?.attempts ?? 0).toBeGreaterThanOrEqual(1);
+  await waitDialogSettled(page);
+  await page.locator('#close-dialog').click();
+  await expect(page.locator('#dialog')).not.toHaveAttribute('open', '');
+});
+
 test('leaving mid-run keeps the answered items and pays their coins', async ({ page }, info) => {
   const touch = isTouch(info);
   await boot(page);

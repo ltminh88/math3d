@@ -90,6 +90,9 @@ export const romanSequence = (rng: Rng, tier: SkillTier): PracticeItem => {
   const story = ref('romanSequence', { seq: shown });
   const want = seq[missing] as number;
   if (pick(rng, ['choice', 'pad']) === 'pad')
-    return numberItem(skillId, tier, story, [numberStep(ref('askMissing'), want)]);
+    // The pad asks for the Arabic value, so the question says so explicitly
+    // ("viết bằng số thường") — a Roman sequence must not leave the child guessing
+    // which script to type (review feedback on PR #55).
+    return numberItem(skillId, tier, story, [numberStep(ref('askMissingArabic'), want)]);
   return numberItem(skillId, tier, story, [romanTextStep(rng, want)]);
 };

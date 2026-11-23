@@ -13,6 +13,14 @@ function checkStep(step: ReasoningStep, where: string): void {
     expect(step.answer, `${where} non-negative answer`).toBeGreaterThanOrEqual(0);
     return;
   }
+  if (step.kind === 'choice') {
+    // A choice step offers ≥ 2 distinct options with exactly one correct.
+    expect(step.options.length, `${where} options`).toBeGreaterThanOrEqual(2);
+    expect(step.options.filter((o) => o.correct).length, `${where} one correct`).toBe(1);
+    const labels = step.options.map((o) => JSON.stringify(o.label));
+    expect(new Set(labels).size, `${where} distinct options`).toBe(labels.length);
+    return;
+  }
   if (step.kind === 'verdict') {
     // A verdict step shows a full worked equation in its statement; when false it
     // must carry the fix (the right value), never a bare "Sai".

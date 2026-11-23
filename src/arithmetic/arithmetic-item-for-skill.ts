@@ -8,6 +8,8 @@ import { WORD_PROBLEM_GENERATORS } from './add-sub-word-problems';
 import { ARITHMETIC_ENTRIES } from './arithmetic-skill-entries';
 import { DIV_GENERATORS } from './div-generators';
 import { MUL_DIV_FIND_ERROR_GENERATORS } from './mul-div-find-error';
+import { LARGE_DIV_GENERATORS, LARGE_MUL_GENERATORS } from './mul-div-large-generators';
+import { LARGE_WP_GENERATORS } from './mul-div-large-word-problems';
 import { MUL_DIV_WP_GENERATORS } from './mul-div-word-problems';
 import { MUL_GENERATORS } from './mul-generators';
 
@@ -18,6 +20,9 @@ const GENERATORS: Readonly<Record<string, ArithmeticGenerator>> = {
   ...WORD_PROBLEM_GENERATORS,
   ...MUL_GENERATORS,
   ...DIV_GENERATORS,
+  ...LARGE_MUL_GENERATORS,
+  ...LARGE_DIV_GENERATORS,
+  ...LARGE_WP_GENERATORS,
   ...MUL_DIV_WP_GENERATORS,
   ...MUL_DIV_FIND_ERROR_GENERATORS,
 };

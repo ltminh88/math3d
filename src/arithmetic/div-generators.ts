@@ -75,8 +75,9 @@ export function pickDivRemainder3d(rng: Rng, tier: SkillTier): [number, number] 
   return tier === 1 ? [305, 2] : tier === 2 ? [307, 4] : [803, 4];
 }
 
-/** One exact division, result only (number pad). */
-const plainDiv =
+/** One exact division, result only (number pad). Exported for the phase-11
+ *  4-5 digit generators, which reuse it with their own pickers. */
+export const plainDiv =
   (skillId: string, pick: (rng: Rng, tier: SkillTier) => [number, number]): ReasoningGenerator =>
   (rng, tier) => {
     const [a, b] = pick(rng, tier);
@@ -85,8 +86,9 @@ const plainDiv =
     ]);
   };
 
-/** A division with a remainder: two steps, quotient then remainder. */
-const remainderDiv =
+/** A division with a remainder: two steps, quotient then remainder. Exported for
+ *  the phase-11 4-5 digit generators, which reuse it with their own pickers. */
+export const remainderDiv =
   (skillId: string, pick: (rng: Rng, tier: SkillTier) => [number, number]): ReasoningGenerator =>
   (rng, tier) => {
     const [a, b] = pick(rng, tier);
