@@ -336,6 +336,43 @@ test('run B2: answer all 6, stars before/after show, coins in store, picker star
   await expect(page.locator('#dialog')).not.toHaveAttribute('open', '');
 });
 
+test('run B7: answer all 6, stars before/after show, coins in store, picker stars update', async ({
+  page,
+}, info) => {
+  const touch = isTouch(info);
+  await boot(page);
+  await openPicker(page, touch);
+  await pickLesson(page, 7, touch);
+  await expect(page.locator('#dialog-content')).toContainText(
+    'Bài 7 · Ôn tập hình học và đo lường · Câu 1/6',
+  );
+  expect(await playLessonRun(page, touch)).toBe(6);
+  const content = page.locator('#dialog-content');
+  await expect(content).toContainText('Xong bài 7!');
+  await expect(content).toContainText('☆☆☆ → ★☆☆');
+  await expect(content).toContainText('+30 xu');
+  await expect(coins(page)).toHaveText('30');
+  const snap = await page.evaluate(() => window.__game?.snapshot());
+  for (const id of [
+    'geo-shape-classify',
+    'geo-right-angle',
+    'meas-ruler-read',
+    'meas-temperature',
+  ])
+    expect(snap?.factStats[`sk:${id}`]?.attempts ?? 0).toBeGreaterThanOrEqual(1);
+  // Back to the picker: B7 now shows 1 star.
+  const back = page.locator('#lesson-back');
+  if (touch) await back.tap();
+  else await back.click();
+  await expect(page.locator('#dialog-content')).toContainText('Chọn bài để luyện');
+  await expect(
+    page.locator('button.lesson-row[data-lesson="7"] .lesson-row__stars'),
+  ).toHaveAttribute('data-stars', '1');
+  await waitDialogSettled(page);
+  await page.locator('#close-dialog').click();
+  await expect(page.locator('#dialog')).not.toHaveAttribute('open', '');
+});
+
 test('B2 four-digit answer: 700 + 300 types 1000 and completes the step', async ({
   page,
 }, info) => {
