@@ -56,8 +56,8 @@ describe('KNTT lesson table', () => {
     ).toEqual([7]);
   });
 
-  it('only B7 (grade-2 review) is not practicable', () => {
-    expect(ALL_LESSONS.filter((l) => !l.practicable).map((l) => l.n)).toEqual([7]);
+  it('every lesson is practicable (B7 reviews since phase 21)', () => {
+    expect(ALL_LESSONS.filter((l) => !l.practicable).map((l) => l.n)).toEqual([]);
   });
 
   it('every legacy skill lesson exists in the table', () => {
@@ -103,10 +103,18 @@ describe('skillsOfLesson', () => {
     expect(keys).toContain('mul:2x3');
   });
 
-  it('B7 (not practicable) yields nothing: pattern-skip-count is tables-only now', () => {
-    // Phase 12 legacy fix: pattern-skip-count is tagged only with the tables lessons
-    // (B4, B5, B6, B9-B12), not B7 (geometry review) or B8 (mixed practice).
-    expect(skillsOfLesson(7)).toEqual([]);
+  it('B7 yields its four review skills (phase 21, catalog order)', () => {
+    // B7 is a grade-2 review, so it uses only what a child learned before B7:
+    // shape classify/count, solid identify, ruler read — all tier-1 easy.
+    // geo-right-angle (B18) and meas-temperature (B33) are new grade-3
+    // content (TASK #2). pattern-skip-count stays tables-only (phase-12
+    // legacy fix).
+    expect(skillsOfLesson(7)).toEqual([
+      'sk:geo-shape-classify',
+      'sk:geo-shape-count',
+      'sk:geo-solid-identify',
+      'sk:meas-ruler-read',
+    ]);
   });
 
   it('no catalog skill is orphaned: every skill appears in at least one practicable lesson', () => {

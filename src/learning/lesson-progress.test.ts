@@ -231,6 +231,10 @@ describe('nextLesson', () => {
 });
 
 describe('topicProgress', () => {
+  it('topic 1 has 8 playable lessons (B1-B8; B7 via phase 21 review skills)', () => {
+    expect(topicProgress(1, {})).toEqual({ completed: 0, total: 8 });
+  });
+
   it('topic 2 has 7 playable lessons', () => {
     expect(topicProgress(2, {})).toEqual({ completed: 0, total: 7 });
     const b9 = [...mulFactsForTables([6]), ...divFactsForTables([6])];

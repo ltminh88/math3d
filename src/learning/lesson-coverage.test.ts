@@ -1,8 +1,7 @@
-// Lesson coverage (phase 02): every practicable lesson passes while the family phases land
-// one by one. A lesson passes when ≥1 of its skills already has a generator, or when all its
-// skills belong to families whose GENERATORS record is still empty (the escape hatch —
-// derived from code, not a list). Phase 21 removes the hatch: then every practicable lesson
-// needs ≥1 generated skill.
+// Lesson coverage (phase 21, strict): every practicable lesson passes — ≥1 of its
+// skills already has a generator. The phase-02 escape hatch (a lesson passed when
+// all its skills sat in families with no generator yet, or when it had no skills
+// at all) is gone: all families generate now, and all 81 lessons are practicable.
 import { describe, expect, it } from 'vitest';
 import { ARITHMETIC_SKILLS } from '../arithmetic/arithmetic-item-for-skill';
 import { DATA_SKILLS } from '../data/data-item-for-skill';
@@ -49,25 +48,20 @@ function hasGenerator(key: FactKey): boolean {
   return family !== undefined && GENERATORS_BY_FAMILY[family].includes(key.slice(3));
 }
 
-/** True when the family has not generated any skill yet (the escape hatch). */
+/** True when the family has not generated any skill yet (kept for the test below). */
 function familyHasNoGenerator(family: SkillFamily): boolean {
   return GENERATORS_BY_FAMILY[family].length === 0;
 }
 
 /**
- * A practicable lesson passes when ≥1 skill has a generator, or all its skills sit in
- * families with no generator yet. A lesson with no skills at all passes vacuously — its
- * family phase has not landed and there is nothing to check yet.
+ * A practicable lesson passes when ≥1 skill has a generator. No escape hatch: a
+ * lesson with no skills at all does not pass.
  */
 function lessonPasses(keys: readonly FactKey[]): boolean {
-  if (keys.some(hasGenerator)) return true;
-  return keys.every((key) => {
-    const family = key.startsWith('sk:') ? skillEntry(key.slice(3))?.family : undefined;
-    return family !== undefined && familyHasNoGenerator(family);
-  });
+  return keys.some(hasGenerator);
 }
 
-describe('lesson coverage (phase 02 escape hatch)', () => {
+describe('lesson coverage (phase 21 strict)', () => {
   it('every practicable lesson passes', () => {
     for (const lesson of ALL_LESSONS.filter((l) => l.practicable)) {
       expect(lessonPasses(skillsOfLesson(lesson.n)), `B${lesson.n}`).toBe(true);
@@ -97,8 +91,9 @@ describe('lesson coverage (phase 02 escape hatch)', () => {
       expect(familyHasNoGenerator(family)).toBe(false);
   });
 
-  it('a lesson with no skills passes vacuously (its family phase has not landed)', () => {
-    expect(lessonPasses([])).toBe(true);
+  it('a lesson with no skills does not pass (no escape hatch)', () => {
+    expect(lessonPasses([])).toBe(false);
     expect(lessonPasses(skillsOfLesson(1))).toBe(true); // B1: six skills, all generated (phase 07)
+    expect(lessonPasses(skillsOfLesson(7))).toBe(true); // B7: four review skills (phase 21)
   });
 });
