@@ -136,7 +136,7 @@ const en = {
   wpDivBoxes: '{name} has {a} {item}. Each box holds {b} {item}.',
   wpReduceTimes: 'Reduce {a} {unit} by {b} times. How many {unit} is that?',
   wpMoneyChange:
-    '{name} buys {n} {item}. Each {item} costs {per} đồng. {name} hands the seller {paid} đồng.',
+    '{name} buys {n} {item}. Each one costs {per} đồng. {name} hands the seller {paid} đồng.',
   wpCompareLarge: 'Three calculations: {expr1}; {expr2}; {expr3}.',
   askSpent: 'How many đồng did the shopping cost in all?',
   askChange: 'How many đồng does the seller give back?',

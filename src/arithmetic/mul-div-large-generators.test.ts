@@ -9,6 +9,7 @@ import { dialogRenderable } from '../practice/item-for-skill';
 import type { PracticeItem } from '../practice/practice-scene';
 import { evalExpr } from '../reasoning/reasoning-test-oracles';
 import type { ReasoningStep } from '../reasoning/reasoning-types';
+import { ref } from './arithmetic-distractors';
 import { arithmeticItemForSkill } from './arithmetic-item-for-skill';
 import { renderArithmeticPrompt } from './arithmetic-strings';
 import {
@@ -367,5 +368,18 @@ describe('arithmetic mul/div large word-problem contexts', () => {
       expect(story, `story: ${story}`).not.toContain('i:');
     }
     expect(sawMoney).toBe(true);
+  });
+
+  it('the English money-change story says "Each one costs", never "Each notebooks costs"', () => {
+    setLanguage('en');
+    for (const item of ['i:notebook', 'i:pen', 'i:cake', 'i:book']) {
+      const story = renderArithmeticPrompt(
+        ref('wpMoneyChange', { name: 'An', item, paid: 50000, n: 2, per: 3000 }),
+      );
+      expect(story, `story: ${story}`).toContain('Each one costs');
+      for (const bad of ['notebooks costs', 'pens costs', 'cakes costs', 'books costs']) {
+        expect(story, `story: ${story}`).not.toContain(bad);
+      }
+    }
   });
 });
