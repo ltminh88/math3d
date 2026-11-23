@@ -1,0 +1,135 @@
+/* Market level HUD: recovered tokens (--ink, --paper, --gold, fonts), glass panels, and the
+   market's lantern orange for the round counter. The step card's widgets come from the kit
+   (step-kit.css); the scene picture comes from the dialog scenes (dialog-scene.css). */
+.market-guide {
+  position: absolute;
+  top: max(16px, env(safe-area-inset-top));
+  left: 50%;
+  transform: translate(-50%);
+  width: min(560px, calc(100% - 440px));
+  display: flex;
+  align-items: flex-start;
+  gap: 8px;
+  padding: 10px 16px;
+  border-radius: var(--radius);
+  font-size: 15px;
+  line-height: 1.45;
+}
+.market-guide p {
+  margin: 0;
+  color: var(--ink-soft);
+  font-weight: 700;
+}
+.market-guide__name {
+  font-family: var(--font-display);
+  color: var(--gold-deep);
+}
+.market-guide__dot {
+  color: #e07856;
+}
+.market-progress {
+  position: absolute;
+  top: max(16px, env(safe-area-inset-top));
+  right: max(16px, env(safe-area-inset-right));
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 10px 14px;
+  border-radius: 14px;
+  font-size: 14px;
+  font-weight: 900;
+}
+.market-rounds {
+  display: flex;
+  gap: 5px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+.market-rounds li {
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+  background: #d8c9a8;
+}
+.market-rounds li.done {
+  background: #e07856;
+}
+.market-rounds li.current {
+  background: #f0c45d;
+}
+.market-panel {
+  position: absolute;
+  top: 76px;
+  right: max(16px, env(safe-area-inset-right));
+  width: 400px;
+  max-height: calc(100% - 92px);
+  overflow: auto;
+  padding: 16px 18px;
+  border-radius: var(--radius-lg);
+  background: var(--glass-strong);
+}
+.market-panel .question-intro {
+  margin: 0 0 6px;
+  font-family: var(--font-display);
+  font-size: 18px;
+  color: #a04a2e;
+}
+.market-scene svg {
+  width: 100%;
+  height: auto;
+  margin-bottom: 8px;
+}
+.market-card .kit-step-card__story {
+  margin: 0 0 8px;
+  font-size: 17px;
+  line-height: 1.5;
+  font-weight: 700;
+  color: var(--ink);
+}
+.market-card .kit-step-card__steps {
+  margin: 0;
+  padding-left: 22px;
+}
+.market-hint-button {
+  min-height: 44px;
+  min-width: 44px;
+  margin-top: 6px;
+}
+.market-hint-button.offer {
+  color: var(--gold-deep);
+  text-decoration: underline;
+}
+.market-hint-button.offer .hint-nudge {
+  /* The nudge runs on the bulb span, not the button: a transform on the button moves
+     its box, so Playwright never sees it stable (city hint tap timed out on
+     mobile-pixel after 680 "element is not stable" retries). The box stays put now. */
+  animation: nudge 1.6s infinite ease-in-out;
+}
+.market-hint {
+  margin-top: 6px;
+  padding: 8px 12px;
+  border-radius: 12px;
+  background: #fdf0dd;
+  line-height: 1.5;
+}
+.market-next {
+  width: 100%;
+  min-height: 48px;
+  margin-top: 10px;
+}
+.market-keys {
+  margin: 10px 0 0;
+  font-size: 11px;
+  color: var(--muted-2);
+}
+.market-panel .reward-pop {
+  top: 8px;
+}
+.market-card .kit-pad__display {
+  border: 2px solid #e3e8d6;
+  border-radius: 12px;
+  background: #fffbea;
+  font-family: var(--font-display);
+  font-weight: 800;
+}
