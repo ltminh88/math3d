@@ -123,6 +123,12 @@
   font-size: 11px;
   color: var(--muted-2);
 }
+/* Touch screens have no keyboard: no key hints there. */
+@media (pointer: coarse) {
+  .market-keys {
+    display: none;
+  }
+}
 .market-panel .reward-pop {
   top: 8px;
 }
