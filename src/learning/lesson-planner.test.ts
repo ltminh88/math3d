@@ -189,17 +189,19 @@ describe('planLessonRun', () => {
       expect(new Set(run).size).toBe(4);
       for (const key of run) expect(skills).toContain(key);
     }
-    // B58/B65/B77 mix the 4-digit and 5-digit lessons: six items, five distinct skills
-    // for B58/B65, six distinct for B77 (eight skills in its pool).
-    for (const [n, distinct] of [
-      [58, 5],
-      [65, 5],
-      [77, 6],
+    // B58/B65/B77 mix the 4-digit and 5-digit lessons: six items; B58 has six
+    // distinct skills now that phase 11 landed B56/B57, B65 has five, B77 six
+    // (eight skills in its pool). B58's run now mixes mul/div skills in with the
+    // add/sub ones; B65/B77 stay add/sub only.
+    for (const [n, distinct, pattern] of [
+      [58, 6, /^(sk:add-|sk:sub-|sk:mul-|sk:div-)/],
+      [65, 5, /^(sk:add-|sk:sub-)/],
+      [77, 6, /^(sk:add-|sk:sub-)/],
     ] as const) {
       const run = planLessonRun(n, {}, mulberry32(4));
       expect(run).toHaveLength(6);
       expect(new Set(run).size).toBe(distinct);
-      expect(run.every((k) => /^(sk:add-|sk:sub-)/.test(k))).toBe(true);
+      expect(run.every((k) => pattern.test(k))).toBe(true);
     }
     // B23/B26/B36/B37 plan their mul/div arithmetic skills now that phase 10 landed them.
     const B23_SKILLS = ['sk:mul-2d-1d', 'sk:mul-tens-mental', 'sk:mul-2d-1d-wp'] as const;

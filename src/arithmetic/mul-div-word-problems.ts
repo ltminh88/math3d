@@ -16,15 +16,17 @@ import { pickMulPair } from './mul-generators';
 
 /** A big-number two-step context: the story key, the step-1 key (which asks how much
  *  was bought in all — one purchase only, so never "Sau lần mua thứ nhất"), and the
- *  `i:` item for the generic final step. */
-const BIG_THEN_SUB = [
+ *  `i:` item for the generic final step. Exported for the phase-11 large word
+ *  problems, which reuse the same contexts. */
+export const BIG_THEN_SUB = [
   { story: 'wpMulThenSubRice', askFirst: 'askTotalBoughtRice', item: 'i:riceKg' },
   { story: 'wpMulThenSubBooks', askFirst: 'askTotalBoughtBooks', item: 'i:book' },
   { story: 'wpMulThenSubSchool', askFirst: 'askTotalBoughtSchool', item: 'i:book' },
 ] as const;
 
-/** A big-number "gấp n lần" context: the story key and its step key. */
-const BIG_TIMES = [
+/** A big-number "gấp n lần" context: the story key and its step key. Exported for
+ *  the phase-11 large word problems, which reuse the same contexts. */
+export const BIG_TIMES = [
   { story: 'wpMulTimesRice', ask: 'askTotalRice' },
   { story: 'wpMulTimesBooks', ask: 'askTotalBooks' },
   { story: 'wpMulTimesStudents', ask: 'askTotalStudents' },

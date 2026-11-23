@@ -3,12 +3,14 @@
 // numbers-generators.test.ts (it sweeps every num-* skill); this file holds the
 // converter + rounding hand tables and the phase-08 structural checks.
 import { describe, expect, it } from 'vitest';
+import { setLanguage } from '../i18n/i18n';
 import { mulberry32 } from '../learning/seeded-rng';
 import type { SkillTier } from '../learning/skill-tiers';
 import { dialogRenderable } from '../practice/item-for-skill';
 import type { PracticeItem } from '../practice/practice-scene';
 import { NUMBER_SKILLS, numberItemForSkill } from './number-item-for-skill';
 import type { PlaceName } from './numbers-scene-types';
+import { renderNumbersPrompt } from './numbers-strings';
 import {
   correctLabel,
   ROMAN_TABLE,
@@ -171,5 +173,19 @@ describe('rounding + roman generators', () => {
       if (step.kind === 'number') expect(step.answer).toBe(want);
       else expect(romanToNumberOracle(String(correctLabel(step).params?.r))).toBe(want);
     }
+  });
+
+  it('roman-sequence: the number-pad form says to write the answer in ordinary numbers (review feedback on PR #55)', () => {
+    setLanguage('vi');
+    let sawPad = false;
+    for (let seed = 0; seed < 200; seed++) {
+      const item = numberItemForSkill('roman-sequence', mulberry32(seed), 2);
+      const step = item.steps[0];
+      if (step?.kind !== 'number') continue;
+      sawPad = true;
+      expect(step.prompt.key).toBe('askMissingArabic');
+      expect(renderNumbersPrompt(step.prompt)).toContain('Viết bằng số thường (ví dụ 7)');
+    }
+    expect(sawPad).toBe(true);
   });
 });

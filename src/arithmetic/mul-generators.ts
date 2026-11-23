@@ -6,19 +6,28 @@ import { pick, type Rng, randInt } from '../learning/seeded-rng';
 import type { SkillTier } from '../learning/skill-tiers';
 import type { ReasoningGenerator } from '../reasoning/reasoning-types';
 import { arithmeticItem, numberStep, ref } from './arithmetic-distractors';
-import { RANGE_99, RANGE_999 } from './arithmetic-ranges';
+import { RANGE_99, RANGE_999, RANGE_10000, RANGE_100000 } from './arithmetic-ranges';
 import { countMulCarries } from './carry-count';
 
 /** Fallbacks when rejection sampling misses (never in practice): one valid pair per tier. */
 const MUL_FALLBACK: Record<number, Record<SkillTier, [number, number]>> = {
   [RANGE_99]: { 1: [12, 2], 2: [15, 2], 3: [19, 5] },
   [RANGE_999]: { 1: [111, 2], 2: [115, 2], 3: [199, 3] },
+  [RANGE_10000]: { 1: [1002, 2], 2: [1005, 2], 3: [1999, 4] },
+  [RANGE_100000]: { 1: [10002, 2], 2: [10005, 2], 3: [19999, 4] },
 };
 
 /** A mul pair (a, b): a 2-digit (maxProduct 99) or 3-digit (maxProduct 999) times a
  *  single digit, product ≤ maxProduct, with the tier's carry rule. */
 export function pickMulPair(rng: Rng, maxProduct: number, tier: SkillTier): [number, number] {
-  const minA = maxProduct === RANGE_99 ? 11 : 101;
+  const minA =
+    maxProduct === RANGE_99
+      ? 11
+      : maxProduct === RANGE_999
+        ? 101
+        : maxProduct === RANGE_10000
+          ? 1001
+          : 10001;
   for (let t = 0; t < 500; t++) {
     const a = randInt(rng, minA, maxProduct);
     const b = randInt(rng, 2, 9);
@@ -142,4 +151,6 @@ export const MUL_GENERATORS: Record<string, ReasoningGenerator> = {
   'mul-tens-mental': mulTensMental,
   'mul-3d-1d': plainMul('mul-3d-1d', RANGE_999),
   'mul-hundreds-mental': mulHundredsMental,
+  'mul-4d-1d': plainMul('mul-4d-1d', RANGE_10000),
+  'mul-5d-1d': plainMul('mul-5d-1d', RANGE_100000),
 };
