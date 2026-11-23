@@ -1,16 +1,17 @@
 // Stage sub-line under the quest card's step row ("Chặng n/m · s sao" / "Đã qua hết các
-// chặng!"). The closing card shows the cave's line (the last level); the bridge card shows
-// none. Split out of quest-chain.ts so that file stays under 200 lines.
+// chặng!"). The closing card shows the last level's line; the bridge card shows none. Split out
+// of quest-chain.ts so that file stays under 200 lines.
 import { levelDefinition } from '../levels/shared/level-registry';
 import { byId } from './icons';
 import { connectedStore } from './progress-sync';
-import { type QuestStage, questStageLine } from './quest-chain-stage';
+import { CHAIN_LEVELS, type QuestStage, questStageLine } from './quest-chain-stage';
 import { tq } from './quest-chain-strings';
 
 /** Writes (or removes) the stage sub-line for `stage` (DOM touched only when it changes). */
 export function renderStageLine(stage: QuestStage): void {
   let line = document.getElementById('quest-stage');
-  const levelId = stage === 'bridge' ? undefined : stage === 'done' ? 'cave' : stage;
+  const lastLevel = CHAIN_LEVELS[CHAIN_LEVELS.length - 1];
+  const levelId = stage === 'bridge' ? undefined : stage === 'done' ? lastLevel : stage;
   let text: string | null = null;
   if (levelId) {
     const definition = levelDefinition(levelId);

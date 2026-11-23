@@ -1,6 +1,7 @@
 // Phase 13: importing a shipped M3D3 code into M3D4 keeps every level's stage 1 complete
-// with its old stars, opens stages 2+ at 0, shows the closing quest card, offers the next
-// stage at the gate, and unlocks daily practice with a pool drawn from the imported stats.
+// with its old stars, opens stages 2+ at 0, points the quest card at the market (chapter 3
+// opens after the cave), offers the next stage at the gate, and unlocks daily practice with a
+// pool drawn from the imported stats.
 // A fresh profile still sees field stage 1 open and daily locked.
 // Uses the shipped all-done M3D3 code from stage-migration.spec.ts.
 import { type Page, test } from '@playwright/test';
@@ -47,10 +48,10 @@ test('importing a shipped M3D3 code migrates every level to stage 1 done', async
     expect(level?.stageStars, `${levelId} stage 1 inherits its stars`).toEqual([2]);
     expect(level?.completedAt, `${levelId} completedAt`).toBeGreaterThan(0);
   }
-  // The quest card shows the closing card, with the cave's next stage on its sub-line
-  // (stage 1 done with 2 stars, stages 2+ open) and the daily line (unlocked, not done).
-  await expect(page.locator('#quest-title')).toHaveText('Bạn đã qua cả chín thử thách!');
-  await expect(page.locator('#quest-stage')).toHaveText('Chặng 2/5 · 2/15 sao');
+  // The quest card points at the market (chapter 3), with the market's fresh stage line
+  // (an old all-done save never played the market) and the daily line (unlocked, not done).
+  await expect(page.locator('#quest-title')).toHaveText('Chợ Phiên Tí Hon');
+  await expect(page.locator('#quest-stage')).toHaveText('Chặng 1/5 · 0/15 sao');
   await expect(page.locator('#quest-daily')).toHaveText('Hôm nay: chưa luyện');
   // The field gate offers stage 2 (its stage 1 is done, stages 2+ open at 0).
   await page.locator('#open-map').click();

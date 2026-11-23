@@ -1,6 +1,6 @@
 // Which quest the quest card shows (pure). The chain follows the gates: the bridge quest opens
 // the field gate, then each level opens the next (forest, city, tower; chapter 2: garden, valley,
-// workshop, cave); after the cave a closing card remains.
+// workshop, cave; chapter 3: market, numberfort); after the numberfort a closing card remains.
 import type { ProgressionState } from '../levels/shared/level-progression';
 import { nextStage, stagesCompleted } from '../levels/shared/level-stages';
 
@@ -14,6 +14,8 @@ export const CHAIN_LEVELS = [
   'valley',
   'workshop',
   'cave',
+  'market',
+  'numberfort',
 ] as const;
 
 export type ChainLevel = (typeof CHAIN_LEVELS)[number];
@@ -24,6 +26,7 @@ export type ChainStage = Exclude<QuestStage, 'done'>;
 export const QUEST_CHAPTERS: readonly (readonly ChainStage[])[] = [
   ['bridge', 'field', 'forest', 'city', 'tower'],
   ['garden', 'valley', 'workshop', 'cave'],
+  ['market', 'numberfort'],
 ];
 
 export interface QuestChapterView {

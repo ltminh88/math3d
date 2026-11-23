@@ -1,7 +1,8 @@
 // The quest chain after the bridge: the quest card, VLM and the completion dialog point at the
 // next open gate (chapter 1: field, forest, city, tower; chapter 2: garden, valley, workshop,
-// cave), locked gates say why, "Sắp ra mắt" while a chapter 2 level is not shipped, and a closing
-// card ends the chain. The card shows one chapter row (≤5 cells) and a "Chương n · k/m" label.
+// cave; chapter 3: market, numberfort), locked gates say why, "Sắp ra mắt" while a chapter 2
+// level is not shipped, and a closing card ends the chain. The card shows one chapter row
+// (≤5 cells) and a "Chương n · k/m" label.
 // Uses the test-build hook `window.__game`.
 import { type Page, test } from '@playwright/test';
 import {
@@ -150,17 +151,45 @@ test('the field leads to the forest, city and tower gates, then the closing card
   await expect(page.locator('#quest-steps .done')).toHaveCount(2);
 
   await page.evaluate(() => window.__game?.seedProgress({ completedLevels: ['workshop', 'cave'] }));
-  await expectCard(page, 'CHÚC MỪNG BẠN', 'Bạn đã qua cả chín thử thách!', '✓ Hoàn thành');
+  // Chapter 3 opens after the cave: both gates open at once, the card leads market first.
+  await expectCard(page, 'NHIỆM VỤ TIẾP THEO', 'Chợ Phiên Tí Hon', 'Đến Cổng Chợ Phiên');
+  await expect(page.locator('#quest-copy')).toContainText('✨ Cổng Chợ Phiên Tí Hon');
+  await expect(page.locator('#quest-chapter')).toHaveText('Chương 3 · 0/2');
+  await expect(steps).toHaveText(['Khu Chợ', 'Lâu Đài']);
+  await expect(page.locator('#quest-steps .done')).toHaveCount(0);
+  await expect(page.locator('#quest-stage')).toHaveText('Chặng 1/5 · 0/15 sao');
+  await talkToVlm(page);
+  await expect(page.locator('#dialog .dialog-copy')).toContainText(
+    'Cổng Chợ Phiên Tí Hon đã mở! Cổng ở khu chợ nhỏ phía bắc bờ tây.',
+  );
+  await waitDialogSettled(page);
+  await page.locator('#close-dialog').click();
+
+  await page.evaluate(() => window.__game?.seedProgress({ completedLevels: ['market'] }));
+  await expectCard(page, 'NHIỆM VỤ TIẾP THEO', 'Lâu Đài Số', 'Đến Cổng Lâu Đài Số');
+  await expect(page.locator('#quest-copy')).toContainText('✨ Cổng Lâu Đài Số');
+  await expect(page.locator('#quest-chapter')).toHaveText('Chương 3 · 1/2');
+  await expect(page.locator('#quest-steps .done')).toHaveCount(1);
+  await expect(page.locator('#quest-stage')).toHaveText('Chặng 1/5 · 0/15 sao');
+  await talkToVlm(page);
+  await expect(page.locator('#dialog .dialog-copy')).toContainText(
+    'Cổng Lâu Đài Số đã mở! Cổng ở cuối con đường rẽ khỏi đường lên tháp, phía lâu đài bờ đông.',
+  );
+  await waitDialogSettled(page);
+  await page.locator('#close-dialog').click();
+
+  await page.evaluate(() => window.__game?.seedProgress({ completedLevels: ['numberfort'] }));
+  await expectCard(page, 'CHÚC MỪNG BẠN', 'Bạn đã qua cả mười một thử thách!', '✓ Hoàn thành');
   await expect(page.locator('#quest-copy')).toHaveText(
     'Bạn có thể luyện thêm cùng VLM, hoặc ghé Cửa hàng trong làng để tiêu xu.',
   );
-  await expect(page.locator('#quest-chapter')).toHaveText('Chương 2 · 4/4');
-  await expect(page.locator('#quest-steps .done')).toHaveCount(4);
+  await expect(page.locator('#quest-chapter')).toHaveText('Chương 3 · 2/2');
+  await expect(page.locator('#quest-steps .done')).toHaveCount(2);
 
   // The stage is read back from the store after a reload.
   await page.reload();
   await waitForStoreBoot(page);
-  await expectCard(page, 'CHÚC MỪNG BẠN', 'Bạn đã qua cả chín thử thách!', '✓ Hoàn thành');
+  await expectCard(page, 'CHÚC MỪNG BẠN', 'Bạn đã qua cả mười một thử thách!', '✓ Hoàn thành');
 });
 
 test('the quest card names the E key only where there is a keyboard-like pointer', async ({

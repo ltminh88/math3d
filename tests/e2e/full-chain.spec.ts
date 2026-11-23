@@ -1,9 +1,9 @@
-// The whole 9-stage chain bridge → field → forest → city → tower → garden → valley → workshop →
-// cave → done, on desktop, phone and both tablet orientations: seed progression stage by stage and
-// check every gate's status, the quest card (title, progress, "Chương n · k/m" label and cells),
-// VLM's pointer line and the map ("Sắp ra mắt" nowhere); enter each newly opened gate once and
-// leave through the host's "Về thế giới" button (≥44 px tall on touch screens). Touch projects
-// use tap() only. Uses the test-build hook `window.__game`.
+// The whole 11-stage chain bridge → field → forest → city → tower → garden → valley → workshop →
+// cave → market → numberfort → done, on desktop, phone and both tablet orientations: seed
+// progression stage by stage and check every gate's status, the quest card (title, progress,
+// "Chương n · k/m" label and cells), VLM's pointer line and the map ("Sắp ra mắt" nowhere);
+// enter each newly opened gate once and leave through the host's "Về thế giới" button (≥44 px
+// tall on touch screens). Touch projects use tap() only. Uses the test-build hook `window.__game`.
 import { type Locator, type Page, test } from '@playwright/test';
 import { CHAIN, chapterRow, STAGES, type Stage } from './full-chain-stages';
 import {
@@ -26,6 +26,8 @@ const STAGE_TOTAL: Record<string, number> = {
   valley: 5,
   workshop: 5,
   cave: 5,
+  market: 5,
+  numberfort: 5,
 };
 
 /** "Cổng đã mở" plus the stage line for a staged level, else "Cổng đã mở". */
@@ -37,6 +39,21 @@ type Press = (target: Locator) => Promise<void>;
 
 const statuses = (page: Page) =>
   page.evaluate((ids) => ids.map((id) => window.__game?.gateStatus(id)), [...CHAIN]);
+
+/** Expected gate statuses at walk step `i`: every earlier gate completed, the current one
+ * open, later ones locked — except the numberfort gate, which opens with the market as soon
+ * as the cave is done (both chapter 3 gates require only the cave, so two gates are open at
+ * once at the market stage). */
+const expectedStatuses = (i: number): string[] => {
+  const market = CHAIN.indexOf('market');
+  const numberfort = CHAIN.indexOf('numberfort');
+  return CHAIN.map((_, j) => {
+    if (j < i) return 'completed';
+    if (j === i) return 'open';
+    if (j === numberfort && i >= market) return 'open';
+    return 'locked';
+  });
+};
 
 /** Every quest step cell shows its name on one line: not clipped, one line box. */
 async function expectStepsOnOneLine(page: Page): Promise<void> {
@@ -124,15 +141,14 @@ async function enterAndLeave(page: Page, press: Press, touch: boolean, stage: St
 }
 
 async function expectChainGatesWithoutComingSoon(page: Page): Promise<void> {
-  // The chain's gates never say "Sắp ra mắt" — only the chapter 3 gates (market, numberfort)
-  // do, and they are not part of this walk (phase 18: no levels yet). The blanket `body`
-  // check used to hold before chapter 3 existed.
+  // No gate of the chain ever says "Sắp ra mắt" — every level of the walk has shipped
+  // (the blanket `body` check used to hold before chapter 3 existed).
   for (const id of CHAIN) {
     await expect(page.locator(`#gate-${id}-label small`)).not.toHaveText('Sắp ra mắt');
   }
 }
 
-test('the 9-stage chain: each stage opens the next gate, every level loads and exits', async ({
+test('the 11-stage chain: each stage opens the next gate, every level loads and exits', async ({
   page,
 }, info) => {
   const touch = !!info.project.use.hasTouch;
@@ -159,9 +175,7 @@ test('the 9-stage chain: each stage opens the next gate, every level loads and e
       (done) => window.__game?.seedProgress({ completedLevels: done }),
       CHAIN.slice(0, i),
     );
-    expect(await statuses(page)).toEqual(
-      CHAIN.map((_, j) => (j < i ? 'completed' : j === i ? 'open' : 'locked')),
-    );
+    expect(await statuses(page)).toEqual(expectedStatuses(i));
     await expectCard(page, i, stage);
     await expect(page.locator(`#gate-${stage.levelId}-label small`)).toHaveText(
       gateLine(stage.levelId),
@@ -182,15 +196,15 @@ test('the 9-stage chain: each stage opens the next gate, every level loads and e
     }
   }
 
-  // Done: the closing card shows chapter 2 complete; every gate is completed.
-  await page.evaluate(() => window.__game?.seedProgress({ completedLevels: ['cave'] }));
+  // Done: the closing card shows chapter 3 complete; every gate is completed.
+  await page.evaluate(() => window.__game?.seedProgress({ completedLevels: ['numberfort'] }));
   expect(await statuses(page)).toEqual(CHAIN.map(() => 'completed'));
   await expect(page.locator('#quest-toggle .eyebrow')).toHaveText('CHÚC MỪNG BẠN');
-  await expect(page.locator('#quest-title')).toHaveText('Bạn đã qua cả chín thử thách!');
+  await expect(page.locator('#quest-title')).toHaveText('Bạn đã qua cả mười một thử thách!');
   await expect(page.locator('#quest-progress')).toHaveText('✓ Hoàn thành');
-  await expect(page.locator('#quest-chapter')).toHaveText('Chương 2 · 4/4');
-  await expect(page.locator('#quest-steps .done')).toHaveCount(4);
-  // The closing card's sub-line follows the cave: stage 1 done with 1 star, stage 2 next.
+  await expect(page.locator('#quest-chapter')).toHaveText('Chương 3 · 2/2');
+  await expect(page.locator('#quest-steps .done')).toHaveCount(2);
+  // The closing card's sub-line follows the numberfort: stage 1 done with 1 star, stage 2 next.
   await expect(page.locator('#quest-stage')).toHaveText('Chặng 2/5 · 1/15 sao');
   // Every level's stage 1 holds its seeded star and nothing else.
   const all = await page.evaluate(() => window.__game?.snapshot()?.levelProgress);
