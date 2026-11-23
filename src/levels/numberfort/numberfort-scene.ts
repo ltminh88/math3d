@@ -65,6 +65,13 @@ function start(ctx: LevelContext): LevelSession {
       zoom.reset();
     },
     onLevelDone(earned, stars) {
+      // The celebration's "Về cổng" button sits under the top-bar zoom group on
+      // landscape (the group moved there in #60, left 210px, z-index 7 — the same
+      // overlap that went red on #59's tablet-landscape shard 2): hide the group
+      // now — there is nothing left to zoom once the run is done. dispose()
+      // removes the group and its listeners; the session's own dispose() calls it
+      // again on teardown, which is a no-op on the detached group.
+      zoomHandle.dispose();
       panel.hide();
       panel.say(cs('doneTitle'));
       ctx.audio.celebrate();
