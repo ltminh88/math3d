@@ -18,9 +18,9 @@ Start in the reviewer Claude Code session (repo root) with:
 6. **Re-ping**: a TASK with no ACK after 2 ticks → one `PING` (own id, not a new TASK); still nothing → note in summary.
 7. **Schedule** next wake: 600–900 s if a CI run or Muse task is in flight, 1800 s when idle.
    Quiet hours 22:00–07:00: only urgent Telegram messages; the rest go into the morning line.
-8. **Fast answers**: while any Qn is open, keep `python3 scripts/relay/telegram-relay.py wait 3600`
+8. **Fast answers**: while any Qn is open, keep `python3 scripts/relay/telegram-relay.py wait 3300`
    running in the background (Bash `run_in_background`). Its exit wakes this session within seconds;
-   handle the printed rows, then restart it if a Qn is still open. Exit code 3 = an hour passed quietly.
+   handle the printed rows, then restart it if a Qn is still open. Exit code 3 = 55 min passed quietly. Keep it under 3600 s: the session kills background shells at ~1 h (exit 143) and may leave an orphan `wait` holding `.relay/wait.pid`.
    While it runs, `poll` steps aside (one reader only), so step 1 is skipped.
 
 ## Decide alone vs ask the user
