@@ -23,7 +23,17 @@ const scene = <K extends GeoItem['scene']['kind']>(i: GeoItem, kind: K) => {
 };
 const firstPrompt = (i: GeoItem) => i.steps[0]?.prompt.key ?? '';
 const PARTS: Record<string, number> = { Faces: 6, Edges: 12, Vertices: 8 };
-const CM = ['midFind', 'midDouble', 'midCheck', 'circleR', 'circleD', 'circleRow'];
+const CM = [
+  'midFind',
+  'midDouble',
+  'midCheck',
+  'midPart',
+  'midSum',
+  'midPartB',
+  'circleR',
+  'circleD',
+  'circleRow',
+];
 
 /** Independent answers per story key, from the story params and the scene's raw data. */
 const ORACLE: Record<string, (i: GeoItem) => void> = {
@@ -39,6 +49,29 @@ const ORACLE: Record<string, (i: GeoItem) => void> = {
     expect(step.answer).toBe(p(i, 'am') === p(i, 'mb'));
     expect(step.fix?.answer).toBe(step.answer ? undefined : (p(i, 'am') + p(i, 'mb')) / 2);
     expect(scene(i, 'segment').points.find((pt) => pt.label === 'M')?.at).toBe(p(i, 'am'));
+  },
+  midPart: (i) => {
+    expect(p(i, 'len') % 2).toBe(0);
+    expect(p(i, 'am') % 2).toBe(0);
+    expect(scene(i, 'segment').length).toBe(p(i, 'len'));
+    expect(scene(i, 'segment').points.find((pt) => pt.label === 'M')?.at).toBe(p(i, 'am'));
+    expect(lastValue(i)).toBe(p(i, 'len') - p(i, 'am'));
+  },
+  midSum: (i) => {
+    expect(p(i, 'am') % 2).toBe(0);
+    expect(p(i, 'mb') % 2).toBe(0);
+    expect(scene(i, 'segment').length).toBe(p(i, 'am') + p(i, 'mb'));
+    expect(scene(i, 'segment').points.find((pt) => pt.label === 'M')?.at).toBe(p(i, 'am'));
+    expect(lastValue(i)).toBe(p(i, 'am') + p(i, 'mb'));
+  },
+  midPartB: (i) => {
+    expect(p(i, 'len') % 2).toBe(0);
+    expect(p(i, 'mb') % 2).toBe(0);
+    expect(scene(i, 'segment').length).toBe(p(i, 'len'));
+    expect(scene(i, 'segment').points.find((pt) => pt.label === 'M')?.at).toBe(
+      p(i, 'len') - p(i, 'mb'),
+    );
+    expect(lastValue(i)).toBe(p(i, 'len') - p(i, 'mb'));
   },
   circleParts: (i) => {
     const s = scene(i, 'circle');
@@ -144,6 +177,18 @@ describe('geometry generators', () => {
             expect(geometryItemForSkill(skillId, mulberry32(seed), tier)).toEqual(item);
         }
     });
+
+  it('geo-midpoint-length: missing part / total, one step per tier', () => {
+    const t1 = geometryItemForSkill('geo-midpoint-length', mulberry32(7), 1);
+    expect(firstPrompt(t1)).toBe('askMB');
+    expect(lastValue(t1)).toBe(p(t1, 'len') - p(t1, 'am'));
+    const t2 = geometryItemForSkill('geo-midpoint-length', mulberry32(7), 2);
+    expect(firstPrompt(t2)).toBe('askAB');
+    expect(lastValue(t2)).toBe(p(t2, 'am') + p(t2, 'mb'));
+    const t3 = geometryItemForSkill('geo-midpoint-length', mulberry32(7), 3);
+    expect(firstPrompt(t3)).toBe('askAM');
+    expect(lastValue(t3)).toBe(p(t3, 'len') - p(t3, 'mb'));
+  });
 
   it('refuses skills it has no generator for', () => {
     expect(() => geometryItemForSkill('meas-gram', mulberry32(1), 1)).toThrow();

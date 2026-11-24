@@ -192,3 +192,187 @@ export const measTemperature: GeoGenerator = (rng, tier) => {
     drop,
   ]);
 };
+
+/** B31 second skill: add / subtract masses (the first skill reads one pack / compares). */
+export const measGramCalc: GeoGenerator = (rng, tier) => {
+  const [x, y] = twoNouns(rng, MASS_NOUNS);
+  const a = 5 * randInt(rng, 2, 18);
+  const b = 5 * randInt(rng, 2, Math.floor((100 - a) / 5));
+  const story = ref('gramTotal', { x, y, a, b });
+  const totalScene = balance(x, 2, a + b);
+  if (tier === 1)
+    return geoItem(
+      'meas-gram-calc',
+      tier,
+      story,
+      [numberStep(ref('askGramTotal'), a + b)],
+      totalScene,
+      'g',
+    );
+  if (tier === 2) {
+    const steps = [
+      qtyChoiceStep(rng, ref('askGramTotal'), a + b, 'g', [
+        { value: a - b, misconception: 'wrong-step' },
+        { value: a, misconception: 'one-step-only' },
+        { value: b, misconception: 'one-step-only' },
+      ]),
+    ];
+    return geoItem('meas-gram-calc', tier, story, steps, totalScene, 'g');
+  }
+  // Tier 3: add two packs, then use some grams -> what is left.
+  const c = 5 * randInt(rng, 1, Math.floor((a + b - 5) / 5));
+  const steps = [
+    numberStep(ref('askGramTotal'), a + b),
+    qtyChoiceStep(rng, ref('askGramLeft'), a + b - c, 'g', [
+      { value: c, misconception: 'wrong-step' },
+      { value: a + b, misconception: 'one-step-only' },
+    ]),
+  ];
+  return geoItem(
+    'meas-gram-calc',
+    tier,
+    ref('gramTotalLeft', { x, y, a, b, c }),
+    steps,
+    totalScene,
+    'g',
+    [a + b, a + b - c],
+  );
+};
+
+/** B32 second skill: add / subtract millilitres (the first skill reads one jug). */
+export const measMlCalc: GeoGenerator = (rng, tier) => {
+  // One 100 ml jug with 10 ml marks, so the scene level is always a whole mark.
+  const jug100 = (total: number) => jug(100, 10, total / 10);
+  const pair = (maxTotal: number): [number, number] => {
+    const a = 10 * randInt(rng, 1, maxTotal / 10 - 1);
+    const b = 10 * randInt(rng, 1, (maxTotal - a) / 10);
+    return [a, b];
+  };
+  if (tier === 1) {
+    const [a, b] = pair(100);
+    return geoItem(
+      'meas-ml-calc',
+      tier,
+      ref('mlAdd', { a, b }),
+      [numberStep(ref('askMlTotal'), a + b)],
+      jug100(a + b),
+      'ml',
+    );
+  }
+  if (tier === 2) {
+    let [a, b] = pair(100);
+    while (a === b) [a, b] = pair(100);
+    const steps = [
+      qtyChoiceStep(rng, ref('askMlDiff'), Math.abs(a - b), 'ml', [
+        { value: a + b, misconception: 'wrong-step' },
+        { value: a, misconception: 'one-step-only' },
+      ]),
+    ];
+    return geoItem(
+      'meas-ml-calc',
+      tier,
+      ref('mlDiff', { a, b }),
+      steps,
+      jug100(Math.max(a, b)),
+      'ml',
+    );
+  }
+  // Tier 3: pour more, then what is missing to fill the 100 ml jug.
+  const [a, b] = pair(90);
+  const total = a + b;
+  const steps = [
+    numberStep(ref('askMlTotal'), total),
+    qtyChoiceStep(rng, ref('askMlMissing'), 100 - total, 'ml', [
+      { value: total, misconception: 'wrong-step' },
+      { value: a, misconception: 'one-step-only' },
+    ]),
+  ];
+  return geoItem('meas-ml-calc', tier, ref('mlFill', { a, b }), steps, jug100(total), 'ml', [
+    total,
+    100 - total,
+  ]);
+};
+
+/** B33 second skill: differences between places / drops (the first skill reads one place). */
+export const measTemperatureCompare: GeoGenerator = (rng, tier) => {
+  const [lo, hi] = TEMP_RANGE;
+  if (tier === 1) {
+    const [x, y] = twoNouns(rng, PLACES);
+    const a = randInt(rng, lo, hi);
+    let b = randInt(rng, lo, hi);
+    while (b === a) b = randInt(rng, lo, hi);
+    const readings = [
+      { label: x, value: a },
+      { label: y, value: b },
+    ];
+    const s = scene({ kind: 'thermometers', minorStep: 1, readings }, 32);
+    return geoItem(
+      'meas-temperature-compare',
+      tier,
+      ref('tempCompare'),
+      [numberStep(ref('askTempDiff'), Math.abs(a - b))],
+      s,
+      'degC',
+    );
+  }
+  if (tier === 2) {
+    const places = shuffle(rng, PLACES).slice(0, 3);
+    const temps = shuffle(
+      rng,
+      Array.from({ length: hi - lo + 1 }, (_, i) => lo + i),
+    ).slice(0, 3);
+    const options = pickOptions(
+      rng,
+      places.map((l, i) => ({
+        label: ref('letter', { l }),
+        correct: temps[i] === Math.max(...temps),
+        misconception:
+          temps[i] === Math.min(...temps) ? ('wrong-step' as const) : ('near-miss' as const),
+      })),
+    );
+    const readings = places.map((label, i) => ({ label, value: temps[i] as number }));
+    const s = scene({ kind: 'thermometers', minorStep: 1, readings }, 32);
+    const steps: ReasoningStep[] = [
+      { kind: 'choice', prompt: ref('askHottest'), options },
+      numberStep(ref('askTempDiff'), Math.max(...temps) - Math.min(...temps)),
+    ];
+    return geoItem('meas-temperature-compare', tier, ref('tempHotDiff'), steps, s, 'degC');
+  }
+  // Tier 3: two places, noon -> evening drops; which drop is bigger, by how much.
+  const [x, y] = twoNouns(rng, PLACES);
+  const dropPair = (): [number, number, number, number] => {
+    const a = randInt(rng, 25, hi);
+    const dx = randInt(rng, 5, 20);
+    const c = randInt(rng, 25, hi);
+    const dy = randInt(rng, 5, 20);
+    return [a, a - dx, c, c - dy];
+  };
+  let [a, b, c, d] = dropPair();
+  while (a - b === c - d) [a, b, c, d] = dropPair();
+  const [dx, dy] = [a - b, c - d];
+  const options = pickOptions(rng, [
+    { label: ref('letter', { l: x }), correct: dx > dy, misconception: 'wrong-step' },
+    { label: ref('letter', { l: y }), correct: dy > dx, misconception: 'wrong-step' },
+    { label: ref('sameDrop'), correct: false, misconception: 'near-miss' },
+  ]);
+  const readings = [
+    { label: 'A', value: a },
+    { label: 'B', value: b },
+    { label: 'C', value: c },
+    { label: 'D', value: d },
+  ];
+  const s = scene({ kind: 'thermometers', minorStep: 1, readings }, 32);
+  const steps: ReasoningStep[] = [
+    { kind: 'choice', prompt: ref('askBiggerDrop'), options },
+    numberStep(ref('askDropDiff'), Math.abs(dx - dy)),
+  ];
+  return geoItem(
+    'meas-temperature-compare',
+    tier,
+    ref('tempDropCompare', { x, y, a, b, c, d }),
+    steps,
+    s,
+    'degC',
+    [dx, dy],
+  );
+};

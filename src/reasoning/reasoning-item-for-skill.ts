@@ -11,19 +11,25 @@ import {
   patternSkipCount,
   patternSub,
   unknownAddSub,
+  unknownAddSubWp,
   unknownMulDiv,
+  unknownMulDivWp,
 } from './unknown-and-pattern-generators';
 import { wpDifferenceCompare, wpTimesCompare } from './word-problem-compare-generators';
 import {
   wpDivideThenAdd,
+  wpDivideThenSub,
   wpMoreLessThenTotal,
   wpTimesThenAdd,
+  wpTimesThenSub,
   wpUnitThenTimes,
 } from './word-problem-generators';
 
 const GENERATORS: Readonly<Record<string, ReasoningGenerator>> = {
   'wp-times-then-add': wpTimesThenAdd,
   'wp-divide-then-add': wpDivideThenAdd,
+  'wp-times-then-sub': wpTimesThenSub,
+  'wp-divide-then-sub': wpDivideThenSub,
   'wp-more-less-then-total': wpMoreLessThenTotal,
   'wp-unit-then-times': wpUnitThenTimes,
   'wp-times-compare': wpTimesCompare,
@@ -31,6 +37,8 @@ const GENERATORS: Readonly<Record<string, ReasoningGenerator>> = {
   'div-rem-ceil': divRemCeil,
   'unknown-add-sub': unknownAddSub,
   'unknown-mul-div': unknownMulDiv,
+  'unknown-add-sub-wp': unknownAddSubWp,
+  'unknown-mul-div-wp': unknownMulDivWp,
   'pattern-add': patternAdd,
   'pattern-sub': patternSub,
   'pattern-skip-count': patternSkipCount,

@@ -52,6 +52,34 @@ export const WP_DIVIDE_THEN_ADD: readonly WpContext[] = [
   },
 ];
 
+/** R8: the same a·n as wp-times-then-add, but B uses a (as many as A has): a·n − a. */
+export const WP_TIMES_THEN_SUB: readonly WpContext[] = [
+  { key: 'wpTimesThenSub', nouns: GENERIC_NOUNS, lesson: 'T1 B24, B28' },
+  { key: 'wpTimesThenSubChairs', nouns: ['i:chair'], lesson: 'T1 B24' },
+  { key: 'wpTimesThenSubCakes', nouns: ['i:cake', 'i:candy'], lesson: 'T1 B24' },
+  {
+    key: 'wpTimesThenSubHarvest',
+    nouns: ['i:apple', 'i:orange', 'i:flower'],
+    lesson: 'T1 B24',
+  },
+];
+
+/** R8: the same a + a:n as wp-divide-then-add, but A uses as many as B has: a − a:n. */
+export const WP_DIVIDE_THEN_SUB: readonly WpContext[] = [
+  { key: 'wpDivideThenSub', nouns: GENERIC_NOUNS, lesson: 'T1 B27, B28' },
+  {
+    key: 'wpDivideThenSubHarvest',
+    nouns: ['i:apple', 'i:orange', 'i:flower'],
+    lesson: 'T1 B27',
+  },
+  { key: 'wpDivideThenSubMake', nouns: ['i:cake', 'i:candy'], lesson: 'T1 B27' },
+  {
+    key: 'wpDivideThenSubPack',
+    nouns: ['i:pencil', 'i:notebook', 'i:book'],
+    lesson: 'T1 B27',
+  },
+];
+
 export const WP_MORE_LESS_THEN_TOTAL: readonly MoreLessContext[] = [
   { key: 'wpMoreThenTotal', nouns: GENERIC_NOUNS, lesson: 'T1 B28', more: true },
   { key: 'wpLessThenTotal', nouns: GENERIC_NOUNS, lesson: 'T1 B28', more: false },
@@ -140,6 +168,8 @@ export const WP_UNIT_THEN_TIMES: readonly WpContext[] = [
 export const WP_CONTEXT_KEYS: Readonly<Record<string, readonly string[]>> = {
   'wp-times-then-add': WP_TIMES_THEN_ADD.map((c) => c.key),
   'wp-divide-then-add': WP_DIVIDE_THEN_ADD.map((c) => c.key),
+  'wp-times-then-sub': WP_TIMES_THEN_SUB.map((c) => c.key),
+  'wp-divide-then-sub': WP_DIVIDE_THEN_SUB.map((c) => c.key),
   'wp-more-less-then-total': WP_MORE_LESS_THEN_TOTAL.map((c) => c.key),
   'wp-unit-then-times': WP_UNIT_THEN_TIMES.map((c) => c.key),
   'wp-times-compare': WP_TIMES_COMPARE.map((c) => c.key),

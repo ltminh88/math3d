@@ -17,7 +17,14 @@ import { planWorkshopSkills, STATION_OF } from './workshop-stations';
 const RULER = ['meas-ruler-read', 'meas-mm-convert'];
 const PERIMETER_PAIR = ['meas-perimeter-rect', 'meas-perimeter-square'];
 const AREA_TRIO = ['meas-area-rect', 'meas-area-square', 'meas-area-count'];
-const INSTRUMENTS = ['meas-gram', 'meas-ml', 'meas-temperature'];
+const INSTRUMENTS = [
+  'meas-gram',
+  'meas-ml',
+  'meas-temperature',
+  'meas-gram-calc',
+  'meas-ml-calc',
+  'meas-temperature-compare',
+];
 
 const boxed = (box: number) => ({ ...newFactStat(), box, attempts: 3 });
 const seen = (box = 3) =>

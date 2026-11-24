@@ -49,6 +49,20 @@ describe('reasoning strings', () => {
       'div-rem-ceil': ['divRemCeil', 'divRemCeilCamp', 'divRemCeilCinema'],
       'unknown-add-sub': ['unknownEq', 'unknownEqFind'],
       'unknown-mul-div': ['unknownEq', 'unknownEqFind'],
+      'unknown-add-sub-wp': [
+        'unknownWpAddFirst',
+        'unknownWpAddSecond',
+        'unknownWpSubSecond',
+        'unknownWpSubFirst',
+        'unknownWpSubPack',
+      ],
+      'unknown-mul-div-wp': [
+        'unknownWpMulBoxes',
+        'unknownWpMulEach',
+        'unknownWpDivBoxes',
+        'unknownWpDivShare',
+        'unknownWpMulSum',
+      ],
       'expr-from-story': [
         'exprStoryEat',
         'exprStoryBox',

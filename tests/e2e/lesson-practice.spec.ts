@@ -113,12 +113,17 @@ async function solveSkillItem(page: Page, touch: boolean): Promise<void> {
 }
 
 /** Plays one whole lesson run and leaves the finish screen showing. */
-async function playLessonRun(page: Page, touch: boolean): Promise<number> {
+async function playLessonRun(
+  page: Page,
+  touch: boolean,
+  onItem?: (skillId: string | undefined) => void,
+): Promise<number> {
   let items = 0;
   for (;;) {
     const state = await page.evaluate(() => window.__lesson?.state() ?? null);
     if (!state) throw new Error('lesson hook missing');
     if (state.index >= state.total) break;
+    onItem?.(state.skillId);
     items += 1;
     if (state.kind === 'quiz') await solveQuizItem(page, touch);
     else await solveSkillItem(page, touch);
@@ -781,3 +786,25 @@ declare global {
     };
   }
 }
+
+test('R8: B3 run mixes two skills (unknown-add-sub + unknown-add-sub-wp), 3 + 3', async ({
+  page,
+}, info) => {
+  const touch = isTouch(info);
+  await boot(page);
+  await openPicker(page, touch);
+  await openTopic(page, 1, touch);
+  await pickLesson(page, 3, touch);
+  await expect(page.locator('#dialog-content')).toContainText(
+    'Bài 3 · Tìm thành phần trong phép cộng, trừ · Câu 1/6',
+  );
+  const skills: (string | undefined)[] = [];
+  expect(await playLessonRun(page, touch, (id) => skills.push(id))).toBe(6);
+  expect(skills.filter((s) => s === 'unknown-add-sub')).toHaveLength(3);
+  expect(skills.filter((s) => s === 'unknown-add-sub-wp')).toHaveLength(3);
+  const content = page.locator('#dialog-content');
+  await expect(content).toContainText('Xong bài 3!');
+  await waitDialogSettled(page);
+  await page.locator('#close-dialog').click();
+  await expect(page.locator('#dialog')).not.toHaveAttribute('open', '');
+});

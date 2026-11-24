@@ -18,6 +18,24 @@ const vi = {
   unknownEq: 'Dấu ? là số nào? {text}',
   // Phase 02: a second wording for the same unknown.
   unknownEqFind: 'Tìm số còn thiếu: {text}',
+  // R8: the same unknowns as word problems (B3, B13) — who has what, no bare equation.
+  unknownWpAddFirst:
+    '{who1} có một số {item}. {who2} cho {who1} thêm {a} {item}. Bây giờ {who1} có tất cả {s} {item}.',
+  unknownWpAddSecond:
+    '{who1} có {a} {item}. {who2} cho {who1} thêm một số {item}. Bây giờ {who1} có tất cả {s} {item}.',
+  unknownWpSubSecond:
+    '{who1} có {s} {item}. {who1} cho {who2} một số {item}. Bây giờ {who1} còn {a} {item}.',
+  unknownWpSubFirst:
+    '{who1} có một số {item}. {who1} cho {who2} {a} {item}. Bây giờ {who1} còn {b} {item}.',
+  unknownWpSubPack:
+    '{who1} có một số {item}. {who1} cho {who2} {a} {item}. Bây giờ {who1} còn {b} hộp, mỗi hộp có {c} {item}.',
+  unknownWpMulBoxes: '{who1} có một số hộp như nhau, mỗi hộp có {n} {item}. Tất cả có {p} {item}.',
+  unknownWpMulEach: '{who1} có {n} hộp như nhau, đựng tất cả {p} {item}.',
+  unknownWpDivBoxes: '{who1} có {p} {item}. {who1} xếp đều vào một số hộp, mỗi hộp có {q} {item}.',
+  unknownWpDivShare:
+    '{who1} có một số {item}. {who1} chia đều cho {n} bạn, mỗi bạn được {q} {item}.',
+  unknownWpMulSum:
+    'Có một số hộp như nhau, mỗi hộp có {n} {item}. Các hộp đựng tất cả {a} {item} của {who1} và {b} {item} của {who2}.',
   patternNext: 'Các số xếp theo một quy luật. Tìm số còn thiếu nhé: {terms}',
   exprValue: 'Tính giá trị của biểu thức: {text}',
   exprStoryEat: 'Mẹ mua {n} túi, mỗi túi có {p} {item}. Cả nhà đã dùng {e} {item}.',
@@ -83,6 +101,25 @@ const en: Record<keyof typeof vi, string> = {
   divRemCeil: '{total} children go on a trip. Each car takes {per} children.',
   unknownEq: 'Which number is the ?: {text}',
   unknownEqFind: 'Find the missing number: {text}',
+  unknownWpAddFirst:
+    '{who1} has some {item}. {who2} gives {who1} {a} more {item}. Now {who1} has {s} {item} in all.',
+  unknownWpAddSecond:
+    '{who1} has {a} {item}. {who2} gives {who1} some more {item}. Now {who1} has {s} {item} in all.',
+  unknownWpSubSecond:
+    '{who1} has {s} {item}. {who1} gives {who2} some {item}. Now {who1} has {a} {item} left.',
+  unknownWpSubFirst:
+    '{who1} has some {item}. {who1} gives {who2} {a} {item}. Now {who1} has {b} {item} left.',
+  unknownWpSubPack:
+    '{who1} has some {item}. {who1} gives {who2} {a} {item}. Now {who1} has {b} boxes left, with {c} {item} in each.',
+  unknownWpMulBoxes:
+    '{who1} has some equal boxes, with {n} {item} in each. There are {p} {item} in all.',
+  unknownWpMulEach: '{who1} has {n} equal boxes holding {p} {item} in all.',
+  unknownWpDivBoxes:
+    '{who1} has {p} {item}. {who1} packs them equally into some boxes, with {q} {item} in each.',
+  unknownWpDivShare:
+    '{who1} has some {item}. {who1} shares them equally between {n} friends, and each friend gets {q} {item}.',
+  unknownWpMulSum:
+    'There are some equal boxes, with {n} {item} in each. The boxes hold {a} {item} of {who1}’s and {b} {item} of {who2}’s in all.',
   patternNext: 'The numbers follow a rule. Find the missing ones: {terms}',
   exprValue: 'Work out the expression: {text}',
   exprStoryEat: 'Mum buys {n} bags with {p} {item} in each. The family uses {e} {item}.',

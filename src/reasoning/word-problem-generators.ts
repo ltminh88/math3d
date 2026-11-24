@@ -16,8 +16,10 @@ import { MAX_NUMBER, TIER_RANGES } from './reasoning-ranges';
 import type { ReasoningGenerator, ReasoningStep } from './reasoning-types';
 import {
   WP_DIVIDE_THEN_ADD,
+  WP_DIVIDE_THEN_SUB,
   WP_MORE_LESS_THEN_TOTAL,
   WP_TIMES_THEN_ADD,
+  WP_TIMES_THEN_SUB,
   WP_UNIT_THEN_TIMES,
 } from './word-problem-contexts';
 
@@ -82,6 +84,55 @@ export const wpDivideThenAdd: ReasoningGenerator = (rng, tier) => {
     numberStep(askBoth(item), a + q),
   );
   return reasoningItem('wp-divide-then-add', tier, story, steps, [q, a + q]);
+};
+
+/** A, then B "gấp n lần" A; B uses a (as many as A has). a·n − a. */
+export const wpTimesThenSub: ReasoningGenerator = (rng, tier) => {
+  const n = pick(rng, TIER_RANGES[tier].factors);
+  const a = randInt(rng, 2, Math.min(TIER_RANGES[tier].maxBase, Math.floor(MAX_NUMBER / n)));
+  const [who1, who2] = pickNames(rng);
+  const ctx = pick(rng, WP_TIMES_THEN_SUB);
+  const item = pick(rng, ctx.nouns);
+  const story = ref(ctx.key, { who1, who2, a, n, item });
+  const steps = tiered(
+    tier,
+    numberStep(ref('askOther', { who: who2, item }), a * n),
+    () =>
+      expressionChoiceStep(rng, PICK_EXPR, `${a} × ${n} − ${a}`, [
+        { value: `${a} × ${n}`, misconception: 'one-step-only' },
+        { value: `${a} × ${n} + ${a}`, misconception: 'wrong-step' },
+        { value: `${a} − ${n}`, misconception: 'wrong-step' },
+      ]),
+    numberStep(ref('askLeftOver', { item }), a * n - a),
+  );
+  return reasoningItem('wp-times-then-sub', tier, story, steps, [a * n, a * n - a]);
+};
+
+/** A, then B is A "giảm n lần"; A uses as many as B has. a − a:n. */
+export const wpDivideThenSub: ReasoningGenerator = (rng, tier) => {
+  const n = pick(rng, TIER_RANGES[tier].factors);
+  const maxQ = Math.min(
+    Math.floor(TIER_RANGES[tier].maxBase / n),
+    Math.floor(MAX_NUMBER / (n + 1)),
+  );
+  const q = randInt(rng, 2, Math.max(2, maxQ));
+  const a = q * n;
+  const [who1, who2] = pickNames(rng);
+  const ctx = pick(rng, WP_DIVIDE_THEN_SUB);
+  const item = pick(rng, ctx.nouns);
+  const story = ref(ctx.key, { who1, who2, a, n, item });
+  const steps = tiered(
+    tier,
+    numberStep(ref('askOther', { who: who2, item }), q),
+    () =>
+      expressionChoiceStep(rng, PICK_EXPR, `${a} − ${a} : ${n}`, [
+        { value: `${a} : ${n}`, misconception: 'one-step-only' },
+        { value: `${a} + ${a} : ${n}`, misconception: 'wrong-step' },
+        { value: `${a} × ${n} − ${a}`, misconception: 'wrong-inverse' },
+      ]),
+    numberStep(ref('askLeftOver', { item }), a - q),
+  );
+  return reasoningItem('wp-divide-then-sub', tier, story, steps, [q, a - q]);
 };
 
 /** A, B has d more / fewer; how many together? a + (a ± d). */

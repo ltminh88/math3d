@@ -11,7 +11,7 @@
 - Generator: 0 lỗi runtime — mọi skill đều sinh câu được ở cả 3 tier (thử tier 1–3 × seed 0, 1, 7); mọi fact nhân/chia đều dựng được câu hỏi.
 - Renderer: 0 lỗi — mọi item sinh ra đều hiển thị được trong hộp thoại (kiểm ở box 1 và box 5).
 - Không có skill mồ côi: cả 127 skill trong catalog đều có ít nhất một bài dùng tới.
-- 9 bài đủ nhưng lượt ôn mỏng (tối đa 3 câu vì chỉ có 1 skill): B3, B13, B16, B24, B27, B31, B32, B33, B51.
+- 9 bài trên đã dày lên nhờ R8 (2026-11-24): mỗi bài có 2 skill khác dạng, lượt ôn 6 câu (2 skill × 3 lượt).
 
 ## Phương pháp
 
@@ -38,7 +38,7 @@ Cột “Ôn theo bài” ghi số câu của một lượt chạy với bài ch
 |---|---|---|---|---|---|
 | B1 | `num-read-write-1000`, `num-place-value-1000`, `num-neighbors-1000`, `num-compare-1000`, `num-order-1000`, `num-sequence-1000` | ✓ 6/6 | ✓ 6/6 | ✓ 6 câu |  |
 | B2 | `add-sub-mental-round`, `add-sub-1000`, `add-sub-1000-wp`, `add-sub-1000-chain`, `add-sub-find-error`, `add-missing-digit` | ✓ 6/6 | ✓ 6/6 | ✓ 6 câu |  |
-| B3 | `unknown-add-sub` | ✓ 1/1 | ✓ 1/1 | ✓ 3 câu | Chỉ 1 skill nên lượt ôn tối đa 3 câu (1 skill × 3 lượt). |
+| B3 | `unknown-add-sub`, `unknown-add-sub-wp` | ✓ 1/1 | ✓ 1/1 | ✓ 6 câu | R8 (2026-11-24): thêm skill thứ hai — lượt ôn 6 câu (2 skill × 3 lượt). |
 | B4 | bảng 2, 5: 17 nhân + 18 chia; skill: `pattern-skip-count` | ✓ 36/36 | ✓ 36/36 | ✓ 6 câu |  |
 | B5 | bảng 3: 9 nhân + 9 chia; skill: `pattern-skip-count` | ✓ 19/19 | ✓ 19/19 | ✓ 6 câu |  |
 | B6 | bảng 4: 9 nhân + 9 chia; skill: `pattern-skip-count` | ✓ 19/19 | ✓ 19/19 | ✓ 6 câu |  |
@@ -48,10 +48,10 @@ Cột “Ôn theo bài” ghi số câu của một lượt chạy với bài ch
 | B10 | bảng 7: 9 nhân + 9 chia; skill: `pattern-skip-count` | ✓ 19/19 | ✓ 19/19 | ✓ 6 câu |  |
 | B11 | bảng 8: 9 nhân + 9 chia; skill: `pattern-skip-count` | ✓ 19/19 | ✓ 19/19 | ✓ 6 câu |  |
 | B12 | bảng 9: 9 nhân + 9 chia; skill: `pattern-skip-count` | ✓ 19/19 | ✓ 19/19 | ✓ 6 câu |  |
-| B13 | `unknown-mul-div` | ✓ 1/1 | ✓ 1/1 | ✓ 3 câu | Chỉ 1 skill nên lượt ôn tối đa 3 câu (1 skill × 3 lượt). |
+| B13 | `unknown-mul-div`, `unknown-mul-div-wp` | ✓ 1/1 | ✓ 1/1 | ✓ 6 câu | R8 (2026-11-24): thêm skill thứ hai — lượt ôn 6 câu (2 skill × 3 lượt). |
 | B14 | `fraction-read`, `fraction-shaded`, `fraction-pick-picture`, `fraction-of-set-circle`, `fraction-of-set-number`, `fraction-wp` | ✓ 6/6 | ✓ 6/6 | ✓ 6 câu |  |
 | B15 | hợp B9, B10, B11, B12, B13, B14 (8 skill) | ✓ 74/74 | ✓ 74/74 | ✓ 6 câu |  |
-| B16 | `geo-midpoint` | ✓ 1/1 | ✓ 1/1 | ✓ 3 câu | Chỉ 1 skill nên lượt ôn tối đa 3 câu (1 skill × 3 lượt). |
+| B16 | `geo-midpoint`, `geo-midpoint-length` | ✓ 1/1 | ✓ 1/1 | ✓ 6 câu | R8 (2026-11-24): thêm skill thứ hai — lượt ôn 6 câu (2 skill × 3 lượt). |
 | B17 | `geo-circle-parts`, `geo-radius-diameter` | ✓ 2/2 | ✓ 2/2 | ✓ 6 câu |  |
 | B18 | `geo-right-angle`, `geo-count-right-angles` | ✓ 2/2 | ✓ 2/2 | ✓ 6 câu |  |
 | B19 | `geo-shape-classify`, `geo-shape-count` | ✓ 2/2 | ✓ 2/2 | ✓ 6 câu |  |
@@ -59,16 +59,16 @@ Cột “Ôn theo bài” ghi số câu của một lượt chạy với bài ch
 | B21 | `geo-solid-identify`, `geo-solid-parts` | ✓ 2/2 | ✓ 2/2 | ✓ 6 câu |  |
 | B22 | hợp B16, B17, B18, B19, B20, B21 (9 skill) | ✓ 9/9 | ✓ 9/9 | ✓ 6 câu |  |
 | B23 | `mul-2d-1d`, `mul-tens-mental`, `mul-2d-1d-wp` | ✓ 3/3 | ✓ 3/3 | ✓ 6 câu |  |
-| B24 | `wp-times-then-add` | ✓ 1/1 | ✓ 1/1 | ✓ 3 câu | Chỉ 1 skill nên lượt ôn tối đa 3 câu (1 skill × 3 lượt). |
+| B24 | `wp-times-then-add`, `wp-times-then-sub` | ✓ 1/1 | ✓ 1/1 | ✓ 6 câu | R8 (2026-11-24): thêm skill thứ hai — lượt ôn 6 câu (2 skill × 3 lượt). |
 | B25 | `div-rem-floor`, `div-rem-ceil`, `choose-all-correct`, `tf-explain` | ✓ 4/4 | ✓ 4/4 | ✓ 6 câu |  |
 | B26 | `div-2d-1d`, `div-2d-1d-remainder`, `div-tens-mental`, `div-2d-1d-wp`, `mul-div-find-error` | ✓ 5/5 | ✓ 5/5 | ✓ 6 câu |  |
-| B27 | `wp-divide-then-add` | ✓ 1/1 | ✓ 1/1 | ✓ 3 câu | Chỉ 1 skill nên lượt ôn tối đa 3 câu (1 skill × 3 lượt). |
+| B27 | `wp-divide-then-add`, `wp-divide-then-sub` | ✓ 1/1 | ✓ 1/1 | ✓ 6 câu | R8 (2026-11-24): thêm skill thứ hai — lượt ôn 6 câu (2 skill × 3 lượt). |
 | B28 | `wp-times-then-add`, `wp-divide-then-add`, `wp-more-less-then-total`, `wp-unit-then-times` | ✓ 4/4 | ✓ 4/4 | ✓ 6 câu |  |
 | B29 | hợp B23, B24, B25, B26, B27, B28 (16 skill) | ✓ 16/16 | ✓ 16/16 | ✓ 6 câu |  |
 | B30 | `meas-ruler-read`, `meas-mm-convert` | ✓ 2/2 | ✓ 2/2 | ✓ 6 câu |  |
-| B31 | `meas-gram` | ✓ 1/1 | ✓ 1/1 | ✓ 3 câu | Chỉ 1 skill nên lượt ôn tối đa 3 câu (1 skill × 3 lượt). |
-| B32 | `meas-ml` | ✓ 1/1 | ✓ 1/1 | ✓ 3 câu | Chỉ 1 skill nên lượt ôn tối đa 3 câu (1 skill × 3 lượt). |
-| B33 | `meas-temperature` | ✓ 1/1 | ✓ 1/1 | ✓ 3 câu | Chỉ 1 skill nên lượt ôn tối đa 3 câu (1 skill × 3 lượt). |
+| B31 | `meas-gram`, `meas-gram-calc` | ✓ 1/1 | ✓ 1/1 | ✓ 6 câu | R8 (2026-11-24): thêm skill thứ hai — lượt ôn 6 câu (2 skill × 3 lượt). |
+| B32 | `meas-ml`, `meas-ml-calc` | ✓ 1/1 | ✓ 1/1 | ✓ 6 câu | R8 (2026-11-24): thêm skill thứ hai — lượt ôn 6 câu (2 skill × 3 lượt). |
+| B33 | `meas-temperature`, `meas-temperature-compare` | ✓ 1/1 | ✓ 1/1 | ✓ 6 câu | R8 (2026-11-24): thêm skill thứ hai — lượt ôn 6 câu (2 skill × 3 lượt). |
 | B34 | hợp B30, B31, B32, B33 (5 skill) | ✓ 5/5 | ✓ 5/5 | ✓ 6 câu | Bài thực hành đo (không thao tác dụng cụ trong game); ôn qua skill đo của B30–B33. |
 | B35 | hợp B30, B31, B32, B33, B34 (5 skill) | ✓ 5/5 | ✓ 5/5 | ✓ 6 câu |  |
 | B36 | `mul-3d-1d`, `mul-hundreds-mental`, `mul-3d-1d-wp` | ✓ 3/3 | ✓ 3/3 | ✓ 6 câu |  |
@@ -86,7 +86,7 @@ Cột “Ôn theo bài” ghi số câu của một lượt chạy với bài ch
 | B48 | `round-tens`, `round-hundreds` | ✓ 2/2 | ✓ 2/2 | ✓ 6 câu |  |
 | B49 | hợp B45, B46, B47, B48 (10 skill) | ✓ 10/10 | ✓ 10/10 | ✓ 6 câu |  |
 | B50 | `meas-perimeter-polygon`, `meas-perimeter-rect`, `meas-perimeter-square`, `meas-wp-fence` | ✓ 4/4 | ✓ 4/4 | ✓ 6 câu |  |
-| B51 | `meas-area-count` | ✓ 1/1 | ✓ 1/1 | ✓ 3 câu | Chỉ 1 skill nên lượt ôn tối đa 3 câu (1 skill × 3 lượt). |
+| B51 | `meas-area-count`, `meas-area-equal` | ✓ 1/1 | ✓ 1/1 | ✓ 6 câu | R8 (2026-11-24): thêm skill thứ hai — lượt ôn 6 câu (2 skill × 3 lượt). |
 | B52 | `meas-area-rect`, `meas-area-square` | ✓ 2/2 | ✓ 2/2 | ✓ 6 câu |  |
 | B53 | hợp B50, B51, B52 (7 skill) | ✓ 7/7 | ✓ 7/7 | ✓ 6 câu |  |
 | B54 | `add-4digit`, `add-sub-10000-wp`, `add-sub-find-error`, `add-missing-digit` | ✓ 4/4 | ✓ 4/4 | ✓ 6 câu |  |
@@ -128,6 +128,6 @@ Chỉ 1 bài không vào được “Ôn theo bài”:
 
 ## Ghi chú thêm cho phase 21
 
-- 9 bài lượt ôn mỏng (1 skill → tối đa 3 câu/lượt): B3, B13, B16, B24, B27, B31, B32, B33, B51. Đều đạt, nhưng nếu muốn lượt ôn đủ 6 câu thì cần thêm skill cho các bài này hoặc cho phép 1 skill đóng góp hơn 3 câu.
+- 9 bài trên đã được làm dày ở R8 (2026-11-24): mỗi bài thêm 1 skill mới (xem bảng), lượt ôn 6 câu (2 skill × 3 lượt).
 - B81 hợp 78 skill (qua các bài ôn nguồn); lượt chạy 6 câu vẫn đủ vì planner trải đều theo nguồn.
 - B20, B34, B67 là bài thực hành tay (vẽ hình / thao tác dụng cụ đo / xem đồng hồ, lịch thật) nên không có skill riêng; cả ba đều ôn được qua skill của bài nguồn — không thiếu.

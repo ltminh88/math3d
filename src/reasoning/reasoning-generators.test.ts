@@ -51,6 +51,63 @@ const ORACLE: Record<string, (item: ReasoningItem) => void> = {
   },
   'unknown-add-sub': (i) => checkUnknown(i),
   'unknown-mul-div': (i) => checkUnknown(i),
+  'unknown-add-sub-wp': (i) => {
+    const key = i.story.key;
+    if (key === 'unknownWpSubPack') {
+      const first = i.steps[0] as ReasoningStep;
+      expect(first.kind === 'number' ? first.answer : -1).toBe(p(i, 'b') * p(i, 'c'));
+      expect(finalNumber(i)).toBe(p(i, 'b') * p(i, 'c') + p(i, 'a'));
+    } else if (key === 'unknownWpSubFirst') {
+      expect(finalNumber(i)).toBe(p(i, 'a') + p(i, 'b'));
+    } else {
+      expect(finalNumber(i)).toBe(p(i, 's') - p(i, 'a'));
+    }
+  },
+  'unknown-mul-div-wp': (i) => {
+    const key = i.story.key;
+    if (key === 'unknownWpMulSum') {
+      const first = i.steps[0] as ReasoningStep;
+      expect(first.kind === 'number' ? first.answer : -1).toBe(p(i, 'a') + p(i, 'b'));
+      expect(finalNumber(i)).toBe((p(i, 'a') + p(i, 'b')) / p(i, 'n'));
+    } else if (key === 'unknownWpMulBoxes' || key === 'unknownWpMulEach') {
+      expect(finalNumber(i)).toBe(p(i, 'p') / p(i, 'n'));
+    } else if (key === 'unknownWpDivBoxes') {
+      expect(finalNumber(i)).toBe(p(i, 'p') / p(i, 'q'));
+    } else {
+      // unknownWpDivShare
+      expect(finalNumber(i)).toBe(p(i, 'n') * p(i, 'q'));
+    }
+  },
+  'wp-times-then-sub': (i) => {
+    expect(finalNumber(i)).toBe(p(i, 'a') * p(i, 'n') - p(i, 'a'));
+    if (i.tier === 1) {
+      const first = i.steps[0] as ReasoningStep;
+      expect(first.kind === 'number' ? first.answer : -1).toBe(p(i, 'a') * p(i, 'n'));
+    }
+    if (i.tier === 3) {
+      const first = i.steps[0];
+      if (first?.kind !== 'choice')
+        throw new Error('wp-times-then-sub t3 needs an expression choice');
+      expect(first.options.find((o) => o.correct)?.label.params?.text).toBe(
+        `${p(i, 'a')} × ${p(i, 'n')} − ${p(i, 'a')}`,
+      );
+    }
+  },
+  'wp-divide-then-sub': (i) => {
+    expect(finalNumber(i)).toBe(p(i, 'a') - p(i, 'a') / p(i, 'n'));
+    if (i.tier === 1) {
+      const first = i.steps[0] as ReasoningStep;
+      expect(first.kind === 'number' ? first.answer : -1).toBe(p(i, 'a') / p(i, 'n'));
+    }
+    if (i.tier === 3) {
+      const first = i.steps[0];
+      if (first?.kind !== 'choice')
+        throw new Error('wp-divide-then-sub t3 needs an expression choice');
+      expect(first.options.find((o) => o.correct)?.label.params?.text).toBe(
+        `${p(i, 'a')} − ${p(i, 'a')} : ${p(i, 'n')}`,
+      );
+    }
+  },
   'pattern-add': (i) => checkPattern(i, (d) => d > 0),
   'pattern-sub': (i) => checkPattern(i, (d) => d < 0),
   'pattern-skip-count': (i) => checkPattern(i, (d, terms) => terms.every((t) => t % d === 0)),
@@ -122,8 +179,8 @@ function checkShape(step: ReasoningStep): void {
 }
 
 describe('reasoning generators', () => {
-  it('cover the 18 reasoning skills of the catalog', () => {
-    expect(REASONING_SKILLS).toHaveLength(18);
+  it('cover the 22 reasoning skills of the catalog', () => {
+    expect(REASONING_SKILLS).toHaveLength(22);
   });
 
   for (const skillId of REASONING_SKILLS) {

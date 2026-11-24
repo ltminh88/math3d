@@ -65,6 +65,62 @@ export const geoMidpoint: GeoGenerator = (rng, tier) => {
   return geoItem('geo-midpoint', tier, story, [step], segmentScene(len, am), 'cm', [len, half]);
 };
 
+/** B16 second skill: the missing part of a segment, or the whole from its parts.
+ * M is not the midpoint here — the two parts are unequal in general. */
+export const geoMidpointLength: GeoGenerator = (rng, tier) => {
+  if (tier === 1) {
+    // AB and AM given → MB = AB − AM.
+    const [lo, hi] = MIDPOINT_LENGTHS[1];
+    const len = 2 * randInt(rng, Math.max(lo / 2, 2), hi / 2);
+    const am = 2 * randInt(rng, 1, len / 2 - 1);
+    const mb = len - am;
+    return geoItem(
+      'geo-midpoint-length',
+      tier,
+      ref('midPart', { len, am }),
+      [numberStep(ref('askMB'), mb)],
+      segmentScene(len, am),
+      'cm',
+      [mb],
+    );
+  }
+  if (tier === 2) {
+    // AM and MB given → AB = AM + MB.
+    const am = 2 * randInt(rng, 1, 6);
+    const mb = 2 * randInt(rng, 1, 6);
+    const len = am + mb;
+    const steps = [
+      qtyChoiceStep(rng, ref('askAB'), len, 'cm', [
+        { value: am, misconception: 'one-step-only' },
+        { value: mb, misconception: 'one-step-only' },
+      ]),
+    ];
+    return geoItem(
+      'geo-midpoint-length',
+      tier,
+      ref('midSum', { am, mb }),
+      steps,
+      segmentScene(len, am),
+      'cm',
+      [len],
+    );
+  }
+  // Tier 3: AB and MB given → AM = AB − MB (the reverse of tier 1).
+  const [lo, hi] = MIDPOINT_LENGTHS[3];
+  const len = 2 * randInt(rng, Math.max(lo / 2, 2), hi / 2);
+  const mb = 2 * randInt(rng, 1, len / 2 - 1);
+  const am = len - mb;
+  return geoItem(
+    'geo-midpoint-length',
+    tier,
+    ref('midPartB', { len, mb }),
+    [numberStep(ref('askAM'), am)],
+    segmentScene(len, am),
+    'cm',
+    [am],
+  );
+};
+
 /** Points of a circle: centre O, diameter ends, radius ends and a chord (never through O). */
 function circleParts(rng: Rng, radii: number) {
   const base = randInt(rng, 0, 11) * 15;

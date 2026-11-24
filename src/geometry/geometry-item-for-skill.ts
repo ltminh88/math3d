@@ -3,12 +3,18 @@ import type { Rng } from '../learning/seeded-rng';
 import type { SkillTier } from '../learning/skill-tiers';
 import { geoCountRightAngles, geoRightAngle } from './angle-generators';
 import type { GeoGenerator, GeoItem } from './geo-scene-types';
-import { geoCircleParts, geoMidpoint, geoRadiusDiameter } from './midpoint-and-circle-generators';
+import {
+  geoCircleParts,
+  geoMidpoint,
+  geoMidpointLength,
+  geoRadiusDiameter,
+} from './midpoint-and-circle-generators';
 import { geoShapeClassify, geoShapeCount } from './shape-generators';
 import { geoSolidIdentify, geoSolidParts } from './solid-generators';
 
 const GENERATORS: Readonly<Record<string, GeoGenerator>> = {
   'geo-midpoint': geoMidpoint,
+  'geo-midpoint-length': geoMidpointLength,
   'geo-circle-parts': geoCircleParts,
   'geo-radius-diameter': geoRadiusDiameter,
   'geo-right-angle': geoRightAngle,

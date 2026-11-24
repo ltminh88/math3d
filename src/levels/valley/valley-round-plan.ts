@@ -11,6 +11,7 @@ export type ValleyKind = 'midpoint' | 'circle' | 'right-angle' | 'classify' | 's
 
 export const VALLEY_KIND: Readonly<Record<string, ValleyKind>> = {
   'geo-midpoint': 'midpoint',
+  'geo-midpoint-length': 'midpoint',
   'geo-circle-parts': 'circle',
   'geo-radius-diameter': 'circle',
   'geo-right-angle': 'right-angle',

@@ -2,7 +2,7 @@
 // first, round-robin. Oracles below are computed by hand from the catalog (phase 01),
 // not by calling the helpers under test:
 //   B25 = div-rem-floor, div-rem-ceil, choose-all-correct, tf-explain (catalog lines 36-37, 49-50)
-//   B3  = unknown-add-sub only; B1 has the six number skills (phase 07); B2 has
+//   B3  = unknown-add-sub + unknown-add-sub-wp (R8); B1 has the six number skills (phase 07); B2 has
 //         the six arithmetic skills (phase 09); B7 reviews four geometry/measurement
 //         skills (phase 21); B14 = the six fraction skills (phase 12); B23/B26/B36/B37
 //         have the mul/div arithmetic skills (phase 10)
@@ -256,32 +256,37 @@ describe('planLessonRun', () => {
 
   it('one skill contributes at most 6 items; items opt is honoured', () => {
     expect(planLessonRun(25, {}, mulberry32(6), { items: 2 })).toHaveLength(2);
-    const one = planLessonRun(3, {}, mulberry32(6)); // B3: unknown-add-sub only
+    // B3 now has two skills (R8); the renderable filter keeps one skill only.
+    const one = planLessonRun(3, {}, mulberry32(6), {
+      renderable: (k) => k === 'sk:unknown-add-sub',
+    });
     expect(one).toHaveLength(6);
     expect(one.every((k) => k === 'sk:unknown-add-sub')).toBe(true);
   });
 
-  it('single-skill lessons plan 6 items, no repeated fact key (phase 21)', () => {
-    // B3, B13, B16, B24, B27, B31, B32, B33, B51 each have one skill: six
-    // re-rolls of that skill (a new question each time), never a repeated fact.
-    const single: Readonly<Record<number, FactKey>> = {
-      3: 'sk:unknown-add-sub',
-      13: 'sk:unknown-mul-div',
-      16: 'sk:geo-midpoint',
-      24: 'sk:wp-times-then-add',
-      27: 'sk:wp-divide-then-add',
-      31: 'sk:meas-gram',
-      32: 'sk:meas-ml',
-      33: 'sk:meas-temperature',
-      51: 'sk:meas-area-count',
+  it('two-skill lessons plan 6 items, 3 + 3, no repeated fact key (R8)', () => {
+    // B3, B13, B16, B24, B27, B31, B32, B33, B51 each have two skills now:
+    // three items of each, round-robin, never a repeated fact.
+    const two: Readonly<Record<number, readonly [FactKey, FactKey]>> = {
+      3: ['sk:unknown-add-sub', 'sk:unknown-add-sub-wp'],
+      13: ['sk:unknown-mul-div', 'sk:unknown-mul-div-wp'],
+      16: ['sk:geo-midpoint', 'sk:geo-midpoint-length'],
+      24: ['sk:wp-times-then-add', 'sk:wp-times-then-sub'],
+      27: ['sk:wp-divide-then-add', 'sk:wp-divide-then-sub'],
+      31: ['sk:meas-gram', 'sk:meas-gram-calc'],
+      32: ['sk:meas-ml', 'sk:meas-ml-calc'],
+      33: ['sk:meas-temperature', 'sk:meas-temperature-compare'],
+      51: ['sk:meas-area-count', 'sk:meas-area-equal'],
     };
-    for (const [n, key] of Object.entries(single)) {
+    for (const [n, keys] of Object.entries(two)) {
       const run = planLessonRun(Number(n), {}, mulberry32(9));
       expect(run, `B${n}`).toHaveLength(6);
-      expect(
-        run.every((k) => k === key),
-        `B${n}`,
-      ).toBe(true);
+      for (const key of keys) {
+        expect(
+          run.filter((k) => k === key),
+          `B${n} ${key}`,
+        ).toHaveLength(3);
+      }
       const facts = run.filter((k) => k.startsWith('mul:') || k.startsWith('div:'));
       expect(new Set(facts).size, `B${n}`).toBe(facts.length);
     }

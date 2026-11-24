@@ -193,6 +193,7 @@ describe('nextLesson', () => {
         'sk:add-sub-find-error',
         'sk:add-missing-digit',
         'sk:unknown-add-sub',
+        'sk:unknown-add-sub-wp',
       ] as const,
       4,
     );
