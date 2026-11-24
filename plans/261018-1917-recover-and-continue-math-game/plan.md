@@ -34,7 +34,7 @@ Supersedes [261018-1803-vlm-math-game-mvp](../261018-1803-vlm-math-game-mvp/plan
 | 15 | [Forest level](phase-15-forest-level.md) | Done (phase-15) |
 | 16 | [Supabase backend](phase-16-supabase-backend.md) | Deferred (2026-11-24: author keeps local save for now; Free project pauses after ~7 days idle) |
 | 17 | [Parent auth, profiles, sync client](phase-17-parent-auth-profiles-sync-client.md) | Deferred (with 16) |
-| 18 | [Polish, a11y, perf, e2e, Vercel deploy](phase-18-polish-a11y-perf-e2e-deploy.md) | Pending |
+| 18 | [Polish, a11y, perf, e2e, Vercel deploy](phase-18-polish-a11y-perf-e2e-deploy.md) | Next (2026-11-24, no-backend scope: a11y, tablet perf, offline SW + kill-switch, playtest fixes; Vercel deploy already live) |
 | 19 | [Cosmetics shop in village](phase-19-cosmetics-shop-in-village.md) (runs in G7) | Done (phase-19) |
 
 Follow-up: the city and tower levels (full map) are planned and merged in [261024-1515-city-and-tower-levels](../261024-1515-city-and-tower-levels/plan.md) (tags `city-level`, `tower-level`, `full-map`).
