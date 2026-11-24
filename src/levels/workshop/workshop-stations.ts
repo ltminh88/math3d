@@ -137,10 +137,12 @@ export function planWorkshopSkills(stats: Stats, rng: Rng, rounds: number, stage
     chosen.push(weakestFirst(free, stats, rng)[0] as string);
   }
   // Instruments in the workshop's order: balance, jug, thermometer.
-  const tail = chosen.splice(4).sort(
-    (a, b) =>
-      STATION_ORDER.indexOf(STATION_OF[a] as WorkshopStation) -
-      STATION_ORDER.indexOf(STATION_OF[b] as WorkshopStation),
-  );
+  const tail = chosen
+    .splice(4)
+    .sort(
+      (a, b) =>
+        STATION_ORDER.indexOf(STATION_OF[a] as WorkshopStation) -
+        STATION_ORDER.indexOf(STATION_OF[b] as WorkshopStation),
+    );
   return [...chosen, ...tail].slice(0, Math.min(rounds, WORKSHOP_ROUNDS));
 }
