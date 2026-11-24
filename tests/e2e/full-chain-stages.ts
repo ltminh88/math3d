@@ -1,5 +1,5 @@
 // Expected quest card, gate and map data for each level stage of the full-chain e2e walk
-// (field → cave). The bridge stage and the closing card are checked inline in the spec.
+// (field → numberfort). The bridge stage and the closing card are checked inline in the spec.
 
 export const CHAIN = [
   'field',
@@ -10,6 +10,8 @@ export const CHAIN = [
   'valley',
   'workshop',
   'cave',
+  'market',
+  'numberfort',
 ] as const;
 
 export type LevelId = (typeof CHAIN)[number];
@@ -26,6 +28,7 @@ export interface Stage {
 export const CHAPTER_CELLS = [
   ['Cây cầu', 'Cánh Đồng', 'Khu Rừng', 'Thành Phố', 'Tháp'],
   ['Khu Vườn', 'Thung Lũng', 'Xưởng', 'Hang'],
+  ['Khu Chợ', 'Lâu Đài'],
 ] as const;
 
 export const STAGES: readonly Stage[] = [
@@ -37,6 +40,8 @@ export const STAGES: readonly Stage[] = [
   ['valley', 'valley', 'Thung Lũng Hình Học', 'Đến Cổng Thung Lũng'],
   ['workshop', 'workshop', 'Xưởng Đo Đạc', 'Đến Cổng Xưởng Đo Đạc'],
   ['cave', 'cave', 'Hang Đố Vui', 'Đến Cổng Hang Đố Vui'],
+  ['market', 'market', 'Chợ Phiên Tí Hon', 'Đến Cổng Chợ Phiên'],
+  ['numberfort', 'numberfort', 'Lâu Đài Số', 'Đến Cổng Lâu Đài Số'],
 ].map(([levelId, region, title, progress]) => ({
   levelId: levelId as LevelId,
   region: region as string,
@@ -51,10 +56,11 @@ export function chapterRow(stage: number): {
   cells: string[];
   done: number;
 } {
-  // Chain position 1..9 (bridge = 0); chapter 1 holds positions 0..4, chapter 2 holds 5..8.
+  // Chain position 1..11 (bridge = 0); chapter 1 holds positions 0..4, chapter 2 holds
+  // 5..8, chapter 3 holds 9..10.
   const position = stage + 1;
-  const chapter = position < 5 ? 0 : 1;
-  const first = chapter === 0 ? 0 : 5;
+  const chapter = position < 5 ? 0 : position < 9 ? 1 : 2;
+  const first = chapter === 0 ? 0 : chapter === 1 ? 5 : 9;
   const names = CHAPTER_CELLS[chapter] ?? [];
   const done = Math.min(position - first, names.length);
   const cells = names.map(

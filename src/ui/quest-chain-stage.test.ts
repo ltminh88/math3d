@@ -35,7 +35,7 @@ describe('quest chain stage', () => {
     );
   });
 
-  it('walks chapter 2 garden → valley → workshop → cave, then the closing card', () => {
+  it('walks chapter 2 garden → valley → workshop → cave, then chapter 3', () => {
     const chapter1 = ['field', 'forest', 'city', 'tower'];
     expect(questStage(progressionState(true, done(...chapter1, 'garden')))).toBe('valley');
     expect(questStage(progressionState(true, done(...chapter1, 'garden', 'valley')))).toBe(
@@ -43,7 +43,28 @@ describe('quest chain stage', () => {
     );
     const allButCave = [...chapter1, 'garden', 'valley', 'workshop'];
     expect(questStage(progressionState(true, done(...allButCave)))).toBe('cave');
-    expect(questStage(progressionState(true, done(...allButCave, 'cave')))).toBe('done');
+    const allButMarket = [...allButCave, 'cave'];
+    expect(questStage(progressionState(true, done(...allButMarket)))).toBe('market');
+    expect(questStage(progressionState(true, done(...allButMarket, 'market')))).toBe('numberfort');
+    expect(questStage(progressionState(true, done(...allButMarket, 'market', 'numberfort')))).toBe(
+      'done',
+    );
+  });
+
+  it('an old save that finished the cave points at the market, not the closing card', () => {
+    // Before chapter 3, finishing the cave was 'done'; the save must now lead onward.
+    const throughCave = [
+      'field',
+      'forest',
+      'city',
+      'tower',
+      'garden',
+      'valley',
+      'workshop',
+      'cave',
+    ];
+    expect(questStage(progressionState(true, done(...throughCave)))).toBe('market');
+    expect(questStage(progressionState(true, done(...throughCave)))).not.toBe('done');
   });
 });
 
@@ -71,10 +92,11 @@ describe('quest stage line', () => {
 });
 
 describe('quest chapters', () => {
-  it('splits the 9 stages into two rows of at most 5 cells', () => {
+  it('splits the 11 stages into three rows of at most 5 cells', () => {
     expect(QUEST_CHAPTERS).toEqual([
       ['bridge', 'field', 'forest', 'city', 'tower'],
       ['garden', 'valley', 'workshop', 'cave'],
+      ['market', 'numberfort'],
     ]);
   });
 
@@ -84,6 +106,12 @@ describe('quest chapters', () => {
     expect(questChapter('tower')).toEqual({ chapter: 1, stages: QUEST_CHAPTERS[0], done: 4 });
     expect(questChapter('garden')).toEqual({ chapter: 2, stages: QUEST_CHAPTERS[1], done: 0 });
     expect(questChapter('cave')).toEqual({ chapter: 2, stages: QUEST_CHAPTERS[1], done: 3 });
-    expect(questChapter('done')).toEqual({ chapter: 2, stages: QUEST_CHAPTERS[1], done: 4 });
+    expect(questChapter('market')).toEqual({ chapter: 3, stages: QUEST_CHAPTERS[2], done: 0 });
+    expect(questChapter('numberfort')).toEqual({
+      chapter: 3,
+      stages: QUEST_CHAPTERS[2],
+      done: 1,
+    });
+    expect(questChapter('done')).toEqual({ chapter: 3, stages: QUEST_CHAPTERS[2], done: 2 });
   });
 });

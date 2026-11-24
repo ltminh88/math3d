@@ -13,8 +13,9 @@ export const tq = defineStrings('questChain', {
     titleValley: 'Thung Lũng Hình Học',
     titleWorkshop: 'Xưởng Đo Đạc',
     titleCave: 'Hang Đố Vui',
+    titleMarket: 'Chợ Phiên Tí Hon',
     titleNumberfort: 'Lâu Đài Số',
-    titleDone: 'Bạn đã qua cả chín thử thách!',
+    titleDone: 'Bạn đã qua cả mười một thử thách!',
     copyField:
       'Đi theo con đường bên kia cầu tới cánh đồng lúa vàng. Tìm cổng có dấu ✨ {gate}, {enter}',
     copyForest:
@@ -31,6 +32,8 @@ export const tq = defineStrings('questChain', {
       'Cổng mới đã mở! Đi theo con đường mới về phía nam, giữa khu rừng và thành phố. Tìm cổng có dấu ✨ {gate}, {enter}',
     copyCave:
       'Thử thách cuối đã mở! Về làng rồi đi theo con đường qua chòi nghỉ tới hang đá. Tìm cổng có dấu ✨ {gate}, {enter}',
+    copyMarket:
+      'Chương 3 đã mở! Đi theo con đường bên kia cầu về phía bắc, tới khu chợ nhỏ ở bờ tây. Tìm cổng có dấu ✨ {gate}, {enter}',
     copyNumberfort:
       'Cổng mới đã mở! Đi theo con đường bên kia cầu về phía tháp, rồi rẽ sang lâu đài của các số lớn ở bờ đông. Tìm cổng có dấu ✨ {gate}, {enter}',
     copyComingSoon: '{gate} sắp ra mắt. Trong lúc chờ, bạn luyện thêm cùng {guide} nhé!',
@@ -45,6 +48,7 @@ export const tq = defineStrings('questChain', {
     progressValley: 'Đến Cổng Thung Lũng',
     progressWorkshop: 'Đến Cổng Xưởng Đo Đạc',
     progressCave: 'Đến Cổng Hang Đố Vui',
+    progressMarket: 'Đến Cổng Chợ Phiên',
     progressNumberfort: 'Đến Cổng Lâu Đài Số',
     progressComingSoon: 'Sắp ra mắt',
     progressDone: '✓ Hoàn thành',
@@ -59,6 +63,7 @@ export const tq = defineStrings('questChain', {
     stepValley: 'Thung Lũng',
     stepWorkshop: 'Xưởng',
     stepCave: 'Hang',
+    stepMarket: 'Khu Chợ',
     stepNumberfort: 'Lâu Đài',
     chapterLabel: 'Chương {n} · {k}/{m}',
     stageLine: 'Chặng {n}/{m} · {stars}/{max} sao',
@@ -81,6 +86,8 @@ export const tq = defineStrings('questChain', {
       '{gate} đã mở! Cổng ở cuối con đường mới phía nam, giữa khu rừng và thành phố. Bạn cũng có thể luyện thêm phép nhân cùng mình nhé!',
     guideCave:
       '{gate} đã mở! Cổng ở hang đá bên bờ làng, cuối con đường qua chòi nghỉ. Bạn cũng có thể luyện thêm phép nhân cùng mình nhé!',
+    guideMarket:
+      '{gate} đã mở! Cổng ở khu chợ nhỏ phía bắc bờ tây. Bạn cũng có thể luyện thêm phép nhân cùng mình nhé!',
     guideNumberfort:
       '{gate} đã mở! Cổng ở cuối con đường rẽ khỏi đường lên tháp, phía lâu đài bờ đông. Bạn cũng có thể luyện thêm phép nhân cùng mình nhé!',
     guideComingSoon:
@@ -101,8 +108,9 @@ export const tq = defineStrings('questChain', {
     titleValley: 'Geometry Valley',
     titleWorkshop: 'Measuring Workshop',
     titleCave: 'Puzzle Cave',
+    titleMarket: 'Tiny Market Fair',
     titleNumberfort: 'Number Castle',
-    titleDone: 'You finished all nine challenges!',
+    titleDone: 'You finished all eleven challenges!',
     copyField:
       'Follow the road across the bridge to the golden meadow. Find the ✨ {gate}, {enter}',
     copyForest:
@@ -119,6 +127,8 @@ export const tq = defineStrings('questChain', {
       'A new gate is open! Follow the new road south, between the forest and the city. Find the ✨ {gate}, {enter}',
     copyCave:
       'The last challenge is open! Go back to the village and follow the road past the gazebo to the cave. Find the ✨ {gate}, {enter}',
+    copyMarket:
+      'Chapter 3 is open! Follow the road across the bridge north, to the little market on the west bank. Find the ✨ {gate}, {enter}',
     copyNumberfort:
       'A new gate is open! Follow the road across the bridge toward the tower, then turn off to the castle of big numbers on the east bank. Find the ✨ {gate}, {enter}',
     copyComingSoon: 'The {gate} is coming soon. Meanwhile, practise more with {guide}!',
@@ -133,6 +143,7 @@ export const tq = defineStrings('questChain', {
     progressValley: 'Reach the Valley Gate',
     progressWorkshop: 'Reach the Workshop Gate',
     progressCave: 'Reach the Cave Gate',
+    progressMarket: 'Reach the Market Gate',
     progressNumberfort: 'Reach the Number Castle Gate',
     progressComingSoon: 'Coming soon',
     progressDone: '✓ Complete',
@@ -147,6 +158,7 @@ export const tq = defineStrings('questChain', {
     stepValley: 'Valley',
     stepWorkshop: 'Workshop',
     stepCave: 'Cave',
+    stepMarket: 'Market',
     stepNumberfort: 'Castle',
     chapterLabel: 'Chapter {n} · {k}/{m}',
     stageLine: 'Stage {n}/{m} · {stars}/{max} stars',
@@ -169,6 +181,8 @@ export const tq = defineStrings('questChain', {
       'The {gate} is open! It stands at the end of the new road south, between the forest and the city. We can also practise multiplication together!',
     guideCave:
       'The {gate} is open! It stands by the cave on the village bank, at the end of the road past the gazebo. We can also practise multiplication together!',
+    guideMarket:
+      'The {gate} is open! It stands at the little market on the north-west bank. We can also practise multiplication together!',
     guideNumberfort:
       'The {gate} is open! It stands at the end of the road off the tower road, by the castle on the east bank. We can also practise multiplication together!',
     guideComingSoon:

@@ -1,7 +1,8 @@
 // Cave level "Hang Đố Vui" (chapter 2 phase 08): seed chapter 1 and the garden, valley and
 // workshop, enter through the cave gate, solve seven chambers (keys on desktop, taps only on the
 // phone and both tablets), come back with the level completed, `sk:` skills stored and the quest
-// card's closing card. Uses `window.__cave`/`__game`. CAVE_SCREENS=<dir> saves screenshots.
+// card pointing at the market (chapter 3 opens after the cave). Uses `window.__cave`/`__game`.
+// CAVE_SCREENS=<dir> saves screenshots.
 import { type Page, test } from '@playwright/test';
 import { expect, SLOW_TEST_MS, waitForStoreBoot } from './legacy-live-save-fixtures';
 
@@ -196,7 +197,7 @@ async function playChamberCorrect(page: Page, tap: boolean): Promise<void> {
   await expect(page.locator('.cave-panel .feedback')).toContainText('Đúng rồi!');
 }
 
-test('the cave: seven chambers of mixed reasoning, then the closing quest card', async ({
+test('the cave: seven chambers of mixed reasoning, then the market quest card', async ({
   page,
 }, info) => {
   const tap = !!info.project.use.hasTouch;
@@ -263,9 +264,9 @@ test('the cave: seven chambers of mixed reasoning, then the closing quest card',
   });
   expect(store.completedAt).toBeGreaterThan(0);
   for (const id of skills) expect(store.keys).toContain(`sk:${id}`);
-  // Chapter 2 done: the quest card shows its closing card.
-  await expect(page.locator('#quest-title')).toHaveText('Bạn đã qua cả chín thử thách!');
-  await shot(page, project, 'closing-card');
+  // Chapter 2 done: the quest card points at the market (chapter 3 opens after the cave).
+  await expect(page.locator('#quest-title')).toHaveText('Chợ Phiên Tí Hon');
+  await shot(page, project, 'market-card');
   expect(await page.evaluate(() => window.__cave)).toBeUndefined();
   expect(errors).toEqual([]);
 });

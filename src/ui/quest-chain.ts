@@ -1,8 +1,9 @@
 // The quest card's content for every quest in the chain: the bridge quest (recovered copy, kept
-// byte-identical), then chapter 1 (field, forest, city, tower) and chapter 2 (garden, valley,
-// workshop, cave) gates and a closing card. The row shows the current chapter only (≤5 cells) with
-// a "Chương n · k/m" label. A gate whose level is not shipped yet says "Sắp ra mắt". The stage comes
-// from the same state the level gates read, so the card follows a level commit and a reload.
+// byte-identical), then chapter 1 (field, forest, city, tower), chapter 2 (garden, valley,
+// workshop, cave) and chapter 3 (market, numberfort) gates and a closing card. The row shows the
+// current chapter only (≤5 cells) with a "Chương n · k/m" label. A gate whose level is not
+// shipped yet says "Sắp ra mắt". The stage comes from the same state the level gates read, so the
+// card follows a level commit and a reload.
 import { BRIDGE_SEGMENTS } from '../config/world-constants';
 import { tc } from '../i18n/common-strings';
 import { translateLongText } from '../i18n/legacy-translator';
@@ -75,6 +76,14 @@ export const CHAIN_TEXT_KEYS = {
   valley: ['titleValley', 'copyValley', 'progressValley', 'stepValley', 'guideValley'],
   workshop: ['titleWorkshop', 'copyWorkshop', 'progressWorkshop', 'stepWorkshop', 'guideWorkshop'],
   cave: ['titleCave', 'copyCave', 'progressCave', 'stepCave', 'guideCave'],
+  market: ['titleMarket', 'copyMarket', 'progressMarket', 'stepMarket', 'guideMarket'],
+  numberfort: [
+    'titleNumberfort',
+    'copyNumberfort',
+    'progressNumberfort',
+    'stepNumberfort',
+    'guideNumberfort',
+  ],
 } as const satisfies Record<ChainLevel, readonly QuestKey[]>;
 
 const STAGES: readonly QuestStage[] = ['bridge', ...CHAIN_LEVELS, 'done'];
