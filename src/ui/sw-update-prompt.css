@@ -1,0 +1,50 @@
+/* Service-worker update prompt: the game toast's look, with buttons big enough for
+   tablet taps. The prompt is hidden until a new version is waiting. */
+.sw-update-prompt {
+  position: absolute;
+  left: 50%;
+  bottom: 100px;
+  z-index: 45;
+  transform: translateX(-50%);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 12px;
+  max-width: min(560px, 90vw);
+  padding: 16px 22px;
+  border: 1px solid #d1ddbd;
+  border-radius: 16px;
+  background: var(--paper);
+  color: var(--ink);
+  text-align: center;
+  box-shadow: var(--shadow-lift);
+  animation: rise-in 0.25s ease;
+}
+.sw-update-prompt[hidden] {
+  display: none;
+}
+.sw-update-message {
+  margin: 0;
+  font-size: 15px;
+  font-weight: 700;
+}
+.sw-update-actions {
+  display: flex;
+  gap: 12px;
+}
+/* The kit button has no stylesheet of its own, so the prompt styles its buttons here. */
+.sw-update-prompt .kit-button {
+  min-height: 56px;
+  min-width: 120px;
+  padding: 0 22px;
+  border: 1px solid var(--ink);
+  border-radius: 12px;
+  background: var(--leaf);
+  color: #fff;
+  font-size: 15px;
+  font-weight: 700;
+}
+.sw-update-prompt .kit-button--secondary {
+  background: var(--paper);
+  color: var(--ink);
+}

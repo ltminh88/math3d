@@ -2,10 +2,12 @@
 import './styles/fonts.css';
 import './styles/game/game-styles-index.css';
 import { bootstrapGame } from './ui/bootstrap-game';
+import { registerServiceWorker } from './ui/sw-update-prompt';
 import { registerProgressTool } from './webmcp/progress-tool';
 
 void bootstrapGame();
 registerProgressTool();
+registerServiceWorker();
 
 // Dev-only perf probe; Vite drops the whole branch from production builds.
 if (import.meta.env.DEV && new URLSearchParams(location.search).get('debug') === 'fps') {
