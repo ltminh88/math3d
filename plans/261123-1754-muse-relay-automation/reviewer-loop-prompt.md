@@ -55,3 +55,12 @@ No answer within 12 h → ask once more, then carry it in the daily summary.
 - Repo public: no textbook content, secrets or personal data in comments.
 - Never interrupt a Muse mid-task; messages wait in the inbox.
 - Prod deploy command and verification as in memory `vercel-deploy`; only after "deploy đi".
+
+## After a machine restart
+
+Scheduled wakeups die with the session, so the loop stops on reboot. To bring it back:
+
+1. Terminal in the repo: `claude -c` (continues this conversation).
+2. Type: `/loop Reviewer relay tick — follow plans/261123-1754-muse-relay-automation/reviewer-loop-prompt.md`
+3. First tick: delete a stale `.relay/wait.pid` (the PID may be reused after reboot), and if a Paseo/resumed copy is also open, tell it via SendMessage that it is Q&A only.
+4. Muse tabs: if Chrome restarted, re-paste `muse-loop-prompt.md` into each tab (their background sleep died too).
