@@ -39,6 +39,13 @@ export default defineConfig({
       workbox: {
         globPatterns: ['**/*.{js,css,html,woff2,png,svg,ico}'],
         navigateFallback: 'index.html',
+        // The update prompt relies on this: when the user taps "Tải lại", the
+        // waiting worker activates, and only a claiming worker takes control of
+        // the open page — without it no controllerchange fires, workbox-window
+        // never reloads, and the toast's reload button leaves the old build
+        // on screen. skipWaiting stays off: activation happens only via the
+        // prompt, so the claim never swaps a build under a playing child.
+        clientsClaim: true,
       },
     }),
   ],

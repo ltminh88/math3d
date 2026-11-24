@@ -52,6 +52,7 @@ export const gameShellHtml = (): string => `
       <aside class="map-panel"><div id="map-regions" class="map-regions"></div><div id="map-detail" class="map-detail"></div></aside>
     </section>
     <div id="toast" class="toast" role="status" aria-live="polite" hidden></div>
+    <div id="sw-update-prompt" class="sw-update-prompt" hidden></div>
     <footer id="menu-footer" class="menu-footer"><span><b>math</b>3d</span><span>Một thế giới nhỏ. Những khám phá lớn.</span><span>Lưu trên thiết bị này ${icon('save')}</span></footer>
     <dialog id="dialog" aria-labelledby="dialog-title"><button id="close-dialog" class="dialog-close" aria-label="Đóng">${icon('close')}</button><div id="dialog-content"></div></dialog>
   </main>`;
