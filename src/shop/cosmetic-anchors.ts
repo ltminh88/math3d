@@ -22,6 +22,9 @@ export const PLACEMENT_BY_ID: Readonly<Record<string, CosmeticPlacement>> = {
   'vlm-round-glasses': { owner: 'vlm', anchor: 'head' },
   'vlm-star-pendant': { owner: 'vlm', anchor: 'neck' },
   'vlm-book-bag': { owner: 'vlm', anchor: 'back' },
+  'vlm-star-staff': { owner: 'vlm', anchor: 'back' },
+  'vlm-moon-pin': { owner: 'vlm', anchor: 'head' },
+  'vlm-rainbow-ribbon': { owner: 'vlm', anchor: 'neck' },
   'avatar-blue-cap': { owner: 'avatar', anchor: 'head' },
   'avatar-striped-scarf': { owner: 'avatar', anchor: 'neck' },
   'avatar-gold-crown': { owner: 'avatar', anchor: 'head' },
@@ -29,6 +32,9 @@ export const PLACEMENT_BY_ID: Readonly<Record<string, CosmeticPlacement>> = {
   'avatar-straw-hat': { owner: 'avatar', anchor: 'head' },
   'avatar-flower-lei': { owner: 'avatar', anchor: 'neck' },
   'avatar-raincoat': { owner: 'avatar', anchor: 'back' },
+  'avatar-knit-beanie': { owner: 'avatar', anchor: 'head' },
+  'avatar-red-bow': { owner: 'avatar', anchor: 'neck' },
+  'avatar-backpack': { owner: 'avatar', anchor: 'back' },
   'decor-flower-pots': { owner: 'decor', anchor: 'ground' },
   'decor-star-lantern': { owner: 'decor', anchor: 'ground' },
   'decor-paper-lanterns': { owner: 'decor', anchor: 'ground' },
@@ -36,6 +42,10 @@ export const PLACEMENT_BY_ID: Readonly<Record<string, CosmeticPlacement>> = {
   'decor-peach-tree': { owner: 'decor', anchor: 'ground' },
   'decor-chicken-coop': { owner: 'decor', anchor: 'ground' },
   'decor-rainbow-arch': { owner: 'decor', anchor: 'ground' },
+  'decor-windmill': { owner: 'decor', anchor: 'ground' },
+  'decor-number-sign': { owner: 'decor', anchor: 'ground' },
+  'decor-berry-bush': { owner: 'decor', anchor: 'ground' },
+  'decor-stone-frog': { owner: 'decor', anchor: 'ground' },
 };
 
 export const placementOf = (id: string): CosmeticPlacement | undefined => PLACEMENT_BY_ID[id];
