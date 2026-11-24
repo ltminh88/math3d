@@ -115,7 +115,7 @@ test('fresh profile: the book opens on 0 earned, pages flip, targets are 44 px',
     'Hình học',
     'Đo lường',
   ];
-  const counts = ['0/8', '0/2', '0/5', '0/11', '0/9', '0/12'];
+  const counts = ['0/8', '0/2', '0/7', '0/13', '0/10', '0/16'];
   for (let i = 1; i < 6; i++) {
     // dispatchEvent: no actionability wait — plain clicks on the flip button have hung on
     // the stability check on this VM (SwiftShader ~1 fps); see the #learn note below.
@@ -145,7 +145,7 @@ test('a table seeded at 13 of 18 facts at box 4 earns its sticker; 12 does not',
   await page.locator('[data-sticker="table:3"]').dispatchEvent('click');
   await expect(page.locator('.sticker-detail')).toContainText('Bảng nhân 3 — con đã thuộc!');
   for (let i = 0; i < 4; i++) await page.locator('#sticker-next').dispatchEvent('click');
-  await expect(page.locator('.sticker-count')).toHaveText('1/9');
+  await expect(page.locator('.sticker-count')).toHaveText('1/10');
   await expect(page.locator('[data-sticker="sk:geo-midpoint"]')).toHaveClass(/earned/);
   await page.locator('[data-sticker="sk:geo-midpoint"]').dispatchEvent('click');
   await expect(page.locator('.sticker-detail')).toContainText('Điểm ở giữa — con đã thuộc!');
