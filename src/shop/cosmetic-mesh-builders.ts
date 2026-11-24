@@ -4,6 +4,19 @@
 // tops out near 2.2; his backpack ends at z -0.59.
 import { box, cylinder, type Part, ring, sphere } from './vertex-color-parts';
 
+// R9 items live in their own builders file too.
+export {
+  avatarBackpack,
+  avatarKnitBeanie,
+  avatarRedBow,
+  decorBerryBush,
+  decorNumberSign,
+  decorStoneFrog,
+  decorWindmill,
+  vlmMoonPin,
+  vlmRainbowRibbon,
+  vlmStarStaff,
+} from './cosmetic-mesh-builders-more-items';
 // Phase 24 items live in their own builders file (this file must stay under 200 lines).
 export {
   avatarFlowerLei,

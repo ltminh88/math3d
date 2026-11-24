@@ -10,11 +10,11 @@ import { cosmeticName } from './shop-strings';
 import { mergeParts } from './vertex-color-parts';
 
 describe('cosmetic catalog', () => {
-  it('has 8 VLM, 7 avatar and 7 decor items, with unique ids the server accepts', () => {
+  it('has 11 VLM, 10 avatar and 11 decor items, with unique ids the server accepts', () => {
     expect(COSMETIC_SLOTS).toEqual(['vlm-outfit', 'avatar-outfit', 'village-decor']);
-    expect(COSMETIC_CATALOG.filter((item) => item.slot === 'vlm-outfit')).toHaveLength(8);
-    expect(COSMETIC_CATALOG.filter((item) => item.slot === 'avatar-outfit')).toHaveLength(7);
-    expect(COSMETIC_CATALOG.filter((item) => item.slot === 'village-decor')).toHaveLength(7);
+    expect(COSMETIC_CATALOG.filter((item) => item.slot === 'vlm-outfit')).toHaveLength(11);
+    expect(COSMETIC_CATALOG.filter((item) => item.slot === 'avatar-outfit')).toHaveLength(10);
+    expect(COSMETIC_CATALOG.filter((item) => item.slot === 'village-decor')).toHaveLength(11);
     const ids = COSMETIC_CATALOG.map((item) => item.id);
     expect(new Set(ids).size).toBe(ids.length);
     for (const id of ids) {
@@ -41,9 +41,9 @@ describe('cosmetic catalog', () => {
     const spots = COSMETIC_CATALOG.filter((item) => item.slot === 'village-decor').map(
       (item) => item.spot,
     );
-    expect(spots).toHaveLength(7);
+    expect(spots).toHaveLength(11);
     expect(spots.every(Boolean)).toBe(true);
-    expect(new Set(spots.map((s) => s?.join(','))).size).toBe(7);
+    expect(new Set(spots.map((s) => s?.join(','))).size).toBe(11);
     for (const item of COSMETIC_CATALOG.filter((item) => item.slot !== 'village-decor'))
       expect(item.spot).toBeUndefined();
   });
