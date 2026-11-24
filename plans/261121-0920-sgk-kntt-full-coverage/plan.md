@@ -1,7 +1,7 @@
 ---
 title: SGK Toán 3 KNTT full coverage — practise every lesson B1–B81 in textbook order
 description: Fix the daily-practice crash, add structured lesson metadata + an "Ôn theo bài" lesson mode, six new skill families (numbers, arithmetic, fractions, time, money, data), one lenient save-code bump, and two chapter-3 regions for HK2.
-status: in-progress
+status: completed
 priority: P1
 effort: 130h
 branch: main
@@ -52,7 +52,7 @@ Author: "con tôi cần thực hành hết tất cả từ đầu đến cuối"
 | 23 | [Shop: wear many items (per body spot) + save code M3D6](phase-23-shop-multi-equip-and-save-code-m3d6.md) | muse-min | 22 | 6h | done (#50) |
 | 24 | [Shop: 8–12 new items](phase-24-shop-new-items.md) | muse-min | 23 | 5h | done (#52) |
 | 25 | [Level pinch/wheel/button zoom](phase-25-level-pinch-zoom.md) | first free Muse | — | 5h | done (#47, #54) |
-| 21 | [Close-out: coverage, docs, e2e, parity, staging](phase-21-close-out-coverage-docs-parity-staging.md) | reviewer | all | 6h | in progress (#65) |
+| 21 | [Close-out: coverage, docs, e2e, parity, staging](phase-21-close-out-coverage-docs-parity-staging.md) | reviewer | all | 6h | done (#65, #66, #67) |
 
 ## Lanes / order (child is around B23–B30 now → HK1 gaps first)
 Split by file ownership + deps only (both agents same machine, both run e2e); ~53h each.

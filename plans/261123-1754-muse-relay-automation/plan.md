@@ -1,7 +1,7 @@
 ---
 title: "Muse relay automation (GitHub inbox + Telegram)"
 description: "Reviewer and both Muses talk through GitHub inbox issues; the user is asked only important questions via Telegram."
-status: in-progress
+status: completed
 priority: P2
 effort: 7h (≈4h build + 3h long-run test)
 branch: main
@@ -27,8 +27,8 @@ Goal: stop the manual copy-paste between reviewer (this Claude Code session) and
 | 01 | [Telegram scripts](phase-01-telegram-scripts.md) | 1.5h | done |
 | 02 | [Inbox issues + protocol + Muse loop prompt](phase-02-inbox-protocol-and-muse-loop.md) | 1h | done |
 | 03 | [Reviewer loop + escalation rules](phase-03-reviewer-loop-and-escalation.md) | 1h | done |
-| 04 | [Long-run test on muse-min (2–3h)](phase-04-long-run-test-muse-min.md) | 3h wall | pending |
-| 05 | [Cutover after #61 merges](phase-05-cutover.md) | 0.5h | pending |
+| 04 | [Long-run test on muse-min (2–3h)](phase-04-long-run-test-muse-min.md) | 3h wall | done (reports/relay-long-run-test.md) |
+| 05 | [Cutover after #61 merges](phase-05-cutover.md) | 0.5h | done |
 
 ## Dependencies
 - 01 → 03 (loop calls the scripts). 02 → 04. 03 → 04. 04 + #61 merged → 05.

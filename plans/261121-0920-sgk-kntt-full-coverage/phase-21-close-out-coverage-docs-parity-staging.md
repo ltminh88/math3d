@@ -25,10 +25,10 @@ Ownership: `src/learning/lesson-coverage.test.ts`, `docs/**`, parity baselines, 
 Remove hatch → fix gaps → docs → full gates → staging → author sign-off → production.
 
 ## Todo list
-- [ ] strict coverage green
-- [ ] docs
-- [ ] full e2e + parity
-- [ ] staging + author review
+- [x] strict coverage green (#65)
+- [x] docs (#66)
+- [x] full e2e + parity (main CI cf31159 green, baselines recaptured after #67)
+- [x] staging + author review (prod index-BsAmxIga.js, author OK 2026-11-24)
 
 ## Success Criteria
 Every practicable lesson playable in order; author confirms.
