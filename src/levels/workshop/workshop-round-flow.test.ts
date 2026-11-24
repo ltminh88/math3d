@@ -45,11 +45,14 @@ describe('workshop skill plan', () => {
       [skillKey('meas-gram')]: stat(5),
       [skillKey('meas-ml')]: stat(2, 9),
       [skillKey('meas-temperature')]: stat(2, 3),
+      [skillKey('meas-gram-calc')]: stat(4),
+      [skillKey('meas-ml-calc')]: stat(1, 9),
+      [skillKey('meas-temperature-compare')]: stat(1, 3),
     };
     for (let seed = 1; seed <= 20; seed++) {
       const skills = planWorkshopSkills(stats, mulberry32(seed), 6);
       expect(skills[0]).toBe('meas-mm-convert');
-      expect(skills.slice(4).sort()).toEqual(['meas-ml', 'meas-temperature']);
+      expect(skills.slice(4).sort()).toEqual(['meas-ml-calc', 'meas-temperature-compare']);
     }
   });
 

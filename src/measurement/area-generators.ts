@@ -7,6 +7,8 @@ import { geoItem, qtyChoiceStep, scene, unitChoiceStep } from '../geometry/geome
 import { pick, type Rng, randInt } from '../learning/seeded-rng';
 import type { SkillTier } from '../learning/skill-tiers';
 import { numberStep, ref } from '../reasoning/reasoning-distractors';
+import type { ReasoningStep } from '../reasoning/reasoning-types';
+import { pickOptions } from './measurement-distractors';
 import { AREA_CELLS, AREA_SIDE_MAX, CELL_GRID } from './measurement-ranges';
 
 /** A connected shape of `size` unit cells grown cell by cell inside the grid. */
@@ -76,6 +78,75 @@ export const measAreaCount: GeoGenerator = (rng, tier) => {
     ]),
   ];
   return geoItem('meas-area-count', tier, ref('areaDiff'), steps, s, 'cm2', [a, b, a - b]);
+};
+
+/** A shape of `size` cells in another arrangement than `other` (re-drawn until it differs). */
+function differentShape(rng: Rng, size: number, other: Point[]): Point[] {
+  const keyOf = (cells: readonly Point[]) =>
+    cells
+      .map(([x, y]) => `${x},${y}`)
+      .sort()
+      .join(';');
+  const otherKey = keyOf(other);
+  let shape = cellShape(rng, size);
+  for (let i = 0; i < 20 && keyOf(shape) === otherKey; i++) shape = cellShape(rng, size);
+  return shape;
+}
+
+/** B51 second skill: equal area in different arrangements (the first skill counts one shape). */
+export const measAreaEqual: GeoGenerator = (rng, tier) => {
+  const [lo, hi] = range(tier);
+  const biggerOptions = (a: number, b: number) =>
+    pickOptions(rng, [
+      { label: ref('letter', { l: 'A' }), correct: a > b, misconception: 'wrong-step' },
+      { label: ref('letter', { l: 'B' }), correct: b > a, misconception: 'wrong-step' },
+      { label: ref('sameArea'), correct: a === b, misconception: 'near-miss' },
+    ]);
+  if (tier === 1) {
+    const a = randInt(rng, lo, hi);
+    const equal = rng() < 0.5;
+    let b = equal ? a : randInt(rng, lo, hi);
+    if (!equal && b === a) b = a === hi ? a - 1 : a + 1;
+    const cellsA = cellShape(rng, a);
+    const cellsB = equal ? differentShape(rng, b, cellsA) : cellShape(rng, b);
+    const s = cellsScene([
+      { label: 'A', cells: cellsA },
+      { label: 'B', cells: cellsB },
+    ]);
+    const steps: ReasoningStep[] = [
+      { kind: 'choice', prompt: ref('askBigger'), options: biggerOptions(a, b) },
+    ];
+    return geoItem('meas-area-equal', tier, ref('areaBigger'), steps, s, 'cm2');
+  }
+  if (tier === 2) {
+    const a = randInt(rng, lo + 1, hi);
+    const b = randInt(rng, lo, a - 1);
+    const s = cellsScene([
+      { label: 'A', cells: cellShape(rng, a) },
+      { label: 'B', cells: cellShape(rng, b) },
+    ]);
+    return geoItem(
+      'meas-area-equal',
+      tier,
+      ref('areaBiggerDiff'),
+      [numberStep(ref('askAreaMore'), a - b)],
+      s,
+      'cm2',
+    );
+  }
+  // Tier 3: the same count in two different arrangements -> verdict, then the count.
+  const a = randInt(rng, lo, hi);
+  const cellsA = cellShape(rng, a);
+  const cellsB = differentShape(rng, a, cellsA);
+  const s = cellsScene([
+    { label: 'A', cells: cellsA },
+    { label: 'B', cells: cellsB },
+  ]);
+  const steps: ReasoningStep[] = [
+    { kind: 'choice', prompt: ref('askBigger'), options: biggerOptions(a, a) },
+    numberStep(ref('askArea'), a),
+  ];
+  return geoItem('meas-area-equal', tier, ref('areaEqual'), steps, s, 'cm2', [a]);
 };
 
 const rectScene = (w: number, h: number, extra = {}) =>

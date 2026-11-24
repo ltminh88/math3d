@@ -15,6 +15,24 @@ export const WORD_PROBLEM_CONTEXT_VI = {
     '{who1} làm được {a} {item}. Số {item} của {who2} bằng số {item} của {who1} giảm đi {n} lần.',
   wpDivideThenAddPack:
     '{who1} xếp được {a} {item} vào hộp. Số {item} của {who2} bằng số {item} của {who1} giảm đi {n} lần.',
+  // R8: the same a·n − a (chairs, making, picking).
+  wpTimesThenSub:
+    '{who1} có {a} {item}. {who2} có nhiều gấp {n} lần {who1}. {who2} đã dùng {a} {item}.',
+  wpTimesThenSubChairs:
+    '{who1} kê được {a} {item}. {who2} kê được nhiều gấp {n} lần {who1}. {who2} cất đi {a} {item}.',
+  wpTimesThenSubCakes:
+    '{who1} làm được {a} {item}. {who2} làm được nhiều gấp {n} lần {who1}. {who2} ăn hết {a} {item}.',
+  wpTimesThenSubHarvest:
+    '{who1} hái được {a} {item}. {who2} hái được nhiều gấp {n} lần {who1}. {who2} cho {who1} {a} {item}.',
+  // R8: the same a − a:n (picking, making, packing).
+  wpDivideThenSub:
+    '{who1} có {a} {item}. Lấy số {item} của {who1} giảm đi {n} lần thì được số {item} của {who2}. {who1} đã dùng số {item} bằng số {item} của {who2}.',
+  wpDivideThenSubHarvest:
+    '{who1} hái được {a} {item}. Số {item} của {who2} bằng số {item} của {who1} giảm đi {n} lần. {who1} đã ăn số {item} bằng số {item} của {who2}.',
+  wpDivideThenSubMake:
+    '{who1} làm được {a} {item}. Số {item} của {who2} bằng số {item} của {who1} giảm đi {n} lần. {who1} đã dùng số {item} bằng số {item} của {who2}.',
+  wpDivideThenSubPack:
+    '{who1} xếp được {a} {item} vào hộp. Số {item} của {who2} bằng số {item} của {who1} giảm đi {n} lần. {who1} đã lấy ra số {item} bằng số {item} của {who2}.',
   // Two more frames each way (picking, making).
   wpMoreThenTotalHarvest:
     '{who1} hái được {a} {item}. {who2} hái được nhiều hơn {who1} {d} {item}.',
@@ -61,6 +79,22 @@ export const WORD_PROBLEM_CONTEXT_EN: Record<keyof typeof WORD_PROBLEM_CONTEXT_V
     '{who1} makes {a} {item}. {who2} has {who1}’s number of {item} divided by {n}.',
   wpDivideThenAddPack:
     '{who1} packs {a} {item} into a box. {who2} has {who1}’s number of {item} divided by {n}.',
+  wpTimesThenSub:
+    '{who1} has {a} {item}. {who2} has {n} times as many {item} as {who1}. {who2} uses {a} {item}.',
+  wpTimesThenSubChairs:
+    '{who1} sets out {a} {item}. {who2} sets out {n} times as many {item} as {who1}. {who2} puts {a} {item} away.',
+  wpTimesThenSubCakes:
+    '{who1} makes {a} {item}. {who2} makes {n} times as many {item} as {who1}. {who2} eats {a} {item}.',
+  wpTimesThenSubHarvest:
+    '{who1} picks {a} {item}. {who2} picks {n} times as many {item} as {who1}. {who2} gives {who1} {a} {item}.',
+  wpDivideThenSub:
+    '{who1} has {a} {item}. {who2} has {who1}’s number of {item} divided by {n}. {who1} uses as many {item} as {who2} has.',
+  wpDivideThenSubHarvest:
+    '{who1} picks {a} {item}. {who2} has {who1}’s number of {item} divided by {n}. {who1} eats as many {item} as {who2} has.',
+  wpDivideThenSubMake:
+    '{who1} makes {a} {item}. {who2} has {who1}’s number of {item} divided by {n}. {who1} uses as many {item} as {who2} has.',
+  wpDivideThenSubPack:
+    '{who1} packs {a} {item} into a box. {who2} has {who1}’s number of {item} divided by {n}. {who1} takes out as many {item} as {who2} has.',
   wpMoreThenTotalHarvest: '{who1} picks {a} {item}. {who2} picks {d} more {item} than {who1}.',
   wpLessThenTotalHarvest: '{who1} picks {a} {item}. {who2} picks {d} fewer {item} than {who1}.',
   wpMoreThenTotalMake: '{who1} makes {a} {item}. {who2} makes {d} more {item} than {who1}.',

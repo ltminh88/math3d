@@ -2,9 +2,16 @@
 import type { GeoGenerator, GeoItem } from '../geometry/geo-scene-types';
 import type { Rng } from '../learning/seeded-rng';
 import type { SkillTier } from '../learning/skill-tiers';
-import { measAreaCount, measAreaRect, measAreaSquare } from './area-generators';
+import { measAreaCount, measAreaEqual, measAreaRect, measAreaSquare } from './area-generators';
 import { measMmConvert, measRulerRead } from './length-and-unit-generators';
-import { measGram, measMl, measTemperature } from './mass-volume-temperature-generators';
+import {
+  measGram,
+  measGramCalc,
+  measMl,
+  measMlCalc,
+  measTemperature,
+  measTemperatureCompare,
+} from './mass-volume-temperature-generators';
 import {
   measPerimeterPolygon,
   measPerimeterRect,
@@ -16,12 +23,16 @@ const GENERATORS: Readonly<Record<string, GeoGenerator>> = {
   'meas-ruler-read': measRulerRead,
   'meas-mm-convert': measMmConvert,
   'meas-gram': measGram,
+  'meas-gram-calc': measGramCalc,
   'meas-ml': measMl,
+  'meas-ml-calc': measMlCalc,
   'meas-temperature': measTemperature,
+  'meas-temperature-compare': measTemperatureCompare,
   'meas-perimeter-polygon': measPerimeterPolygon,
   'meas-perimeter-rect': measPerimeterRect,
   'meas-perimeter-square': measPerimeterSquare,
   'meas-area-count': measAreaCount,
+  'meas-area-equal': measAreaEqual,
   'meas-area-rect': measAreaRect,
   'meas-area-square': measAreaSquare,
   'meas-wp-fence': measWpFence,

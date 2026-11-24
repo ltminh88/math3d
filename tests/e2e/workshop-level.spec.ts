@@ -275,10 +275,18 @@ test('stage 4 drills cm-mm and the instruments and records only its own stage st
     'meas-wp-fence',
     'meas-area-count',
     'meas-area-square',
+    'meas-area-equal',
   ]).toContain(plan[3]?.skillId);
   expect(new Set([plan[4]?.skillId, plan[5]?.skillId]).size).toBe(2);
   for (const r of plan.slice(4))
-    expect(['meas-gram', 'meas-ml', 'meas-temperature']).toContain(r.skillId);
+    expect([
+      'meas-gram',
+      'meas-ml',
+      'meas-temperature',
+      'meas-gram-calc',
+      'meas-ml-calc',
+      'meas-temperature-compare',
+    ]).toContain(r.skillId);
   expect(plan[1]?.rect).not.toBeNull();
   expect(plan[1]?.rect).toEqual(plan[2]?.rect);
 

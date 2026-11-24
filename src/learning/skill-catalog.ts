@@ -72,6 +72,16 @@ const LEGACY_CATALOG: readonly SkillEntry[] = Object.freeze([
   entry('meas-area-rect', 'measurement', [t2(52)]),
   entry('meas-area-square', 'measurement', [t2(52)]),
   entry('meas-wp-fence', 'measurement', [t2(50, 53)]),
+  // R8: second skill for each thin lesson (phase 21) — diversity, not length.
+  entry('unknown-add-sub-wp', 'unknown', [t1(3)]),
+  entry('unknown-mul-div-wp', 'unknown', [t1(13)]),
+  entry('geo-midpoint-length', 'geometry', [t1(16)]),
+  entry('wp-times-then-sub', 'word-problem', [t1(24, 28)]),
+  entry('wp-divide-then-sub', 'word-problem', [t1(27, 28)]),
+  entry('meas-gram-calc', 'measurement', [t1(31)]),
+  entry('meas-ml-calc', 'measurement', [t1(32)]),
+  entry('meas-temperature-compare', 'measurement', [t1(33)]),
+  entry('meas-area-equal', 'measurement', [t2(51)]),
 ]);
 
 export const SKILL_CATALOG: readonly SkillEntry[] = Object.freeze([

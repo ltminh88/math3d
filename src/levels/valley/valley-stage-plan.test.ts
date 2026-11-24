@@ -22,6 +22,7 @@ import {
 
 const SKILLS = [
   'geo-midpoint',
+  'geo-midpoint-length',
   'geo-circle-parts',
   'geo-radius-diameter',
   'geo-right-angle',

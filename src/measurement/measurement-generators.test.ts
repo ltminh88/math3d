@@ -59,6 +59,15 @@ const ORACLE: Record<string, (i: GeoItem) => void> = {
     const b = scene(i, 'balance');
     expect(values(i)).toEqual([sum(b.weights), sum(b.weights) / b.count]);
   },
+  gramTotal: (i) => {
+    expect(values(i)).toEqual([p(i, 'a') + p(i, 'b')]);
+    expect(sum(scene(i, 'balance').weights)).toBe(p(i, 'a') + p(i, 'b'));
+  },
+  gramTotalLeft: (i) => {
+    const [a, b, c] = [p(i, 'a'), p(i, 'b'), p(i, 'c')];
+    expect(values(i)).toEqual([a + b, a + b - c]);
+    expect(sum(scene(i, 'balance').weights)).toBe(a + b);
+  },
   jugRead: (i) => {
     const j = scene(i, 'jug');
     expect(last(i)).toBe((j.level * j.capacity) / j.marks);
@@ -75,10 +84,50 @@ const ORACLE: Record<string, (i: GeoItem) => void> = {
     const j = scene(i, 'jug');
     expect((j.level * j.capacity) / j.marks).toBe(p(i, 'total'));
   },
+  mlAdd: (i) => {
+    const j = scene(i, 'jug');
+    expect(last(i)).toBe(p(i, 'a') + p(i, 'b'));
+    expect((j.level * j.capacity) / j.marks).toBe(p(i, 'a') + p(i, 'b'));
+  },
+  mlDiff: (i) => {
+    const [a, b] = [p(i, 'a'), p(i, 'b')];
+    expect(a).not.toBe(b);
+    expect(last(i)).toBe(Math.abs(a - b));
+    const j = scene(i, 'jug');
+    expect((j.level * j.capacity) / j.marks).toBe(Math.max(a, b));
+  },
+  mlFill: (i) => {
+    const [a, b] = [p(i, 'a'), p(i, 'b')];
+    expect(values(i)).toEqual([a + b, 100 - (a + b)]);
+    const j = scene(i, 'jug');
+    expect((j.level * j.capacity) / j.marks).toBe(a + b);
+  },
   tempRead: (i) => expect(last(i)).toBe(scene(i, 'thermometers').readings[0]?.value),
   tempHottest: (i) => checkExtreme(i, Math.max),
   tempColdest: (i) => checkExtreme(i, Math.min),
   tempDrop: (i) => expect(last(i)).toBe(p(i, 'noon') - p(i, 'night')),
+  tempCompare: (i) => {
+    const [a, b] = scene(i, 'thermometers').readings.map((r) => r.value) as [number, number];
+    expect(a).not.toBe(b);
+    expect(last(i)).toBe(Math.abs(a - b));
+  },
+  tempHotDiff: (i) => {
+    const readings = scene(i, 'thermometers').readings;
+    const temps = readings.map((r) => r.value);
+    const best = Math.max(...temps);
+    const winners = readings.filter((r) => r.value === best).map((r) => r.label);
+    expect(winners).toHaveLength(1);
+    expect(correctLabels(i)).toEqual(winners);
+    expect(last(i)).toBe(Math.max(...temps) - Math.min(...temps));
+  },
+  tempDropCompare: (i) => {
+    const [a, b, c, d] = [p(i, 'a'), p(i, 'b'), p(i, 'c'), p(i, 'd')];
+    const [dx, dy] = [a - b, c - d];
+    expect(dx).not.toBe(dy);
+    const want = dx > dy ? i.story.params?.x : i.story.params?.y;
+    expect(correctLabels(i)).toEqual([want]);
+    expect(last(i)).toBe(Math.abs(dx - dy));
+  },
   perimSum: (i) => {
     const s = scene(i, 'side-polygon');
     expect(s.hidden).toEqual([]);
@@ -104,6 +153,23 @@ const ORACLE: Record<string, (i: GeoItem) => void> = {
   areaDiff: (i) => {
     const [a, b] = cellsOf(i).map(area) as [number, number];
     expect(values(i)).toEqual([a, b, a - b]);
+  },
+  areaBigger: (i) => {
+    const [a, b] = cellsOf(i).map(area) as [number, number];
+    const want = a === b ? 'sameArea' : a > b ? 'A' : 'B';
+    const label = correctKey(i);
+    expect(label?.key === 'sameArea' ? 'sameArea' : label?.params?.l).toBe(want);
+  },
+  areaBiggerDiff: (i) => {
+    const [a, b] = cellsOf(i).map(area) as [number, number];
+    expect(a).toBeGreaterThan(b);
+    expect(last(i)).toBe(a - b);
+  },
+  areaEqual: (i) => {
+    const [a, b] = cellsOf(i).map(area) as [number, number];
+    expect(a).toBe(b);
+    expect(correctKey(i)?.key).toBe('sameArea');
+    expect(last(i)).toBe(a);
   },
   rectArea: (i) => expect(last(i)).toBe(p(i, 'a') * p(i, 'b')),
   rectCut: (i) => {

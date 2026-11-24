@@ -32,10 +32,10 @@ it('fresh stats: one sticker per catalog skill and table, none earned', () => {
   expect(stickers.filter((s) => s.earned)).toHaveLength(0);
   expect(topicProgress(stickers, 'tables')).toEqual({ earned: 0, total: STICKER_TABLES.length });
   expect(topicProgress(stickers, 'remainder')).toEqual({ earned: 0, total: 2 });
-  expect(topicProgress(stickers, 'unknown-pattern')).toEqual({ earned: 0, total: 5 });
-  expect(topicProgress(stickers, 'expression-logic')).toEqual({ earned: 0, total: 11 });
-  expect(topicProgress(stickers, 'geometry')).toEqual({ earned: 0, total: 9 });
-  expect(topicProgress(stickers, 'measurement')).toEqual({ earned: 0, total: 12 });
+  expect(topicProgress(stickers, 'unknown-pattern')).toEqual({ earned: 0, total: 7 });
+  expect(topicProgress(stickers, 'expression-logic')).toEqual({ earned: 0, total: 13 });
+  expect(topicProgress(stickers, 'geometry')).toEqual({ earned: 0, total: 10 });
+  expect(topicProgress(stickers, 'measurement')).toEqual({ earned: 0, total: 16 });
   // New-family page totals are derived from the catalog, so the next family phase
   // does not have to edit this test (Brian's suggestion, phase 13 onward).
   expect(topicProgress(stickers, 'number')).toEqual({

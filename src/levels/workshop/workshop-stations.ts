@@ -19,20 +19,34 @@ export const STATION_OF: Readonly<Record<string, WorkshopStation>> = {
   'meas-ruler-read': 'ruler',
   'meas-mm-convert': 'ruler',
   'meas-gram': 'balance',
+  'meas-gram-calc': 'balance',
   'meas-ml': 'jug',
+  'meas-ml-calc': 'jug',
   'meas-temperature': 'thermometer',
+  'meas-temperature-compare': 'thermometer',
   'meas-perimeter-polygon': 'fence',
   'meas-perimeter-rect': 'fence',
   'meas-perimeter-square': 'fence',
   'meas-area-count': 'tiles',
   'meas-area-rect': 'tiles',
   'meas-area-square': 'tiles',
+  'meas-area-equal': 'tiles',
   'meas-wp-fence': 'fence',
 };
 
 export const WORKSHOP_ROUNDS = 6;
 
-const INSTRUMENTS = ['meas-gram', 'meas-ml', 'meas-temperature'];
+const INSTRUMENTS = [
+  'meas-gram',
+  'meas-ml',
+  'meas-temperature',
+  'meas-gram-calc',
+  'meas-ml-calc',
+  'meas-temperature-compare',
+];
+
+/** Stations in the workshop's story order: balance, jug, thermometer. */
+const STATION_ORDER: readonly WorkshopStation[] = ['balance', 'jug', 'thermometer'];
 
 /** Candidates per round, in story order (the two instrument rounds take different skills). */
 const SLOTS: readonly (readonly string[])[] = [
@@ -45,6 +59,7 @@ const SLOTS: readonly (readonly string[])[] = [
     'meas-wp-fence',
     'meas-area-count',
     'meas-area-square',
+    'meas-area-equal',
   ],
   INSTRUMENTS,
   INSTRUMENTS,
@@ -79,6 +94,7 @@ const STAGE_SLOTS: Readonly<Record<number, readonly (readonly string[])[]>> = {
       'meas-wp-fence',
       'meas-area-count',
       'meas-area-square',
+      'meas-area-equal',
     ],
     INSTRUMENTS,
     INSTRUMENTS,
@@ -109,11 +125,24 @@ function weakestFirst(ids: readonly string[], stats: Stats, rng: Rng): string[] 
 export function planWorkshopSkills(stats: Stats, rng: Rng, rounds: number, stage = 1): string[] {
   const slots = STAGE_SLOTS[stage] ?? SLOTS;
   const chosen: string[] = [];
-  for (const slot of slots) {
-    const free = slot.filter((id) => !chosen.includes(id));
+  for (let i = 0; i < slots.length; i++) {
+    const slot = slots[i] as readonly string[];
+    let free = slot.filter((id) => !chosen.includes(id));
+    // The two instrument rounds are two different instruments: the second one never
+    // repeats the first one's station (six instrument skills, three stations — R8).
+    if (i === 5 && chosen[4]) {
+      const firstStation = STATION_OF[chosen[4] as string];
+      free = free.filter((id) => STATION_OF[id] !== firstStation);
+    }
     chosen.push(weakestFirst(free, stats, rng)[0] as string);
   }
   // Instruments in the workshop's order: balance, jug, thermometer.
-  const tail = chosen.splice(4).sort((a, b) => INSTRUMENTS.indexOf(a) - INSTRUMENTS.indexOf(b));
+  const tail = chosen
+    .splice(4)
+    .sort(
+      (a, b) =>
+        STATION_ORDER.indexOf(STATION_OF[a] as WorkshopStation) -
+        STATION_ORDER.indexOf(STATION_OF[b] as WorkshopStation),
+    );
   return [...chosen, ...tail].slice(0, Math.min(rounds, WORKSHOP_ROUNDS));
 }
