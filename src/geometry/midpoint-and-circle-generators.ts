@@ -65,8 +65,9 @@ export const geoMidpoint: GeoGenerator = (rng, tier) => {
   return geoItem('geo-midpoint', tier, story, [step], segmentScene(len, am), 'cm', [len, half]);
 };
 
-/** B16 second skill: the missing part of a segment, or the whole from its parts.
- * M is not the midpoint here — the two parts are unequal in general. */
+/** B16 second skill: the missing part of a segment, the whole from its parts,
+ * or half of a segment at its midpoint (tier 3, AM = MB = AB / 2). Tiers 1–2
+ * use unequal parts, so M is not the midpoint there. */
 export const geoMidpointLength: GeoGenerator = (rng, tier) => {
   if (tier === 1) {
     // AB and AM given → MB = AB − AM.
@@ -105,15 +106,14 @@ export const geoMidpointLength: GeoGenerator = (rng, tier) => {
       [len],
     );
   }
-  // Tier 3: AB and MB given → AM = AB − MB (the reverse of tier 1).
+  // Tier 3: M is the midpoint of AB (R10) — AM = MB = AB / 2.
   const [lo, hi] = MIDPOINT_LENGTHS[3];
   const len = 2 * randInt(rng, Math.max(lo / 2, 2), hi / 2);
-  const mb = 2 * randInt(rng, 1, len / 2 - 1);
-  const am = len - mb;
+  const am = len / 2;
   return geoItem(
     'geo-midpoint-length',
     tier,
-    ref('midPartB', { len, mb }),
+    ref('midHalf', { len }),
     [numberStep(ref('askAM'), am)],
     segmentScene(len, am),
     'cm',
