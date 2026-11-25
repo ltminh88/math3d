@@ -99,7 +99,7 @@ export function planLessonRun(
   const boxOf = (k: FactKey): number => stats[k]?.box ?? 1;
   // Shuffled first so the stable sort below breaks box ties deterministically by seed.
   const ordered = shuffle(rng, keys).sort((a, b) => boxOf(a) - boxOf(b));
-  const spread = lesson.kind === 'mix' ? spreadBySource(ordered, lesson) : ordered;
+  const spread = lesson.kind === 'mix' ? spreadMixWeakestFirst(ordered, lesson, stats) : ordered;
   const skills = spread.filter(isSkillKey);
   // Round-robin: one item per key, then up to five more rounds over skill keys only (a
   // fact repeated is the same question; a skill re-rolled is a new one).
@@ -109,12 +109,43 @@ export function planLessonRun(
 }
 
 /**
+ * Mix runs pick the weakest keys first, globally (R25, direction 1): box
+ * ascending, longest unseen first inside each source group. A key below box 4
+ * in a late source group is therefore picked in the next run instead of
+ * starving forever — the old spread took one key per source group in order,
+ * so with 8 groups and 6 items the 7th/8th groups were never reached and B8's
+ * B6 table-4 leftovers got 0 picks in 20 runs. Source spread survives only
+ * as the tie-break inside one box level (one key per source in turn, so a
+ * fact-heavy mix still touches every source) and the seeded shuffle still
+ * decides the display order within equal (box, last-seen) keys.
+ */
+function spreadMixWeakestFirst(keys: FactKey[], lesson: KnttLesson, stats: Stats): FactKey[] {
+  const boxOf = (k: FactKey): number => stats[k]?.box ?? 1;
+  const lastSeenOf = (k: FactKey): number => stats[k]?.lastSeenAt ?? 0;
+  const boxes = [...new Set(keys.map(boxOf))].sort((a, b) => a - b);
+  const out: FactKey[] = [];
+  for (const box of boxes)
+    out.push(
+      ...spreadBySource(
+        keys.filter((k) => boxOf(k) === box),
+        lesson,
+        lastSeenOf,
+      ),
+    );
+  return out;
+}
+
+/**
  * Mix lessons spread over their source lessons: one key per source in turn, weakest
  * first within each source — the lesson's own skills lead, then its sources. Without
  * this a fact-heavy mix (B44) would plan six facts from its biggest source and never
- * touch the rest.
+ * touch the rest. Inside one source, the longest-unseen key goes first.
  */
-function spreadBySource(keys: FactKey[], lesson: KnttLesson): FactKey[] {
+function spreadBySource(
+  keys: FactKey[],
+  lesson: KnttLesson,
+  lastSeenOf: (k: FactKey) => number = () => 0,
+): FactKey[] {
   const own = SKILL_CATALOG.filter((s) =>
     s.lessons.some((ref) => ref.book === lesson.book && ref.n.includes(lesson.n)),
   ).map((s) => `sk:${s.id}`);
@@ -134,7 +165,11 @@ function spreadBySource(keys: FactKey[], lesson: KnttLesson): FactKey[] {
       else groups.get(src)?.push(key);
     }
   }
-  const ordered = [ownKeys, ...groups.values(), unassigned].filter((g) => g.length > 0);
+  const ordered = [ownKeys, ...groups.values(), unassigned]
+    .filter((g) => g.length > 0)
+    // Longest unseen first inside each source (stable: equal last-seen keeps
+    // the seeded-shuffle order from the caller).
+    .map((g) => [...g].sort((a, b) => lastSeenOf(a) - lastSeenOf(b)));
   const out: FactKey[] = [];
   for (let i = 0; ; i++) {
     let took = false;

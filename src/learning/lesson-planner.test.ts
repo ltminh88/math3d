@@ -12,9 +12,9 @@
 import { describe, expect, it } from 'vitest';
 import { divFactsForTables, mulFactsForTables } from './curriculum-tables';
 import type { FactKey } from './fact-key';
-import { skillsOfLesson } from './kntt-lesson-index';
+import { lessonByNumber, skillsOfLesson } from './kntt-lesson-index';
 import type { FactStat } from './learning-types';
-import { planLessonRun } from './lesson-planner';
+import { planLessonRun, plannableKeys } from './lesson-planner';
 import { mulberry32 } from './seeded-rng';
 
 const stat = (box: number, attempts = 1): FactStat => ({
@@ -289,6 +289,60 @@ describe('planLessonRun', () => {
       }
       const facts = run.filter((k) => k.startsWith('mul:') || k.startsWith('div:'));
       expect(new Set(facts).size, `B${n}`).toBe(facts.length);
+    }
+  });
+
+  it('mix run picks the weakest keys first, even from a late source group (B8, R25)', () => {
+    // B8's measured state after perfect B1–B7 play (walkthrough report): only
+    // B6's three table-4 facts sit at box 3; everything else is at box 4. The
+    // old spread took one key per source group in order — 8 groups, 6 items —
+    // so the B6 leftovers were picked 0 times in 20 runs and B8 starved at
+    // 2 stars. A weakest-first run must contain all three.
+    const stats: Record<FactKey, FactStat> = {};
+    for (const k of skillsOfLesson(8)) stats[k] = stat(4);
+    for (const k of ['mul:4x4', 'div:32/4', 'div:36/4'] as const) stats[k] = stat(3);
+    const run = planLessonRun(8, stats, mulberry32(21));
+    expect(run).toHaveLength(6);
+    expect(run).toContain('mul:4x4');
+    expect(run).toContain('div:32/4');
+    expect(run).toContain('div:36/4');
+  });
+
+  it('every below-box-4 key of a wide mix is picked within a few runs (B8/B44/B79/B81, R25)', () => {
+    // Same starvation shape, generalised: for each mix lesson with more than
+    // 6 source groups, put three keys from the late groups (group index >= 6
+    // in spread order — never reached by a 6-item run under the old spread)
+    // at box 3 and everything else at box 4, then play perfectly (each picked
+    // key rises one box) until every key is at box 4.
+    for (const n of [8, 44, 79, 81]) {
+      const lesson = lessonByNumber(n);
+      if (!lesson) throw new Error(`no B${n}`);
+      const keys = plannableKeys(n);
+      const groups: FactKey[][] = [
+        keys.filter((k) => !(lesson.mixOf ?? []).flatMap((m) => skillsOfLesson(m)).includes(k)),
+      ];
+      for (const m of lesson.mixOf ?? []) groups.push(skillsOfLesson(m));
+      const groupOf = new Map<FactKey, number>();
+      groups.forEach((g, i) => {
+        for (const k of g) if (!groupOf.has(k)) groupOf.set(k, i);
+      });
+      const late = keys.filter((k) => (groupOf.get(k) ?? 0) >= 6).slice(0, 3);
+      expect(late.length, `B${n} has late-group keys`).toBe(3);
+      const stats: Record<FactKey, FactStat> = {};
+      for (const k of keys) stats[k] = stat(4);
+      for (const k of late) stats[k] = stat(3);
+      let runs = 0;
+      while (keys.some((k) => (stats[k]?.box ?? 1) < 4) && runs < 10) {
+        const run = planLessonRun(n, stats, mulberry32(100 + runs));
+        expect(run.length, `B${n} run ${runs + 1} plans items`).toBeGreaterThan(0);
+        for (const k of new Set(run)) stats[k] = stat(Math.min(5, (stats[k]?.box ?? 1) + 1));
+        runs += 1;
+      }
+      expect(
+        keys.every((k) => (stats[k]?.box ?? 1) >= 4),
+        `B${n}: all keys reach box 4`,
+      ).toBe(true);
+      expect(runs, `B${n} runs to finish`).toBeLessThanOrEqual(2);
     }
   });
 
