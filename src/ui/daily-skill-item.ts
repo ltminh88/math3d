@@ -11,6 +11,8 @@ import type { ReasoningRoundPlan } from '../levels/shared/reasoning-round-slot';
 import { trr } from '../levels/shared/reasoning-round-strings';
 import { renderPromptFor } from '../practice/family-prompt-registry';
 import { familyOfSkill, itemForSkill } from '../practice/item-for-skill';
+import { explainWrongAnswer } from '../practice/wrong-answer-explanation';
+import { twa } from '../practice/wrong-answer-strings';
 import { renderScene } from './dialog-scenes/dialog-scene-registry';
 import '../styles/dialog-scene.css';
 import '../styles/dialog-scene-market.css';
@@ -109,7 +111,19 @@ export function mountSkillItem(
         say(trr('stepRight'), 'success');
         gameState.audio.tone(698, 0.12);
       } else if (result.verdict === 'wrong') {
-        say(trr('wrong'), 'gentle');
+        // R35: a per-skill explanation when the mistake is recognised; otherwise the
+        // generic sentence. flow.answer already counted this miss, so wrongAttempts
+        // is 1 on the first miss and 2 on the second. The explanation never states
+        // the answer (the second miss leads to it only once the reviewer answers Q1).
+        const explanation = explainWrongAnswer({
+          skillId: plan.skillId,
+          tier: plan.tier,
+          item: plan.item,
+          stepIndex: event.stepIndex,
+          answer: event.answer,
+          missNumber: flow.hint.wrongAttempts,
+        });
+        say(explanation ? twa(explanation.key, explanation.params) : trr('wrong'), 'gentle');
         hintButton.classList.toggle('offer', flow.canHint);
         gameState.audio.hint();
       } else if (result.outcome) finish(result.outcome, result.outcome.correct);
