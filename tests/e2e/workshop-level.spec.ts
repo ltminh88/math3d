@@ -152,6 +152,20 @@ async function playRound(page: Page, index: number, touch: boolean, project: str
     }
     await expect(hint).toBeDisabled();
   }
+  if (index === 2) {
+    // R42: a wrong first step on a tiles round shows a counting explanation for
+    // the area skills. The other tiles skills keep the generic sentence — except
+    // a meas-area-rect trap option, which shows its own misconception note, so
+    // the negative branch only rules out an area sentence.
+    await give(page, s.steps[0] as Planned, touch, true);
+    const feedback = page.locator('.workshop-panel .feedback');
+    await expect(feedback).toHaveClass(/gentle/);
+    if (s.skillId === 'meas-area-count' || s.skillId === 'meas-area-equal') {
+      await expect(feedback).toContainText(/Bạn đếm|Hai hình/);
+    } else {
+      await expect(feedback).not.toContainText(/Bạn đếm|Hai hình/);
+    }
+  }
   if (index === ROUNDS - 1) {
     // Three misses show the answer and move on (the order is recorded as not correct).
     for (let i = 0; i < 3; i++) await give(page, s.steps[s.stepIndex] as Planned, touch, true);

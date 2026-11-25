@@ -327,6 +327,59 @@ test('the valley plays six geometry rounds by taps or keys and records sk:geo-* 
   expect(errors).toEqual([]);
 });
 
+// R42: a forced geo-midpoint-length round shows a midpoint-specific explanation
+// (not the generic sentence) for a wrong step answer. The skill is forced through
+// window.__valleyPlan (Q6): the level's own stage plan plays geo-midpoint (the
+// board-tap skill), not geo-midpoint-length (the step-answer skill).
+test('a wrong midpoint-length step shows a midpoint-specific explanation', async ({
+  page,
+}, info) => {
+  const touch = info.project.use.hasTouch === true;
+  const errors: string[] = [];
+  page.on('pageerror', (e) => errors.push(String(e)));
+  await page.goto('/');
+  await waitForStoreBoot(page);
+  await page.waitForFunction(() => '__game' in window);
+  await page.locator('#play').click();
+  await expect(page.locator('body')).toHaveClass(/playing/);
+  await page.evaluate(() =>
+    window.__game?.seedProgress({
+      bridgeComplete: true,
+      completedLevels: ['field', 'forest', 'city', 'tower', 'garden'],
+    }),
+  );
+  expect(await page.evaluate(() => window.__game?.gateStatus('valley'))).toBe('open');
+  await page.evaluate(() => {
+    window.__valleyPlan = [{ skillId: 'geo-midpoint-length', tier: 1 }];
+  });
+  await page.evaluate(() => window.__game?.teleportToGate('valley'));
+  const interact = page.locator('#interact');
+  await expect(interact).toContainText('Vào Cổng Thung Lũng Hình Học');
+  await press(interact, touch);
+  await expect(page.locator('.valley-panel')).toBeVisible();
+  let s = await state(page);
+  expect(s.skillId).toBe('geo-midpoint-length');
+  if (s.phase === 'action') {
+    await tapTarget(page, s.rightTargets[0] as string, touch);
+    s = await state(page);
+  }
+  expect(s.phase).toBe('steps');
+  expect(s.step?.kind).toBe('number');
+  // One wrong number: MB + 1 is never the whole, a part, or the sum, so the
+  // explanation is the midpoint fallback (or the not-the-midpoint note).
+  const answer = (s.step as { answer: number }).answer;
+  await wrongNumber(page, answer + 1, touch);
+  const feedback = page.locator('.valley-panel .feedback');
+  await expect(feedback).toHaveClass(/gentle/);
+  await expect(feedback).toBeVisible();
+  await expect(feedback).toContainText(/M không nằm chính giữa AB|điểm M nằm ở đâu trên đoạn AB/);
+  // The round still finishes: answer the step right.
+  s = await state(page);
+  await answerStep(page, s, touch);
+  await expect(page.locator('.valley-panel .feedback')).toContainText('Đúng rồi!');
+  expect(errors).toEqual([]);
+});
+
 // Stage 4 (phase 08): seed stages 1-3 done, enter stage 4 with no forced plan, so the stage
 // plan decides the rounds. Every round drills the S4 subset (classify/count), the classify
 // rounds are choose-all (multi-select) by the tier floor, and only stage 4's stars are added.

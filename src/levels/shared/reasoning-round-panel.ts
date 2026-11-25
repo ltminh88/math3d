@@ -11,6 +11,7 @@ import { ReasoningRoundFlow } from './reasoning-round-flow';
 import type { ReasoningRoundPlan } from './reasoning-round-slot';
 import { trr } from './reasoning-round-strings';
 import { installReasoningTestHook } from './reasoning-round-test-hook';
+import { wrongAnswerFeedback } from './wrong-answer-feedback';
 
 export interface ReasoningRoundPanelOptions {
   ui: HTMLElement;
@@ -95,7 +96,20 @@ export function mountReasoningRound(o: ReasoningRoundPanelOptions): ReasoningRou
         say(trr('stepRight'), 'success');
         o.audio.tone(698, 0.12);
       } else if (result.verdict === 'wrong') {
-        say(trr('wrong'), 'gentle');
+        // R42: a per-skill explanation when the mistake is recognised (R35);
+        // otherwise the generic sentence. flow.answer already counted this
+        // miss, so wrongAttempts is 1 on the first miss and 2 on the second.
+        say(
+          wrongAnswerFeedback({
+            skillId: o.plan.skillId,
+            tier: o.plan.tier,
+            item: o.plan.item,
+            stepIndex: event.stepIndex,
+            answer: event.answer,
+            missNumber: flow.hint.wrongAttempts,
+          }) ?? trr('wrong'),
+          'gentle',
+        );
         hintButton.classList.toggle('offer', flow.canHint);
         o.audio.hint();
       } else if (result.outcome) finish(result.outcome, result.outcome.correct);

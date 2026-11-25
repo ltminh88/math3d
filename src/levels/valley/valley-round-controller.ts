@@ -7,6 +7,7 @@ import { shouldOfferHint } from '../../learning/hint-ladder';
 import { createStepCard, type StepAnswerEvent, type StepCard } from '../../ui/kit/step-card';
 import { createLevelRunTally } from '../shared/level-run-tally';
 import type { LevelContext } from '../shared/level-types';
+import { wrongAnswerFeedback } from '../shared/wrong-answer-feedback';
 import type { ValleyBoardViews } from './valley-board-views';
 import { valleyHint } from './valley-hints';
 import type { ValleyTarget } from './valley-layout-types';
@@ -126,8 +127,25 @@ export class ValleyRoundController {
   private onAnswer(event: StepAnswerEvent): void {
     this.idle = 0;
     const verdict = this.flow.answer(event.correct, event.answer);
-    if (verdict === 'wrong') this.miss(this.vs('wrong'));
-    else if (verdict === 'revealed') {
+    if (verdict === 'wrong') {
+      // R42: a per-skill explanation when the mistake is recognised (R35);
+      // otherwise the generic sentence. flow.answer already counted this
+      // miss, so wrongAttempts is 1 on the first miss and 2 on the second.
+      // The board tap keeps vs('notThere') — it is not a step answer (Q2).
+      const round = this.flow.round;
+      const text =
+        (round &&
+          wrongAnswerFeedback({
+            skillId: round.item.skillId,
+            tier: round.item.tier,
+            item: round.item,
+            stepIndex: event.stepIndex,
+            answer: event.answer,
+            missNumber: this.flow.hint.wrongAttempts,
+          })) ??
+        this.vs('wrong');
+      this.miss(text);
+    } else if (verdict === 'revealed') {
       // Third miss on this step: after the card's own handling of this try, show its answer.
       const card = this.card;
       queueMicrotask(() => {

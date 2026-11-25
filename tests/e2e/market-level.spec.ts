@@ -150,6 +150,16 @@ async function playRound(page: Page, index: number, tap: boolean): Promise<void>
     // One miss: gentle feedback, a hint is offered; rungs 1-3, then the button is spent.
     await give(page, s.expected as Expected, false, tap);
     await expect(page.locator('.market-panel .feedback')).toHaveClass(/gentle/);
+    // R42: a recognised clock mistake shows a clock-specific explanation, any
+    // other clock skill keeps the generic sentence.
+    const feedback = page.locator('.market-panel .feedback');
+    if (s.skillId === 'roman-clock-hour' || s.skillId === 'clock-sang-chieu-24h') {
+      await expect(feedback).toContainText(
+        /chữ La Mã|cộng thêm 12 giờ|Kim phút đang ở vạch|kim giờ|buổi/,
+      );
+    } else {
+      await expect(feedback).toContainText('Chưa đúng, mình thử lại nhé!');
+    }
     await expect(page.locator('.market-hint-button')).toHaveClass(/offer/);
     for (const rung of ['1', '2', '3']) {
       await hintButton(page, tap, !tap && rung === '1');
