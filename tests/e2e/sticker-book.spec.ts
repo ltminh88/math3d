@@ -143,12 +143,12 @@ test('a table seeded at 13 of 18 facts at box 4 earns its sticker; 12 does not',
   await expect(page.locator('.sticker-count')).toHaveText('1/8');
   await expect(page.locator('[data-sticker="table:3"]')).toHaveClass(/earned/);
   await page.locator('[data-sticker="table:3"]').dispatchEvent('click');
-  await expect(page.locator('.sticker-detail')).toContainText('Bảng nhân 3 — con đã thuộc!');
+  await expect(page.locator('.sticker-detail')).toContainText('Bảng nhân 3 — bạn đã thuộc!');
   for (let i = 0; i < 4; i++) await page.locator('#sticker-next').dispatchEvent('click');
   await expect(page.locator('.sticker-count')).toHaveText('1/10');
   await expect(page.locator('[data-sticker="sk:geo-midpoint"]')).toHaveClass(/earned/);
   await page.locator('[data-sticker="sk:geo-midpoint"]').dispatchEvent('click');
-  await expect(page.locator('.sticker-detail')).toContainText('Điểm ở giữa — con đã thuộc!');
+  await expect(page.locator('.sticker-detail')).toContainText('Điểm ở giữa — bạn đã thuộc!');
   await expect(page.locator('.sticker-detail')).toContainText('SGK Toán 3');
   await waitDialogSettled(page);
   await page.locator('#close-dialog').dispatchEvent('click');
@@ -211,7 +211,7 @@ test('one clean quiz answer moves a fact to box 4 and earns the table sticker', 
   await earnTable3Sticker(page);
   await expect
     .poll(() => page.evaluate(() => window.__game?.pendingEarningLines()))
-    .toContain('Con vừa dán được hình Bảng nhân 3!');
+    .toContain('Bạn vừa dán được hình Bảng nhân 3!');
   await openBook(page);
   await expect(page.locator('.sticker-count')).toHaveText('1/8');
   await expect(page.locator('[data-sticker="table:3"]')).toHaveClass(/earned/);
@@ -234,7 +234,7 @@ test('VLM says the earning line once, then offers the book from his dialog', asy
   await page.locator('#interact').dispatchEvent('click');
   await expect(page.locator('#dialog')).toHaveAttribute('open', '');
   await expectDialogFits(page);
-  await expect(page.locator('#dialog')).toContainText('Con vừa dán được hình Bảng nhân 3!');
+  await expect(page.locator('#dialog')).toContainText('Bạn vừa dán được hình Bảng nhân 3!');
   const guideButton = page.locator('#open-sticker-book-guide');
   await expect(guideButton).toHaveText('📖 Sổ dán hình');
   const guideBox = await guideButton.boundingBox();
@@ -258,7 +258,7 @@ test('VLM says the earning line once, then offers the book from his dialog', asy
   await expect(page.locator('#milo-label')).toHaveClass(/near/);
   await page.locator('#interact').dispatchEvent('click');
   await expect(page.locator('#dialog')).toHaveAttribute('open', '');
-  await expect(page.locator('#dialog')).not.toContainText('Con vừa dán được hình Bảng nhân 3!');
+  await expect(page.locator('#dialog')).not.toContainText('Bạn vừa dán được hình Bảng nhân 3!');
   await expect(page.locator('#open-sticker-book-guide')).toBeVisible();
   await waitDialogSettled(page);
   await page.locator('#close-dialog').dispatchEvent('click');

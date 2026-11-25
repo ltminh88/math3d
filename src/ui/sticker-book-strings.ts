@@ -4,7 +4,7 @@ import { defineStrings } from '../i18n/i18n';
 export const ts = defineStrings('stickerBook', {
   vi: {
     title: 'Sổ dán hình',
-    eyebrow: 'BỘ SƯU TẬP CỦA CON',
+    eyebrow: 'BỘ SƯU TẬP CỦA BẠN',
     openButton: 'Sổ dán hình',
     topicTables: 'Bảng nhân',
     topicRemainder: 'Chia và số dư',
@@ -20,11 +20,11 @@ export const ts = defineStrings('stickerBook', {
     topicData: 'Thống kê',
     prevPage: 'Trang trước',
     nextPage: 'Trang sau',
-    earnedLine: '{name} — con đã thuộc!',
+    earnedLine: '{name} — bạn đã thuộc!',
     unearnedLine: '{name} — luyện thêm để dán hình này nhé!',
     lessonLine: 'SGK Toán 3 · {lesson}',
-    earningLine: 'Con vừa dán được hình {name}!',
-    bookNote: 'Hình có màu là hình con đã dán được. Chạm vào một hình để xem tên nhé!',
+    earningLine: 'Bạn vừa dán được hình {name}!',
+    bookNote: 'Hình có màu là hình bạn đã dán được. Chạm vào một hình để xem tên nhé!',
     countLabel: 'Đã dán {earned} trên tổng số {total} hình',
     earnedState: 'đã dán',
     unearnedState: 'chưa dán',

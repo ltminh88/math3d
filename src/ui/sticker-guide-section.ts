@@ -1,5 +1,5 @@
 // The sticker book's entries in the two shared surfaces (phase 12). VLM's dialog gets the
-// earning line ("Con vừa dán được hình …!") and a "Sổ dán hình" button; the quest card gets
+// earning line ("Bạn vừa dán được hình …!") and a "Sổ dán hình" button; the quest card gets
 // the same button in its bottom row. The two shared files each call one function from here
 // — no sticker HTML lives in them. The sticker part always sits BELOW the daily-practice
 // part (the order le fixed): in miloBodyHtml it is appended after the accept-quest button,

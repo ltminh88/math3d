@@ -139,7 +139,7 @@ test('locked: Milo dialog shows the daily locked line above the sticker entry', 
   await openMiloDialog(page);
   await expectDialogFits(page);
   await expect(page.locator('.daily-guide-locked')).toHaveText(
-    'Luyện tập hôm nay sẽ mở sau khi con xong chặng 1 ở Cánh Đồng Phép Tính.',
+    'Luyện tập hôm nay sẽ mở sau khi bạn xong chặng 1 ở Cánh Đồng Phép Tính.',
   );
   const guideButton = page.locator('#open-sticker-book-guide');
   await expect(guideButton).toHaveText('📖 Sổ dán hình');

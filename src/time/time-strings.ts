@@ -38,7 +38,7 @@ const vi = {
   calendarStory: 'Xem tờ lịch tháng {m} năm {y}.',
   askWeekday: 'Ngày {d} là thứ mấy?',
   askBetween: 'Ngày {d1} và ngày {d2} cách nhau bao nhiêu ngày?',
-  roman24Story: 'Buổi chiều đồng hồ có số La Mã chỉ như hình bên.',
+  roman24Story: 'Buổi chiều, đồng hồ số La Mã chỉ như hình bên.',
 };
 
 const en = {

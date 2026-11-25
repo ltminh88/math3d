@@ -10,7 +10,7 @@ const define = (defineFn: typeof defineStrings) =>
     vi: {
       title: 'Lâu Đài Số',
       intro:
-        'Lâu đài mở rồi! Mỗi câu trả lời đúng là một viên đá bạn đặt lên tường thành, đủ sáu viên thì lâu đài hoàn thành.',
+        'Lâu đài mở rồi! Mỗi câu đúng là một viên đá bạn đặt lên tường thành. Đủ sáu viên thì lâu đài hoàn thành.',
       round: 'Viên đá {n}/{total}',
       stageTenThousand: 'Số đến 10 000',
       stageRoundingRoman: 'Làm tròn và số La Mã',

@@ -40,7 +40,7 @@ const vi = {
   tileUnit: 'Mỗi ô vuông: 1 cm²',
   shape: 'Hình {l}',
   weights: 'Quả cân',
-  keysHelp: 'Phím: gõ số rồi Enter · 1–4 chọn đáp án · → đi tiếp · Space đặt một hàng · H gợi ý',
+  keysHelp: 'Gõ số rồi Enter để trả lời. Phím 1–4 để chọn, → đi tiếp, Space đặt một hàng, H gợi ý',
   doneTitle: 'Giao xong hết đơn hàng!',
   doneLine: 'Bạn đo, tính chu vi và diện tích giỏi lắm. Bác thợ mộc cảm ơn bạn nhiều!',
   doneScore: '+{xp} XP · +{coins} xu',

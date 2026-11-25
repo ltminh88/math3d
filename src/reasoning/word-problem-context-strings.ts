@@ -26,13 +26,13 @@ export const WORD_PROBLEM_CONTEXT_VI = {
     '{who1} hái được {a} {item}. {who2} hái được nhiều gấp {n} lần {who1}. {who2} cho {who1} {a} {item}.',
   // R8: the same a − a:n (picking, making, packing).
   wpDivideThenSub:
-    '{who1} có {a} {item}. Lấy số {item} của {who1} giảm đi {n} lần thì được số {item} của {who2}. {who1} đã dùng số {item} bằng số {item} của {who2}.',
+    '{who1} có {a} {item}. Lấy số {item} của {who1} giảm đi {n} lần thì được số {item} của {who2}. Số {item} {who1} đã dùng bằng số {item} của {who2}.',
   wpDivideThenSubHarvest:
-    '{who1} hái được {a} {item}. Số {item} của {who2} bằng số {item} của {who1} giảm đi {n} lần. {who1} đã ăn số {item} bằng số {item} của {who2}.',
+    '{who1} hái được {a} {item}. Số {item} của {who2} bằng số {item} của {who1} giảm đi {n} lần. Số {item} {who1} đã ăn bằng số {item} của {who2}.',
   wpDivideThenSubMake:
-    '{who1} làm được {a} {item}. Số {item} của {who2} bằng số {item} của {who1} giảm đi {n} lần. {who1} đã dùng số {item} bằng số {item} của {who2}.',
+    '{who1} làm được {a} {item}. Số {item} của {who2} bằng số {item} của {who1} giảm đi {n} lần. Số {item} {who1} đã dùng bằng số {item} của {who2}.',
   wpDivideThenSubPack:
-    '{who1} xếp được {a} {item} vào hộp. Số {item} của {who2} bằng số {item} của {who1} giảm đi {n} lần. {who1} đã lấy ra số {item} bằng số {item} của {who2}.',
+    '{who1} xếp được {a} {item} vào hộp. Số {item} của {who2} bằng số {item} của {who1} giảm đi {n} lần. Số {item} {who1} đã lấy ra bằng số {item} của {who2}.',
   // Two more frames each way (picking, making).
   wpMoreThenTotalHarvest:
     '{who1} hái được {a} {item}. {who2} hái được nhiều hơn {who1} {d} {item}.',

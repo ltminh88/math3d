@@ -21,7 +21,7 @@ const define = (defineFn: typeof defineStrings) =>
       familyPrompt: 'Ba số {a}, {b} và {p} là một gia đình phép tính. Điền số còn thiếu nhé!',
       guideShare: 'Bấm vào một quả rồi bấm vào bạn thú, hoặc kéo quả sang. Chia đều nhé!',
       guidePack: 'Mỗi giỏ đựng vừa {size} quả. Đầy giỏ này thì có giỏ mới.',
-      guideFamily: 'Phép nhân và phép chia là anh em đấy. Một phép nhân cho ta hai phép chia!',
+      guideFamily: 'Phép nhân và phép chia là anh em đấy. Một phép nhân cho mình hai phép chia!',
       dealShare: 'Chia mỗi bạn một quả',
       dealPack: 'Xếp đầy một giỏ',
       check: 'Kiểm tra',
