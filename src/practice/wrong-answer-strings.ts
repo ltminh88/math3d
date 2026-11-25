@@ -7,15 +7,15 @@ export const twa = defineStrings('wrongAnswer', {
   vi: {
     // Nhóm 1 — tìm thành phần chưa biết (unknown-add-sub / unknown-mul-div + WP)
     unknownWrongInverseAdd:
-      'Bạn cộng {s} với {a} rồi, nhưng dấu ? cần phép trừ. Mình thử lấy {s} trừ {a} xem bằng mấy nhé.',
+      'Bạn cộng {s} với {a} rồi. Muốn tìm số ở dấu ?, mình làm phép trừ: lấy {s} trừ {a} nhé.',
     unknownWrongInverseMul:
-      'Bạn lấy {p} trừ {n} rồi, nhưng dấu ? cần phép chia. Mình thử lấy {p} chia cho {n} xem bằng mấy nhé.',
+      'Bạn lấy {p} trừ {n} rồi. Muốn tìm số ở dấu ?, mình làm phép chia: lấy {p} chia cho {n} nhé.',
     unknownWrongInverseDivBoxes:
-      'Bạn lấy {p} trừ {q} rồi, nhưng dấu ? cần phép chia. Mình thử lấy {p} chia cho {q} xem bằng mấy nhé.',
+      'Bạn lấy {p} trừ {q} rồi. Muốn tìm số ở dấu ?, mình làm phép chia: lấy {p} chia cho {q} nhé.',
     unknownWrongInverseDivShareSub:
-      'Bạn lấy {q} trừ {n} rồi, nhưng dấu ? cần phép nhân. Mình thử lấy {n} nhân {q} xem bằng mấy nhé.',
+      'Bạn lấy {q} trừ {n} rồi. Muốn tìm số ở dấu ?, mình làm phép nhân: lấy {n} nhân {q} nhé.',
     unknownWrongInverseDivShareAdd:
-      'Bạn cộng {n} với {q} rồi, nhưng dấu ? cần phép nhân. Mình thử lấy {n} nhân {q} xem bằng mấy nhé.',
+      'Bạn cộng {n} với {q} rồi. Muốn tìm số ở dấu ?, mình làm phép nhân: lấy {n} nhân {q} nhé.',
     unknownGivenNumberAdd:
       'Số {s} là tổng, bạn còn phải trừ {a} nữa. Mình thử lấy {s} trừ {a} xem bằng mấy nhé.',
     unknownGivenMinuend:
@@ -58,7 +58,7 @@ export const twa = defineStrings('wrongAnswer', {
       'Bạn trừ {a} rồi, nhưng phải cộng {a} mới đúng. Mình cộng thêm {a} rồi thử lại nhé.',
     unknownForgotDivide:
       'Bạn tính xong {a} cộng {b} rồi, còn phải chia cho {n} nữa. Mình chia {p} cho {n} rồi thử lại nhé.',
-    unknown1Fallback: 'Số còn thiếu phải thử lại vào dấu ?, xem hai bên có bằng nhau không.',
+    unknown1Fallback: 'Bạn thử thay số vừa tìm vào dấu ? xem hai bên có bằng nhau không nhé.',
     // Nhóm 2 — bài toán hai bước (wp-times-then-sub / wp-divide-then-sub)
     wp2Step0AddInstead:
       'Bạn cộng {a} với {n} rồi, nhưng gấp {n} lần là phép nhân. Mình thử lấy {a} nhân {n} xem bằng mấy nhé.',
@@ -113,8 +113,8 @@ export const twa = defineStrings('wrongAnswer', {
       'Bạn chia AB thành bốn phần rồi, trung điểm chỉ chia AB thành hai phần bằng nhau. Mình chia {len} thành hai phần bằng nhau nhé.',
     midFallback: 'Bạn nhìn hình nhé, điểm M nằm ở đâu trên đoạn AB.',
     // Nhóm 4 — diện tích đếm ô (meas-area-count / meas-area-equal)
-    areaMissOne: 'Bạn đếm sót một ô rồi. Đếm lại từng ô, đánh dấu ô đã đếm nhé.',
-    areaExtraOne: 'Bạn đếm thừa một ô rồi. Đếm lại từng ô, đánh dấu ô đã đếm nhé.',
+    areaMissOne: 'Bạn đếm sót một ô rồi. Đếm lại từng ô, chỉ tay vào từng ô nhé.',
+    areaExtraOne: 'Bạn đếm thừa một ô rồi. Đếm lại từng ô, chỉ tay vào từng ô nhé.',
     areaEqualThoughtBigger: 'Hai hình có số ô bằng nhau đó. Bạn đếm lại số ô mỗi hình nhé.',
     areaEqualThoughtSame: 'Hai hình chưa bằng nhau đâu. Bạn đếm lại xem hình nào nhiều ô hơn nhé.',
     areaEqualReversed: 'Bạn đếm lại số ô hình A và hình B nhé, hình nào nhiều ô hơn?',
@@ -122,7 +122,7 @@ export const twa = defineStrings('wrongAnswer', {
     areaAddInstead: 'Hỏi hơn nhau bao nhiêu thì mình trừ đi, không cộng đâu nhé.',
     areaWrongUnit: 'Diện tích đếm bằng ô vuông, nên đơn vị là xăng-ti-mét vuông nhé.',
     areaDiffIsB: 'Bạn điền số ô của hình B rồi. Hiệu là số ô hình A trừ hình B, bạn thử lại nhé.',
-    areaFallback: 'Bạn đếm lại từng ô một nhé, ô nào đã đếm thì đánh dấu lại.',
+    areaFallback: 'Bạn đếm lại từng ô một nhé, chỉ tay vào từng ô đã đếm.',
     // Nhóm 5 — phân số chia đều (fraction-wp + fraction-of-set-*)
     fracForgetDivide: 'Bạn lấy cả {count} cái rồi. Chỉ lấy 1/{n} số đó thôi nhé.',
     fracWrongDenominator:
@@ -162,7 +162,7 @@ export const twa = defineStrings('wrongAnswer', {
     moneyTotalDouble: 'Bạn đếm trùng một tờ rồi. Mình chỉ tay đếm mỗi tờ một lần nhé.',
     moneyCountFallback: 'Bạn đếm lại từng tờ tiền trên bàn nhé.',
     moneyPickTooFew: 'Bạn chọn chưa đủ {target} đồng. Mình cộng lại các tờ đã chọn nhé.',
-    moneyPickTooMuch: 'Bạn chọn thừa {target} đồng rồi. Mình thử bỏ một tờ ra nhé.',
+    moneyPickTooMuch: 'Bạn chọn nhiều hơn {target} đồng rồi. Mình thử bỏ bớt một tờ nhé.',
     moneyPickTooMany: 'Bạn đủ {target} đồng rồi, nhưng mình thử dùng ít tờ hơn nhé.',
     moneyPickFallback: 'Bạn cộng lại các tờ đã chọn xem đủ {target} đồng chưa nhé.',
     moneyWpAddShort:
@@ -263,15 +263,15 @@ export const twa = defineStrings('wrongAnswer', {
   },
   en: {
     unknownWrongInverseAdd:
-      'You added {s} and {a}, but ? needs a subtraction. Try {s} minus {a} and see what you get.',
+      'You added {s} and {a}. To find the number at ?, subtract: try {s} minus {a}.',
     unknownWrongInverseMul:
-      'You took {n} away from {p}, but ? needs a division. Try {p} divided by {n} and see what you get.',
+      'You took {n} away from {p}. To find the number at ?, divide: try {p} divided by {n}.',
     unknownWrongInverseDivBoxes:
-      'You took {q} away from {p}, but ? needs a division. Try {p} divided by {q} and see what you get.',
+      'You took {q} away from {p}. To find the number at ?, divide: try {p} divided by {q}.',
     unknownWrongInverseDivShareSub:
-      'You took {n} away from {q}, but ? needs a multiplication. Try {n} times {q} and see what you get.',
+      'You took {n} away from {q}. To find the number at ?, multiply: try {n} times {q}.',
     unknownWrongInverseDivShareAdd:
-      'You added {n} and {q}, but ? needs a multiplication. Try {n} times {q} and see what you get.',
+      'You added {n} and {q}. To find the number at ?, multiply: try {n} times {q}.',
     unknownGivenNumberAdd:
       '{s} is the total; you still need to take away {a}. Try {s} minus {a} and see what you get.',
     unknownGivenMinuend:
@@ -312,7 +312,7 @@ export const twa = defineStrings('wrongAnswer', {
     unknownForgotStepSub: 'You took away {a}, but you need to add {a}. Add {a}, then try again.',
     unknownForgotDivide:
       'You worked out {a} plus {b}; now divide by {n} as well. Divide {p} by {n}, then try again.',
-    unknown1Fallback: 'Put your number back in place of ? and check both sides match.',
+    unknown1Fallback: 'Try your number in place of ? and check whether both sides are equal.',
     wp2Step0AddInstead:
       'You added {a} and {n}, but {n} times as many means multiply. Try {a} times {n} and see what you get.',
     wp2Step0ForgotTimes:
@@ -365,9 +365,10 @@ export const twa = defineStrings('wrongAnswer', {
     mid3Quarter:
       'You split AB into four parts; the midpoint splits AB into two equal parts. Split {len} into two equal parts.',
     midFallback: 'Look at the picture: where is M on segment AB?',
-    areaMissOne: 'You missed one square. Count again one by one, marking each square you count.',
+    areaMissOne:
+      'You missed one square. Count again one by one, pointing at each square as you count.',
     areaExtraOne:
-      'You counted one square too many. Count again one by one, marking each square you count.',
+      'You counted one square too many. Count again one by one, pointing at each square as you count.',
     areaEqualThoughtBigger:
       'The two shapes have the same number of squares. Count the squares in each shape again.',
     areaEqualThoughtSame:
@@ -378,7 +379,7 @@ export const twa = defineStrings('wrongAnswer', {
     areaWrongUnit: 'Area is counted in squares, so the unit is square centimetres.',
     areaDiffIsB:
       'You wrote shape B’s squares. The difference is shape A take away shape B — try again.',
-    areaFallback: 'Count the squares again one by one, marking each one you have counted.',
+    areaFallback: 'Count the squares again one by one, pointing at each one you have counted.',
     fracForgetDivide: 'You took all {count}. Take only 1/{n} of them.',
     fracWrongDenominator:
       'The number {n} is how many parts there are, not how many are in one part. Share {count} into {n} equal parts.',
@@ -415,7 +416,7 @@ export const twa = defineStrings('wrongAnswer', {
     moneyTotalDouble: 'You counted one note twice. Point at each note once as you count.',
     moneyCountFallback: 'Count each banknote on the table again.',
     moneyPickTooFew: 'Your notes add up to less than {target} dong. Add your chosen notes again.',
-    moneyPickTooMuch: 'Your notes add up to more than {target} dong. Try leaving one note out.',
+    moneyPickTooMuch: 'You picked more than {target} dong. Try leaving one note out.',
     moneyPickTooMany: 'You reached {target} dong, but try using fewer notes.',
     moneyPickFallback: 'Add your chosen notes again and check whether they make {target} dong.',
     moneyWpAddShort: 'You added one time too few. For {count} {item}, add {price} {count} times.',
