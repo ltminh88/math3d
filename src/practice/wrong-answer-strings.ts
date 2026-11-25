@@ -113,6 +113,38 @@ export const twa = defineStrings('wrongAnswer', {
     mid3Quarter:
       'Bạn chia AB thành bốn phần rồi, trung điểm chỉ chia AB thành hai phần bằng nhau. Mình chia {len} thành hai phần bằng nhau nhé.',
     midFallback: 'Bạn nhìn hình nhé, điểm M nằm ở đâu trên đoạn AB.',
+    // Nhóm 4 — diện tích đếm ô (meas-area-count / meas-area-equal)
+    areaMissOne: 'Bạn đếm sót một ô rồi. Đếm lại từng ô, đánh dấu ô đã đếm nhé.',
+    areaExtraOne: 'Bạn đếm thừa một ô rồi. Đếm lại từng ô, đánh dấu ô đã đếm nhé.',
+    areaEqualThoughtBigger: 'Hai hình có số ô bằng nhau đó. Bạn đếm lại số ô mỗi hình nhé.',
+    areaEqualThoughtSame: 'Hai hình chưa bằng nhau đâu. Bạn đếm lại xem hình nào nhiều ô hơn nhé.',
+    areaEqualReversed: 'Bạn đếm lại số ô hình A và hình B nhé, hình nào nhiều ô hơn?',
+    areaForgotSub: 'Hình A có {a} ô, hình B có {b} ô. Bạn trừ đi số ô hình B nhé.',
+    areaAddInstead: 'Hỏi hơn nhau bao nhiêu thì mình trừ đi, không cộng đâu nhé.',
+    areaWrongUnit: 'Diện tích đếm bằng ô vuông, nên đơn vị là xăng-ti-mét vuông nhé.',
+    areaDiffIsB: 'Bạn điền số ô của hình B rồi. Hiệu là số ô hình A trừ hình B, bạn thử lại nhé.',
+    areaFallback: 'Bạn đếm lại từng ô một nhé, ô nào đã đếm thì đánh dấu lại.',
+    // Nhóm 5 — phân số chia đều (fraction-wp + fraction-of-set-*)
+    fracForgetDivide: 'Bạn lấy cả {count} cái rồi. Chỉ lấy 1/{n} số đó thôi nhé.',
+    fracWrongDenominator:
+      'Số {n} là số phần chia, không phải số mỗi phần. Bạn chia {count} thành {n} phần bằng nhau nhé.',
+    fracLeftOnePart: 'Bạn vừa tính được một phần rồi. Còn lại thì lấy {count} trừ đi phần đó nhé.',
+    fracKPartsOnePart:
+      'Bạn mới tính một phần thôi. Bài hỏi {k} phần, mình nhân một phần với {k} nhé.',
+    fracKPartsWhole:
+      'Bạn lấy cả {count} cái rồi. Bài hỏi {k} phần thôi, mình nhân một phần với {k} nhé.',
+    fracKPartsK: 'Số {k} chỉ là số phần cần tính thôi. Bạn nhân một phần với {k} xem bằng mấy nhé.',
+    fracFallback: 'Nhớ nhé, 1/{n} là một phần trong {n} phần bằng nhau của {count}.',
+    // Nhóm 6 — đồng hồ số La Mã / sáng–chiều (roman-clock-hour / clock-sang-chieu-24h)
+    clockWrongPeriodAfternoon: 'Đồng hồ chỉ {h} giờ, mà đang buổi chiều. Bạn cộng thêm 12 giờ nhé.',
+    clockWrongPeriodEvening: 'Đồng hồ chỉ {h} giờ, mà đang buổi tối. Bạn cộng thêm 12 giờ nhé.',
+    clockFiveMin: 'Kim phút đang ở vạch {mark}. Mỗi vạch là 5 phút nhé.',
+    clockRomanSubtractive: 'Bạn nhìn lại chữ La Mã nhé, chữ I đứng trước hay sau chữ {big} đó?',
+    clockNearHour: 'Bạn nhìn lại kim giờ nhé, nó gần số nào nhất?',
+    clockSangChieuFallback:
+      'Bạn xem buổi trong đề rồi cộng thêm 12 giờ nếu là buổi chiều hay tối nhé.',
+    clockRomanFallback:
+      'Bạn đọc lại chữ La Mã trên mặt đồng hồ nhé, nhìn kĩ chữ I đứng trước hay sau.',
   },
   en: {
     unknownWrongInverseAdd:
@@ -219,6 +251,41 @@ export const twa = defineStrings('wrongAnswer', {
     mid3Quarter:
       'You split AB into four parts; the midpoint splits AB into two equal parts. Split {len} into two equal parts.',
     midFallback: 'Look at the picture: where is M on segment AB?',
+    areaMissOne: 'You missed one square. Count again one by one, marking each square you count.',
+    areaExtraOne:
+      'You counted one square too many. Count again one by one, marking each square you count.',
+    areaEqualThoughtBigger:
+      'The two shapes have the same number of squares. Count the squares in each shape again.',
+    areaEqualThoughtSame:
+      'The two shapes are not equal yet. Count again and see which shape has more squares.',
+    areaEqualReversed: 'Count the squares in shapes A and B again — which one has more?',
+    areaForgotSub: 'Shape A has {a} squares and shape B has {b}. Take away shape B’s squares.',
+    areaAddInstead: 'To find how many more, subtract — do not add.',
+    areaWrongUnit: 'Area is counted in squares, so the unit is square centimetres.',
+    areaDiffIsB:
+      'You wrote shape B’s squares. The difference is shape A take away shape B — try again.',
+    areaFallback: 'Count the squares again one by one, marking each one you have counted.',
+    fracForgetDivide: 'You took all {count}. Take only 1/{n} of them.',
+    fracWrongDenominator:
+      'The number {n} is how many parts there are, not how many are in one part. Share {count} into {n} equal parts.',
+    fracLeftOnePart: 'You already found one part. For what is left, take it away from {count}.',
+    fracKPartsOnePart:
+      'You only worked out one part. The question asks for {k} parts — multiply one part by {k}.',
+    fracKPartsWhole:
+      'You took all {count}. The question asks for {k} parts — multiply one part by {k}.',
+    fracKPartsK:
+      '{k} is only how many parts to count. Multiply one part by {k} and see what you get.',
+    fracFallback: 'Remember, 1/{n} is one of {n} equal parts of {count}.',
+    clockWrongPeriodAfternoon:
+      'The clock shows {h} o’clock, and it is the afternoon. Add 12 hours.',
+    clockWrongPeriodEvening: 'The clock shows {h} o’clock, and it is the evening. Add 12 hours.',
+    clockFiveMin: 'The minute hand is on mark {mark}. Each mark is 5 minutes.',
+    clockRomanSubtractive: 'Look at the Roman numeral again — is the I before or after the {big}?',
+    clockNearHour: 'Look at the hour hand again — which number is it closest to?',
+    clockSangChieuFallback:
+      'Check whether it is morning or afternoon first, then add 12 hours for the afternoon or evening.',
+    clockRomanFallback:
+      'Read the Roman numeral on the clock face again, and check whether the I comes before or after.',
   },
 });
 

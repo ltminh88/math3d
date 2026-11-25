@@ -2,8 +2,8 @@
 // answer in the lesson/daily dialog. The UI calls this on a 'wrong' verdict; null means
 // "no per-skill explanation — keep the generic sentence". The selector never states the
 // answer: it only names the likely confusion, with the question's own numbers.
-// Lane 1 covers groups 1–3; lanes 2–3 add their matchers here and their keys to
-// wrong-answer-strings.ts. The hint ladder is untouched (golden).
+// Lane 1 covers groups 1–3, lane 2 groups 4–6; lane 3 adds groups 7–10 and their keys
+// to wrong-answer-strings.ts. The hint ladder is untouched (golden).
 import type { SkillTier } from '../learning/skill-tiers';
 import {
   isStepAnswerCorrect,
@@ -12,6 +12,9 @@ import {
 } from '../reasoning/reasoning-step-answers';
 import type { ChoiceOption, ReasoningStep } from '../reasoning/reasoning-types';
 import type { PracticeItem } from './practice-scene';
+import { explainArea } from './wrong-answer-area';
+import { explainClock } from './wrong-answer-clock';
+import { explainFraction } from './wrong-answer-fraction';
 import { explainMidpoint } from './wrong-answer-midpoint';
 import type { WrongAnswerKey } from './wrong-answer-strings';
 import { explainTwoStep } from './wrong-answer-two-step';
@@ -90,5 +93,15 @@ export function explainWrongAnswer(input: WrongAnswerInput): WrongAnswerExplanat
   if (input.skillId === 'wp-times-then-sub' || input.skillId === 'wp-divide-then-sub')
     return explainTwoStep(ctx);
   if (input.skillId === 'geo-midpoint-length') return explainMidpoint(ctx);
+  if (input.skillId === 'meas-area-count' || input.skillId === 'meas-area-equal')
+    return explainArea(ctx);
+  if (
+    input.skillId === 'fraction-wp' ||
+    input.skillId === 'fraction-of-set-number' ||
+    input.skillId === 'fraction-of-set-circle'
+  )
+    return explainFraction(ctx);
+  if (input.skillId === 'roman-clock-hour' || input.skillId === 'clock-sang-chieu-24h')
+    return explainClock(ctx);
   return null;
 }
