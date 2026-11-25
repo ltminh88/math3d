@@ -28,7 +28,7 @@ const vi = {
   unknownWpSubFirst:
     '{who1} có một số {item}. {who1} cho {who2} {a} {item}. Bây giờ {who1} còn {b} {item}.',
   unknownWpSubPack:
-    '{who1} có một số hộp như nhau, mỗi hộp có {c} {item}. {who1} cho {who2} {a} {item}. Bây giờ {who1} còn {b} hộp.',
+    '{who1} có một số {item}. {who1} cho {who2} {a} {item}. Bây giờ {who1} còn {b} hộp, mỗi hộp có {c} {item}.',
   unknownWpMulBoxes: '{who1} có một số hộp như nhau, mỗi hộp có {n} {item}. Tất cả có {p} {item}.',
   unknownWpMulEach: '{who1} có {n} hộp như nhau, đựng tất cả {p} {item}.',
   unknownWpDivBoxes: '{who1} có {p} {item}. {who1} xếp đều vào một số hộp, mỗi hộp có {q} {item}.',

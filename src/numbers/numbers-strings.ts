@@ -38,7 +38,7 @@ const vi = {
   askPrev: 'Số liền trước là mấy?',
   askNext: 'Số liền sau là mấy?',
   askMissing: 'Số còn thiếu là mấy?',
-  askMissingArabic: 'Số còn thiếu là mấy? Viết bằng số (ví dụ 7).',
+  askMissingArabic: 'Số còn thiếu là mấy? Viết bằng chữ số thường (ví dụ 7).',
   askMissingLabel: 'Số ở ô {label} là mấy?',
   askCompare: 'Chọn dấu đúng:',
   askOrder: 'Số {ord} ({pos}) là?',

@@ -184,7 +184,7 @@ describe('rounding + roman generators', () => {
       if (step?.kind !== 'number') continue;
       sawPad = true;
       expect(step.prompt.key).toBe('askMissingArabic');
-      expect(renderNumbersPrompt(step.prompt)).toContain('Viết bằng số (ví dụ 7)');
+      expect(renderNumbersPrompt(step.prompt)).toContain('Viết bằng chữ số thường (ví dụ 7)');
     }
     expect(sawPad).toBe(true);
   });
