@@ -23,7 +23,7 @@ export const tq = defineStrings('questChain', {
     copyCity:
       'Cổng mới đã mở! Đi theo con đường bên kia cầu tới thành phố của những tòa nhà mang số. Tìm cổng có dấu ✨ {gate}, {enter}',
     copyTower:
-      'Thử thách cuối đã mở! Đi theo con đường bên kia cầu tới ngọn tháp cao nhất. Tìm cổng có dấu ✨ {gate}, {enter}',
+      'Thử thách cuối của chương 1 đã mở! Đi theo con đường bên kia cầu tới ngọn tháp cao nhất. Tìm cổng có dấu ✨ {gate}, {enter}',
     copyGarden:
       'Chương 2 đã mở! Quay lại khu vườn ngay bên kia cầu. Tìm cổng có dấu ✨ {gate}, {enter}',
     copyValley:
@@ -31,11 +31,11 @@ export const tq = defineStrings('questChain', {
     copyWorkshop:
       'Cổng mới đã mở! Đi theo con đường mới về phía nam, giữa khu rừng và thành phố. Tìm cổng có dấu ✨ {gate}, {enter}',
     copyCave:
-      'Thử thách cuối đã mở! Về làng rồi đi theo con đường qua chòi nghỉ tới hang đá. Tìm cổng có dấu ✨ {gate}, {enter}',
+      'Thử thách cuối của chương 2 đã mở! Về làng rồi đi theo con đường qua chòi nghỉ tới hang đá. Tìm cổng có dấu ✨ {gate}, {enter}',
     copyMarket:
       'Chương 3 đã mở! Đi theo con đường bên kia cầu về phía bắc, tới khu chợ nhỏ ở bờ tây. Tìm cổng có dấu ✨ {gate}, {enter}',
     copyNumberfort:
-      'Cổng mới đã mở! Đi theo con đường bên kia cầu về phía tháp, rồi rẽ sang lâu đài của các số lớn ở bờ đông. Tìm cổng có dấu ✨ {gate}, {enter}',
+      'Cổng mới đã mở! Đi theo con đường bên kia cầu về phía tháp. Rẽ sang lâu đài của các số lớn ở bờ đông. Tìm cổng có dấu ✨ {gate}, {enter}',
     copyComingSoon: '{gate} sắp ra mắt. Trong lúc chờ, bạn luyện thêm cùng {guide} nhé!',
     enterKeyOrTap: 'rồi nhấn E hoặc bấm nút Vào cổng nhé!',
     enterTap: 'rồi bấm nút Vào cổng nhé!',
@@ -79,19 +79,18 @@ export const tq = defineStrings('questChain', {
     guideTower:
       '{gate} đã mở! Cổng đang chờ bạn ở cuối con đường bên kia cầu, dưới chân ngọn tháp cao nhất. Bạn cũng có thể luyện thêm phép nhân cùng mình nhé!',
     guideGarden:
-      '{gate} đã mở! Cổng ở ngay khu vườn bên kia cầu. Bạn cũng có thể luyện thêm phép nhân cùng mình nhé!',
+      '{gate} đã mở! Cổng ở ngay khu vườn bên kia cầu. Bạn cũng có thể luyện thêm dãy số cùng mình nhé!',
     guideValley:
-      '{gate} đã mở! Cổng ở cuối con đường mới phía bắc, giữa cánh đồng và ngọn tháp. Bạn cũng có thể luyện thêm phép nhân cùng mình nhé!',
+      '{gate} đã mở! Cổng ở cuối con đường mới phía bắc, giữa cánh đồng và ngọn tháp. Bạn cũng có thể luyện thêm hình học cùng mình nhé!',
     guideWorkshop:
-      '{gate} đã mở! Cổng ở cuối con đường mới phía nam, giữa khu rừng và thành phố. Bạn cũng có thể luyện thêm phép nhân cùng mình nhé!',
+      '{gate} đã mở! Cổng ở cuối con đường mới phía nam, giữa khu rừng và thành phố. Bạn cũng có thể luyện thêm đo lường cùng mình nhé!',
     guideCave:
-      '{gate} đã mở! Cổng ở hang đá bên bờ làng, cuối con đường qua chòi nghỉ. Bạn cũng có thể luyện thêm phép nhân cùng mình nhé!',
+      '{gate} đã mở! Cổng ở hang đá bên bờ làng, cuối con đường qua chòi nghỉ. Bạn cũng có thể luyện thêm đố vui cùng mình nhé!',
     guideMarket:
-      '{gate} đã mở! Cổng ở khu chợ nhỏ phía bắc bờ tây. Bạn cũng có thể luyện thêm phép nhân cùng mình nhé!',
+      '{gate} đã mở! Cổng ở khu chợ nhỏ phía bắc bờ tây. Bạn cũng có thể luyện thêm cùng mình nhé!',
     guideNumberfort:
-      '{gate} đã mở! Cổng ở cuối con đường rẽ khỏi đường lên tháp, phía lâu đài bờ đông. Bạn cũng có thể luyện thêm phép nhân cùng mình nhé!',
-    guideComingSoon:
-      '{gate} sắp ra mắt đấy! Trong lúc chờ, bạn luyện thêm phép nhân cùng mình nhé?',
+      '{gate} đã mở! Cổng ở cuối con đường rẽ khỏi đường lên tháp, phía lâu đài bờ đông. Bạn cũng có thể luyện thêm số lớn cùng mình nhé!',
+    guideComingSoon: '{gate} sắp ra mắt đấy! Trong lúc chờ, bạn luyện thêm cùng mình nhé?',
     completeNote:
       '✨ {gate} đã mở! Cổng ở cuối con đường bên kia cầu, phía cánh đồng lúa vàng. Nhấn M để xem bản đồ nhé!',
     completeNoteTouch:

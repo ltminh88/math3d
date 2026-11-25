@@ -42,7 +42,7 @@ describe('daily copy', () => {
   });
 
   it('the streak line only celebrates the current count', () => {
-    expect(td('streak', { n: 1 })).toBe('Con đã luyện 1 ngày liên tiếp!');
-    expect(td('streak', { n: 7 })).toBe('Con đã luyện 7 ngày liên tiếp!');
+    expect(td('streak', { n: 1 })).toBe('Bạn đã luyện 1 ngày liên tiếp!');
+    expect(td('streak', { n: 7 })).toBe('Bạn đã luyện 7 ngày liên tiếp!');
   });
 });

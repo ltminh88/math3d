@@ -8,7 +8,7 @@ describe('dailyGuideSectionHtml', () => {
   it('shows the locked line only, before field stage 1', () => {
     const html = dailyGuideSectionHtml({ unlocked: false, streak: 0 });
     expect(html).toContain(
-      'Luyện tập hôm nay sẽ mở sau khi con xong chặng 1 ở Cánh Đồng Phép Tính.',
+      'Luyện tập hôm nay sẽ mở sau khi bạn xong chặng 1 ở Cánh Đồng Phép Tính.',
     );
     expect(html).not.toContain('daily-guide-button');
     // Own class: the dialog's main copy is `.dialog-copy`, and a second match breaks
@@ -26,7 +26,7 @@ describe('dailyGuideSectionHtml', () => {
   it('shows the streak once the child has one', () => {
     const html = dailyGuideSectionHtml({ unlocked: true, streak: 3 });
     expect(html).toContain('id="daily-guide-button"');
-    expect(html).toContain('Con đã luyện 3 ngày liên tiếp!');
+    expect(html).toContain('Bạn đã luyện 3 ngày liên tiếp!');
   });
 });
 

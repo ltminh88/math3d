@@ -86,7 +86,7 @@ test('a fresh profile sees field stage 1 open and daily locked', async ({ page }
   await expect(page.locator('#quest-daily')).toHaveCount(0);
   await page.locator('#open-daily').click();
   await expect(page.locator('#dialog-content')).toContainText(
-    'Luyện tập hôm nay sẽ mở sau khi con xong chặng 1 ở Cánh Đồng Phép Tính.',
+    'Luyện tập hôm nay sẽ mở sau khi bạn xong chặng 1 ở Cánh Đồng Phép Tính.',
   );
   await waitDialogSettled(page);
   await page.locator('#close-dialog').click();

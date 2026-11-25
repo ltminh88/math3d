@@ -40,7 +40,7 @@ const define = (defineFn: typeof defineStrings) =>
       hintCount: 'Đếm thêm {t}, đếm {m} lần: {steps}',
       hintCommute: 'Đổi chỗ hai số: {t} × {m} = {m} × {t}. Tính theo bảng {m} cho dễ nhé!',
       hintNearSquare: '{t} × {m} = {s} × {s} + {s}. Mà {s} × {s} = {square} đó.',
-      hintFive: 'Mốc dễ nhớ: {a} × 5 = {five}. Thêm {n} lần {a} nữa là ra {a} × {b}.',
+      hintFive: 'Nhớ số này nhé: {a} × 5 = {five}. Thêm {n} lần {a} nữa là ra {a} × {b}.',
       hintTen:
         'Mẹo số 10: {a} × 10 = {ten}. Bớt đi {back} lần {a} (tức là bớt {minus}) là ra {a} × {b}.',
       hintReverse1: 'Gói nào nhân ra đúng {p}? Bạn tính thử từng gói nhé!',
