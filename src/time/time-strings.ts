@@ -39,6 +39,9 @@ const vi = {
   askWeekday: 'Ngày {d} là thứ mấy?',
   askBetween: 'Ngày {d1} và ngày {d2} cách nhau bao nhiêu ngày?',
   roman24Story: 'Buổi chiều, đồng hồ số La Mã chỉ như hình bên.',
+  setClockStory: 'Đặt đồng hồ theo giờ cho trước.',
+  askSetClock: 'Đặt đồng hồ chỉ {h} giờ {mm} phút.',
+  askSetClockHour: 'Đặt đồng hồ chỉ {h} giờ.',
 };
 
 const en = {
@@ -76,6 +79,9 @@ const en = {
   askWeekday: 'What day of the week is the {d}th?',
   askBetween: 'How many days are there between the {d1}th and the {d2}th?',
   roman24Story: 'In the afternoon the clock with Roman numerals shows the time in the picture.',
+  setClockStory: 'Set the clock to the given time.',
+  askSetClock: 'Set the clock to {h}:{mm}.',
+  askSetClockHour: "Set the clock to {h} o'clock.",
 };
 
 const ts = defineStrings('time', { vi, en });

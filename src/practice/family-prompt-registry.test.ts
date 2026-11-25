@@ -22,6 +22,7 @@ function promptsOfStep(step: ReasoningStep): PromptRef[] {
   if (step.kind === 'number') return [step.prompt];
   if (step.kind === 'choice' || step.kind === 'multi')
     return [step.prompt, ...step.options.map((o) => o.label)];
+  if (step.kind === 'set-clock') return [step.prompt];
   return [step.prompt, step.statement, ...(step.fix ? [step.fix.prompt] : [])];
 }
 

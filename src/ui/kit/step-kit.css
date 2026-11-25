@@ -88,3 +88,93 @@
   font-size: 1.4em;
   text-align: center;
 }
+
+/* Clock setter (R37): a draggable face, 44px hand targets, +/− buttons, Xong. */
+.kit-clock-setter {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 12px;
+  max-width: 320px;
+}
+
+.kit-clock-setter__face {
+  position: relative;
+  width: min(220px, 100%);
+  aspect-ratio: 1;
+  border: 3px solid currentColor;
+  border-radius: 50%;
+  touch-action: none;
+  user-select: none;
+}
+
+.kit-clock-setter__num {
+  position: absolute;
+  transform: translate(-50%, -50%);
+  font-weight: 700;
+}
+
+.kit-clock-setter__hand {
+  position: absolute;
+  left: calc(50% - 22px);
+  bottom: 50%;
+  width: 44px;
+  transform-origin: 50% 100%;
+  cursor: grab;
+  touch-action: none;
+}
+
+.kit-clock-setter__hand:active {
+  cursor: grabbing;
+}
+
+.kit-clock-setter__hand--hour {
+  /* Hand lengths: keep in sync with HOUR_HAND_LEN / MINUTE_HAND_LEN in clock-setter.ts. */
+  height: 62px;
+}
+
+.kit-clock-setter__hand--minute {
+  height: 84px;
+}
+
+.kit-clock-setter__hand-line {
+  position: absolute;
+  left: 50%;
+  top: 0;
+  bottom: 0;
+  width: 6px;
+  transform: translateX(-50%);
+  background: currentColor;
+  border-radius: 3px;
+}
+
+.kit-clock-setter__hand--minute .kit-clock-setter__hand-line {
+  width: 4px;
+}
+
+.kit-clock-setter__dot {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  width: 12px;
+  height: 12px;
+  transform: translate(-50%, -50%);
+  border-radius: 50%;
+  background: currentColor;
+}
+
+.kit-clock-setter__readout {
+  margin: 0;
+  font-weight: 700;
+}
+
+.kit-clock-setter__controls {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  justify-content: center;
+}
+
+.kit-clock-setter__done {
+  width: 100%;
+}

@@ -17,6 +17,7 @@ const word = (text: string) => new RegExp(`(^|[^\\p{L}\\p{N}])${text}($|[^\\p{L}
 const answersOf = (step: ReasoningStep): string[] => {
   if (step.kind === 'number') return [String(step.answer)];
   if (step.kind === 'verdict') return [];
+  if (step.kind === 'set-clock') return [];
   // Numbers ("6", "14 cm") and figure names ("B", "OA"); named terms ("Khối lập phương") are
   // what a definition is about, so they are not answers a hint could leak.
   return step.options

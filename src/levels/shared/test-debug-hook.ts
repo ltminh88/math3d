@@ -37,7 +37,8 @@ export type PlannedStep =
   | { kind: 'number'; answer: number }
   | { kind: 'choice'; label: string }
   | { kind: 'multi'; ids: string[] }
-  | { kind: 'verdict'; answer: boolean };
+  | { kind: 'verdict'; answer: boolean }
+  | { kind: 'set-clock'; h: number; m: number };
 
 export interface TestGameHook {
   /** Commits stats for × / : facts and `sk:` skills (e.g. box 3+ to reach higher tiers). */
@@ -146,6 +147,7 @@ function mountStepCard(skillId: string, seed: number, tier: SkillTier): PlannedS
   return playableSteps(item).map((step): PlannedStep => {
     if (step.kind === 'number') return { kind: 'number', answer: step.answer };
     if (step.kind === 'verdict') return { kind: 'verdict', answer: step.answer };
+    if (step.kind === 'set-clock') return { kind: 'set-clock', h: step.h, m: step.m };
     const right = step.options.filter((o) => o.correct);
     if (step.kind === 'multi') return { kind: 'multi', ids: right.map((o) => o.id) };
     return {

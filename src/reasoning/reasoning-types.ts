@@ -124,6 +124,15 @@ export type ReasoningStep =
       readonly statement: PromptRef;
       readonly answer: boolean;
       readonly fix?: { readonly prompt: PromptRef; readonly answer: number };
+    }
+  /** Set the clock hands to the target time (R37): the child drags the hands or uses
+   * the +/− buttons, then "Xong". `snapMinutes` is the minute-hand grid (5 or 1). */
+  | {
+      readonly kind: 'set-clock';
+      readonly prompt: PromptRef;
+      readonly h: number;
+      readonly m: number;
+      readonly snapMinutes: 5 | 1;
     };
 
 export interface ReasoningItem {

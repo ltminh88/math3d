@@ -88,9 +88,11 @@ async function give(page: Page, step: Planned, touch: boolean, wrong = false): P
   } else if (step.kind === 'verdict') {
     const answer = wrong ? !step.answer : step.answer;
     await press(row.locator(`[data-verdict="${answer}"]`), touch);
-  } else {
+  } else if (step.kind === 'multi') {
     for (const i of step.indexes) await press(row.locator('.kit-multi__option').nth(i), touch);
     await press(row.locator('.kit-multi__done'), touch);
+  } else {
+    throw new Error('workshop spec: set-clock steps are not played (workshop skills only)');
   }
 }
 

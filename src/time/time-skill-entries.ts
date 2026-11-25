@@ -15,4 +15,5 @@ export const TIME_ENTRIES: readonly SkillEntry[] = Object.freeze([
   entry('months-days-count', 'time', [t2(66)]),
   entry('calendar-weekday', 'time', [t2(66)]),
   entry('calendar-days-between', 'time', [t2(66)]),
+  entry('time-set-clock', 'time', [t2(66)]),
 ]);

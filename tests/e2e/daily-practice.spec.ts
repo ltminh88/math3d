@@ -12,6 +12,7 @@
 // the dialog close button never become actionable.
 import { type Locator, type Page, type TestInfo, test } from '@playwright/test';
 import { expect, SLOW_TEST_MS, waitDialogSettled } from './legacy-live-save-fixtures';
+import { solveSetClock } from './lesson-walkthrough-helpers';
 
 test.use({ locale: 'vi-VN' });
 test.describe.configure({ timeout: SLOW_TEST_MS * 3 });
@@ -40,7 +41,8 @@ type PlannedStep =
   | { kind: 'number'; answer: number }
   | { kind: 'choice'; label: string }
   | { kind: 'multi'; ids: string[] }
-  | { kind: 'verdict'; answer: boolean };
+  | { kind: 'verdict'; answer: boolean }
+  | { kind: 'set-clock'; h: number; m: number };
 
 const isTouch = (info: TestInfo) => info.project.use.hasTouch === true;
 
@@ -147,6 +149,7 @@ async function solveSkillItem(page: Page, touch: boolean): Promise<void> {
       );
     else if (step.kind === 'verdict')
       await press(page, row.locator(`[data-verdict="${step.answer}"]`), touch);
+    else if (step.kind === 'set-clock') await solveSetClock(page, row, step, touch);
     else {
       for (const id of step.ids) await press(page, row.locator(`[data-choice="${id}"]`), touch);
       await press(page, row.locator('.kit-multi__done'), touch);

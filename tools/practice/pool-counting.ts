@@ -27,6 +27,7 @@ const stepSig = (step: ReasoningStep): string => {
     return `v:${refSig(step.prompt)}|${refSig(step.statement)}=${step.answer}${
       step.fix ? `|fix=${step.fix.answer}` : ''
     }`;
+  if (step.kind === 'set-clock') return `c:${refSig(step.prompt)}=${step.h}:${step.m}`;
   const correct = step.options
     .filter((o) => o.correct)
     .map((o) => refSig(o.label))

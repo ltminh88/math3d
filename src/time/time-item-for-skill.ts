@@ -10,6 +10,7 @@ import {
   clockReadHourHalf,
   clockReadMinute,
   clockSangChieu24h,
+  clockSetClock,
   romanClockHour,
   timesOrderDigital,
 } from './clock-generators';
@@ -26,6 +27,7 @@ const GENERATORS: Readonly<Record<string, TimeGenerator>> = {
   'months-days-count': monthsDaysCount,
   'calendar-weekday': calendarWeekday,
   'calendar-days-between': calendarDaysBetween,
+  'time-set-clock': clockSetClock,
 };
 
 /** The time skills (catalog order) that have a generator. */
@@ -33,10 +35,12 @@ export const TIME_SKILLS: readonly string[] = Object.keys(GENERATORS);
 
 export const isTimeSkill = (id: string): boolean => id in GENERATORS;
 
-/** The time skills whose items carry no scene (playable in the dialog before phase 17). */
+/** The time skills whose items carry no scene: months-days-count and times-order-digital
+ * render in the shared dialog, and time-set-clock draws its own clock in the step widget. */
 export const TIME_SCENE_FREE_SKILLS: readonly string[] = Object.freeze([
   'months-days-count',
   'times-order-digital',
+  'time-set-clock',
 ]);
 
 /** True when the skill's items never need a picture. */
