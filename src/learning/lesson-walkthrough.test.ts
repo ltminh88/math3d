@@ -23,15 +23,10 @@ describe('lesson walkthrough B1→B81 (R18, perfect player)', () => {
     expect(total).toBeLessThanOrEqual(400);
   });
 
-  // KNOWN BUG — B8 cannot reach 3 stars, even played directly (report
-  // muse-88-261124-b1-b81-walkthrough.md). B8 is a mix of B1–B7, so
-  // `planLessonRun` spreads each run over 8 source groups but a run has only
-  // 6 items: the 7th/8th groups are never picked, and B6's leftover table-4
-  // facts (mul:4x4, div:32/4, div:36/4 — each one correct answer short of
-  // box 4) get 0 picks in 20 runs. "Học tiếp" then points at B8 forever and
-  // the child never reaches B9–B81 through it. This test is marked `fails`
-  // until the planner is fixed; when it starts passing, remove the `.fails`.
-  it.fails('every lesson finishes — directly and via Học tiếp (B8 is stuck)', () => {
+  // B8 used to be stuck at 2 stars (mix spread starved its B6 table-4
+  // leftovers) — fixed in R25 direction 1: mix runs pick the weakest keys
+  // first globally, so the three box-3 keys are picked in the next run.
+  it('every lesson finishes — directly and via Học tiếp', () => {
     const unfinished = inOrder
       .filter((l) => l.status !== 'done')
       .map((l) => `B${l.n} (${l.status}, ${l.stars}★, ${l.runs} runs)`);

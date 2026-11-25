@@ -6,9 +6,10 @@
 // (tap/click, no hooks to answer), check it advances — or stays, when one run
 // cannot finish it. Desktop-chromium + tablet-portrait only (R18); the full
 // 81-lesson walk lives in the vitest layer (src/learning/lesson-walkthrough.test.ts).
-// B8 is the known exception: it cannot reach 3 stars even with perfect play
-// (its mix spread starves B6's leftover table-4 facts), so it gets its own test
-// that plays 3 runs and asserts "Học tiếp" still points at B8.
+// B8 used to be the known exception (it could not reach 3 stars even with
+// perfect play: its mix spread starved B6's leftover table-4 facts), fixed in
+// R25 direction 1 — so it gets its own test that plays up to 3 runs and
+// asserts it reaches 3 stars on desktop (tablet: runs play, "Học tiếp" stays).
 // Solver + seeding live in ./lesson-walkthrough-helpers (shared with the manual script).
 import { type Page, test } from '@playwright/test';
 import { lessonByNumber } from '../../src/learning/kntt-lesson-index';
@@ -169,8 +170,9 @@ test('sample covers first+last lesson of each topic and the 9 R8 lessons', () =>
   for (let n = 1; n <= 81; n++) topics.get(lessonByNumber(n)?.topic ?? 0)?.push(n);
   const ends = [...topics.values()].flatMap((ns) => ns.slice(0, 1).concat(ns.slice(-1)));
   const r8 = [3, 13, 16, 24, 27, 31, 32, 33, 51];
-  // B8 is a topic end too, but it has its own dedicated test (known bug), so it
-  // is not in SAMPLE: 40 lessons sampled in total (39 here + B8).
+  // B8 is a topic end too, but it has its own dedicated test (it needs up to
+  // 3 runs: its own skills start at box 1), so it is not in SAMPLE: 40
+  // lessons sampled in total (39 here + B8).
   const want = [...new Set([...ends, ...r8])].filter((n) => n !== 8).sort((a, b) => a - b);
   expect(
     SAMPLE.map((s) => s.n),
@@ -203,13 +205,17 @@ for (const group of [
   });
 }
 
-test('B8 (known bug): 3 perfect runs still leave it under 3 stars', async ({ page }, info) => {
+test('B8 (R25 fix): the weakest keys are picked and it reaches 3 stars', async ({ page }, info) => {
   onlySampleProjects(info.project.name);
   const touch = isTouch(info);
   await boot(page);
   // Seed B1–B7 the way perfect play leaves them: everything at box 4 except
   // B6's leftover table-4 facts (mul:4x4, div:32/4, div:36/4) at box 3 — the
-  // three keys B8's mix spread never picks (see the vitest walkthrough).
+  // three keys the old mix spread never picked (see the vitest walkthrough).
+  // B8's own skills (sk:pattern-add, sk:pattern-sub) are not seeded: they
+  // start at box 1, so B8 starts at 0 stars and needs up to 3 perfect runs
+  // (run 1 lifts the table-4 facts to box 4, runs 1–3 lift the own skills
+  // 1→4) — the same 3 runs the vitest layer measures.
   await seedBefore(page, 8, {
     'mul:4x4': { box: 3, attempts: 2, correct: 2 },
     'div:32/4': { box: 3, attempts: 2, correct: 2 },
@@ -217,12 +223,24 @@ test('B8 (known bug): 3 perfect runs still leave it under 3 stars', async ({ pag
   });
   await openPicker(page, touch);
   expect(await continueLesson(page), 'Học tiếp must point at B8').toBe(8);
-  expect(await rowStars(page, 8), 'B8 stars before playing').toBeLessThan(3);
-  for (let run = 0; run < 3; run++) {
+  expect(await rowStars(page, 8), 'B8 stars before playing').toBe(0);
+  let after = 0;
+  let runs = 0;
+  while (after < 3 && runs < 3) {
     await playViaContinue(page, touch, 8);
     await backToPicker(page, touch);
-    expect(await rowStars(page, 8), `B8 stars after run ${run + 1}`).toBeLessThan(3);
-    expect(await continueLesson(page), `Học tiếp must stay on B8 after run ${run + 1}`).toBe(8);
+    after = await rowStars(page, 8);
+    runs += 1;
+  }
+  if (touch) {
+    // Tablet: a Leitner box only promotes when the item is answered in under
+    // 8 s, and a tablet item takes 9–24 s on this VM — so 3 stars is not
+    // guaranteed here, the same split as the 'finish' lessons in checkLesson.
+    // The runs must still play through touch and "Học tiếp" must not go back.
+    expect(await continueLesson(page), 'Học tiếp must not go back from B8 (tablet)').toBe(8);
+  } else {
+    expect(after, `B8 stars after ${runs} run(s)`).toBe(3);
+    expect(await continueLesson(page), 'Học tiếp must move on from B8').toBeGreaterThan(8);
   }
   await closePicker(page);
 });
