@@ -14,8 +14,8 @@
     font-size: 14px;
   }
   .brand-mark {
-    width: 40px;
-    height: 40px;
+    width: 44px;
+    height: 44px;
     border-radius: 12px;
   }
   .brand-mark svg {
@@ -29,8 +29,8 @@
     display: none;
   }
   .icon-button {
-    width: 38px;
-    height: 38px;
+    width: 44px;
+    height: 44px;
     border-radius: 12px;
   }
   .area-label {
@@ -187,9 +187,13 @@
     border-radius: 16px;
   }
   .tool-button {
-    padding: 9px 11px;
+    padding: 9px 9px;
     font-size: 12px;
     gap: 6px;
+    min-height: 44px;
+  }
+  .welcome .text-button {
+    min-height: 44px;
   }
   .tool-button svg {
     width: 19px;
@@ -230,6 +234,9 @@
   .world-label {
     min-width: 86px;
     padding: 5px 9px;
+  }
+  #milo-label {
+    min-height: 44px;
   }
   .world-label strong {
     font-size: 12px;
