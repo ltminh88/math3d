@@ -67,6 +67,28 @@ const ORACLE: Record<string, (i: TimeItem, tier: SkillTier) => void> = {
       expect(stepValue(i.steps[0])).toBe(s.h);
     }
   },
+  // R37: the set-clock step carries the target time itself (no scene — the step
+  // widget draws the clock); the prompt names the target, the snap follows the tier.
+  'time-set-clock': (i, tier) => {
+    expect(i.scene).toBeUndefined();
+    const step = i.steps[0];
+    expect(step?.kind).toBe('set-clock');
+    if (step?.kind !== 'set-clock') return;
+    expect(step.h).toBeGreaterThanOrEqual(1);
+    expect(step.h).toBeLessThanOrEqual(12);
+    expect(step.m).toBeGreaterThanOrEqual(0);
+    expect(step.m).toBeLessThanOrEqual(59);
+    expect(step.snapMinutes).toBe(tier === 3 ? 1 : 5);
+    if (step.snapMinutes === 5) expect(step.m % 5).toBe(0);
+    if (tier === 1) expect([0, 15, 30, 45]).toContain(step.m);
+    expect(step.prompt.params?.h).toBe(step.h);
+    if (step.m === 0) {
+      expect(step.prompt.key).toBe('askSetClockHour');
+    } else {
+      expect(step.prompt.key).toBe('askSetClock');
+      expect(step.prompt.params?.mm).toBe(String(step.m).padStart(2, '0'));
+    }
+  },
 };
 
 const CLOCK_SKILLS = [
@@ -77,6 +99,7 @@ const CLOCK_SKILLS = [
   'clock-elapsed-minutes',
   'times-order-digital',
   'roman-clock-hour',
+  'time-set-clock',
 ] as const;
 
 describe('time generators (clock skills)', () => {

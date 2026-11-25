@@ -4,6 +4,7 @@
 import { pick, shuffle } from '../learning/seeded-rng';
 import { type Candidate, numberChoiceStep, ref } from '../reasoning/reasoning-distractors';
 import type { PromptRef } from '../reasoning/reasoning-types';
+import { snapMinutesForTier } from './clock-setter';
 import {
   clockScene,
   digitalChoiceStep,
@@ -63,6 +64,25 @@ export const clockReadMinute: TimeGenerator = (rng, tier) => {
   if (tier >= 2) candidates.push(...fiveMinMisread(h, m), ...swapped(h, m));
   const step = digitalChoiceStep(rng, ref('askClock'), h, m, candidates, false, NEAR_BY_TIER[tier]);
   return timeSceneItem('clock-read-minute', tier, ref('clockStory'), [step], clockScene(h, m));
+};
+
+/** R37: set the clock hands to a given time. T1 asks quarter hours, T2 any 5-minute
+ * mark, T3 any minute; the snap follows the tier (5 / 5 / 1). No scene: the step
+ * widget draws the clock the child sets. Whole hours ask "mấy giờ", not "0 phút". */
+export const clockSetClock: TimeGenerator = (rng, tier) => {
+  const h = pick(rng, HOURS_1_12);
+  const snapMinutes = snapMinutesForTier(tier);
+  const m =
+    snapMinutes === 1
+      ? Math.floor(rng() * 60)
+      : pick(rng, tier === 1 ? ([0, 15, 30, 45] as const) : FIVE_MIN);
+  const prompt =
+    m === 0
+      ? ref('askSetClockHour', { h })
+      : ref('askSetClock', { h, mm: String(m).padStart(2, '0') });
+  return timeItem('time-set-clock', tier, ref('setClockStory'), [
+    { kind: 'set-clock', prompt, h, m, snapMinutes },
+  ]);
 };
 
 const PERIOD_STORIES = {

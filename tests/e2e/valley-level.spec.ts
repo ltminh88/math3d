@@ -80,7 +80,7 @@ async function answerStep(page: Page, s: ValleyState, touch: boolean): Promise<v
       await blur(page);
       await page.keyboard.press(String((await choiceIndex(page, step.label)) + 1));
     }
-  } else {
+  } else if (step.kind === 'multi') {
     // Choose-all: shapes/blocks on the board stand for the options (touch), keys 1-4 on desktop.
     const boardOptions = s.targets.some((t) => t.startsWith('shape:') || t.startsWith('block:'));
     for (const option of step.options) {
@@ -97,6 +97,8 @@ async function answerStep(page: Page, s: ValleyState, touch: boolean): Promise<v
       .toEqual([...step.options].sort());
     if (touch) await row.locator('.kit-multi__done').tap();
     else await page.keyboard.press('Enter');
+  } else {
+    throw new Error('valley spec: set-clock steps are not played (valley skills only)');
   }
 }
 

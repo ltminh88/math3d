@@ -104,12 +104,12 @@ describe('planLessonRun', () => {
     expect(b14).toHaveLength(6);
     expect(new Set(b14).size).toBe(6);
     expect(b14.every((k) => k.startsWith('sk:fraction-'))).toBe(true);
-    // B66 plans its nine time skills now that phase 13 landed them.
+    // B66 plans its ten time skills now that phase 13 landed them (plus R37's set-clock).
     const b66 = planLessonRun(66, {}, mulberry32(4));
     expect(b66).toHaveLength(6);
     expect(new Set(b66).size).toBe(6);
     expect(
-      b66.every((k) => /^(sk:clock-|sk:times-|sk:roman-|sk:months-|sk:calendar-)/.test(k)),
+      b66.every((k) => /^(sk:clock-|sk:times-|sk:roman-|sk:months-|sk:calendar-|sk:time-)/.test(k)),
     ).toBe(true);
     // B47 has one time skill (roman-clock-hour) plus three number skills now that
     // phase 08 landed Roman numerals: six items, the four unique, two repeats.
@@ -140,7 +140,7 @@ describe('planLessonRun', () => {
     expect(new Set(b69).size).toBe(6);
     expect(
       b69.every((k) =>
-        /^(sk:clock-|sk:times-|sk:roman-|sk:months-|sk:calendar-|sk:money-)/.test(k),
+        /^(sk:clock-|sk:times-|sk:roman-|sk:months-|sk:calendar-|sk:money-|sk:time-)/.test(k),
       ),
     ).toBe(true);
     // B73 plans its five data table skills now that phase 15 landed them: six items,

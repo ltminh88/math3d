@@ -18,6 +18,7 @@
 import { dialogRenderable, itemForSkill } from '../practice/item-for-skill';
 import { buildDailyQuestion } from '../quiz/daily-question';
 import { isStepAnswerCorrect, playableSteps } from '../reasoning/reasoning-step-answers';
+import type { ClockSetting } from '../time/clock-setter';
 import { isKeyRenderable } from '../ui/practice-run';
 import { type FactKey, isSkillKey, parseKey } from './fact-key';
 import {
@@ -74,7 +75,7 @@ type Stats = Record<FactKey, FactStat | undefined>;
 
 /** The correct answer for one playable step, as the step kit would submit it. */
 function correctAnswerOf(step: ReturnType<typeof playableSteps>[number]): {
-  answer: number | string | readonly string[] | boolean;
+  answer: number | string | readonly string[] | boolean | ClockSetting;
   problem?: string;
 } {
   switch (step.kind) {
@@ -96,6 +97,8 @@ function correctAnswerOf(step: ReturnType<typeof playableSteps>[number]): {
       return typeof step.answer === 'boolean'
         ? { answer: step.answer }
         : { answer: false, problem: 'verdict step with non-boolean answer' };
+    case 'set-clock':
+      return { answer: { h: step.h, m: step.m } };
   }
 }
 

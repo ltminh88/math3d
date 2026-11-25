@@ -10,7 +10,8 @@ export type NumberfortExpected =
   | { kind: 'number'; answer: number }
   | { kind: 'choice'; index: number }
   | { kind: 'multi'; ids: string[]; all: string[] }
-  | { kind: 'verdict'; answer: boolean };
+  | { kind: 'verdict'; answer: boolean }
+  | { kind: 'set-clock'; h: number; m: number };
 
 export interface NumberfortTestHook {
   state(): {
@@ -37,6 +38,7 @@ function expectedOf(step: ReasoningStep | undefined): NumberfortExpected | null 
   if (step.kind === 'verdict') return { kind: 'verdict', answer: step.answer };
   if (step.kind === 'choice')
     return { kind: 'choice', index: step.options.findIndex((o) => o.correct) };
+  if (step.kind === 'set-clock') return { kind: 'set-clock', h: step.h, m: step.m };
   return {
     kind: 'multi',
     ids: step.options.filter((o) => o.correct).map((o) => o.id),

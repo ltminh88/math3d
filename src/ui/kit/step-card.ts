@@ -6,8 +6,10 @@ import {
 } from '../../reasoning/reasoning-step-answers';
 import { renderPrompt as renderReasoningPrompt } from '../../reasoning/reasoning-strings';
 import type { PromptRef, ReasoningItem, ReasoningStep } from '../../reasoning/reasoning-types';
+import { digitalText } from '../../time/time-ranges';
 import { announce } from './aria-announcer';
 import { createChoiceButtons } from './choice-buttons';
+import { createClockSetter } from './clock-setter';
 import { createMultiSelectButtons } from './multi-select-buttons';
 import { createNumberPad } from './number-pad';
 import { tk } from './ui-kit-strings';
@@ -46,6 +48,7 @@ interface Widget {
 const answerText = (step: ReasoningStep, renderPrompt: (p: PromptRef) => string): string => {
   if (step.kind === 'number') return String(step.answer);
   if (step.kind === 'verdict') return tk(step.answer ? 'yes' : 'no');
+  if (step.kind === 'set-clock') return digitalText(step.h, step.m);
   return step.options
     .filter((o) => o.correct)
     .map((o) => renderPrompt(o.label))
@@ -127,6 +130,11 @@ export function createStepCard(
     }
     if (step.kind === 'choice') return createChoiceButtons(choices(step), (c) => submit(c.id), doc);
     if (step.kind === 'verdict') return createVerdictButtons((v) => submit(v), doc);
+    if (step.kind === 'set-clock')
+      return createClockSetter(
+        { snapMinutes: step.snapMinutes, onDone: (setting) => submit(setting) },
+        doc,
+      );
     const multi = createMultiSelectButtons(
       choices(step),
       (ids) => {

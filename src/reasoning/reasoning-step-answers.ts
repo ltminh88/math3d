@@ -1,8 +1,9 @@
 // Answer checking for reasoning steps, shared by the step kit and level code (pure).
+import { type ClockSetting, isSetClockCorrect } from '../time/clock-setter';
 import type { ReasoningItem, ReasoningStep } from './reasoning-types';
 
-/** number step: a number; choice: an option id; multi: the chosen option ids; verdict: true/false. */
-export type StepAnswer = number | string | readonly string[] | boolean;
+/** number step: a number; choice: an option id; multi: the chosen option ids; verdict: true/false; set-clock: the set hands. */
+export type StepAnswer = number | string | readonly string[] | boolean | ClockSetting;
 
 /** The steps as played: a false verdict that carries a fix is followed by a number step for it. */
 export function playableSteps(item: ReasoningItem): ReasoningStep[] {
@@ -26,6 +27,12 @@ export function isStepAnswerCorrect(step: ReasoningStep, answer: StepAnswer): bo
     }
     case 'verdict':
       return answer === step.answer;
+    case 'set-clock': {
+      if (typeof answer !== 'object' || answer === null || Array.isArray(answer)) return false;
+      const setting = answer as ClockSetting;
+      if (typeof setting.h !== 'number' || typeof setting.m !== 'number') return false;
+      return isSetClockCorrect(setting, { h: step.h, m: step.m }, step.snapMinutes);
+    }
   }
 }
 

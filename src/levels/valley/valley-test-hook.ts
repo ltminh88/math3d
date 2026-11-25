@@ -13,7 +13,8 @@ export type ValleyStepState =
   | { kind: 'number'; answer: number }
   | { kind: 'choice'; label: string; option: string }
   | { kind: 'multi'; options: string[] }
-  | { kind: 'verdict'; answer: boolean };
+  | { kind: 'verdict'; answer: boolean }
+  | { kind: 'set-clock'; h: number; m: number };
 
 export interface ValleyTestHook {
   state(): {
@@ -62,6 +63,7 @@ export function installValleyTestHook(
     if (!step) return null;
     if (step.kind === 'number' || step.kind === 'verdict')
       return { kind: step.kind, answer: step.answer } as ValleyStepState;
+    if (step.kind === 'set-clock') return { kind: 'set-clock', h: step.h, m: step.m };
     const right = step.options.filter((o) => o.correct);
     if (step.kind === 'multi') return { kind: 'multi', options: right.map((o) => o.id) };
     const first = right[0];

@@ -37,6 +37,19 @@ describe('reasoning step answers', () => {
     const verdict: ReasoningStep = { kind: 'verdict', prompt: p, statement: p, answer: false };
     expect(isStepAnswerCorrect(verdict, false)).toBe(true);
     expect(isStepAnswerCorrect(verdict, true)).toBe(false);
+
+    const setClock: ReasoningStep = {
+      kind: 'set-clock',
+      prompt: p,
+      h: 3,
+      m: 25,
+      snapMinutes: 5,
+    };
+    expect(isStepAnswerCorrect(setClock, { h: 3, m: 25 })).toBe(true);
+    expect(isStepAnswerCorrect(setClock, { h: 4, m: 25 })).toBe(false);
+    expect(isStepAnswerCorrect(setClock, { h: 3, m: 30 })).toBe(false);
+    expect(isStepAnswerCorrect(setClock, 325)).toBe(false);
+    expect(isStepAnswerCorrect(setClock, '3:25')).toBe(false);
   });
 
   it('plays a false verdict with a fix as verdict, then a number step', () => {

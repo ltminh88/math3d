@@ -12,7 +12,8 @@ export type WorkshopPlannedStep =
   | { kind: 'number'; answer: number }
   | { kind: 'choice'; index: number; label: string; wrongIndex: number }
   | { kind: 'multi'; indexes: number[] }
-  | { kind: 'verdict'; answer: boolean };
+  | { kind: 'verdict'; answer: boolean }
+  | { kind: 'set-clock'; h: number; m: number };
 
 export interface WorkshopTestHook {
   state(): {
@@ -58,6 +59,7 @@ export function installWorkshopTestHook(c: WorkshopRoundController): () => void 
         steps: steps.map((step): WorkshopPlannedStep => {
           if (step.kind === 'number') return { kind: 'number', answer: step.answer };
           if (step.kind === 'verdict') return { kind: 'verdict', answer: step.answer };
+          if (step.kind === 'set-clock') return { kind: 'set-clock', h: step.h, m: step.m };
           const right = step.options.flatMap((o, i) => (o.correct ? [i] : []));
           if (step.kind === 'multi') return { kind: 'multi', indexes: right };
           const index = right[0] ?? 0;

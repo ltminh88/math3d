@@ -12,7 +12,8 @@ export type PlannedStep =
   | { kind: 'number'; answer: number }
   | { kind: 'choice'; label: string }
   | { kind: 'multi'; ids: string[] }
-  | { kind: 'verdict'; answer: boolean };
+  | { kind: 'verdict'; answer: boolean }
+  | { kind: 'set-clock'; h: number; m: number };
 
 export const isTouch = (info: TestInfo) => info.project.use.hasTouch === true;
 
@@ -62,6 +63,49 @@ async function typeNumber(page: Page, pad: Locator, value: number, touch: boolea
   }
 }
 
+/** Sets a clock-setter step to (h, m) with the +/− buttons, reading the live readout
+ * after each press — snap-agnostic (the minute step is the widget's grid, 5 or 1).
+ * The widget starts at 12:00, so hour+ cycles forward to the target hour and
+ * minute+ to the target minute; a wrong target throws instead of looping forever. */
+export async function setClockViaButtons(
+  page: Page,
+  row: Locator,
+  target: { h: number; m: number },
+  touch: boolean,
+): Promise<void> {
+  const readout = row.locator('.kit-clock-setter__readout');
+  const read = async (): Promise<{ h: number; m: number }> => {
+    const text = (await readout.textContent()) ?? '';
+    const match = /(\d+):(\d{2})/.exec(text);
+    if (!match) throw new Error(`clock readout not parsed: ${text}`);
+    return { h: Number(match[1]), m: Number(match[2]) };
+  };
+  for (let i = 0; i < 12; i++) {
+    if ((await read()).h === target.h) break;
+    await press(page, row.locator('[data-clock="hour-plus"]'), touch);
+  }
+  for (let i = 0; i < 60; i++) {
+    if ((await read()).m === target.m) break;
+    await press(page, row.locator('[data-clock="minute-plus"]'), touch);
+  }
+  const current = await read();
+  if (current.h !== target.h || current.m !== target.m)
+    throw new Error(
+      `clock setter did not reach ${target.h}:${target.m}, at ${current.h}:${current.m}`,
+    );
+}
+
+/** Sets the clock with the +/− buttons, then presses "Xong". */
+export async function solveSetClock(
+  page: Page,
+  row: Locator,
+  target: { h: number; m: number },
+  touch: boolean,
+): Promise<void> {
+  await setClockViaButtons(page, row, target, touch);
+  await press(page, row.locator('.kit-clock-setter__done'), touch);
+}
+
 async function solveQuizItem(page: Page, touch: boolean): Promise<void> {
   const content = page.locator('#dialog-content');
   const equation = await content.locator('.equation').textContent();
@@ -103,6 +147,7 @@ async function solveSkillItem(page: Page, touch: boolean): Promise<void> {
       );
     else if (step.kind === 'verdict')
       await press(page, row.locator(`[data-verdict="${step.answer}"]`), touch);
+    else if (step.kind === 'set-clock') await solveSetClock(page, row, step, touch);
     else {
       for (const id of step.ids) await press(page, row.locator(`[data-choice="${id}"]`), touch);
       await press(page, row.locator('.kit-multi__done'), touch);

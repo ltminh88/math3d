@@ -161,6 +161,7 @@ describe('skill catalog', () => {
       'months-days-count',
       'calendar-weekday',
       'calendar-days-between',
+      'time-set-clock',
     ]);
     // Money landed in phase 14 (B68): its six skills are in the catalog.
     expect(skillsOfFamily('money')).toEqual([

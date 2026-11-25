@@ -22,7 +22,8 @@ type PlannedStep =
   | { kind: 'number'; answer: number }
   | { kind: 'choice'; label: string }
   | { kind: 'multi'; ids: string[] }
-  | { kind: 'verdict'; answer: boolean };
+  | { kind: 'verdict'; answer: boolean }
+  | { kind: 'set-clock'; h: number; m: number };
 
 declare global {
   interface Window {
@@ -124,9 +125,11 @@ async function solveFirstItem(page: Page, touch: boolean): Promise<void> {
       );
     else if (step.kind === 'verdict')
       await press(page, row.locator(`[data-verdict="${step.answer}"]`), touch);
-    else {
+    else if (step.kind === 'multi') {
       for (const id of step.ids) await press(page, row.locator(`[data-choice="${id}"]`), touch);
       await press(page, row.locator('.kit-multi__done'), touch);
+    } else {
+      throw new Error('pwa-offline spec: set-clock steps are not played (B1 only)');
     }
     await expect(row).toHaveClass(/kit-step--done/);
   }

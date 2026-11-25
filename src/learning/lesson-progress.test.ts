@@ -79,6 +79,7 @@ describe('lessonStars', () => {
       'sk:months-days-count',
       'sk:calendar-weekday',
       'sk:calendar-days-between',
+      'sk:time-set-clock',
     ] as const;
     expect(lessonStars(66, {})).toBe(0);
     expect(lessonStars(66, statsOf(keys, 2))).toBe(1); // all attempted, none >= 3
