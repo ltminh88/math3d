@@ -10,7 +10,8 @@ Vòng lặp của em:
 1. Đang code → cứ làm. Đọc hộp thư ở điểm dừng (vừa push, mở PR, CI bắt đầu/xong, kẹt) VÀ mỗi lần
    em kiểm CI hay kiểm tiến trình tác nhân con — đang chờ cũng là điểm dừng.
 2. Ở điểm dừng: đọc mọi comment mới trong #{INBOX} kể từ tin cuối em đã xử lý
-   (gh issue view {INBOX} --repo ltminh88/math3d --comments), ACK các TASK/QUESTION/HANDOFF, làm theo.
+   (gh api --paginate 'repos/ltminh88/math3d/issues/{INBOX}/comments?per_page=100' — PHẢI có --paginate:
+   API mặc định chỉ trả 30 comment CŨ NHẤT, hộp thư > 30 tin sẽ trông như rỗng), ACK các TASK/QUESTION/HANDOFF, làm theo.
 3. Gửi REPORT ở mỗi điểm dừng quan trọng (gh issue comment {INBOX} --repo ltminh88/math3d --body-file ...),
    dòng đầu đúng định dạng: [{MUSE}→reviewer] LOẠI M<số> (mã tin không có dấu #; tin của reviewer mã R<số>).
 4. Không có việc → chạy nền `sleep 600` rồi kiểm lại. Đang chờ CI → `sleep 300` rồi kiểm CI và hộp thư.
