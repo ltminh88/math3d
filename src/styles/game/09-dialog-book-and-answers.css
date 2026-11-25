@@ -13,8 +13,8 @@ dialog::backdrop {
   position: absolute;
   top: 16px;
   right: 16px;
-  width: 34px;
-  height: 34px;
+  width: 44px;
+  height: 44px;
   display: grid;
   place-items: center;
   border: 0;
@@ -94,7 +94,7 @@ dialog h2 {
   letter-spacing: 1px;
 }
 .equation > span {
-  color: #80a184;
+  color: #6a8f72;
 }
 .equation .stone-symbol {
   font-size: 38px;
