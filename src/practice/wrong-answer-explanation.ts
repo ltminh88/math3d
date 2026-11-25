@@ -2,8 +2,7 @@
 // answer in the lesson/daily dialog. The UI calls this on a 'wrong' verdict; null means
 // "no per-skill explanation — keep the generic sentence". The selector never states the
 // answer: it only names the likely confusion, with the question's own numbers.
-// Lane 1 covers groups 1–3, lane 2 groups 4–6; lane 3 adds groups 7–10 and their keys
-// to wrong-answer-strings.ts. The hint ladder is untouched (golden).
+// Lanes 1–3 cover groups 1–10; the hint ladder is untouched (golden).
 import type { SkillTier } from '../learning/skill-tiers';
 import {
   isStepAnswerCorrect,
@@ -13,9 +12,13 @@ import {
 import type { ChoiceOption, ReasoningStep } from '../reasoning/reasoning-types';
 import type { PracticeItem } from './practice-scene';
 import { explainArea } from './wrong-answer-area';
+import { explainCarry } from './wrong-answer-carry';
 import { explainClock } from './wrong-answer-clock';
+import { explainData } from './wrong-answer-data';
 import { explainFraction } from './wrong-answer-fraction';
 import { explainMidpoint } from './wrong-answer-midpoint';
+import { explainMoney } from './wrong-answer-money';
+import { explainRemainder } from './wrong-answer-remainder';
 import type { WrongAnswerKey } from './wrong-answer-strings';
 import { explainTwoStep } from './wrong-answer-two-step';
 import { explainUnknown } from './wrong-answer-unknown';
@@ -44,10 +47,14 @@ export interface WrongAnswerContext {
   readonly tier: SkillTier;
   readonly item: PracticeItem;
   readonly step: ReasoningStep;
+  /** Index into playableSteps(item) — which step the wrong answer belongs to. */
+  readonly stepIndex: number;
   /** The chosen option for choice steps (undefined when the id did not match). */
   readonly option?: ChoiceOption;
   /** The wrong number for number steps (and for choice steps with a numeric label). */
   readonly wrongNumber?: number;
+  /** The chosen option ids for multi steps (money-pick-notes). */
+  readonly chosenIds?: readonly string[];
   readonly missNumber: number;
 }
 
@@ -65,12 +72,13 @@ export function numParam(
 function resolveAnswer(
   step: ReasoningStep,
   answer: StepAnswer,
-): { option?: ChoiceOption; wrongNumber?: number } {
+): { option?: ChoiceOption; wrongNumber?: number; chosenIds?: readonly string[] } {
   if (step.kind === 'choice' && typeof answer === 'string') {
     const option = step.options.find((o) => o.id === answer);
     const n = option?.label.params?.n;
     return { option, wrongNumber: typeof n === 'number' ? n : undefined };
   }
+  if (step.kind === 'multi' && Array.isArray(answer)) return { chosenIds: answer };
   if (step.kind === 'number' && typeof answer === 'number') return { wrongNumber: answer };
   return {};
 }
@@ -86,6 +94,7 @@ export function explainWrongAnswer(input: WrongAnswerInput): WrongAnswerExplanat
     tier: input.tier,
     item: input.item,
     step,
+    stepIndex: input.stepIndex,
     missNumber: input.missNumber,
     ...resolveAnswer(step, input.answer),
   };
@@ -103,5 +112,45 @@ export function explainWrongAnswer(input: WrongAnswerInput): WrongAnswerExplanat
     return explainFraction(ctx);
   if (input.skillId === 'roman-clock-hour' || input.skillId === 'clock-sang-chieu-24h')
     return explainClock(ctx);
+  if (
+    input.skillId === 'money-change-back' ||
+    input.skillId === 'money-total-notes' ||
+    input.skillId === 'money-pick-notes' ||
+    input.skillId === 'money-wp'
+  )
+    return explainMoney(ctx);
+  if (
+    input.skillId === 'tally-count' ||
+    input.skillId === 'table-read' ||
+    input.skillId === 'table-max-min' ||
+    input.skillId === 'table-sums' ||
+    input.skillId === 'table-fill-missing' ||
+    input.skillId === 'chance-bag' ||
+    input.skillId === 'chance-dice'
+  )
+    return explainData(ctx);
+  if (
+    input.skillId === 'add-sub-1000' ||
+    input.skillId === 'add-sub-1000-wp' ||
+    input.skillId === 'add-sub-10000-wp' ||
+    input.skillId === 'add-sub-100000-wp' ||
+    input.skillId === 'add-sub-1000-chain' ||
+    input.skillId === 'add-4digit' ||
+    input.skillId === 'sub-4digit' ||
+    input.skillId === 'add-5digit' ||
+    input.skillId === 'sub-5digit' ||
+    input.skillId === 'add-sub-find-error' ||
+    input.skillId === 'add-missing-digit'
+  )
+    return explainCarry(ctx);
+  if (
+    input.skillId === 'div-2d-1d-remainder' ||
+    input.skillId === 'div-3d-1d-remainder' ||
+    input.skillId === 'div-4d-1d-remainder' ||
+    input.skillId === 'div-5d-1d-remainder' ||
+    input.skillId === 'div-rem-floor' ||
+    input.skillId === 'div-rem-ceil'
+  )
+    return explainRemainder(ctx);
   return null;
 }
