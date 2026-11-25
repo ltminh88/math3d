@@ -48,6 +48,17 @@ describe('explainWrongAnswer — group 3 midpoint', () => {
     expect(explain(it, 0, 8)).toBeNull();
   });
 
+  test('tier 1 midPart: halving is right when am == len/2 — no blame (R38 Q3)', () => {
+    const it = item(
+      'geo-midpoint-length',
+      1,
+      { key: 'midPart', params: { len: 12, am: 6 } },
+      [num('askMB', 6)],
+      [6],
+    );
+    expect(explain(it, 0, 6)).toBeNull();
+  });
+
   test('tier 2 midSum: one part instead of the whole, near-miss → fallback', () => {
     const it = item(
       'geo-midpoint-length',

@@ -22,7 +22,14 @@ export function explainMidpoint(ctx: WrongAnswerContext): WrongAnswerExplanation
     if (w === len) return { key: 'mid1Whole', params: { len, am } };
     if (w === am) return { key: 'mid1AmInstead', params: { am } };
     if (w === len + am) return { key: 'mid1AddInstead', params: { len, am } };
-    if (w === len / 2) return { key: 'mid1HalfInstead', params: { len, am } };
+    // R38 Q3: only blame halving when halving is actually wrong — when
+    // am == len/2, MB is len/2, so halving is right (the dispatcher guard
+    // already returns null then; check explicitly so the matcher never
+    // blames a right halving).
+    if (w === len / 2) {
+      if (ctx.step.kind === 'number' && len / 2 === ctx.step.answer) return null;
+      return { key: 'mid1HalfInstead', params: { len, am } };
+    }
     return FALLBACK;
   }
   if (key === 'midSum') {

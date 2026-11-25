@@ -30,8 +30,9 @@ export interface WrongAnswerInput {
   readonly stepIndex: number;
   readonly answer: StepAnswer;
   /**
-   * 1 = first miss on this step, 2 = second miss. Lane 1 returns the same explanation
-   * for both (reviewer Q1 about leading to the answer on the second miss is pending).
+   * 1 = first miss on this step, 2 = second miss. The same explanation is
+   * shown for both (reviewer Q1, R38: explanation only — the hint button
+   * leads to the answer, so the selector never states it).
    */
   readonly missNumber: number;
 }

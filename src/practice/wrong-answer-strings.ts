@@ -104,8 +104,7 @@ export const twa = defineStrings('wrongAnswer', {
       'Bạn điền AM dài {am} cm, nhưng bài hỏi đoạn MB còn lại. Mình nhìn hình xem MB là đoạn nào nhé.',
     mid1AddInstead:
       'Bạn cộng {len} với {am} rồi, nhưng MB là phần còn lại sau khi trừ. Mình lấy {len} trừ {am} xem bằng mấy nhé.',
-    mid1HalfInstead:
-      'Bạn chia đôi cả đoạn AB, nhưng M chưa chắc là trung điểm đâu. Mình lấy {len} trừ {am} xem bằng mấy nhé.',
+    mid1HalfInstead: 'M không nằm chính giữa AB đâu. Mình lấy {len} trừ {am} nhé.',
     mid2OnePart:
       'Bạn mới lấy một đoạn thôi, AB gồm cả AM và MB gộp lại. Mình cộng AM với MB xem bằng mấy nhé.',
     mid3Whole:
@@ -358,8 +357,7 @@ export const twa = defineStrings('wrongAnswer', {
       'You wrote AM, {am} cm, but the question asks for the leftover MB. Look at the picture and see which part MB is.',
     mid1AddInstead:
       'You added {len} and {am}, but MB is what is left after subtracting. Try {len} minus {am} and see what you get.',
-    mid1HalfInstead:
-      'You halved AB, but M is not necessarily the midpoint here. Try {len} minus {am} and see what you get.',
+    mid1HalfInstead: 'M is not in the middle of AB. Try {len} minus {am}.',
     mid2OnePart:
       'You only took one part; AB is AM and MB put together. Try adding AM and MB and see what you get.',
     mid3Whole:
