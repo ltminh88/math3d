@@ -237,7 +237,11 @@ test('B8 (R25 fix): the weakest keys are picked and it reaches 3 stars', async (
     // 8 s, and a tablet item takes 9–24 s on this VM — so 3 stars is not
     // guaranteed here, the same split as the 'finish' lessons in checkLesson.
     // The runs must still play through touch and "Học tiếp" must not go back.
-    expect(await continueLesson(page), 'Học tiếp must not go back from B8 (tablet)').toBe(8);
+    // On a fast runner the items do beat 8 s, B8 reaches 3 stars and "Học tiếp"
+    // moves on to B9 — so the pointer depends on the stars actually earned.
+    const next = await continueLesson(page);
+    if (after >= 3) expect(next, 'Học tiếp must move on from B8 (tablet)').toBeGreaterThan(8);
+    else expect(next, 'Học tiếp must stay on B8 (tablet)').toBe(8);
   } else {
     expect(after, `B8 stars after ${runs} run(s)`).toBe(3);
     expect(await continueLesson(page), 'Học tiếp must move on from B8').toBeGreaterThan(8);
