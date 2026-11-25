@@ -5,6 +5,7 @@ import type { QuestionOutcome } from '../../learning/session-recorder';
 import { createStepCard, type StepAnswerEvent, type StepCard } from '../../ui/kit/step-card';
 import { createLevelRunTally } from '../shared/level-run-tally';
 import type { LevelContext } from '../shared/level-types';
+import { wrongAnswerFeedback } from '../shared/wrong-answer-feedback';
 import type { CaveFormat } from './cave-chamber-formats';
 import { caveHintText, renderOf } from './cave-hints';
 import type { CavePanel } from './cave-panel';
@@ -71,10 +72,22 @@ export class CaveRoundController {
     if (result.verdict === 'ignored') return;
     this.idle = 0;
     if (result.verdict === 'wrong') {
-      this.panel.setFeedback(this.cs('wrong'), 'gentle');
+      // R42: a per-skill explanation when the mistake is recognised (R35);
+      // otherwise the generic sentence. flow.answer already counted this
+      // miss, so wrongAttempts is 1 on the first miss and 2 on the second.
+      const text =
+        wrongAnswerFeedback({
+          skillId: chamber.skillId,
+          tier: chamber.item.tier,
+          item: chamber.item,
+          stepIndex: event.stepIndex,
+          answer: event.answer,
+          missNumber: this.flow.hint.wrongAttempts,
+        }) ?? this.cs('wrong');
+      this.panel.setFeedback(text, 'gentle');
       this.panel.offerHint(this.flow.hintOffered(0));
       this.ctx.audio.hint();
-      this.ctx.announce(this.cs('wrong'));
+      this.ctx.announce(text);
       return;
     }
     const revealed = result.verdict === 'revealed';

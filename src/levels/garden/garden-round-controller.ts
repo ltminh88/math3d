@@ -5,6 +5,7 @@
 import { createStepCard, type StepAnswerEvent, type StepCard } from '../../ui/kit/step-card';
 import { createLevelRunTally } from '../shared/level-run-tally';
 import type { LevelContext } from '../shared/level-types';
+import { wrongAnswerFeedback } from '../shared/wrong-answer-feedback';
 import type { GardenBalanceView } from './garden-balance-view';
 import { renderGardenHint } from './garden-hints';
 import type { GardenPanel } from './garden-panel';
@@ -94,10 +95,22 @@ export class GardenRoundController {
     if (result.verdict === 'ignored') return;
     this.idle = 0;
     if (result.verdict === 'wrong') {
-      this.panel.setFeedback(this.gs('wrong'), 'gentle');
+      // R42: a per-skill explanation when the mistake is recognised (R35);
+      // otherwise the generic sentence. flow.submit already counted this
+      // miss, so wrongAttempts is 1 on the first miss and 2 on the second.
+      const text =
+        wrongAnswerFeedback({
+          skillId: round.skillId,
+          tier: round.item.tier,
+          item: round.item,
+          stepIndex: event.stepIndex,
+          answer: event.answer,
+          missNumber: this.flow.hint.wrongAttempts,
+        }) ?? this.gs('wrong');
+      this.panel.setFeedback(text, 'gentle');
       this.panel.offerHint(this.flow.hintOffered(0));
       this.ctx.audio.hint();
-      this.ctx.announce(this.gs('wrong'));
+      this.ctx.announce(text);
       return;
     }
     const revealed = result.verdict === 'revealed';

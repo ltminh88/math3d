@@ -14,6 +14,7 @@ import { createLevelRunTally } from '../shared/level-run-tally';
 import type { LevelContext } from '../shared/level-types';
 import { LAST_REASONING_RUNG, ReasoningRoundFlow } from '../shared/reasoning-round-flow';
 import type { ReasoningRoundPlan } from '../shared/reasoning-round-slot';
+import { wrongAnswerFeedback } from '../shared/wrong-answer-feedback';
 import type { NumberfortPanel } from './numberfort-panel';
 import type { NumberfortStrings } from './numberfort-strings';
 
@@ -117,10 +118,25 @@ export class NumberfortRoundController {
     if (result.verdict === 'ignored') return;
     this.idle = 0;
     if (result.verdict === 'wrong') {
-      this.panel.setFeedback(this.cs('wrong'), 'gentle');
+      // R42: a per-skill explanation when the mistake is recognised (R35);
+      // otherwise the generic sentence. flow.answer already counted this
+      // miss, so wrongAttempts is 1 on the first miss and 2 on the second.
+      const plan = this.plan;
+      const text =
+        (plan &&
+          wrongAnswerFeedback({
+            skillId: plan.skillId,
+            tier: plan.tier,
+            item: plan.item,
+            stepIndex: event.stepIndex,
+            answer: event.answer,
+            missNumber: flow.hint.wrongAttempts,
+          })) ??
+        this.cs('wrong');
+      this.panel.setFeedback(text, 'gentle');
       this.panel.offerHint(shouldOfferHint(flow.hint, 0));
       this.ctx.audio.hint();
-      this.ctx.announce(this.cs('wrong'));
+      this.ctx.announce(text);
       return;
     }
     const revealed = result.verdict === 'revealed';

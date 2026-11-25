@@ -7,6 +7,7 @@ import { playableSteps } from '../../reasoning/reasoning-step-answers';
 import { createStepCard, type StepAnswerEvent, type StepCard } from '../../ui/kit/step-card';
 import { createLevelRunTally } from '../shared/level-run-tally';
 import type { LevelContext } from '../shared/level-types';
+import { wrongAnswerFeedback } from '../shared/wrong-answer-feedback';
 import { createWorkshopBoard, type WorkshopBoard } from './workshop-board';
 import type { WorkshopHintStrings } from './workshop-hint-strings';
 import { misconceptionNote, workshopHint } from './workshop-hints';
@@ -93,7 +94,19 @@ export class WorkshopRoundController {
         ? step.options.find((o) => o.id === event.answer)
         : undefined;
     const note = misconceptionNote(chosen?.misconception);
-    const text = note ? this.hs(note.key as never) : this.ws('wrong');
+    // R42 (Q1b): the level's own misconception note wins; the R35 explanation is
+    // used only when there is no note — never both. flow.answer already counted
+    // this miss, so misses is 1 on the first miss and 2 on the second.
+    const text = note
+      ? this.hs(note.key as never)
+      : (wrongAnswerFeedback({
+          skillId: round.skillId,
+          tier: round.tier,
+          item: round.item,
+          stepIndex: event.stepIndex,
+          answer: event.answer,
+          missNumber: this.flow.misses,
+        }) ?? this.ws('wrong'));
     this.panel.setFeedback(text, 'gentle');
     this.panel.offerHint(true);
     this.ctx.audio.hint();
