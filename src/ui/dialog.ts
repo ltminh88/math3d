@@ -27,12 +27,11 @@ export function openDialog(title: string, bodyHtml: string, kind: DialogKind): v
   } else {
     // The content was swapped while the dialog stayed open: the control that
     // had focus may have been removed with the old content, leaving focus on
-    // <body>. Move it to the first focusable element of the new content so
-    // keyboard / screen-reader users land inside the dialog.
-    const first = dialog.querySelector<HTMLElement>(
-      'button:not([disabled]), [href], input, select, textarea, [tabindex]:not([tabindex="-1"])',
-    );
-    first?.focus();
+    // <body>. Move it to the content container itself (tabindex -1, not a
+    // control) so keyboard / screen-reader users land inside the dialog without
+    // focusing the close button — a focused button would swallow number keys
+    // meant for the number pad and turn Enter into "close".
+    byId('dialog-content').focus({ preventScroll: true });
   }
 }
 

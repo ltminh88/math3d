@@ -165,3 +165,8 @@ dialog h2 {
 .answer:disabled:not(.correct):not(.incorrect) {
   opacity: 0.55;
 }
+
+/* Focus target after a content swap (dialog.ts); not a control, so no ring. */
+#dialog-content:focus {
+  outline: none;
+}
