@@ -166,6 +166,7 @@ test('the new regions add no draw calls', async ({ page }) => {
   // sign, portal, padlock + their shadows), and the sign textures add 2 textures. The bounds
   // below are main + 16 (draws/geometries) and main + 2 (textures): tight enough to catch a
   // future gate-sized addition, loose enough for the windmill/beacon drift at the spawn spot.
+  // Phase 1A adds the island gate the same way (+1 sign texture, so the texture bound is 28).
   const spawn = await drawCallsAt(page, -6, 0.5);
   expect(spawn.calls).toBeLessThanOrEqual(334);
   const market = await drawCallsAt(page, -32, -30);
@@ -174,6 +175,6 @@ test('the new regions add no draw calls', async ({ page }) => {
   expect(numberfort.calls).toBeLessThanOrEqual(278);
   for (const spot of [spawn, market, numberfort]) {
     expect(spot.geometries).toBeLessThanOrEqual(308);
-    expect(spot.textures).toBeLessThanOrEqual(27);
+    expect(spot.textures).toBeLessThanOrEqual(28);
   }
 });
