@@ -67,14 +67,17 @@ describe('patterns', () => {
   });
 
   it('every sentence contains a bank word, so the gloss line is never empty', () => {
-    const singular = (word: string): string =>
-      word.endsWith('s') ? word.slice(0, -1) : word;
+    const singular = (word: string): string => (word.endsWith('s') ? word.slice(0, -1) : word);
     for (const sentences of Object.values(ENGLISH_PATTERN_SENTENCES)) {
       for (const sentence of sentences) {
         expect(
           sentence.some((w) => byName.has(w) || byName.has(singular(w))),
           sentence.join(' '),
         ).toBe(true);
+        // The last word is the fill blank and the gloss word: it must be a
+        // bank word in its own right, not just reachable through another word.
+        const last = sentence[sentence.length - 1] as string;
+        expect(byName.has(last) || byName.has(singular(last)), last).toBe(true);
       }
     }
   });

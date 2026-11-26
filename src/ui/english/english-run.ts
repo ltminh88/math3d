@@ -11,12 +11,13 @@
 // button unlocks the book pack, and `signal` lets the shell abort mid-run.
 import './english-widgets.css';
 import { unitForStage } from '../../english/content/units';
+import { ENGLISH_WORD_BANK } from '../../english/content/word-bank';
 import type { EnglishAttempt } from '../../english/engine/answer-check';
 import { checkAnswer } from '../../english/engine/answer-check';
 import { englishWrongFeedback } from '../../english/engine/english-wrong-feedback';
 import { generateItem } from '../../english/engine/item-generators';
 import { createItemPlanner, type PlannedRound } from '../../english/engine/item-planner';
-import type { EnglishItem, EnglishPack, EnglishUnit } from '../../english/english-types';
+import type { EnglishItem, EnglishPack } from '../../english/english-types';
 import { fetchEnglishPack } from '../../english/pack/pack-client';
 import { openPackStore } from '../../english/pack/pack-storage';
 import { skillKey } from '../../learning/fact-key';
@@ -90,9 +91,14 @@ export function getEnglishRunLive(): EnglishRunLive {
   return live;
 }
 
-/** Word → gloss pairs the widget reveals after the item is done. */
-function glossesFor(item: EnglishItem, unit: EnglishUnit): { word: string; vi: string }[] {
-  const byWord = new Map(unit.words.map((w) => [w.word, w.gloss]));
+/**
+ * Word → gloss pairs the widget reveals after the item is done. Looked up in
+ * the whole word bank, not the stage unit: pattern sentences come from the
+ * shared sentence bank, so a stage-1 sentence may teach a word from a later
+ * block ("I can swim", "I see the sun") — its gloss must still show.
+ */
+function glossesFor(item: EnglishItem): { word: string; vi: string }[] {
+  const byWord = new Map(ENGLISH_WORD_BANK.map((w) => [w.word, w.gloss]));
   const singular = (word: string): string =>
     byWord.has(word) ? word : word.endsWith('s') ? word.slice(0, -1) : word;
   const words: string[] =
@@ -133,12 +139,11 @@ function speakTextFor(item: EnglishItem): string {
 function mountWidget(
   item: EnglishItem,
   hooks: EnglishWidgetHooks,
-  unit: EnglishUnit,
   onSpeak: (text: string) => void,
   hideWord: boolean,
 ): EnglishWidget {
   const options: EnglishWidgetOptions = {
-    glosses: glossesFor(item, unit),
+    glosses: glossesFor(item),
     speak: { onSpeak: () => onSpeak(speakTextFor(item)) },
     hideWord,
   };
@@ -337,7 +342,7 @@ export async function startEnglishRun(port: EnglishRunPort): Promise<EnglishRunR
       item.kind === 'listen-pick-picture' &&
       item.listenOnly === true &&
       speaker.isAvailable(item.word);
-    widget = mountWidget(item, hooks, unit, onSpeak, hideWord);
+    widget = mountWidget(item, hooks, onSpeak, hideWord);
     itemArea.appendChild(widget.element);
     if (!appSettings.get().sound && !mutedPromptShown) {
       mutedPromptShown = true;
