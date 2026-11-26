@@ -20,9 +20,9 @@ Playwright on 4 projects, `tap()` only, targets ≥ 44 px).
 ## Phases
 | # | Phase | Owner | Depends | Effort | Status |
 |---|---|---|---|---|---|
-| 0 | [Shared contracts](phase-00-shared-contracts.md) | Lane B, muse-min (R51, `muse-min/english-contracts`) | — | 0.5d | assigned |
+| 0 | [Shared contracts](phase-00-shared-contracts.md) | Lane B, muse-min (R51, PR #80) | — | 0.5d | done (d5f20d1) |
 | 1A | [Region, level shell, gate, map](phase-01a-island-region-level-shell.md) | Lane A, muse-88 (R52, `muse/english-island-region`) | 0 (rebase only) | 1d | assigned |
-| 1B | [Engine + tap-only UI](phase-01b-exercise-engine-and-ui.md) | Lane B, muse-min | 0 | 1.5d | pending |
+| 1B | [Engine + tap-only UI](phase-01b-exercise-engine-and-ui.md) | Lane B, muse-min (R55, `muse-min/english-engine`) | 0 | 1.5d | assigned |
 | 2A | [Own content, stages 1–8](phase-02a-own-english-content.md) | Lane A, muse-88 | 1A | 1d | pending |
 | 2C | [Audio clips](phase-02c-audio-clips.md) | Lane A, muse-88 | 2A | 0.75d | pending |
 | 3B | [Speech + pack client](phase-03b-speech-and-pack-client.md) | Lane B, muse-min | 1B | 1d | pending |
