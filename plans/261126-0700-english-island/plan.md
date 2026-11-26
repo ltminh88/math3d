@@ -81,3 +81,7 @@ Session 2026-11-26. All answers took the recommended option.
 - Island placement → **west bank, near the Bridge**, on existing walkable ground (Phase 1A).
 - Deploy gains the pack-emit step, with a preview test first; prod still waits for "deploy đi" → **confirmed**.
 - Voice audition 2026-11-26 (20 words + 2 sentences via Telegram Q8) → **Kokoro `af_heart`, speed 0.9** (Piper dropped).
+
+## Follow-up plans
+- [Two English modes + Look 1 island](../261126-2130-english-two-modes-look-island/plan.md): Phase 6 here now runs **after** that plan's Phase 1 (engine per-book split).
+- Related math work in parallel: [Add/sub + length boost](../261126-2145-math-add-sub-length-boost/plan.md).
