@@ -23,7 +23,7 @@ Playwright on 4 projects, `tap()` only, targets ≥ 44 px).
 | 0 | [Shared contracts](phase-00-shared-contracts.md) | Lane B, muse-min (R51, PR #80) | — | 0.5d | done (d5f20d1) |
 | 1A | [Region, level shell, gate, map](phase-01a-island-region-level-shell.md) | Lane A, muse-88 (R52, PR #82) | 0 (rebase only) | 1d | done (merged) |
 | 1B | [Engine + tap-only UI](phase-01b-exercise-engine-and-ui.md) | Lane B, muse-min (R55, PR #81) | 0 | 1.5d | done (merged) |
-| 2A | [Own content, stages 1–8](phase-02a-own-english-content.md) | muse-min (R72, moved: muse-88 quota 84%) | 1A | 1d | assigned |
+| 2A | [Own content, stages 1–8](phase-02a-own-english-content.md) | muse-min (R72, PR #85) | 1A | 1d | done (merged) |
 | 2C | [Audio clips](phase-02c-audio-clips.md) | Lane A, muse-88 (R74, voice: Kokoro af_heart) | 2A | 0.75d | assigned |
 | 3B | [Speech + pack client](phase-03b-speech-and-pack-client.md) | Lane B, muse-min (R62, PR #84) | 1B | 1d | done (merged) |
 | 6 | [English in daily practice](phase-06-english-in-daily-practice.md) | Lane B, muse-min | 3B, 2A | 0.5d | pending |
