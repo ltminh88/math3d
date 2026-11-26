@@ -1,9 +1,11 @@
 // English run (Phase 1B): the run the island level shell (1A) calls. Eight rounds:
 // the planner picks the weakest skill, the generator builds the item, a tap-only
 // widget renders it, the miss budget reveals after 3 misses, hints narrow the
-// choices, and every round records under `sk:en-*` with the run tally.
+// choices, and every round records under `sk:en-*`.
 // Only seed unit 1 exists in 1B (2A maps units to stages), so every stage drills
 // it until then — the engine reads its pool from the unit, not from the stage.
+// R64: the run draws no finish screen and resolves right after round 8 — the
+// level shell owns the ending screen (stars, reward, "Về cổng").
 import './english-widgets.css';
 import { SEED_UNIT_1 } from '../../english/content/seed-unit-1';
 import type { EnglishAttempt } from '../../english/engine/answer-check';
@@ -15,7 +17,6 @@ import type { EnglishItem, EnglishUnit } from '../../english/english-types';
 import { skillKey } from '../../learning/fact-key';
 import type { QuestionOutcome } from '../../learning/session-recorder';
 import { skillTierOf } from '../../learning/skill-tiers';
-import { createLevelRunTally } from '../../levels/shared/level-run-tally';
 import type { LevelLearning } from '../../levels/shared/level-types';
 import { StepMissBudget } from '../../levels/shared/step-miss-budget';
 import { announce } from '../kit/aria-announcer';
@@ -128,7 +129,6 @@ export async function startEnglishRun(port: EnglishRunPort): Promise<EnglishRunR
     stats: learning.stats(),
     seed: learning.sessionNo,
   });
-  const tally = createLevelRunTally();
   const doc = port.ui.ownerDocument ?? document;
 
   const root = doc.createElement('div');
@@ -246,7 +246,6 @@ export async function startEnglishRun(port: EnglishRunPort): Promise<EnglishRunR
       wrongAnswers,
     };
     learning.record(outcome);
-    tally.add(outcome);
     if (result.correct) correctCount += 1;
     widget.destroy();
     itemArea.textContent = '';
@@ -260,28 +259,8 @@ export async function startEnglishRun(port: EnglishRunPort): Promise<EnglishRunR
     item: null,
     hintRung: 0,
   };
-  const stars = tally.stars();
-  const earned = tally.earned();
+  // R64: no finish screen — resolve at once so the level shell can show its
+  // own ending card. Clear the run's controls so nothing stale stays tappable.
   root.textContent = '';
-  const finish = doc.createElement('div');
-  finish.className = 'english-finish';
-  const finishTitle = doc.createElement('h2');
-  finishTitle.className = 'english-finish__title';
-  finishTitle.textContent = tei('finishTitle');
-  const starsEl = doc.createElement('p');
-  starsEl.className = 'english-finish__score';
-  starsEl.textContent = `${'★'.repeat(stars)}${'☆'.repeat(3 - stars)}`;
-  const score = doc.createElement('p');
-  score.className = 'english-finish__score';
-  score.textContent = tei('finishScore', { correct: correctCount, total: ENGLISH_ROUNDS });
-  const reward = doc.createElement('p');
-  reward.className = 'english-finish__reward';
-  reward.textContent = `+${earned.xp} XP · +${earned.coins} xu`;
-  const doneButton = createUiButton({ label: tei('finishDone'), onClick: () => {} }, doc);
-  finish.append(finishTitle, starsEl, score, reward, doneButton);
-  root.appendChild(finish);
-  await new Promise<void>((resolve) => {
-    doneButton.addEventListener('click', () => resolve(), { once: true });
-  });
   return { completed: true, roundsPlayed: ENGLISH_ROUNDS, correctCount };
 }

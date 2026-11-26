@@ -183,27 +183,3 @@
   gap: 12px;
   justify-content: center;
 }
-
-.english-finish {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 12px;
-  max-width: 560px;
-  width: 100%;
-  margin: auto;
-  text-align: center;
-}
-
-.english-finish__title {
-  margin: 0;
-  font-family: var(--font-display);
-  font-size: 28px;
-}
-
-.english-finish__score,
-.english-finish__reward {
-  margin: 0;
-  font-size: 18px;
-  font-weight: 700;
-}
