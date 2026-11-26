@@ -21,7 +21,7 @@ export function mountLetterChoice(
 ): EnglishWidget {
   const doc = options.doc ?? document;
   const cue = item.skillId === 'en-alphabet-order' ? tei('cueNextLetter') : tei('cueFirstLetter');
-  const { root, body, gloss } = widgetRoot(item, cue, doc);
+  const { root, body, gloss } = widgetRoot(item, cue, doc, options);
   const prompt = doc.createElement('p');
   prompt.className = 'english-prompt';
   prompt.append(englishWordEl(item.prompt, doc));

@@ -28,9 +28,12 @@ export interface IslandTestHook {
   state(): IslandRunState | null;
   /** What the current item expects, in the terms a spec taps. */
   currentAnswer(): EnglishExpected | null;
+  /** Abort the running run (3B): the run resolves `{completed: false}`. */
+  abort(): void;
 }
 
 export function createIslandTestHook(): IslandTestHook {
+  let controller: AbortController | null = null;
   return {
     start(stage, seed) {
       const store = connectedStore();
@@ -40,6 +43,7 @@ export function createIslandTestHook(): IslandTestHook {
       container.id = 'english-test-run';
       container.style.cssText = 'position:fixed;inset:0;z-index:10000';
       document.body.appendChild(container);
+      controller = new AbortController();
       const sessionNo = store.nextSessionNo();
       const stats = () => store.getSnapshot().factStats;
       const rng = mulberry32(seed ?? sessionNo);
@@ -60,16 +64,21 @@ export function createIslandTestHook(): IslandTestHook {
           planSession({ stats: stats(), pool, tables: [], sessionNo, rng, length }),
         record: (outcome) => recorder.recordQuestion(outcome),
       };
-      void startEnglishRun({ stage, ui: container, learning }).then((result) => {
-        // R64: the run draws no finish screen (the level shell owns it), so the
-        // hook shows a minimal summary line itself for the spec to assert.
-        const summary = document.createElement('p');
-        summary.className = 'english-test-summary';
-        summary.textContent = `Bạn đúng ${result.correctCount}/${result.roundsPlayed} câu.`;
-        container.appendChild(summary);
-        const commit = levelRunToCommit(recorder, result);
-        if (commit) void commitLevelRun(commit, firstCompletionBonus('island', commit));
-      });
+      void startEnglishRun({ stage, ui: container, learning, signal: controller.signal }).then(
+        (result) => {
+          // R64: the run draws no finish screen (the level shell owns it), so the
+          // hook shows a minimal summary line itself for the spec to assert.
+          const summary = document.createElement('p');
+          summary.className = 'english-test-summary';
+          summary.textContent = `Bạn đúng ${result.correctCount}/${result.roundsPlayed} câu.`;
+          container.appendChild(summary);
+          const commit = levelRunToCommit(recorder, result);
+          if (commit) void commitLevelRun(commit, firstCompletionBonus('island', commit));
+        },
+      );
+    },
+    abort() {
+      controller?.abort();
     },
     state() {
       const live = getEnglishRunLive();

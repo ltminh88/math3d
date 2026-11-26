@@ -27,7 +27,7 @@ export function mountTapPairMatcher(
   options: EnglishWidgetOptions,
 ): EnglishWidget {
   const doc = options.doc ?? document;
-  const { root, body, gloss } = widgetRoot(item, tei('cuePairs'), doc);
+  const { root, body, gloss } = widgetRoot(item, tei('cuePairs'), doc, options);
   const columns = doc.createElement('div');
   columns.className = 'english-pair-columns';
   const wordsCol = doc.createElement('div');
