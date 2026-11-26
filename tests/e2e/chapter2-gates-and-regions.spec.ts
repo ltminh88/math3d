@@ -115,7 +115,8 @@ test('the area badge and the world map know the new regions', async ({ page }) =
 
   await page.locator('#open-map').click();
   await expect(page.locator('#world-map')).toBeVisible();
-  await expect(page.locator('[data-region]')).toHaveCount(11);
+  // 12 regions: the 11 from chapters 1–3 plus the island (Phase 1A).
+  await expect(page.locator('[data-region]')).toHaveCount(12);
   await page.locator('[data-region="valley"]').click();
   await expect(page.locator('#map-detail strong')).toHaveText('📐 Thung Lũng Hình Học');
   await expect(page.locator('#map-detail .map-gate')).toHaveText(

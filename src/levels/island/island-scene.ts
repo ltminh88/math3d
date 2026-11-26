@@ -1,7 +1,7 @@
 // Island level scene (own chunk): builds the islet diorama, the HUD, and hands the run
-// to `startEnglishRun` (Phase 0 stub, Phase 1B engine). The panel frames the run for its
-// whole life: the run's widgets mount inside it, and the done card replaces them when the
-// run resolves. Leaving through the host's "Về thế giới" button exits uncompleted.
+// to `startEnglishRun` (Phase 1B engine). The panel frames the run for its whole life:
+// the run's widgets mount inside it, and the done card replaces them when the run
+// resolves. Leaving through the host's "Về thế giới" button exits uncompleted.
 import { Scene } from 'three';
 import { type EnglishRunResult, startEnglishRun } from '../../ui/english/english-run';
 import { LEVEL_COMPLETE_BONUS } from '../shared/level-run-result';

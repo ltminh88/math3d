@@ -1,6 +1,6 @@
 // Island level "Đảo Tiếng Anh": the English side region, eight stages of eight rounds
 // each. Only the definition is eager; the scene is its own chunk. The run itself is
-// `startEnglishRun` (Phase 0 stub, Phase 1B engine): the shell only frames it.
+// `startEnglishRun` (Phase 1B engine): the shell only frames it.
 import type { LevelDefinition } from '../shared/level-types';
 import { ISLAND_ROUNDS, ISLAND_STAGES } from './island-stage-plan';
 
