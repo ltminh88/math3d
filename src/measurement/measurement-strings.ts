@@ -7,6 +7,7 @@ import {
 } from '../geometry/geometry-strings';
 import { defineStrings } from '../i18n/i18n';
 import type { PromptRef } from '../reasoning/reasoning-types';
+import { LENGTH_EN, LENGTH_VI } from './length-strings';
 import { PERIMETER_AREA_EN, PERIMETER_AREA_VI } from './perimeter-area-strings';
 
 const vi = {
@@ -77,6 +78,7 @@ const vi = {
   item_orange: 'quả cam',
   item_cake: 'cái bánh',
   ...PERIMETER_AREA_VI,
+  ...LENGTH_VI,
 };
 
 const en: Record<keyof typeof vi, string> = {
@@ -147,6 +149,7 @@ const en: Record<keyof typeof vi, string> = {
   item_orange: 'orange',
   item_cake: 'cake',
   ...PERIMETER_AREA_EN,
+  ...LENGTH_EN,
 };
 
 const ms = defineStrings('measurement', { vi, en });

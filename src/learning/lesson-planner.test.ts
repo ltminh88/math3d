@@ -3,8 +3,8 @@
 // not by calling the helpers under test:
 //   B25 = div-rem-floor, div-rem-ceil, choose-all-correct, tf-explain (catalog lines 36-37, 49-50)
 //   B3  = unknown-add-sub + unknown-add-sub-wp (R8); B1 has the six number skills (phase 07); B2 has
-//         the six arithmetic skills (phase 09); B7 reviews four geometry/measurement
-//         skills (phase 21); B14 = the six fraction skills (phase 12); B23/B26/B36/B37
+//         the six arithmetic skills (phase 09); B7 reviews twelve geometry/measurement
+//         skills (phase 21 + boost 1B); B14 = the six fraction skills (phase 12); B23/B26/B36/B37
 //         have the mul/div arithmetic skills (phase 10)
 //   B5  = tables [3]: 9 mul facts (3x2..3x10) + 9 div facts (6/3..30/3), plus
 //         sk:pattern-skip-count (tagged 4, 5, 6, 9-12)
@@ -83,21 +83,29 @@ describe('planLessonRun', () => {
     expect(run.some((k) => k.startsWith('sk:'))).toBe(true);
   });
 
-  it('landed lessons plan their skills; B7 reviews four skills (phase 21)', () => {
-    // B7 plans its four review skills now that phase 21 tagged them (geometry
+  it('landed lessons plan their skills; B7 reviews twelve skills (phase 21 + boost 1B)', () => {
+    // B7 plans its twelve review skills now that phase 21 tagged them (geometry
     // shape classify/count + solid identify, measurement ruler read — all
     // tier-1 easy, all learned before B7; TASK #2 dropped geo-right-angle and
-    // meas-temperature, new grade-3 content): six items, one per skill first,
-    // then two repeats.
+    // meas-temperature, new grade-3 content) and boost 1B added the eight
+    // length-ladder skills: six items, one per skill first, no repeats yet.
     const b7 = planLessonRun(7, {}, mulberry32(4));
     expect(b7).toHaveLength(6);
-    expect(new Set(b7).size).toBe(4);
+    expect(new Set(b7).size).toBe(6);
     for (const key of b7)
       expect([
         'sk:geo-shape-classify',
         'sk:geo-shape-count',
         'sk:geo-solid-identify',
         'sk:meas-ruler-read',
+        'sk:meas-len-ladder',
+        'sk:meas-len-convert',
+        'sk:meas-len-convert-far',
+        'sk:meas-len-compare',
+        'sk:meas-len-order',
+        'sk:meas-len-choose-unit',
+        'sk:meas-len-mixed',
+        'sk:meas-len-add-sub',
       ]).toContain(key);
     // B14 plans its six fraction skills now that phase 12 landed them.
     const b14 = planLessonRun(14, {}, mulberry32(4));

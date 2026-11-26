@@ -103,17 +103,26 @@ describe('skillsOfLesson', () => {
     expect(keys).toContain('mul:2x3');
   });
 
-  it('B7 yields its four review skills (phase 21, catalog order)', () => {
+  it('B7 yields its twelve review skills (phase 21 + boost 1B, catalog order)', () => {
     // B7 is a grade-2 review, so it uses only what a child learned before B7:
     // shape classify/count, solid identify, ruler read — all tier-1 easy.
     // geo-right-angle (B18) and meas-temperature (B33) are new grade-3
     // content (TASK #2). pattern-skip-count stays tables-only (phase-12
-    // legacy fix).
+    // legacy fix). Boost 1B adds the eight length-ladder skills (m/dm/cm/mm,
+    // D1: whole numbers <= 1000, m<->mm from ladder L2).
     expect(skillsOfLesson(7)).toEqual([
       'sk:geo-shape-classify',
       'sk:geo-shape-count',
       'sk:geo-solid-identify',
       'sk:meas-ruler-read',
+      'sk:meas-len-ladder',
+      'sk:meas-len-convert',
+      'sk:meas-len-convert-far',
+      'sk:meas-len-compare',
+      'sk:meas-len-order',
+      'sk:meas-len-choose-unit',
+      'sk:meas-len-mixed',
+      'sk:meas-len-add-sub',
     ]);
   });
 

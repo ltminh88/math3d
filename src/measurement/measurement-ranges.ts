@@ -1,7 +1,12 @@
 // Measurement ranges in one place, locked after the KNTT check (plans/.../research/
 // researcher-03-kntt-geometry-measurement-verification.md). Author cap: every number <= 100, so
 // there is no kg ↔ g, l ↔ ml or m ↔ mm; only cm ↔ mm (1 cm = 10 mm). Tiers raise the reasoning.
+// Boost D1 (Phase 1B) relaxes the cap for the new `meas-len-*` skills only: whole numbers
+// <= 1000, m/dm/cm/mm, m↔mm from ladder L2, no decimals. Legacy skills keep <= 100.
 import type { SkillTier } from '../learning/skill-tiers';
+
+/** Boost (Phase 1B, D1): the number cap for the new `meas-len-*` skills only. */
+export const LENGTH_LADDER_MAX = 1000;
 
 /** B30: a 10 cm ruler with mm ticks keeps every reading <= 100 mm. */
 export const RULER_MAX_CM = 10;

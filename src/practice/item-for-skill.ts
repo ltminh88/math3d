@@ -12,6 +12,7 @@ import { geometryItemForSkill, isGeometrySkill } from '../geometry/geometry-item
 import type { Rng } from '../learning/seeded-rng';
 import { type SkillFamily, skillEntry } from '../learning/skill-catalog';
 import type { SkillTier } from '../learning/skill-tiers';
+import { isLengthSkill, lengthItemForSkill } from '../measurement/length-item-for-skill';
 import {
   isMeasurementSkill,
   measurementItemForSkill,
@@ -32,6 +33,7 @@ export function familyOfSkill(id: string): SkillFamily | undefined {
 export function itemForSkill(id: string, rng: Rng, tier: SkillTier): PracticeItem {
   if (isReasoningSkill(id)) return reasoningItemForSkill(id, rng, tier);
   if (isGeometrySkill(id)) return geometryItemForSkill(id, rng, tier);
+  if (isLengthSkill(id)) return lengthItemForSkill(id, rng, tier);
   if (isMeasurementSkill(id)) return measurementItemForSkill(id, rng, tier);
   if (isNumberSkill(id)) return numberItemForSkill(id, rng, tier);
   if (isArithmeticSkill(id)) return arithmeticItemForSkill(id, rng, tier);

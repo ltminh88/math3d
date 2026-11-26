@@ -115,6 +115,15 @@ export const TOPIC_SKILLS: Readonly<Record<Exclude<StickerTopic, 'tables'>, read
     'meas-area-rect',
     'meas-area-square',
     'meas-wp-fence',
+    // Boost, Phase 1B: the length ladder (measurement is a hardcoded list here).
+    'meas-len-ladder',
+    'meas-len-convert',
+    'meas-len-convert-far',
+    'meas-len-compare',
+    'meas-len-order',
+    'meas-len-choose-unit',
+    'meas-len-mixed',
+    'meas-len-add-sub',
   ],
   // New families: the topic is the family — no per-skill edits when a family phase lands.
   number: skillsOfFamily('number'),

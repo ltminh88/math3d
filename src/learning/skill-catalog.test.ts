@@ -95,7 +95,7 @@ describe('skill catalog', () => {
   it('groups skills by family', () => {
     expect(skillsOfFamily('remainder')).toEqual(['div-rem-floor', 'div-rem-ceil']);
     expect(skillsOfFamily('geometry')).toHaveLength(10);
-    expect(skillsOfFamily('measurement')).toHaveLength(16);
+    expect(skillsOfFamily('measurement')).toHaveLength(24);
   });
 
   it('every new family has skills now (arithmetic landed in phase 09)', () => {

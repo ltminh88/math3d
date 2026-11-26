@@ -35,7 +35,9 @@ const ORACLE: Record<string, (i: GeoItem) => void> = {
   rulerMm: (i) => expect(last(i)).toBe(scene(i, 'ruler').toMm - scene(i, 'ruler').fromMm),
   rulerShift: (i) => {
     expect(scene(i, 'ruler').fromMm).toBeGreaterThan(0);
-    expect(last(i)).toBe(scene(i, 'ruler').toMm - scene(i, 'ruler').fromMm);
+    // Two number steps now (boost 1B): the cm part, then the mm part.
+    const len = scene(i, 'ruler').toMm - scene(i, 'ruler').fromMm;
+    expect(values(i)).toEqual([Math.floor(len / 10), len % 10]);
   },
   cmToMm: (i) => expect(last(i)).toBe(10 * p(i, 'n')),
   mmToCm: (i) => expect((last(i) as number) * 10).toBe(p(i, 'm')),
@@ -210,7 +212,13 @@ function checkExtreme(i: GeoItem, pickFn: (...n: number[]) => number): void {
 
 describe('measurement generators', () => {
   it('cover every meas-* skill of the catalog', () => {
-    expect([...MEASUREMENT_SKILLS].sort()).toEqual(skillsOfFamily('measurement').sort());
+    // The length-ladder ids have their own dispatcher (boost 1B) and sweep:
+    // they are not GeoItems, so the shared <=100 sweep cannot cover them.
+    expect([...MEASUREMENT_SKILLS].sort()).toEqual(
+      skillsOfFamily('measurement')
+        .filter((id) => !id.startsWith('meas-len-'))
+        .sort(),
+    );
   });
 
   for (const skillId of MEASUREMENT_SKILLS)

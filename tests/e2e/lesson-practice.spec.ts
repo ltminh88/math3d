@@ -6,6 +6,7 @@
 // Lesson mode is open from day one (no field stage 1 needed) and introduces untaught
 // skills (unlike daily), so the spec seeds no facts.
 import { type Locator, type Page, type TestInfo, test } from '@playwright/test';
+import { skillsOfLesson } from '../../src/learning/kntt-lesson-index';
 import { expect, SLOW_TEST_MS, waitDialogSettled } from './legacy-live-save-fixtures';
 import { solveSetClock } from './lesson-walkthrough-helpers';
 
@@ -269,7 +270,7 @@ test('picker: 81 lessons in 16 topics, "Học tiếp" points at B1, all lessons 
   const b2 = page.locator('button.lesson-row[data-lesson="2"]');
   await expect(b2).toBeEnabled();
   await expect(b2).toContainText('Cộng, trừ trong phạm vi 1 000');
-  // B7 reviews now (phase 21): four geometry/measurement skills, playable.
+  // B7 reviews now (phase 21 + boost 1B): twelve geometry/measurement skills, playable.
   const b7 = page.locator('button.lesson-row[data-lesson="7"]');
   await expect(b7).toBeEnabled();
   await expect(b7).toContainText('Ôn tập hình học và đo lường');
@@ -344,7 +345,7 @@ test('run B2: answer all 6, stars before/after show, coins in store, picker star
   await expect(page.locator('#dialog')).not.toHaveAttribute('open', '');
 });
 
-test('run B7: answer all 6, stars before/after show, coins in store, picker stars update', async ({
+test('run B7: two runs cover all 12 skills, stars show after the second, coins in store, picker stars update', async ({
   page,
 }, info) => {
   const touch = isTouch(info);
@@ -354,20 +355,31 @@ test('run B7: answer all 6, stars before/after show, coins in store, picker star
   await expect(page.locator('#dialog-content')).toContainText(
     'Bài 7 · Ôn tập hình học và đo lường · Câu 1/6',
   );
-  expect(await playLessonRun(page, touch)).toBe(6);
+  const played: (string | undefined)[] = [];
+  // B7 has twelve skills since boost 1B (four legacy + eight length-ladder),
+  // so one 6-item run cannot earn the first star: it needs every skill
+  // attempted. Run 1 plays six; run 2 plays the other six (longest unseen
+  // first), then the star lands.
+  expect(await playLessonRun(page, touch, (id) => played.push(id))).toBe(6);
   const content = page.locator('#dialog-content');
+  await expect(content).toContainText('Xong bài 7!');
+  await expect(content).toContainText('☆☆☆ → ☆☆☆');
+  await expect(content).toContainText('+30 xu');
+  const replay = page.locator('#lesson-replay');
+  if (touch) await replay.tap();
+  else await replay.click();
+  await expect(page.locator('#dialog-content')).toContainText(
+    'Bài 7 · Ôn tập hình học và đo lường · Câu 1/6',
+  );
+  expect(await playLessonRun(page, touch, (id) => played.push(id))).toBe(6);
   await expect(content).toContainText('Xong bài 7!');
   await expect(content).toContainText('☆☆☆ → ★☆☆');
   await expect(content).toContainText('+30 xu');
-  await expect(coins(page)).toHaveText('30');
+  await expect(coins(page)).toHaveText('60');
   const snap = await page.evaluate(() => window.__game?.snapshot());
-  for (const id of [
-    'geo-shape-classify',
-    'geo-shape-count',
-    'geo-solid-identify',
-    'meas-ruler-read',
-  ])
-    expect(snap?.factStats[`sk:${id}`]?.attempts ?? 0).toBeGreaterThanOrEqual(1);
+  for (const key of skillsOfLesson(7))
+    expect(snap?.factStats[key]?.attempts ?? 0, key).toBeGreaterThanOrEqual(1);
+  expect(new Set(played).size, 'both runs together play all 12 skills').toBe(12);
   // Back to the picker: B7 now shows 1 star.
   const back = page.locator('#lesson-back');
   if (touch) await back.tap();
