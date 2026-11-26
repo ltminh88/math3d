@@ -71,6 +71,11 @@ export interface ListenPickPictureItem {
   readonly source: EnglishItemSource;
   readonly word: string;
   readonly choices: readonly EnglishPictureChoice[];
+  /**
+   * Tier 3: the child only listens (no word text shown). 1B has no speech yet (3B),
+   * so the widget still shows the word until then — the flag is set, the UI is not.
+   */
+  readonly listenOnly?: boolean;
 }
 
 /** Tap each word, then its picture. */

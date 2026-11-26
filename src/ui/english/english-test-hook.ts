@@ -1,0 +1,85 @@
+// Test builds only (`vite build --mode test`): `window.__game.island` lets e2e
+// specs start an English run (the island level shell of 1A is not on main yet)
+// and read the current item's answer. Installed from the test-debug hook;
+// the run commits through the same level path the host uses (levelId 'island').
+import { type EnglishExpected, expectedOf } from '../../english/engine/answer-check';
+import { mulberry32 } from '../../learning/seeded-rng';
+import { planSession } from '../../learning/session-planner';
+import { createSessionRecorder } from '../../learning/session-recorder';
+import { firstCompletionBonus, levelRunToCommit } from '../../levels/shared/level-run-result';
+import type { LevelLearning } from '../../levels/shared/level-types';
+import { newId } from '../../store/new-id';
+import { commitLevelRun, connectedStore } from '../progress-sync';
+import { getEnglishRunLive, startEnglishRun } from './english-run';
+
+export interface IslandRunState {
+  readonly round: number;
+  readonly total: number;
+  readonly done: boolean;
+  readonly skillId: string | null;
+  readonly kind: string | null;
+  readonly hintRung: number;
+}
+
+export interface IslandTestHook {
+  /** Mounts a run in a full-screen test container (removes any previous one). */
+  start(stage: number, seed?: number): void;
+  /** The live run, or null before the first start. */
+  state(): IslandRunState | null;
+  /** What the current item expects, in the terms a spec taps. */
+  currentAnswer(): EnglishExpected | null;
+}
+
+export function createIslandTestHook(): IslandTestHook {
+  return {
+    start(stage, seed) {
+      const store = connectedStore();
+      if (!store) throw new Error('island test hook: store not connected');
+      document.getElementById('english-test-run')?.remove();
+      const container = document.createElement('div');
+      container.id = 'english-test-run';
+      container.style.cssText = 'position:fixed;inset:0;z-index:10000';
+      document.body.appendChild(container);
+      const sessionNo = store.nextSessionNo();
+      const stats = () => store.getSnapshot().factStats;
+      const rng = mulberry32(seed ?? sessionNo);
+      const recorder = createSessionRecorder({
+        profileId: store.getSnapshot().profile.id,
+        levelId: 'island',
+        sessionNo,
+        stage,
+        getStat: (key) => stats()[key],
+        now: Date.now,
+        newId,
+      });
+      const learning: LevelLearning = {
+        stats,
+        sessionNo,
+        rng,
+        planSession: (pool, length) =>
+          planSession({ stats: stats(), pool, tables: [], sessionNo, rng, length }),
+        record: (outcome) => recorder.recordQuestion(outcome),
+      };
+      void startEnglishRun({ stage, ui: container, learning }).then((result) => {
+        const commit = levelRunToCommit(recorder, result);
+        if (commit) void commitLevelRun(commit, firstCompletionBonus('island', commit));
+      });
+    },
+    state() {
+      const live = getEnglishRunLive();
+      if (live.round === 0) return null;
+      return {
+        round: live.round,
+        total: live.total,
+        done: live.done,
+        skillId: live.skillId,
+        kind: live.item?.kind ?? null,
+        hintRung: live.hintRung,
+      };
+    },
+    currentAnswer() {
+      const live = getEnglishRunLive();
+      return live.item ? expectedOf(live.item) : null;
+    },
+  };
+}

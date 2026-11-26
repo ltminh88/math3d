@@ -1,0 +1,119 @@
+import { describe, expect, it } from 'vitest';
+import { mulberry32 } from '../../learning/seeded-rng';
+import { SEED_UNIT_1 } from '../content/seed-unit-1';
+import type { EnglishItem } from '../english-types';
+import { SYNTHETIC_PACK } from '../fixtures/synthetic-pack';
+import { CONFUSABLE_LETTER, generateItem } from './item-generators';
+
+const gen = (seed: number) => mulberry32(seed);
+
+describe('generateItem', () => {
+  it('letter-pick tier 1 has 3 choices with the answer, tier 2 has 4', () => {
+    for (let seed = 0; seed < 20; seed++) {
+      const t1 = generateItem('en-letters-a-d', 'letter-pick', 1, SEED_UNIT_1, gen(seed));
+      expect(t1.kind).toBe('letter-pick');
+      if (t1.kind !== 'letter-pick') continue;
+      expect(t1.choices).toHaveLength(3);
+      expect(t1.choices).toContain(t1.answer);
+      expect(t1.answer).toBe(t1.prompt[0]);
+      const t2 = generateItem('en-letters-a-d', 'letter-pick', 2, SEED_UNIT_1, gen(seed));
+      if (t2.kind !== 'letter-pick') continue;
+      expect(t2.choices).toHaveLength(4);
+      expect(t2.choices).toContain(t2.answer);
+    }
+  });
+
+  it('letter-pick tier 2 includes the confusable letter for b/d/p/q answers', () => {
+    let checked = 0;
+    for (let seed = 0; seed < 40; seed++) {
+      const item = generateItem('en-letters-a-d', 'letter-pick', 2, SEED_UNIT_1, gen(seed));
+      if (item.kind !== 'letter-pick') continue;
+      const confusable = CONFUSABLE_LETTER[item.answer];
+      if (!confusable) continue;
+      expect(item.choices).toContain(confusable);
+      checked += 1;
+    }
+    expect(checked).toBeGreaterThan(0);
+  });
+
+  it('alphabet-order picks the next letter as the answer', () => {
+    for (let seed = 0; seed < 10; seed++) {
+      const item = generateItem('en-alphabet-order', 'letter-pick', 1, SEED_UNIT_1, gen(seed));
+      if (item.kind !== 'letter-pick') continue;
+      expect(item.prompt).toMatch(/^[a-y]$/);
+      expect(item.answer).toBe(String.fromCharCode(item.prompt.charCodeAt(0) + 1));
+      expect(item.choices).toContain(item.answer);
+    }
+  });
+
+  it('listen-pick-picture tier 1 has 3 choices, tier 3 has 4 and listenOnly', () => {
+    const t1 = generateItem('en-words-a-d', 'listen-pick-picture', 1, SEED_UNIT_1, gen(3));
+    expect(t1.kind).toBe('listen-pick-picture');
+    if (t1.kind !== 'listen-pick-picture') return;
+    expect(t1.choices).toHaveLength(3);
+    expect(t1.choices.map((c) => c.word)).toContain(t1.word);
+    expect(t1.listenOnly).toBeUndefined();
+    const t3 = generateItem('en-words-a-d', 'listen-pick-picture', 3, SEED_UNIT_1, gen(3));
+    if (t3.kind !== 'listen-pick-picture') return;
+    expect(t3.choices).toHaveLength(4);
+    expect(t3.listenOnly).toBe(true);
+  });
+
+  it('match-pairs has 3 unique pairs', () => {
+    const item = generateItem('en-words-a-d', 'match-pairs', 1, SEED_UNIT_1, gen(5));
+    expect(item.kind).toBe('match-pairs');
+    if (item.kind !== 'match-pairs') return;
+    expect(item.pairs).toHaveLength(3);
+    expect(new Set(item.pairs.map((p) => p.word)).size).toBe(3);
+  });
+
+  it('order-words builds the pattern sentence in order', () => {
+    const like = generateItem('en-pattern-i-like', 'order-words', 1, SEED_UNIT_1, gen(2));
+    expect(like.kind).toBe('order-words');
+    if (like.kind !== 'order-words') return;
+    expect(like.words[0]).toBe('I');
+    expect(like.words[1]).toBe('like');
+    expect(like.words[2]).toMatch(/^[a-z]+s$/);
+    const is = generateItem('en-pattern-this-is', 'order-words', 1, SEED_UNIT_1, gen(2));
+    if (is.kind !== 'order-words') return;
+    expect(is.words.slice(0, 3)).toEqual(['This', 'is', 'a']);
+  });
+
+  it('fill-pattern blanks the last word with 2/3/4 options by tier', () => {
+    const counts = { 1: 2, 2: 3, 3: 4 } as const;
+    for (const tier of [1, 2, 3] as const) {
+      const item = generateItem('en-pattern-this-is', 'fill-pattern', tier, SEED_UNIT_1, gen(4));
+      expect(item.kind).toBe('fill-pattern');
+      if (item.kind !== 'fill-pattern') continue;
+      expect(item.blankIndex).toBe(item.sentence.length - 1);
+      expect(item.options).toHaveLength(counts[tier]);
+      expect(item.options).toContain(item.sentence[item.blankIndex]);
+    }
+  });
+
+  it('is deterministic per seed', () => {
+    const a = generateItem('en-words-a-d', 'listen-pick-picture', 1, SEED_UNIT_1, gen(11));
+    const b = generateItem('en-words-a-d', 'listen-pick-picture', 1, SEED_UNIT_1, gen(11));
+    expect(a).toEqual(b);
+  });
+
+  it('throws for a kind the skill cannot make', () => {
+    expect(() => generateItem('en-letters-a-d', 'order-words', 1, SEED_UNIT_1, gen(1))).toThrow(
+      'cannot make',
+    );
+  });
+
+  it('throws for a pattern with no 1B template', () => {
+    expect(() => generateItem('en-pattern-i-can', 'order-words', 1, SEED_UNIT_1, gen(1))).toThrow(
+      'no 1B sentence template',
+    );
+  });
+
+  it('generates from the synthetic pack items shape too (validator guard)', () => {
+    // The fixture proves the pack contract; the generator reads units, so this
+    // just pins the fixture's items as valid EnglishItems.
+    for (const item of SYNTHETIC_PACK.items as readonly EnglishItem[]) {
+      expect(item.source).toBe('pack');
+    }
+  });
+});

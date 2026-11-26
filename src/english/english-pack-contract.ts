@@ -51,6 +51,7 @@ function isEnglishItem(v: unknown): v is EnglishItem {
       if (!isNonEmptyString(v.word) || !Array.isArray(v.choices) || v.choices.length < 2)
         return false;
       if (!v.choices.every(isPictureChoice)) return false;
+      if (v.listenOnly !== undefined && typeof v.listenOnly !== 'boolean') return false;
       return v.choices.some((c) => isRecord(c) && c.word === v.word);
     }
     case 'match-pairs': {

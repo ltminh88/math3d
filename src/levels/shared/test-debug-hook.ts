@@ -13,6 +13,8 @@ import { renderPrompt } from '../../reasoning/reasoning-strings';
 import { newId } from '../../store/new-id';
 import type { GameSnapshot } from '../../store/progress-repository';
 import { progressViewFromSnapshot } from '../../store/store-to-save-v1';
+import type { IslandTestHook } from '../../ui/english/english-test-hook';
+import { createIslandTestHook } from '../../ui/english/english-test-hook';
 import { gameState, getWorld } from '../../ui/game-state';
 import { createStepCard } from '../../ui/kit/step-card';
 import { connectedStore, flushProgress } from '../../ui/progress-sync';
@@ -62,6 +64,8 @@ export interface TestGameHook {
   openStickerBook(): void;
   /** Earning lines collected since boot (not yet shown in the guide dialog). */
   pendingEarningLines(): string[];
+  /** English Island test entry: start a run and read the current answer. */
+  island: IslandTestHook;
 }
 
 declare global {
@@ -185,5 +189,6 @@ export function installTestDebugHook(): void {
     memory: () => ({ ...getWorld().renderer.info.memory }),
     openStickerBook,
     pendingEarningLines,
+    island: createIslandTestHook(),
   };
 }
