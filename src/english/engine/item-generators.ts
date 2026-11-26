@@ -1,13 +1,15 @@
-// Item generators (Phase 1B, pure): build one `EnglishItem` from a stage unit's
-// own words. Tier rules: tier 1 = 3 choices, tier 2 = 4 choices with a confusable
-// letter (b/d, p/q) on letter-pick, tier 3 = listen-only on listen-pick-picture.
-// 1B has no speech yet (3B), so tier 3 still shows the word — the `listenOnly`
-// flag is set on the item and the widget honours it once speech lands.
-// Pattern sentences only exist for this-is / i-like in 1B (seed unit 1);
-// 2A adds the other patterns' banks.
+// Item generators (Phase 1B, pure; 2A banks): build one `EnglishItem` from a
+// stage unit's own words. Tier rules: tier 1 = 3 choices, tier 2 = 4 choices
+// with a confusable letter (b/d, p/q) on letter-pick, tier 3 = listen-only on
+// listen-pick-picture. Pattern sentences come from the 2A bank in
+// `content/patterns.ts` (all 7 patterns); word pools are filtered by skill so
+// a topic skill only serves its own topic and a block skill only serves words
+// starting in its block.
 
 import { pick, type Rng, shuffle } from '../../learning/seeded-rng';
 import type { SkillTier } from '../../learning/skill-tiers';
+import { ENGLISH_PATTERN_SENTENCES } from '../content/patterns';
+import { ENGLISH_TOPIC_WORDS } from '../content/topics';
 import type {
   EnglishItem,
   EnglishItemKind,
@@ -27,14 +29,41 @@ export const CONFUSABLE_LETTER: Readonly<Record<string, string>> = {
 
 const ALPHABET = 'abcdefghijklmnopqrstuvwxyz';
 
-const plural = (word: string): string => `${word}s`;
+function blockRange(skillId: EnglishSkillId): [string, string] | null {
+  const match = /en-(?:letters|sounds|words)-([a-z])-([a-z])$/.exec(skillId);
+  if (!match) return null;
+  return [match[1] as string, match[2] as string];
+}
 
 function blockLetters(skillId: EnglishSkillId): string[] {
-  const match = /en-(?:letters|sounds)-([a-z])-([a-z])$/.exec(skillId);
-  if (!match) return ALPHABET.split('');
-  const start = ALPHABET.indexOf(match[1] as string);
-  const end = ALPHABET.indexOf(match[2] as string);
+  const range = blockRange(skillId);
+  if (!range) return ALPHABET.split('');
+  const start = ALPHABET.indexOf(range[0]);
+  const end = ALPHABET.indexOf(range[1]);
   return ALPHABET.slice(start, end + 1).split('');
+}
+
+/**
+ * The words a skill may serve: a topic skill serves only its topic's words;
+ * a block skill serves only words starting in its block. The schema test
+ * checks every pool has enough words; an empty pool is a content bug.
+ */
+export function poolFor(skillId: EnglishSkillId, unit: EnglishUnit): EnglishWord[] {
+  if (skillId.startsWith('en-topic-')) {
+    const topic = skillId.slice('en-topic-'.length);
+    const names = new Set(ENGLISH_TOPIC_WORDS[topic as keyof typeof ENGLISH_TOPIC_WORDS] ?? []);
+    return unit.words.filter((w) => names.has(w.word));
+  }
+  const range = blockRange(skillId);
+  if (!range) return [...unit.words];
+  const [start, end] = range;
+  return unit.words.filter((w) => (w.word[0] as string) >= start && (w.word[0] as string) <= end);
+}
+
+function pickWord(skillId: EnglishSkillId, unit: EnglishUnit, rng: Rng): EnglishWord {
+  const pool = poolFor(skillId, unit);
+  if (pool.length === 0) throw new Error(`generateItem: empty word pool for ${skillId}`);
+  return pick(rng, pool);
 }
 
 function letterChoices(answer: string, tier: SkillTier, pool: string[], rng: Rng): string[] {
@@ -55,12 +84,12 @@ function letterChoices(answer: string, tier: SkillTier, pool: string[], rng: Rng
 function choiceWords(
   answer: EnglishWord,
   count: number,
-  unit: EnglishUnit,
+  pool: EnglishWord[],
   rng: Rng,
 ): EnglishWord[] {
-  const others = unit.words.filter((w) => w.word !== answer.word);
+  const others = pool.filter((w) => w.word !== answer.word);
   if (others.length < count) {
-    throw new Error(`generateItem: need ${count + 1} words, unit has ${unit.words.length}`);
+    throw new Error(`generateItem: need ${count + 1} words, pool has ${pool.length}`);
   }
   return shuffle(rng, [answer, ...shuffle(rng, others).slice(0, count)]);
 }
@@ -83,7 +112,7 @@ function letterPick(
       answer,
     };
   }
-  const word = pick(rng, unit.words);
+  const word = pickWord(skillId, unit, rng);
   const answer = word.word[0] as string;
   return {
     kind: 'letter-pick',
@@ -101,9 +130,10 @@ function listenPickPicture(
   unit: EnglishUnit,
   rng: Rng,
 ): EnglishItem {
-  const word = pick(rng, unit.words);
+  const pool = poolFor(skillId, unit);
+  const word = pickWord(skillId, unit, rng);
   const count = tier === 1 ? 2 : 3;
-  const choices = choiceWords(word, count, unit, rng).map((w) => ({
+  const choices = choiceWords(word, count, pool, rng).map((w) => ({
     word: w.word,
     picture: w.picture ?? '🖼️',
   }));
@@ -118,52 +148,66 @@ function listenPickPicture(
 }
 
 function matchPairs(skillId: EnglishSkillId, unit: EnglishUnit, rng: Rng): EnglishItem {
-  if (unit.words.length < 3) {
-    throw new Error(`generateItem: need 3 words for match-pairs, unit has ${unit.words.length}`);
+  const pool = poolFor(skillId, unit);
+  if (pool.length < 3) {
+    throw new Error(`generateItem: need 3 words for match-pairs, pool has ${pool.length}`);
   }
-  const pairs = shuffle(rng, unit.words)
+  const pairs = shuffle(rng, pool)
     .slice(0, 3)
     .map((w) => ({ word: w.word, picture: w.picture ?? '🖼️' }));
   return { kind: 'match-pairs', skillId, source: 'own', pairs };
 }
 
+/**
+ * A pattern sentence from the 2A bank: the sentence itself is the item, its
+ * last word is the fill-pattern blank. Distractors are the last words of the
+ * pattern's other sentences (same slot, same kind of word). what-is pairs its
+ * answer sentence with the displayed question ("What is this?" on even
+ * sentences, "What is that?" on odd ones); other patterns have no question.
+ */
 function patternWords(
   skillId: EnglishSkillId,
-  unit: EnglishUnit,
   rng: Rng,
-): { words: string[]; keyWord: string } {
-  const word = pick(rng, unit.words).word;
-  if (skillId === 'en-pattern-i-like') {
-    return { words: ['I', 'like', plural(word)], keyWord: plural(word) };
+): { words: string[]; keyWord: string; siblings: string[]; question?: string } {
+  const pattern = skillId.slice('en-pattern-'.length);
+  const sentences = ENGLISH_PATTERN_SENTENCES[pattern as keyof typeof ENGLISH_PATTERN_SENTENCES];
+  if (!sentences || sentences.length === 0) {
+    throw new Error(`generateItem: no sentence bank for ${skillId}`);
   }
-  if (skillId === 'en-pattern-this-is') {
-    return { words: ['This', 'is', 'a', word], keyWord: word };
-  }
-  throw new Error(`generateItem: no 1B sentence template for ${skillId}`);
+  const picked = pick(rng, [...sentences]);
+  const words = [...(picked as readonly string[])];
+  const keyWord = words[words.length - 1] as string;
+  const siblings = sentences.map((s) => s[s.length - 1] as string).filter((w) => w !== keyWord);
+  if (pattern !== 'what-is') return { words, keyWord, siblings: [...new Set(siblings)] };
+  const index = sentences.indexOf(picked);
+  const question = index % 2 === 0 ? 'What is this?' : 'What is that?';
+  return { words, keyWord, siblings: [...new Set(siblings)], question };
 }
 
-function orderWords(skillId: EnglishSkillId, unit: EnglishUnit, rng: Rng): EnglishItem {
-  const { words } = patternWords(skillId, unit, rng);
-  return { kind: 'order-words', skillId, source: 'own', words };
+function orderWords(skillId: EnglishSkillId, rng: Rng): EnglishItem {
+  const { words, question } = patternWords(skillId, rng);
+  return { kind: 'order-words', skillId, source: 'own', words, ...(question ? { question } : {}) };
 }
 
-function fillPattern(
-  skillId: EnglishSkillId,
-  tier: SkillTier,
-  unit: EnglishUnit,
-  rng: Rng,
-): EnglishItem {
-  const { words, keyWord } = patternWords(skillId, unit, rng);
+function fillPattern(skillId: EnglishSkillId, tier: SkillTier, rng: Rng): EnglishItem {
+  const { words, keyWord, siblings, question } = patternWords(skillId, rng);
   const blankIndex = words.length - 1;
   const count = tier === 1 ? 1 : tier === 2 ? 2 : 3;
-  const others = unit.words
-    .map((w) => (skillId === 'en-pattern-i-like' ? plural(w.word) : w.word))
-    .filter((w) => w !== keyWord);
-  if (others.length < count) {
-    throw new Error(`generateItem: need ${count + 1} words, unit has ${unit.words.length}`);
+  if (siblings.length < count) {
+    throw new Error(
+      `generateItem: need ${count + 1} sibling words for ${skillId}, bank has ${siblings.length + 1}`,
+    );
   }
-  const options = shuffle(rng, [keyWord, ...shuffle(rng, others).slice(0, count)]);
-  return { kind: 'fill-pattern', skillId, source: 'own', sentence: words, blankIndex, options };
+  const options = shuffle(rng, [keyWord, ...shuffle(rng, siblings).slice(0, count)]);
+  return {
+    kind: 'fill-pattern',
+    skillId,
+    source: 'own',
+    sentence: words,
+    blankIndex,
+    options,
+    ...(question ? { question } : {}),
+  };
 }
 
 /** Build one item of `kind` for `skillId` at `tier` from the unit's own words. */
@@ -185,8 +229,8 @@ export function generateItem(
     case 'match-pairs':
       return matchPairs(skillId, unit, rng);
     case 'order-words':
-      return orderWords(skillId, unit, rng);
+      return orderWords(skillId, rng);
     case 'fill-pattern':
-      return fillPattern(skillId, tier, unit, rng);
+      return fillPattern(skillId, tier, rng);
   }
 }

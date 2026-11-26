@@ -60,8 +60,12 @@ function isEnglishItem(v: unknown): v is EnglishItem {
       const words = v.pairs.map((p) => (isRecord(p) ? p.word : undefined));
       return new Set(words).size === words.length;
     }
-    case 'order-words':
-      return isStringArray(v.words) && v.words.length >= 2 && v.words.every(isNonEmptyString);
+    case 'order-words': {
+      if (!isStringArray(v.words) || v.words.length < 2) return false;
+      if (!v.words.every(isNonEmptyString)) return false;
+      if (v.question !== undefined && typeof v.question !== 'string') return false;
+      return true;
+    }
     case 'fill-pattern': {
       if (!isStringArray(v.sentence) || v.sentence.length < 2) return false;
       if (!v.sentence.every(isNonEmptyString)) return false;
@@ -69,6 +73,7 @@ function isEnglishItem(v: unknown): v is EnglishItem {
       if (v.blankIndex < 0 || v.blankIndex >= v.sentence.length) return false;
       if (!isStringArray(v.options) || v.options.length < 2 || v.options.length > 4) return false;
       if (!v.options.every(isNonEmptyString)) return false;
+      if (v.question !== undefined && typeof v.question !== 'string') return false;
       return v.options.includes(v.sentence[v.blankIndex] as string);
     }
     case 'letter-pick':

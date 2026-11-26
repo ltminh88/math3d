@@ -1,7 +1,10 @@
 import { describe, expect, it } from 'vitest';
 import { mulberry32 } from '../../learning/seeded-rng';
+import { ENGLISH_PATTERN_SENTENCES } from '../content/patterns';
 import { SEED_UNIT_1 } from '../content/seed-unit-1';
-import type { EnglishItem } from '../english-types';
+import { ENGLISH_TOPIC_WORDS } from '../content/topics';
+import { unitForStage } from '../content/units';
+import type { EnglishItem, EnglishPattern, EnglishSkillId } from '../english-types';
 import { SYNTHETIC_PACK } from '../fixtures/synthetic-pack';
 import { CONFUSABLE_LETTER, generateItem } from './item-generators';
 
@@ -67,19 +70,21 @@ describe('generateItem', () => {
     expect(new Set(item.pairs.map((p) => p.word)).size).toBe(3);
   });
 
-  it('order-words builds the pattern sentence in order', () => {
-    const like = generateItem('en-pattern-i-like', 'order-words', 1, SEED_UNIT_1, gen(2));
-    expect(like.kind).toBe('order-words');
-    if (like.kind !== 'order-words') return;
-    expect(like.words[0]).toBe('I');
-    expect(like.words[1]).toBe('like');
-    expect(like.words[2]).toMatch(/^[a-z]+s$/);
-    const is = generateItem('en-pattern-this-is', 'order-words', 1, SEED_UNIT_1, gen(2));
-    if (is.kind !== 'order-words') return;
-    expect(is.words.slice(0, 3)).toEqual(['This', 'is', 'a']);
+  it('order-words builds a bank sentence in order, for every pattern', () => {
+    // 2A: all 7 patterns draw their sentences from the pattern bank.
+    const banks = ENGLISH_PATTERN_SENTENCES;
+    for (const pattern of Object.keys(banks) as EnglishPattern[]) {
+      const skillId: EnglishSkillId = `en-pattern-${pattern}`;
+      for (let seed = 0; seed < 10; seed++) {
+        const item = generateItem(skillId, 'order-words', 1, SEED_UNIT_1, gen(seed));
+        expect(item.kind).toBe('order-words');
+        if (item.kind !== 'order-words') continue;
+        expect(banks[pattern as keyof typeof banks]).toContainEqual(item.words);
+      }
+    }
   });
 
-  it('fill-pattern blanks the last word with 2/3/4 options by tier', () => {
+  it('fill-pattern blanks the last word with 2/3/4 options by tier, from sibling sentences', () => {
     const counts = { 1: 2, 2: 3, 3: 4 } as const;
     for (const tier of [1, 2, 3] as const) {
       const item = generateItem('en-pattern-this-is', 'fill-pattern', tier, SEED_UNIT_1, gen(4));
@@ -88,7 +93,28 @@ describe('generateItem', () => {
       expect(item.blankIndex).toBe(item.sentence.length - 1);
       expect(item.options).toHaveLength(counts[tier]);
       expect(item.options).toContain(item.sentence[item.blankIndex]);
+      const siblings = new Set(ENGLISH_PATTERN_SENTENCES['this-is'].map((s) => s[s.length - 1]));
+      for (const option of item.options) expect(siblings.has(option)).toBe(true);
     }
+  });
+
+  it('what-is items ask What is this/that, and the answer is "It is …"', () => {
+    const seen = new Set<string>();
+    for (let seed = 0; seed < 20; seed++) {
+      const ordered = generateItem('en-pattern-what-is', 'order-words', 1, SEED_UNIT_1, gen(seed));
+      expect(ordered.kind).toBe('order-words');
+      if (ordered.kind !== 'order-words') continue;
+      expect(ordered.question).toMatch(/^What is (this|that)\?$/);
+      expect(ordered.words.slice(0, 2)).toEqual(['It', 'is']);
+      if (ordered.question) seen.add(ordered.question);
+      const filled = generateItem('en-pattern-what-is', 'fill-pattern', 1, SEED_UNIT_1, gen(seed));
+      expect(filled.kind).toBe('fill-pattern');
+      if (filled.kind !== 'fill-pattern') continue;
+      expect(filled.question).toMatch(/^What is (this|that)\?$/);
+      expect(filled.sentence.slice(0, 2)).toEqual(['It', 'is']);
+      if (filled.question) seen.add(filled.question);
+    }
+    expect(seen).toEqual(new Set(['What is this?', 'What is that?']));
   });
 
   it('is deterministic per seed', () => {
@@ -103,10 +129,36 @@ describe('generateItem', () => {
     );
   });
 
-  it('throws for a pattern with no 1B template', () => {
-    expect(() => generateItem('en-pattern-i-can', 'order-words', 1, SEED_UNIT_1, gen(1))).toThrow(
-      'no 1B sentence template',
-    );
+  it('topic skills only serve their own topic words', () => {
+    for (let seed = 0; seed < 20; seed++) {
+      const unit2 = unitForStage(2);
+      const animal = generateItem('en-topic-animals', 'listen-pick-picture', 1, unit2, gen(seed));
+      expect(animal.kind).toBe('listen-pick-picture');
+      if (animal.kind !== 'listen-pick-picture') continue;
+      for (const choice of animal.choices) {
+        expect(ENGLISH_TOPIC_WORDS.animals).toContain(choice.word);
+      }
+      const food = generateItem('en-topic-food', 'match-pairs', 1, unit2, gen(seed));
+      expect(food.kind).toBe('match-pairs');
+      if (food.kind !== 'match-pairs') continue;
+      for (const pair of food.pairs) {
+        expect(ENGLISH_TOPIC_WORDS.food).toContain(pair.word);
+      }
+    }
+  });
+
+  it('block skills only serve words starting in their block', () => {
+    for (let seed = 0; seed < 20; seed++) {
+      const item = generateItem(
+        'en-words-e-h',
+        'listen-pick-picture',
+        1,
+        unitForStage(2),
+        gen(seed),
+      );
+      if (item.kind !== 'listen-pick-picture') continue;
+      expect(item.word[0]).toMatch(/[e-h]/);
+    }
   });
 
   it('generates from the synthetic pack items shape too (validator guard)', () => {

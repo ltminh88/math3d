@@ -9,6 +9,7 @@ import {
   type EnglishWidget,
   type EnglishWidgetHooks,
   type EnglishWidgetOptions,
+  questionParagraph,
   renderGloss,
   widgetRoot,
 } from './english-widget-layout';
@@ -20,6 +21,8 @@ export function mountWordTileOrder(
 ): EnglishWidget {
   const doc = options.doc ?? document;
   const { root, body, gloss } = widgetRoot(item, tei('cueOrder'), doc, options);
+  const question = questionParagraph(item.question, doc);
+  if (question) body.appendChild(question);
   const slots = doc.createElement('div');
   slots.className = 'english-slots';
   slots.setAttribute('role', 'group');

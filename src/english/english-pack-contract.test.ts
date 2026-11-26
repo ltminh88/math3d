@@ -68,4 +68,27 @@ describe('isEnglishPack', () => {
     expect(isEnglishPack({ version: 1, stage: 0, items: [] })).toBe(false);
     expect(isEnglishPack({ version: 1, items: [], images: { a: 1 } })).toBe(false);
   });
+
+  it('accepts an optional question on order-words and fill-pattern, rejects a bad one', () => {
+    const order = {
+      kind: 'order-words',
+      skillId: 'en-pattern-what-is',
+      source: 'own',
+      words: ['It', 'is', 'a', 'cat'],
+      question: 'What is this?',
+    };
+    expect(isEnglishPack({ version: 1, items: [order] })).toBe(true);
+    expect(isEnglishPack({ version: 1, items: [{ ...order, question: 7 }] })).toBe(false);
+    const fill = {
+      kind: 'fill-pattern',
+      skillId: 'en-pattern-what-is',
+      source: 'own',
+      sentence: ['It', 'is', 'a', 'cat'],
+      blankIndex: 3,
+      options: ['cat', 'dog'],
+      question: 'What is that?',
+    };
+    expect(isEnglishPack({ version: 1, items: [fill] })).toBe(true);
+    expect(isEnglishPack({ version: 1, items: [{ ...fill, question: null }] })).toBe(false);
+  });
 });
