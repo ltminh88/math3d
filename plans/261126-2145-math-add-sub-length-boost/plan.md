@@ -76,3 +76,6 @@ Lane A (muse-88): 0 → 1A → 2A → 4A → 3A. Lane B (muse-min, after English
    bugs per skill), local only, no Supabase.** Alternative: skip for now.
 6. D6 Level homes: **Garden gets B2 add/sub slots; numberfort stages 3/5 get bug-choice/column
    variants at their own range; workshop gets the length slots.**
+
+## Validation Log
+Session 2026-11-26 (all recommended): D1 **relax for new `meas-len-*` only** (m/dm/cm/mm, integers ≤ 1000, m↔mm from L2, no decimals; KNTT T1 B7 + B30) · D4 **new column-calc scene** · D2+D3 **diagnostic in "Luyện tập hôm nay", re-offered every 14 days, no score/XP; fixed focus group, weak skills computed** · D5 **"Tiến bộ" tab in the sticker book** (local data, view-only). D6 keeps the recommendation (garden + numberfort 3/5 + workshop).
