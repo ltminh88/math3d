@@ -147,7 +147,7 @@ test('the area badge and the world map know the chapter 3 regions', async ({ pag
 
   await page.locator('#open-map').click();
   await expect(page.locator('#world-map')).toBeVisible();
-  await expect(page.locator('[data-region]')).toHaveCount(11);
+  await expect(page.locator('[data-region]')).toHaveCount(12);
   await page.locator('[data-region="market"]').click();
   await expect(page.locator('#map-detail strong')).toHaveText('🏮 Chợ Phiên Tí Hon');
   await page.locator('[data-region="numberfort"]').click();

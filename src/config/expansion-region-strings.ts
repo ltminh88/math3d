@@ -21,6 +21,9 @@ export const tx = defineStrings('expansion-regions', {
     numberfortName: 'Lâu Đài Số',
     numberfortSubtitle: 'THẾ GIỚI 11',
     numberfortBlurb: 'Lâu đài của các số lớn, làm tròn và số La Mã.',
+    islandName: 'Đảo Tiếng Anh',
+    islandSubtitle: 'THẾ GIỚI 12',
+    islandBlurb: 'Đảo tiếng Anh với bãi cát, hàng cọ và cây cầu ván.',
     signpostHint: 'Đi theo biển chỉ đường',
   },
   en: {
@@ -39,6 +42,9 @@ export const tx = defineStrings('expansion-regions', {
     numberfortName: 'Number Castle',
     numberfortSubtitle: 'WORLD 11',
     numberfortBlurb: 'The castle of big numbers, rounding and Roman numerals.',
+    islandName: 'English Island',
+    islandSubtitle: 'WORLD 12',
+    islandBlurb: 'The English island with a sandy beach, palm trees and a plank bridge.',
     signpostHint: 'Follow the signposts',
   },
 });

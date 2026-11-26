@@ -28,7 +28,8 @@ export interface LevelGate {
     | 'workshop'
     | 'cave'
     | 'market'
-    | 'numberfort';
+    | 'numberfort'
+    | 'island';
   readonly regionId: AnyRegionId;
   /** Gate centre on the ground plane as [x, z]. */
   readonly position: readonly [x: number, z: number];
@@ -45,7 +46,8 @@ export interface LevelGate {
  * e2e). All face the default camera. Chapter 2 (garden → valley → workshop → cave) opens only
  * after the tower; its gates stand in the garden by the bridge and in the expansion regions
  * (`expansion-regions.ts`) and say "Sắp ra mắt" until their level folder ships. Chapter 3
- * (market, numberfort) opens only after the cave, same rule.
+ * (market, numberfort) opens only after the cave, same rule. The English island is a side
+ * region, not part of the math quest chain: its gate opens after the bridge, like the field.
  */
 export const LEVEL_GATES: readonly LevelGate[] = [
   {
@@ -127,5 +129,13 @@ export const LEVEL_GATES: readonly LevelGate[] = [
     facing: 0,
     requires: 'cave',
     sign: '100 000',
+  },
+  {
+    levelId: 'island',
+    regionId: 'island',
+    position: [-8, 10],
+    facing: 0,
+    requires: 'bridge',
+    sign: 'A B C',
   },
 ];

@@ -33,7 +33,8 @@ export const EXPANSION_SIGNPOSTS: readonly Signpost[] = [
       { target: 'workshop', heading: [0, 1] },
     ],
   },
-  // West bank, where the bridge road arrives: to the cave west, back over the bridge east.
+  // West bank, where the bridge road arrives: to the cave west, back over the bridge east,
+  // and south to the English island (the island is right there, past the bridgehead).
   {
     id: 'west-bridgehead',
     position: [-1, 5.5],
@@ -41,6 +42,7 @@ export const EXPANSION_SIGNPOSTS: readonly Signpost[] = [
       { target: 'cave', heading: [-1, 0.45] },
       { target: 'workshop', heading: [1, 0.45] },
       { target: 'valley', heading: [1, -0.55] },
+      { target: 'island', heading: [-5, 7.5] },
     ],
   },
   // West bank, at the fork past the village (the floating label hangs over this one).

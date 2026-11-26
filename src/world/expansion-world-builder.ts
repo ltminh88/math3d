@@ -1,6 +1,6 @@
 // Chapter 2 scenery: ground pads + roads, geometry valley, measurement workshop and puzzle cave.
-// Chapter 3 adds the tiny market fair and the number castle, baked into the same three meshes
-// (no new draw calls). Built where the level gates are built (after the world, outside the
+// Chapter 3 adds the tiny market fair and the number castle, and Phase 1A the English island,
+// baked into the same three meshes (no new draw calls). Built where the level gates are built (after the world, outside the
 // static merge): three draws `Math.random` for every object UUID, so building earlier would
 // shift the clouds/mountains and every seeded draw after them. Builders write into scratch
 // groups with their own materials; the groups are baked into 3 meshes (ground, solid scenery,
@@ -19,6 +19,7 @@ import { bakeVertexColoredGeometry } from '../levels/shared/bake-vertex-colored-
 import { buildExpansionGround } from './expansion-road-builder';
 import { buildExpansionSignposts } from './expansion-signpost-builder';
 import { buildGeometryValley } from './regions/geometry-valley-builder';
+import { buildIsland } from './regions/island-region-builder';
 import { buildTinyMarket } from './regions/market-region-builder';
 import { buildMeasurementWorkshop } from './regions/measurement-workshop-builder';
 import { buildNumberCastle } from './regions/numberfort-region-builder';
@@ -60,6 +61,7 @@ export function buildExpansionWorld(world: WorldBuildContext): ExpansionWorldVie
   buildPuzzleCave(scratch, solidRoot, glowRoot);
   buildTinyMarket(scratch, solidRoot, glowRoot);
   buildNumberCastle(scratch, solidRoot);
+  buildIsland(scratch, solidRoot);
   const signText = buildExpansionSignposts(scratch, solidRoot);
   const ground = bakedMesh('expansion-ground', groundRoot, litMaterial());
   ground.receiveShadow = true;
