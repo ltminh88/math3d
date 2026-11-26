@@ -11,8 +11,11 @@ import { RULER_MAX_CM } from './measurement-ranges';
 
 const MAX_MM = RULER_MAX_CM * 10;
 
-const ruler = (fromMm: number, toMm: number) =>
-  scene({ kind: 'ruler', maxCm: RULER_MAX_CM, fromMm, toMm }, 32);
+const ruler = (fromMm: number, toMm: number, showMmLabels = false) =>
+  scene(
+    { kind: 'ruler', maxCm: RULER_MAX_CM, fromMm, toMm, ...(showMmLabels ? { showMmLabels } : {}) },
+    32,
+  );
 
 export const measRulerRead: GeoGenerator = (rng, tier) => {
   const item = pick(rng, LONG_NOUNS);
@@ -38,6 +41,8 @@ export const measRulerRead: GeoGenerator = (rng, tier) => {
   }
   // Tier 3: the object starts at a later mark; reading only its end is the trap.
   // The answer is two number steps (cm part, then mm part) — "6 cm 4 mm".
+  // The ruler numbers its mm ticks here (showMmLabels), so the child can read
+  // the mm part without counting ticks.
   const from = 10 * randInt(rng, 1, 4);
   const len = randInt(rng, 5, MAX_MM - from);
   const to = from + len;
@@ -50,7 +55,7 @@ export const measRulerRead: GeoGenerator = (rng, tier) => {
     tier,
     ref('rulerShift', { item }),
     steps,
-    ruler(from, to),
+    ruler(from, to, true),
     'mm',
     [to, from],
   );

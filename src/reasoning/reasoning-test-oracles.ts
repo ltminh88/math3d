@@ -47,6 +47,11 @@ export function numbersOfItem(item: ReasoningItem): number[] {
     if (step.kind === 'number') out.push(step.answer);
     if (step.kind === 'choice' || step.kind === 'multi')
       for (const o of step.options) out.push(...numbersOfPrompt(o.label));
+    if (step.kind === 'order') for (const t of step.tiles) out.push(...numbersOfPrompt(t));
+    if (step.kind === 'match') {
+      for (const t of step.left) out.push(...numbersOfPrompt(t));
+      for (const o of step.right) out.push(...numbersOfPrompt(o.label));
+    }
     if (step.kind === 'verdict') {
       out.push(...numbersOfPrompt(step.statement));
       if (step.fix) out.push(step.fix.answer, ...numbersOfPrompt(step.fix.prompt));

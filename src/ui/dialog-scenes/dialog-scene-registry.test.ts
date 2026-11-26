@@ -7,6 +7,7 @@ import { DATA_SKILLS } from '../../data/data-item-for-skill';
 import { FRACTION_SKILLS } from '../../fractions/fraction-item-for-skill';
 import { GEOMETRY_SKILLS } from '../../geometry/geometry-item-for-skill';
 import { mulberry32 } from '../../learning/seeded-rng';
+import { LENGTH_SKILLS } from '../../measurement/length-item-for-skill';
 import { MEASUREMENT_SKILLS } from '../../measurement/measurement-item-for-skill';
 import { MONEY_SKILLS } from '../../money/money-item-for-skill';
 import { NUMBER_SKILLS } from '../../numbers/number-item-for-skill';
@@ -46,6 +47,7 @@ const ALL_KINDS: readonly DialogSceneKind[] = [
   'fraction-shape',
   'fraction-set',
   'fraction-pick',
+  'length-ladder',
 ];
 
 describe('dialog scene registry', () => {
@@ -57,6 +59,17 @@ describe('dialog scene registry', () => {
 
   test('every geo/meas skill x tier sample has a renderable scene', () => {
     for (const id of [...GEOMETRY_SKILLS, ...MEASUREMENT_SKILLS]) {
+      for (const tier of [1, 2, 3] as const) {
+        const item = itemForSkill(id, mulberry32(0), tier);
+        if (item.scene === undefined) throw new Error(`skill ${id} tier ${tier} has no scene`);
+        expect(hasSceneRenderer(item.scene.kind)).toBe(true);
+        expect(dialogRenderable(item)).toBe(true);
+      }
+    }
+  });
+
+  test('every length-ladder skill x tier sample has a renderable scene (boost 2B)', () => {
+    for (const id of LENGTH_SKILLS) {
       for (const tier of [1, 2, 3] as const) {
         const item = itemForSkill(id, mulberry32(0), tier);
         if (item.scene === undefined) throw new Error(`skill ${id} tier ${tier} has no scene`);

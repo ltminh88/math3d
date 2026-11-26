@@ -7,9 +7,9 @@ import type { FactKey } from '../../learning/fact-key';
 import type { DeltaFact, DeltaLevel } from '../../learning/learning-types';
 import { mulberry32 } from '../../learning/seeded-rng';
 import type { SkillTier } from '../../learning/skill-tiers';
-import { itemForSkill } from '../../practice/item-for-skill';
+import { renderPromptFor } from '../../practice/family-prompt-registry';
+import { familyOfSkill, itemForSkill } from '../../practice/item-for-skill';
 import { playableSteps } from '../../reasoning/reasoning-step-answers';
-import { renderPrompt } from '../../reasoning/reasoning-strings';
 import { newId } from '../../store/new-id';
 import type { GameSnapshot } from '../../store/progress-repository';
 import { progressViewFromSnapshot } from '../../store/store-to-save-v1';
@@ -145,7 +145,15 @@ function mountStepCard(skillId: string, seed: number, tier: SkillTier): PlannedS
   host.id = 'test-step-card';
   host.style.cssText =
     'position:fixed;inset:0;z-index:10000;overflow:auto;padding:16px;background:#fff;color:#222';
+  // Labels render through the item's own family (measurement renders lenQty
+  // with its unit; the reasoning table would return the raw key instead) —
+  // the same rule as the lesson/daily hooks. The fixture id has no family,
+  // so it falls back to reasoning, which its verbatim keys need. The card
+  // itself gets the same renderer, so the buttons carry the labels the hook
+  // returns.
+  const render = renderPromptFor(familyOfSkill(skillId));
   const card = createStepCard(item, {
+    render,
     onComplete: () => card.element.setAttribute('data-complete', 'true'),
   });
   host.appendChild(card.element);
@@ -157,21 +165,21 @@ function mountStepCard(skillId: string, seed: number, tier: SkillTier): PlannedS
     if (step.kind === 'order')
       return {
         kind: 'order',
-        tiles: step.tiles.map((t) => renderPrompt(t)),
+        tiles: step.tiles.map((t) => render(t)),
         answer: [...step.answer],
       };
     if (step.kind === 'match')
       return {
         kind: 'match',
-        left: step.left.map((t) => renderPrompt(t)),
-        right: step.right.map((o) => renderPrompt(o.label)),
+        left: step.left.map((t) => render(t)),
+        right: step.right.map((o) => render(o.label)),
         pairs: [...step.pairs],
       };
     const right = step.options.filter((o) => o.correct);
     if (step.kind === 'multi') return { kind: 'multi', ids: right.map((o) => o.id) };
     return {
       kind: 'choice',
-      label: right.map((o) => renderPrompt(o.label)).join(', '),
+      label: right.map((o) => render(o.label)).join(', '),
     };
   });
 }

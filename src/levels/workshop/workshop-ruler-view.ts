@@ -47,6 +47,14 @@ export function createRulerView(
     d += `M${x(mm)},${TOP}v${len}`;
   }
   svg.append(svgEl('path', { d, class: 'ws-ticks' }));
+  if (scene.showMmLabels) {
+    // The mm offset inside its centimetre (1-9) under each mm tick, so the
+    // child can read the mm part of a length without counting ticks.
+    for (let mm = 1; mm <= total; mm++) {
+      if (mm % 10 === 0) continue;
+      svg.append(label([x(mm), TOP + 24], String(mm % 10), 'ws-label ws-label--mm'));
+    }
+  }
   for (let cm = 0; cm <= scene.maxCm; cm++)
     svg.append(label([x(cm * 10), TOP + 34], String(cm), 'ws-label ws-label--ruler'));
   svg.append(label([width - 22, TOP + 46], 'cm', 'ws-label ws-label--small'));

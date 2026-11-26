@@ -49,12 +49,14 @@ export type SceneBody =
     }
   /** Solids by edge lengths in cm. */
   | { readonly kind: 'solids'; readonly solids: readonly (Labeled & { dims: readonly number[] })[] }
-  /** Ruler 0..`maxCm` with mm ticks; an object lies from `fromMm` to `toMm`. */
+  /** Ruler 0..`maxCm` with mm ticks; an object lies from `fromMm` to `toMm`. `showMmLabels`
+   * numbers every mm tick 1-9 inside its centimetre (boost 2B, cm + mm reading). */
   | {
       readonly kind: 'ruler';
       readonly maxCm: number;
       readonly fromMm: number;
       readonly toMm: number;
+      readonly showMmLabels?: boolean;
     }
   /** Balance: `count` × item on the left, gram weights on the right, level. */
   | {
