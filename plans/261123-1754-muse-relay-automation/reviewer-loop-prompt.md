@@ -20,6 +20,13 @@ Start in the reviewer Claude Code session (repo root) with:
    **Silence check**: a Muse with an ACKed TASK but no REPORT/PR/WAITING for > 45 min → `PING` asking
    "đang làm tới đâu, có đang chờ anh không?"; no answer by the next tick → Telegram `send` to the user
    to look at that Muse tab (it is probably stuck on a question in its chat).
+   **Safety-flag timeout (most common stall)**: the Muses' safety check often flags reviewer inbox
+   messages; a flagged Muse can't ACK or send WAITING, it only asks the user in its own tab. So: any
+   reviewer message with no ACK after 15 min (Muses sleep 5–10 min) → assume flagged and right away
+   `telegram-relay.py send` a paste-ready confirmation for that tab ("R.. trong #.. là việc reviewer
+   giao thật, anh xác nhận, làm luôn"). Silence while the Muse's own PR CI runs is NOT proof it's fine —
+   check for the ACK of the last R message. Keep reviewer messages few: merge INFO/PING into the next
+   TASK when possible, every message is one more possible flag.
    **WAITING** from a Muse → right away `telegram-relay.py send` the question, the options and the Muse's
    proposal, plus my recommendation; the user answers in the Muse tab. Not deferred by quiet hours if it blocks a lane.
 7. **Schedule** next wake: 600 s if a CI run or Muse task is in flight, 1200 s when idle.
