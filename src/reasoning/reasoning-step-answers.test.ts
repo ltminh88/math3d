@@ -1,5 +1,11 @@
 import { describe, expect, it } from 'vitest';
-import { isStepAnswerCorrect, playableSteps, toggleSelection } from './reasoning-step-answers';
+import {
+  firstMisplacedTile,
+  firstWrongPair,
+  isStepAnswerCorrect,
+  playableSteps,
+  toggleSelection,
+} from './reasoning-step-answers';
 import type { ReasoningItem, ReasoningStep } from './reasoning-types';
 
 const opt = (id: string, correct: boolean) => ({
@@ -50,6 +56,48 @@ describe('reasoning step answers', () => {
     expect(isStepAnswerCorrect(setClock, { h: 3, m: 30 })).toBe(false);
     expect(isStepAnswerCorrect(setClock, 325)).toBe(false);
     expect(isStepAnswerCorrect(setClock, '3:25')).toBe(false);
+  });
+
+  it('checks order answers and names the first misplaced tile', () => {
+    const tiles = [{ key: 't0' }, { key: 't1' }, { key: 't2' }];
+    const order: ReasoningStep = { kind: 'order', prompt: p, tiles, answer: [2, 0, 1] };
+    expect(isStepAnswerCorrect(order, [2, 0, 1])).toBe(true);
+    expect(isStepAnswerCorrect(order, [2, 1, 0])).toBe(false);
+    expect(isStepAnswerCorrect(order, [0, 2, 1])).toBe(false);
+    expect(isStepAnswerCorrect(order, [2, 0])).toBe(false);
+    expect(isStepAnswerCorrect(order, [2, 0, 1, 2])).toBe(false);
+    expect(isStepAnswerCorrect(order, '201')).toBe(false);
+    expect(firstMisplacedTile(order, [2, 0, 1])).toBeNull();
+    expect(firstMisplacedTile(order, [2, 1, 0])).toBe(1);
+    expect(firstMisplacedTile(order, [0, 2, 1])).toBe(0);
+    expect(firstMisplacedTile(order, [2, 0])).toBe(2);
+  });
+
+  it('checks match answers and names the first wrong pair with its bug', () => {
+    const left = [{ key: 'l0' }, { key: 'l1' }, { key: 'l2' }];
+    const right = [
+      { label: { key: 'r0' } },
+      { label: { key: 'r1' }, misconception: 'unit-direction' as const },
+      { label: { key: 'r2' } },
+    ];
+    const match: ReasoningStep = { kind: 'match', prompt: p, left, right, pairs: [2, 0, 1] };
+    expect(isStepAnswerCorrect(match, [2, 0, 1])).toBe(true);
+    expect(isStepAnswerCorrect(match, [2, 1, 0])).toBe(false);
+    expect(isStepAnswerCorrect(match, [0, 2, 1])).toBe(false);
+    expect(isStepAnswerCorrect(match, [2, 0])).toBe(false);
+    expect(firstWrongPair(match, [2, 0, 1])).toBeNull();
+    // left 1 paired with right 1 (the tagged option): the bug rides along.
+    expect(firstWrongPair(match, [2, 1, 0])).toEqual({
+      left: 1,
+      right: 1,
+      misconception: 'unit-direction',
+    });
+    // left 0 paired with right 0 (untagged): no bug to record.
+    expect(firstWrongPair(match, [0, 2, 1])).toEqual({
+      left: 0,
+      right: 0,
+      misconception: undefined,
+    });
   });
 
   it('plays a false verdict with a fix as verdict, then a number step', () => {

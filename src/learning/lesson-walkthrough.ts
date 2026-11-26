@@ -75,7 +75,7 @@ type Stats = Record<FactKey, FactStat | undefined>;
 
 /** The correct answer for one playable step, as the step kit would submit it. */
 function correctAnswerOf(step: ReturnType<typeof playableSteps>[number]): {
-  answer: number | string | readonly string[] | boolean | ClockSetting;
+  answer: number | string | readonly string[] | readonly number[] | boolean | ClockSetting;
   problem?: string;
 } {
   switch (step.kind) {
@@ -97,6 +97,10 @@ function correctAnswerOf(step: ReturnType<typeof playableSteps>[number]): {
       return typeof step.answer === 'boolean'
         ? { answer: step.answer }
         : { answer: false, problem: 'verdict step with non-boolean answer' };
+    case 'order':
+      return { answer: [...step.answer] };
+    case 'match':
+      return { answer: [...step.pairs] };
     case 'set-clock':
       return { answer: { h: step.h, m: step.m } };
   }

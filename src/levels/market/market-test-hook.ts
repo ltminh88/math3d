@@ -11,7 +11,9 @@ export type MarketExpected =
   | { kind: 'choice'; index: number }
   | { kind: 'multi'; ids: string[]; all: string[] }
   | { kind: 'verdict'; answer: boolean }
-  | { kind: 'set-clock'; h: number; m: number };
+  | { kind: 'set-clock'; h: number; m: number }
+  | { kind: 'order'; answer: number[] }
+  | { kind: 'match'; pairs: number[] };
 
 export interface MarketTestHook {
   state(): {
@@ -39,6 +41,8 @@ function expectedOf(step: ReasoningStep | undefined): MarketExpected | null {
   if (step.kind === 'choice')
     return { kind: 'choice', index: step.options.findIndex((o) => o.correct) };
   if (step.kind === 'set-clock') return { kind: 'set-clock', h: step.h, m: step.m };
+  if (step.kind === 'order') return { kind: 'order', answer: [...step.answer] };
+  if (step.kind === 'match') return { kind: 'match', pairs: [...step.pairs] };
   return {
     kind: 'multi',
     ids: step.options.filter((o) => o.correct).map((o) => o.id),

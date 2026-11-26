@@ -13,7 +13,9 @@ export type PlannedStep =
   | { kind: 'choice'; label: string }
   | { kind: 'multi'; ids: string[] }
   | { kind: 'verdict'; answer: boolean }
-  | { kind: 'set-clock'; h: number; m: number };
+  | { kind: 'set-clock'; h: number; m: number }
+  | { kind: 'order'; tiles: string[]; answer: number[] }
+  | { kind: 'match'; left: string[]; right: string[]; pairs: number[] };
 
 export const isTouch = (info: TestInfo) => info.project.use.hasTouch === true;
 
@@ -148,7 +150,17 @@ async function solveSkillItem(page: Page, touch: boolean): Promise<void> {
     else if (step.kind === 'verdict')
       await press(page, row.locator(`[data-verdict="${step.answer}"]`), touch);
     else if (step.kind === 'set-clock') await solveSetClock(page, row, step, touch);
-    else {
+    else if (step.kind === 'order') {
+      for (const ti of step.answer)
+        await press(
+          page,
+          row.locator('.kit-order__bank').getByRole('button', { name: step.tiles[ti], exact: true }),
+          touch,
+        );
+      await press(page, row.locator('.kit-order__done'), touch);
+    } else if (step.kind === 'match') {
+      throw new Error('match steps are not played by this solver');
+    } else {
       for (const id of step.ids) await press(page, row.locator(`[data-choice="${id}"]`), touch);
       await press(page, row.locator('.kit-multi__done'), touch);
     }

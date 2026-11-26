@@ -16,7 +16,7 @@ export interface GardenTestState {
   stepIndex: number;
   steps: number;
   /** null once the round is answered. */
-  step: 'number' | 'choice' | 'multi' | 'verdict' | 'set-clock' | null;
+  step: 'number' | 'choice' | 'multi' | 'verdict' | 'set-clock' | 'order' | 'match' | null;
   /** Number steps: the number; choice steps: the rendered label of the right card. */
   expected: number | string | null;
   choices: string[];

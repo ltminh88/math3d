@@ -14,7 +14,9 @@ export type ValleyStepState =
   | { kind: 'choice'; label: string; option: string }
   | { kind: 'multi'; options: string[] }
   | { kind: 'verdict'; answer: boolean }
-  | { kind: 'set-clock'; h: number; m: number };
+  | { kind: 'set-clock'; h: number; m: number }
+  | { kind: 'order'; tiles: string[]; answer: number[] }
+  | { kind: 'match'; left: string[]; right: string[]; pairs: number[] };
 
 export interface ValleyTestHook {
   state(): {
@@ -64,6 +66,19 @@ export function installValleyTestHook(
     if (step.kind === 'number' || step.kind === 'verdict')
       return { kind: step.kind, answer: step.answer } as ValleyStepState;
     if (step.kind === 'set-clock') return { kind: 'set-clock', h: step.h, m: step.m };
+    if (step.kind === 'order')
+      return {
+        kind: 'order',
+        tiles: step.tiles.map((t) => renderGeometryPrompt(t)),
+        answer: [...step.answer],
+      } as ValleyStepState;
+    if (step.kind === 'match')
+      return {
+        kind: 'match',
+        left: step.left.map((t) => renderGeometryPrompt(t)),
+        right: step.right.map((o) => renderGeometryPrompt(o.label)),
+        pairs: [...step.pairs],
+      } as ValleyStepState;
     const right = step.options.filter((o) => o.correct);
     if (step.kind === 'multi') return { kind: 'multi', options: right.map((o) => o.id) };
     const first = right[0];

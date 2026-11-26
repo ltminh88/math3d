@@ -29,6 +29,8 @@ const rightAnswer = (step: ReasoningStep) => {
   if (step.kind === 'number') return step.answer;
   if (step.kind === 'verdict') return step.answer;
   if (step.kind === 'set-clock') return { h: step.h, m: step.m };
+  if (step.kind === 'order') return [...step.answer];
+  if (step.kind === 'match') return [...step.pairs];
   const right = step.options.filter((o) => o.correct).map((o) => o.id);
   return step.kind === 'multi' ? right : (right[0] as string);
 };
