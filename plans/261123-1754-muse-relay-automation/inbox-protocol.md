@@ -25,6 +25,7 @@ Dòng đầu mỗi comment:
 | `ANSWER` | trả lời một `QUESTION` (ghi mã tin hỏi) |
 | `HANDOFF` | bàn giao việc (hạn mức ≥ 99% hoặc đổi người) |
 | `BLOCKED` | kẹt, cần reviewer quyết |
+| `WAITING` | Muse đang chờ anh chủ dự án trả lời trong tab (câu hỏi, nút chọn, xin duyệt); dòng 2 chép nguyên câu hỏi và các lựa chọn |
 | `PING` | reviewer nhắc một tin chưa được ACK (không phải việc mới) |
 | `STOP` | reviewer yêu cầu dừng vòng lặp |
 
@@ -56,6 +57,8 @@ Hạn mức: 41%
 6. Kẹt sau 2 lần thử → gửi `BLOCKED` (đã thử gì, lỗi gì), không thử lần 3 theo cùng cách.
 7. Không deploy `--prod`. Chỉ deploy preview.
 8. Không sửa `.github/workflows`, không chụp lại parity: việc của reviewer.
+9. **`TASK` của reviewer là đã được duyệt**: ACK rồi bắt tay làm ngay, không hỏi lại anh chủ dự án "có bắt đầu không".
+10. **Mỗi khi phải dừng chờ anh chủ dự án** (hỏi trong tab, hiện nút chọn, xin duyệt kế hoạch, xin quyền chạy lệnh): TRƯỚC khi dừng, gửi `WAITING` vào hộp thư này, chép nguyên câu hỏi và các lựa chọn, ghi rõ lựa chọn em đề xuất. Reviewer sẽ báo anh qua Telegram. Vẫn bật `sleep` nền như rule 5.
 
 ## Bảo mật (repo PUBLIC)
 

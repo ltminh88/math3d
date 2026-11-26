@@ -18,7 +18,10 @@ Vòng lặp của em:
 5. LUÔN kết thúc mỗi lượt bằng một lệnh sleep chạy nền — kể cả ngay sau REPORT hay khi việc đã xong.
    Quên bật thì vòng lặp chết, không ai đánh thức em được.
    Chờ reviewer gộp PR hay trả lời KHÔNG phải là xong việc — vẫn phải ngủ nền.
-6. Dừng vòng lặp khi: nhận STOP, hoặc hạn mức ≥ 99% (sau khi đã HANDOFF + "Bàn giao" trên #11).
+6. TASK của reviewer là đã duyệt: ACK rồi làm ngay, không hỏi anh "có bắt đầu không".
+   Phải dừng chờ anh (hỏi, nút chọn, xin duyệt, xin quyền)? TRƯỚC khi dừng gửi WAITING vào #{INBOX}
+   (chép nguyên câu hỏi + lựa chọn + đề xuất của em), vẫn bật sleep nền.
+7. Dừng vòng lặp khi: nhận STOP, hoặc hạn mức ≥ 99% (sau khi đã HANDOFF + "Bàn giao" trên #11).
 
 Giữ nguyên mọi quy tắc cũ: không deploy --prod, không sửa .github/workflows, không chụp parity,
 không chép nội dung SGK, repo public nên không dán bí mật. Nếu anh nhắn trực tiếp trong tab này,

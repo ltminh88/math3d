@@ -8,20 +8,32 @@ Start in the reviewer Claude Code session (repo root) with:
 
 ## Each tick (in order)
 
-1. **Telegram**: `python3 scripts/relay/telegram-relay.py poll` → apply each answer to its Qn
-   (state in `.relay/telegram-state.json`). Free text with `q: null` = direct instruction from the user.
+1. **Telegram (every tick, never skip)**: `python3 scripts/relay/telegram-relay.py poll` → apply each
+   answer to its Qn (state in `.relay/telegram-state.json`). Free text with `q: null` = direct instruction from the user.
 2. **Inboxes**: read comments on #63 (muse-88) and #64 (muse-min) newer than the last seen id
    (kept in `.relay/inbox-state.json`). ACK every TASK-for-me / QUESTION / HANDOFF / BLOCKED.
 3. **GitHub state**: open PRs, their CI, main CI, board #11.
 4. **Act** per the table below. Write replies in the inbox as `[reviewer→muse-x] TYPE R<n>` (message ids R1, R2… for reviewer, M1, M2… for Muses — never `#n`, GitHub autolinks it).
 5. **Daily summary** at the first tick after 21:00 (once per day) via `telegram-relay.py send`.
-6. **Re-ping**: a TASK with no ACK after 2 ticks → one `PING` (own id, not a new TASK); still nothing → note in summary.
-7. **Schedule** next wake: 600–900 s if a CI run or Muse task is in flight, 1800 s when idle.
+6. **Re-ping**: a TASK with no ACK after 2 ticks → one `PING` (own id, not a new TASK); still nothing → Telegram `send` to the user
+   ("muse-x chưa nhận R.., có thể đang chờ anh trong tab").
+   **Silence check**: a Muse with an ACKed TASK but no REPORT/PR/WAITING for > 45 min → `PING` asking
+   "đang làm tới đâu, có đang chờ anh không?"; no answer by the next tick → Telegram `send` to the user
+   to look at that Muse tab (it is probably stuck on a question in its chat).
+   **WAITING** from a Muse → right away `telegram-relay.py send` the question, the options and the Muse's
+   proposal, plus my recommendation; the user answers in the Muse tab. Not deferred by quiet hours if it blocks a lane.
+7. **Schedule** next wake: 600 s if a CI run or Muse task is in flight, 1200 s when idle.
    Quiet hours 22:00–07:00: only urgent Telegram messages; the rest go into the morning line.
 8. **Fast answers**: while any Qn is open, keep `python3 scripts/relay/telegram-relay.py wait 3300`
    running in the background (Bash `run_in_background`). Its exit wakes this session within seconds;
    handle the printed rows, then restart it if a Qn is still open. Exit code 3 = 55 min passed quietly. Keep it under 3600 s: the session kills background shells at ~1 h (exit 143) and may leave an orphan `wait` holding `.relay/wait.pid`.
    While it runs, `poll` steps aside (one reader only), so step 1 is skipped.
+
+## Questions to the user are always on Telegram
+
+Any question I put to the user in this terminal (AskUserQuestion, a choice in the reply text, "anh muốn…?")
+is ALSO sent with `telegram-relay.py ask` in the same turn (short: question + options + my pick), then
+`wait` runs in the background (step 8). The user may not be watching this terminal.
 
 ## Decide alone vs ask the user
 
