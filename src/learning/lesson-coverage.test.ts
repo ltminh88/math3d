@@ -7,6 +7,7 @@ import { ARITHMETIC_SKILLS } from '../arithmetic/arithmetic-item-for-skill';
 import { DATA_SKILLS } from '../data/data-item-for-skill';
 import { FRACTION_SKILLS } from '../fractions/fraction-item-for-skill';
 import { GEOMETRY_SKILLS } from '../geometry/geometry-item-for-skill';
+import { LENGTH_SKILLS } from '../measurement/length-item-for-skill';
 import { MEASUREMENT_SKILLS } from '../measurement/measurement-item-for-skill';
 import { MONEY_SKILLS } from '../money/money-item-for-skill';
 import { NUMBER_SKILLS } from '../numbers/number-item-for-skill';
@@ -29,7 +30,8 @@ const GENERATORS_BY_FAMILY: Readonly<Record<SkillFamily, readonly string[]>> = {
   expression: byFamily('expression', REASONING_SKILLS),
   logic: byFamily('logic', REASONING_SKILLS),
   geometry: GEOMETRY_SKILLS,
-  measurement: MEASUREMENT_SKILLS,
+  // Boost, Phase 1B: the length-ladder ids generate too (own dispatcher).
+  measurement: [...MEASUREMENT_SKILLS, ...LENGTH_SKILLS],
   number: NUMBER_SKILLS,
   arithmetic: ARITHMETIC_SKILLS,
   fraction: FRACTION_SKILLS,
@@ -96,6 +98,6 @@ describe('lesson coverage (phase 21 strict)', () => {
   it('a lesson with no skills does not pass (no escape hatch)', () => {
     expect(lessonPasses([])).toBe(false);
     expect(lessonPasses(skillsOfLesson(1))).toBe(true); // B1: six skills, all generated (phase 07)
-    expect(lessonPasses(skillsOfLesson(7))).toBe(true); // B7: four review skills (phase 21)
+    expect(lessonPasses(skillsOfLesson(7))).toBe(true); // B7: twelve review skills (phase 21 + boost 1B)
   });
 });

@@ -16,6 +16,7 @@ import { explainCarry } from './wrong-answer-carry';
 import { explainClock } from './wrong-answer-clock';
 import { explainData } from './wrong-answer-data';
 import { explainFraction } from './wrong-answer-fraction';
+import { LENGTH_BUG_EXPLAINERS } from './wrong-answer-length';
 import { explainMidpoint } from './wrong-answer-midpoint';
 import { explainMoney } from './wrong-answer-money';
 import { explainRemainder } from './wrong-answer-remainder';
@@ -70,6 +71,11 @@ export type WrongAnswerMatcher = (ctx: WrongAnswerContext) => WrongAnswerExplana
 export type BugExplainer = (ctx: WrongAnswerContext) => WrongAnswerExplanation | null;
 
 const bugExplainables = new Map<Misconception, BugExplainer>();
+
+// Boost, Phase 1B: the length lane's explainers, merged at load. This import is
+// data-only (wrong-answer-length imports no runtime value from this file), so
+// the merge cannot run into the Map's TDZ.
+for (const [bug, fn] of LENGTH_BUG_EXPLAINERS) bugExplainables.set(bug, fn);
 
 export function registerBugExplainer(bug: Misconception, fn: BugExplainer): void {
   bugExplainables.set(bug, fn);

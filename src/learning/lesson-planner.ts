@@ -13,6 +13,7 @@ import { ARITHMETIC_SKILLS } from '../arithmetic/arithmetic-item-for-skill';
 import { DATA_SKILLS } from '../data/data-item-for-skill';
 import { FRACTION_SKILLS } from '../fractions/fraction-item-for-skill';
 import { GEOMETRY_SKILLS } from '../geometry/geometry-item-for-skill';
+import { LENGTH_SKILLS } from '../measurement/length-item-for-skill';
 import { MEASUREMENT_SKILLS } from '../measurement/measurement-item-for-skill';
 import { MONEY_SKILLS } from '../money/money-item-for-skill';
 import { NUMBER_SKILLS } from '../numbers/number-item-for-skill';
@@ -53,7 +54,8 @@ const GENERATORS_BY_FAMILY: Readonly<Record<SkillFamily, readonly string[]>> = {
   expression: byFamily('expression', REASONING_SKILLS),
   logic: byFamily('logic', REASONING_SKILLS),
   geometry: GEOMETRY_SKILLS,
-  measurement: MEASUREMENT_SKILLS,
+  // Boost, Phase 1B: the length-ladder ids plan like the other measurement ids.
+  measurement: [...MEASUREMENT_SKILLS, ...LENGTH_SKILLS],
   number: NUMBER_SKILLS,
   arithmetic: ARITHMETIC_SKILLS,
   fraction: FRACTION_SKILLS,

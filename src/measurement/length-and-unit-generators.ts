@@ -37,18 +37,19 @@ export const measRulerRead: GeoGenerator = (rng, tier) => {
     return geoItem('meas-ruler-read', tier, ref('rulerMm', { item }), steps, ruler(0, mm), 'mm');
   }
   // Tier 3: the object starts at a later mark; reading only its end is the trap.
+  // The answer is two number steps (cm part, then mm part) — "6 cm 4 mm".
   const from = 10 * randInt(rng, 1, 4);
   const len = randInt(rng, 5, MAX_MM - from);
   const to = from + len;
-  const step = qtyChoiceStep(rng, ref('askLenMm', { item }), len, 'mm', [
-    { value: to, misconception: 'read-end-not-length' },
-    { value: from, misconception: 'wrong-step' },
-  ]);
+  const steps = [
+    numberStep(ref('askCmPart'), Math.floor(len / 10)),
+    numberStep(ref('askMmPart'), len % 10),
+  ];
   return geoItem(
     'meas-ruler-read',
     tier,
     ref('rulerShift', { item }),
-    [step],
+    steps,
     ruler(from, to),
     'mm',
     [to, from],

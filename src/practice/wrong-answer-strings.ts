@@ -260,6 +260,21 @@ export const twa = defineStrings('wrongAnswer', {
     remCeilNeedRemainder:
       'Bạn điền số thừa vào ô số xe rồi. Số xe là số chuyến cần đi, bạn thử lại nhé.',
     remCeilFallback: 'Bạn thử lại nhé: còn thừa thì cần thêm một xe nữa đó.',
+    // Nhóm 11 — thang đo độ dài (meas-len-*, meas-mm-convert, meas-ruler-read)
+    lenDirection:
+      'Bạn đổi ngược chiều rồi. Nhớ thang đo: 1 m = 10 dm = 100 cm = 1 000 mm, đi xuống thì nhân, đi lên thì chia nhé.',
+    lenFactor:
+      'Bạn mới nhân có một lần 10. Thang đo là 1 m = 10 dm = 100 cm = 1 000 mm, bạn đếm lại xem qua mấy bậc nhé.',
+    lenDmSkipped:
+      'Bạn nhảy qua mất một bậc rồi. Thang đo là 1 m = 10 dm = 100 cm = 1 000 mm, bạn đi từng bậc một nhé.',
+    lenMixedConcat:
+      'Bạn ghép hai số lại thành một số rồi. Đổi từng phần ra đơn vị nhỏ rồi cộng lại nhé.',
+    lenMixedDropBig:
+      'Bạn bỏ mất phần lớn rồi. Số đo có hai phần, bạn đổi cả hai phần ra đơn vị nhỏ nhé.',
+    lenIgnoreUnit:
+      'Bạn tính số mà quên đơn vị rồi. Hai số khác đơn vị thì phải đổi về cùng một đơn vị trước nhé.',
+    lenFallback:
+      'Bạn thử lại nhé: nhìn thang đo 1 m = 10 dm = 100 cm = 1 000 mm rồi đổi từng bậc một.',
   },
   en: {
     unknownWrongInverseAdd:
@@ -518,6 +533,21 @@ export const twa = defineStrings('wrongAnswer', {
     remCeilNeedRemainder:
       'You put the leftover in the cars box. The cars are the trips you need to make.',
     remCeilFallback: 'Try again: if anything is left over, one more car is needed.',
+    // Group 11 — the length ladder (meas-len-*, meas-mm-convert, meas-ruler-read)
+    lenDirection:
+      'You converted the wrong way round. Remember the ladder: 1 m = 10 dm = 100 cm = 1 000 mm — going down you multiply, going up you divide.',
+    lenFactor:
+      'You only multiplied by 10 once. The ladder is 1 m = 10 dm = 100 cm = 1 000 mm — count how many steps you crossed.',
+    lenDmSkipped:
+      'You skipped a step. The ladder is 1 m = 10 dm = 100 cm = 1 000 mm — go one step at a time.',
+    lenMixedConcat:
+      'You joined the two numbers into one. Convert each part to the small unit, then add them.',
+    lenMixedDropBig:
+      'You dropped the big part. A mixed measure has two parts — convert both to the small unit.',
+    lenIgnoreUnit:
+      'You worked with the numbers and forgot the units. When the units differ, convert them to the same unit first.',
+    lenFallback:
+      'Try again: look at the ladder 1 m = 10 dm = 100 cm = 1 000 mm and convert one step at a time.',
   },
 });
 
