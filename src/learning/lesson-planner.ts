@@ -60,6 +60,8 @@ const GENERATORS_BY_FAMILY: Readonly<Record<SkillFamily, readonly string[]>> = {
   time: TIME_SKILLS,
   money: MONEY_SKILLS,
   data: DATA_SKILLS,
+  // English items come from the island engine (1B), never the lesson planner.
+  english: [],
 };
 
 /**

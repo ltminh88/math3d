@@ -25,7 +25,8 @@ export type StickerTopic =
   | 'fraction'
   | 'time'
   | 'money'
-  | 'data';
+  | 'data'
+  | 'english';
 
 /** Book order of the topic pages (family topics stay hidden until their skills exist). */
 export const STICKER_TOPICS: readonly StickerTopic[] = [
@@ -41,6 +42,7 @@ export const STICKER_TOPICS: readonly StickerTopic[] = [
   'time',
   'money',
   'data',
+  'english',
 ];
 
 export interface Sticker {
@@ -121,6 +123,7 @@ export const TOPIC_SKILLS: Readonly<Record<Exclude<StickerTopic, 'tables'>, read
   time: skillsOfFamily('time'),
   money: skillsOfFamily('money'),
   data: skillsOfFamily('data'),
+  english: skillsOfFamily('english'),
 };
 
 type Stats = Readonly<Record<FactKey, FactStat | undefined>>;

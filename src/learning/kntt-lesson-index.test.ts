@@ -119,6 +119,8 @@ describe('skillsOfLesson', () => {
 
   it('no catalog skill is orphaned: every skill appears in at least one practicable lesson', () => {
     for (const s of SKILL_CATALOG) {
+      // English skills live on the island, outside the 81 math lessons.
+      if (s.family === 'english') continue;
       const found = ALL_LESSONS.some(
         (l) => l.practicable && skillsOfLesson(l.n).includes(`sk:${s.id}`),
       );

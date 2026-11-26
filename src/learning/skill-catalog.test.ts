@@ -60,7 +60,8 @@ describe('skill catalog', () => {
     expect(new Set(SKILL_CATALOG.map((s) => s.id)).size).toBe(SKILL_CATALOG.length);
     for (const s of SKILL_CATALOG) {
       expect(pattern.test(s.id), s.id).toBe(true);
-      expect(s.lessons.length, s.id).toBeGreaterThan(0);
+      // English skills follow no SGK lesson (lessons: []) — they live on the island.
+      if (s.family !== 'english') expect(s.lessons.length, s.id).toBeGreaterThan(0);
       for (const ref of s.lessons) {
         expect([1, 2], s.id).toContain(ref.book);
         expect(ref.n.length, s.id).toBeGreaterThan(0);

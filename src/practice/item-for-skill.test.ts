@@ -27,7 +27,11 @@ describe('itemForSkill', () => {
   });
 
   test('every catalog id dispatches', () => {
-    for (const { id } of SKILL_CATALOG) expect(itemForSkill(id, mulberry32(7), 1).skillId).toBe(id);
+    // English skills dispatch through the island engine (1B), not this dispatcher.
+    for (const { id, family } of SKILL_CATALOG) {
+      if (family === 'english') continue;
+      expect(itemForSkill(id, mulberry32(7), 1).skillId).toBe(id);
+    }
   });
 });
 

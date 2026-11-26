@@ -23,3 +23,6 @@ supabase/.branches
 
 # agent worktrees
 .claude/worktrees
+
+# English Island book pack (local only, never committed)
+/English */

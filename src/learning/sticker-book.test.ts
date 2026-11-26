@@ -151,10 +151,16 @@ it('empty family topics stay hidden until their skills exist', () => {
     'time',
     'money',
     'data',
+    // English landed in Phase 0: 41 stickers, none earned yet (the island opens in 1A/1B).
+    'english',
   ]);
   // Arithmetic landed in phase 09: twelve stickers, none earned yet.
   expect(topicProgress(stickers, 'arithmetic')).toEqual({
     earned: 0,
     total: skillsOfFamily('arithmetic').length,
+  });
+  expect(topicProgress(stickers, 'english')).toEqual({
+    earned: 0,
+    total: skillsOfFamily('english').length,
   });
 });

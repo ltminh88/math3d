@@ -32,6 +32,7 @@ const TOPIC_TITLE: Record<StickerTopic, Parameters<typeof ts>[0]> = {
   time: 'topicTime',
   money: 'topicMoney',
   data: 'topicData',
+  english: 'topicEnglish',
 };
 
 /** One emoji per sticker, in derivation order (TOPIC_SKILLS order per topic, tables 2–9). */
@@ -49,6 +50,7 @@ const TOPIC_EMOJI: Record<StickerTopic, readonly string[]> = {
   time: [],
   money: [],
   data: [],
+  english: [],
 };
 
 function stickerEmoji(sticker: Sticker): string {
