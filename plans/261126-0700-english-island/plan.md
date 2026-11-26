@@ -34,8 +34,8 @@ that a Vercel function serves.
   builder, scatter clearing after the pass). `REGIONS`, `ROADS` and `WALKABLE_BOUNDS` are untouched
   and the golden `--check` stays byte-identical.
 - **Skills:** the same Leitner `factStats` as math. Add family `'english'` and append the
-  `en-*` entries to `SKILL_CATALOG` with `lessons: []`. "Học tiếp" and daily practice stay
-  math-only.
+  `en-*` entries to `SKILL_CATALOG` with `lessons: []`. "Học tiếp" stays math-only; daily practice
+  gets English items in Phase 6.
 - **Stages:** 8, following the syllabus blocks (A–D, E–H+R1, I–L+R2, M–P+R3, Q–T+R4, U–X+R5,
   Y–Z+R6, A–Z review). 8 rounds per run.
 
