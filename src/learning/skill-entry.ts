@@ -22,7 +22,8 @@ export type SkillFamily =
   | 'fraction'
   | 'time'
   | 'money'
-  | 'data';
+  | 'data'
+  | 'english';
 
 export interface SkillLessonRef {
   readonly book: 1 | 2;
