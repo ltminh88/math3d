@@ -7,6 +7,7 @@
   telegram-relay.py open               list questions still waiting for an answer
   telegram-relay.py wait [MAX_SECONDS] long-poll until the user writes, then print like poll;
                                        exit 3 if MAX_SECONDS (default 3600) pass quietly
+  telegram-relay.py send-audio FILE [caption]   upload one mp3 to the group
 
 Credentials come from .env.relay at the repo root (gitignored). The token never reaches
 argv, stdout, stderr or the log: requests go through urllib and errors are scrubbed.
@@ -130,6 +131,40 @@ def send(env, text):
     return ids
 
 
+def send_audio(env, path, caption=''):
+    """Upload one audio file (mp3/m4a) with an optional caption, multipart via urllib."""
+    if not os.path.isfile(path):
+        raise RelayError('audio file not found: ' + path)
+    boundary = 'relay%d' % int(time.time() * 1000)
+    fields = {'chat_id': str(env['TG_CHAT_ID'])}
+    if caption:
+        fields['caption'] = caption[:1000]
+    parts = []
+    for name, value in fields.items():
+        parts.append(('--%s\r\nContent-Disposition: form-data; name="%s"\r\n\r\n%s\r\n'
+                      % (boundary, name, value)).encode())
+    with open(path, 'rb') as f:
+        blob = f.read()
+    parts.append(('--%s\r\nContent-Disposition: form-data; name="audio"; filename="%s"\r\n'
+                  'Content-Type: audio/mpeg\r\n\r\n' % (boundary, os.path.basename(path))).encode())
+    parts.append(blob + b'\r\n')
+    parts.append(('--%s--\r\n' % boundary).encode())
+    url = 'https://api.telegram.org/bot%s/sendAudio' % env['TG_TOKEN']
+    req = urllib.request.Request(url, data=b''.join(parts), headers={
+        'Content-Type': 'multipart/form-data; boundary=' + boundary})
+    try:
+        with urllib.request.urlopen(req, timeout=120) as resp:
+            body = json.load(resp)
+    except urllib.error.HTTPError as e:
+        raise RelayError('HTTP %s from Telegram' % e.code) from None
+    except (urllib.error.URLError, OSError) as e:
+        raise RelayError('network: ' + scrub(getattr(e, 'reason', e), env)) from None
+    if not body.get('ok'):
+        raise RelayError(scrub(body.get('description', 'unknown error'), env))
+    log('send-audio %s message_id=%d' % (os.path.basename(path), body['result']['message_id']))
+    return body['result']['message_id']
+
+
 def ask(env, question):
     state = load_state()
     n = state['next_q']
@@ -227,9 +262,19 @@ def wait(env, max_seconds):
 
 
 def main(argv):
-    if len(argv) < 2 or argv[1] not in ('send', 'ask', 'poll', 'open', 'wait'):
+    if len(argv) < 2 or argv[1] not in ('send', 'ask', 'poll', 'open', 'wait', 'send-audio'):
         print(__doc__.strip(), file=sys.stderr)
         return 2
+    if argv[1] == 'send-audio':
+        if len(argv) < 3:
+            print('send-audio needs a file path', file=sys.stderr)
+            return 2
+        try:
+            print('ok', send_audio(load_env(), argv[2], ' '.join(argv[3:]).strip()))
+        except RelayError as e:
+            print('relay error: %s' % e, file=sys.stderr)
+            return 1
+        return 0
     cmd, text = argv[1], ' '.join(argv[2:]).strip()
     if cmd in ('send', 'ask') and not text:
         print('%s needs text' % cmd, file=sys.stderr)
