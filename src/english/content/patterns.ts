@@ -37,7 +37,7 @@ export const ENGLISH_PATTERN_SENTENCES: Readonly<
     ['I', 'can', 'run'],
     ['I', 'can', 'jump'],
     ['I', 'can', 'sing'],
-    ['I', 'can', 'read'],
+    ['I', 'can', 'write'],
     ['I', 'can', 'draw'],
   ],
   'i-see': [
@@ -48,13 +48,16 @@ export const ENGLISH_PATTERN_SENTENCES: Readonly<
     ['I', 'see', 'a', 'fish'],
     ['I', 'see', 'a', 'big', 'tree'],
   ],
+  // Every sentence ends with a bank word (its key word), so the gloss line
+  // after the item is never empty — a sentence with no bank word would leave
+  // `.english-gloss` hidden and the child with nothing to review.
   'what-is': [
-    ['What', 'is', 'this'],
-    ['What', 'is', 'that'],
-    ['What', 'is', 'it'],
-    ['What', 'is', 'your', 'name'],
-    ['What', 'is', 'this', 'animal'],
-    ['What', 'is', 'that', 'sound'],
+    ['What', 'is', 'this', 'cat'],
+    ['What', 'is', 'that', 'dog'],
+    ['What', 'is', 'this', 'ball'],
+    ['What', 'is', 'that', 'bird'],
+    ['What', 'is', 'this', 'fish'],
+    ['What', 'is', 'this', 'apple'],
   ],
   'my-favourite': [
     ['My', 'favourite', 'color', 'is', 'red'],

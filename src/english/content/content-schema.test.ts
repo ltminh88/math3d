@@ -66,6 +66,19 @@ describe('patterns', () => {
     }
   });
 
+  it('every sentence contains a bank word, so the gloss line is never empty', () => {
+    const singular = (word: string): string =>
+      word.endsWith('s') ? word.slice(0, -1) : word;
+    for (const sentences of Object.values(ENGLISH_PATTERN_SENTENCES)) {
+      for (const sentence of sentences) {
+        expect(
+          sentence.some((w) => byName.has(w) || byName.has(singular(w))),
+          sentence.join(' '),
+        ).toBe(true);
+      }
+    }
+  });
+
   it('have ≥ 4 distinct blank words, so fill-pattern has 2–4 options', () => {
     for (const sentences of Object.values(ENGLISH_PATTERN_SENTENCES)) {
       const blanks = new Set(sentences.map((s) => s[s.length - 1]));
