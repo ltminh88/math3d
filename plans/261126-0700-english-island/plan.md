@@ -73,3 +73,11 @@ Phase 1A runs in parallel with Phase 0 (region, map, gate first), then rebases t
 - Voice choice after the author's 20-word audition (Kokoro `af_heart` vs Piper ljspeech-high).
 - The family passphrase (the author sets `ENGLISH_PACK_PASSPHRASE`).
 - Whether to include picture crops from the book (needs a manual cropping step by the author).
+
+## Validation Log
+Session 2026-11-26. All answers took the recommended option.
+- 8 stages by book block, 8 rounds per run → **confirmed**.
+- Vietnamese gloss → **shown only after the item is answered** (e.g. "cat = con mèo"). Never shown
+  during the item (Phase 1B).
+- Island placement → **west bank, near the Bridge**, on existing walkable ground (Phase 1A).
+- Deploy gains the pack-emit step, with a preview test first; prod still waits for "deploy đi" → **confirmed**.

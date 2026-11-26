@@ -94,3 +94,6 @@
 
 ## Next steps
 - Phase 2A (own content) on the same lane; Phase 5 parity after 1A and 1B merge.
+
+## Validation note (2026-11-26)
+The author confirmed the placement: west bank, near the Bridge, on existing walkable ground. `WALKABLE_BOUNDS` stays unchanged.

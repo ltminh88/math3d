@@ -85,3 +85,6 @@
 
 ## Next steps
 - Phase 3B (speech, pack client), then Phase 6.
+
+## Validation note (2026-11-26)
+The Vietnamese gloss (`EnglishWord.vi`) is shown only after the item is answered, as feedback such as "cat = con mèo". It is never shown while the item is open.
