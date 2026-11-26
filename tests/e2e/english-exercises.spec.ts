@@ -114,8 +114,9 @@ async function finishRun(page: Page, tap: boolean): Promise<void> {
     await answerRight(page, tap);
     await nextRound(page, tap);
   }
-  await expect(page.locator('.english-finish')).toBeVisible();
-  await tapOrClick(page.locator('.english-finish .kit-button'), tap);
+  // R64: the run resolves right after round 8 with no finish screen; the hook
+  // shows a minimal summary line instead.
+  await expect(page.locator('.english-test-summary')).toBeVisible();
 }
 
 test('plays a full 8-round run by tap, stats land under sk:en-*', async ({ page }, testInfo) => {
@@ -128,7 +129,7 @@ test('plays a full 8-round run by tap, stats land under sk:en-*', async ({ page 
   await expect(page.locator('.english-gloss')).toContainText('=');
   await nextRound(page, tap);
   await finishRun(page, tap);
-  await expect(page.locator('.english-finish')).toContainText('Bạn đúng 8/8 câu.');
+  await expect(page.locator('.english-test-summary')).toContainText('Bạn đúng 8/8 câu.');
   await expect
     .poll(
       () =>
@@ -207,7 +208,7 @@ test('three misses reveal the answer, and a hint narrows the choices', async ({
   await expect(page.locator('.english-feedback')).toContainText('đáp án');
   await nextRound(page, tap);
   await finishRun(page, tap);
-  await expect(page.locator('.english-finish')).toContainText('Bạn đúng 7/8 câu.');
+  await expect(page.locator('.english-test-summary')).toContainText('Bạn đúng 7/8 câu.');
 });
 
 test('tier 2 shows more choices when the skill is in box 3', async ({
@@ -239,5 +240,5 @@ test('tier 2 shows more choices when the skill is in box 3', async ({
     if (round === 8) throw new Error('no choice-kind round in 8 rounds');
   }
   await finishRun(page, tap);
-  await expect(page.locator('.english-finish')).toBeVisible();
+  await expect(page.locator('.english-test-summary')).toBeVisible();
 });
