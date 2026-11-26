@@ -115,17 +115,15 @@ test('playing all 8 questions shows the done card; "Về cổng" completes the g
   page.on('pageerror', (e) => errors.push(String(e)));
   await startPlaying(page);
   await enterIsland(page, tap);
-  // Play the whole run correctly; the engine shows its own finish screen first
-  // (muse-min removes it in R64) — tap through it, then the shell's done card
-  // replaces the run inside the panel.
+  // Play the whole run correctly. After #83 (engine without its own finish
+  // screen) the run resolves right after question 8, so the shell's done card
+  // replaces the run inside the panel at once — no `.english-finish` step.
   for (;;) {
     const state = await islandState(page);
     if (!state || state.done) break;
     await answerRight(page, tap);
     await nextRound(page, tap);
   }
-  await expect(page.locator('.english-finish')).toBeVisible();
-  await tapOrClick(page.locator('.english-run .english-finish button'), tap);
   await expect(page.locator('.island-done')).toBeVisible();
   await expect(page.locator('.island-done')).toContainText('Đúng 8/8 câu');
   await expect
@@ -135,7 +133,11 @@ test('playing all 8 questions shows the done card; "Về cổng" completes the g
   if (tap) await back.tap();
   else await back.click();
   await expect.poll(() => page.evaluate(() => window.__game?.levelRunning())).toBe(false);
-  expect(await page.evaluate(() => window.__game?.gateStatus('island'))).toBe('completed');
+  // The host commits the run in the background after exit: poll, like the
+  // market/numberfort specs, until the commit lands.
+  await expect
+    .poll(() => page.evaluate(() => window.__game?.gateStatus('island')))
+    .toBe('completed');
   expect(errors).toEqual([]);
 });
 
