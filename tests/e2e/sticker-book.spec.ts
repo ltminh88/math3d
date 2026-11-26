@@ -115,7 +115,7 @@ test('fresh profile: the book opens on 0 earned, pages flip, targets are 44 px',
     'Hình học',
     'Đo lường',
   ];
-  const counts = ['0/8', '0/2', '0/7', '0/13', '0/10', '0/16'];
+  const counts = ['0/8', '0/2', '0/7', '0/13', '0/10', '0/24'];
   for (let i = 1; i < 6; i++) {
     // dispatchEvent: no actionability wait — plain clicks on the flip button have hung on
     // the stability check on this VM (SwiftShader ~1 fps); see the #learn note below.
