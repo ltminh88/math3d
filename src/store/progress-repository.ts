@@ -156,6 +156,8 @@ export async function applyDelta(
       streak: local?.streak ?? prev.streak,
       fluent: local?.fluent ?? prev.fluent,
       errs: local?.errs ?? prev.errs,
+      bugs: local?.bugs ?? prev.bugs,
+      recent: local?.recent ?? prev.recent,
     });
   }
 

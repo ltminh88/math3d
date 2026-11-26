@@ -1,3 +1,4 @@
+import type { Misconception } from '../reasoning/reasoning-types';
 import type { FactKey } from './fact-key';
 
 /** Per-fact learning state. Counters are additive (sync adds them); `box` resolves by newest `lastSeenAt`. */
@@ -14,6 +15,10 @@ export interface FactStat {
   fluent: boolean;
   /** Last 3 wrong answers given for this fact, oldest first. */
   errs: number[];
+  /** Last 5 bugs the wrong picks stood for, oldest first (boost Phase 0). Device-only, never in a save code. */
+  bugs?: Misconception[];
+  /** Bitmask of the last 10 first tries, bit 0 = most recent (1 = correct). Device-only, never in a save code. */
+  recent?: number;
 }
 
 /** Device-only fields the server never receives. */
@@ -21,6 +26,8 @@ export interface FactLocalState {
   streak: number;
   fluent: boolean;
   errs: number[];
+  bugs?: Misconception[];
+  recent?: number;
 }
 
 export interface DeltaFact {

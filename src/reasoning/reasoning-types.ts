@@ -94,7 +94,22 @@ export type Misconception =
   | 'dropped-zero'
   | 'off-by-ten'
   | 'wrong-place'
-  | 'wrong-sign';
+  | 'wrong-sign'
+  // Add/sub with regrouping (boost, Phase 0: src/arithmetic 1A)
+  | 'forgot-carry'
+  | 'carry-not-added'
+  | 'smaller-from-larger'
+  | 'borrow-no-decrement'
+  | 'zero-borrow-skip'
+  | 'zero-minus-n-zero'
+  | 'misaligned-columns'
+  | 'second-regroup-dropped'
+  // Length conversion (boost, Phase 0: src/measurement 1B; 'ignore-unit' reused)
+  | 'unit-direction'
+  | 'unit-factor'
+  | 'dm-skipped'
+  | 'mixed-concat'
+  | 'mixed-drop-big';
 
 export interface ChoiceOption {
   readonly id: string;

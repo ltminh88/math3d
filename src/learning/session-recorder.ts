@@ -1,7 +1,16 @@
+import type { Misconception } from '../reasoning/reasoning-types';
 import type { FactKey } from './fact-key';
 import type { DeltaFact, FactLocalState, FactStat, SessionDelta } from './learning-types';
 import { applyAttempt, LEITNER, newFactStat } from './leitner-box';
 import { questionReward, starsFor } from './scoring';
+
+/** One wrong pick inside a question, in the order given. A number wrong carries
+ * its value (kept in the error bank); a choice wrong that stands for a bug
+ * carries the bug (kept in the bug bank). */
+export interface WrongAttempt {
+  readonly wrongAnswer?: number;
+  readonly bug?: Misconception;
+}
 
 export interface QuestionOutcome {
   factKey: FactKey;
@@ -14,6 +23,10 @@ export interface QuestionOutcome {
   usedHint: boolean;
   /** Wrong answers given, in order. */
   wrongAnswers: readonly number[];
+  /** Wrong attempts in the order given (boost Phase 0). When absent, the
+   * recorder derives them from `wrongAnswers` (number wrongs only), so older
+   * callers keep working. */
+  wrongAttempts?: readonly WrongAttempt[];
 }
 
 export interface SessionResult {
@@ -52,27 +65,32 @@ export function createSessionRecorder(opts: RecorderOptions): SessionRecorder {
       let stat = working.get(o.factKey) ?? opts.getStat(o.factKey) ?? newFactStat();
       const boxBefore = stat.box;
       // A revealed question counts as (at least) one wrong attempt.
-      const wrongs = o.correct
-        ? [...o.wrongAnswers]
-        : o.wrongAnswers.length > 0
-          ? [...o.wrongAnswers]
-          : [undefined];
+      const derived: readonly WrongAttempt[] =
+        o.wrongAttempts ?? o.wrongAnswers.map((wrongAnswer) => ({ wrongAnswer }));
+      const wrongs: readonly WrongAttempt[] = !o.correct && derived.length === 0 ? [{}] : derived;
       const attempts = wrongs.length + (o.correct ? 1 : 0);
       const perAttemptMs = o.ms / attempts;
       const at = opts.now();
       const entry = facts[o.factKey] ?? { a: 0, c: 0, ms: 0, box: stat.box, seenAt: at };
 
-      const step = (correct: boolean, wrongAnswer?: number): void => {
+      // The first attempt of a question decides its first try. A correct step
+      // keeps the question-level flag (a miss before it blocks the advance);
+      // a wrong step is a first try only when nothing preceded it — so
+      // `recent` shifts exactly once per question (leitner-box).
+      let firstAttempt = true;
+      const step = (correct: boolean, wrong?: WrongAttempt): void => {
         const before = stat;
         stat = applyAttempt(stat, {
           correct,
-          firstTry: o.firstTry,
+          firstTry: correct ? o.firstTry : firstAttempt,
           usedHint: o.usedHint,
           ms: perAttemptMs,
-          wrongAnswer,
+          wrongAnswer: wrong?.wrongAnswer,
+          bug: wrong?.bug,
           sessionNo: opts.sessionNo,
           at,
         });
+        firstAttempt = false;
         entry.a += 1;
         entry.c += correct ? 1 : 0;
         entry.ms += stat.totalMs - before.totalMs;
@@ -120,7 +138,13 @@ export function createSessionRecorder(opts: RecorderOptions): SessionRecorder {
       };
       const local: Record<FactKey, FactLocalState> = {};
       for (const [key, s] of working)
-        local[key] = { streak: s.streak, fluent: s.fluent, errs: s.errs };
+        local[key] = {
+          streak: s.streak,
+          fluent: s.fluent,
+          errs: s.errs,
+          bugs: s.bugs,
+          recent: s.recent,
+        };
       return { delta, local };
     },
   };

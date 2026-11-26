@@ -9,7 +9,7 @@ import {
   playableSteps,
   type StepAnswer,
 } from '../reasoning/reasoning-step-answers';
-import type { ChoiceOption, ReasoningStep } from '../reasoning/reasoning-types';
+import type { ChoiceOption, Misconception, ReasoningStep } from '../reasoning/reasoning-types';
 import type { PracticeItem } from './practice-scene';
 import { explainArea } from './wrong-answer-area';
 import { explainCarry } from './wrong-answer-carry';
@@ -61,6 +61,20 @@ export interface WrongAnswerContext {
 
 export type WrongAnswerMatcher = (ctx: WrongAnswerContext) => WrongAnswerExplanation | null;
 
+/**
+ * Bug explainer registry (boost, Phase 0): a later lane registers one explainer
+ * per bug id (add/sub, length). The router checks the chosen option's bug first
+ * and falls back to today's per-skill routing when the explainer is missing or
+ * returns null — with no bug, the output is byte-equal to before.
+ */
+export type BugExplainer = (ctx: WrongAnswerContext) => WrongAnswerExplanation | null;
+
+const bugExplainables = new Map<Misconception, BugExplainer>();
+
+export function registerBugExplainer(bug: Misconception, fn: BugExplainer): void {
+  bugExplainables.set(bug, fn);
+}
+
 /** Read a numeric story param (`{a, n, ...}`); undefined when absent or not a number. */
 export function numParam(
   params: Readonly<Record<string, number | string>> | undefined,
@@ -99,6 +113,13 @@ export function explainWrongAnswer(input: WrongAnswerInput): WrongAnswerExplanat
     missNumber: input.missNumber,
     ...resolveAnswer(step, input.answer),
   };
+  // Boost (Phase 0): the chosen option's bug wins when a lane registered an
+  // explainer for it; anything else falls through to today's routing.
+  const bug = ctx.option?.misconception;
+  if (bug) {
+    const explain = bugExplainables.get(bug)?.(ctx);
+    if (explain) return explain;
+  }
   if (input.skillId.startsWith('unknown-')) return explainUnknown(ctx);
   if (input.skillId === 'wp-times-then-sub' || input.skillId === 'wp-divide-then-sub')
     return explainTwoStep(ctx);

@@ -3,8 +3,9 @@
 // One hint ladder for the round: 1 encourage, 2 the picture, 3 the strategy + this step's
 // operation (no rung 4).
 import type { HintState } from '../../learning/hint-ladder';
-import type { QuestionOutcome } from '../../learning/session-recorder';
+import type { QuestionOutcome, WrongAttempt } from '../../learning/session-recorder';
 import { playableSteps, type StepAnswer } from '../../reasoning/reasoning-step-answers';
+import type { Misconception } from '../../reasoning/reasoning-types';
 import { reasoningHint } from './reasoning-round-hints';
 import type { ReasoningRoundPlan } from './reasoning-round-slot';
 import { StepMissBudget } from './step-miss-budget';
@@ -30,6 +31,10 @@ export class ReasoningRoundFlow {
   private stepIndex = 0;
   private readonly stepCount: number;
   private readonly wrongAnswers: number[] = [];
+  /** Wrong attempts in order: number wrongs carry their value, choice wrongs
+   * that stand for a bug carry the bug (boost Phase 0). Choice/verdict wrongs
+   * without a bug record no attempt, as before. */
+  private readonly wrongAttempts: WrongAttempt[] = [];
   private readonly startedAt: number;
 
   constructor(
@@ -52,9 +57,24 @@ export class ReasoningRoundFlow {
   answer({ stepIndex, correct, answer }: ReasoningAnswer): ReasoningVerdict {
     if (this.done || stepIndex !== this.stepIndex) return { verdict: 'ignored' };
     if (correct) return this.advance('step');
-    if (typeof answer === 'number') this.wrongAnswers.push(answer);
+    if (typeof answer === 'number') {
+      this.wrongAnswers.push(answer);
+      this.wrongAttempts.push({ wrongAnswer: answer });
+    } else if (typeof answer === 'string') {
+      // A wrong choice pick that stands for a bug is a recorded attempt, so
+      // the bug lands in the fact's bug bank (boost Phase 0).
+      const bug = this.chosenBug(stepIndex, answer);
+      if (bug !== undefined) this.wrongAttempts.push({ bug });
+    }
     if (!this.budget.miss()) return { verdict: 'wrong' };
     return this.advance('revealed');
+  }
+
+  /** The misconception of the chosen option on a choice step, if it has one. */
+  private chosenBug(stepIndex: number, optionId: string): Misconception | undefined {
+    const step = playableSteps(this.plan.item)[stepIndex];
+    if (step?.kind !== 'choice') return undefined;
+    return step.options.find((o) => o.id === optionId)?.misconception;
   }
 
   /** The live step is answered or shown: the next step, or the round's outcome after the last. */
@@ -83,6 +103,7 @@ export class ReasoningRoundFlow {
       firstTry: result.firstTry,
       usedHint: result.usedHint,
       wrongAnswers: [...this.wrongAnswers],
+      wrongAttempts: [...this.wrongAttempts],
     };
   }
 }

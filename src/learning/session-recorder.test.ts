@@ -89,6 +89,34 @@ describe('session recorder', () => {
     expect(r2.finish().delta.facts['mul:6x7']).toMatchObject({ a: 3, c: 0, box: 4 });
   });
 
+  it('stores a choice bug in local.bugs and counts the pick as an attempt', () => {
+    const r = make({ 'sk:add-sub-1000': { ...newFactStat(), box: 3, attempts: 4 } });
+    r.recordQuestion({
+      factKey: 'sk:add-sub-1000',
+      ms: 6000,
+      correct: true,
+      firstTry: false,
+      usedHint: false,
+      wrongAnswers: [],
+      wrongAttempts: [{ bug: 'forgot-carry' }],
+    });
+    const { delta, local } = r.finish();
+    expect(delta.facts['sk:add-sub-1000']).toMatchObject({ a: 2, c: 1, box: 2 });
+    expect(local['sk:add-sub-1000']?.bugs).toEqual(['forgot-carry']);
+  });
+
+  it('shifts recent once per question in local state', () => {
+    const r = make();
+    r.recordQuestion(clean('mul:2x3'));
+    r.recordQuestion({
+      ...clean('mul:2x3'),
+      correct: true,
+      firstTry: false,
+      wrongAnswers: [5],
+    });
+    expect(r.finish().local['mul:2x3']?.recent).toBe(0b10);
+  });
+
   it('a later question in the same session can drop the fact one more box', () => {
     const r = make({ 'mul:6x7': { ...newFactStat(), box: 3, attempts: 9 } });
     const miss: QuestionOutcome = {

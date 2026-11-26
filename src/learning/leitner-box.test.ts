@@ -62,4 +62,42 @@ describe('applyAttempt', () => {
     expect(s.errs).toEqual([]);
     expect(s.attempts).toBe(0);
   });
+
+  it('keeps the last 5 bugs, oldest first, only on wrong attempts with a bug', () => {
+    let s = newFactStat();
+    s = applyAttempt(s, { ...base, correct: false, bug: 'forgot-carry' });
+    expect(s.bugs).toEqual(['forgot-carry']);
+    s = applyAttempt(s, { ...base, correct: false });
+    expect(s.bugs).toEqual(['forgot-carry']);
+    for (const bug of [
+      'carry-not-added',
+      'smaller-from-larger',
+      'borrow-no-decrement',
+      'zero-borrow-skip',
+      'zero-minus-n-zero',
+    ] as const)
+      s = applyAttempt(s, { ...base, correct: false, bug });
+    expect(s.bugs).toEqual([
+      'carry-not-added',
+      'smaller-from-larger',
+      'borrow-no-decrement',
+      'zero-borrow-skip',
+      'zero-minus-n-zero',
+    ]);
+  });
+
+  it('shifts recent once per question: bit 0 is the latest first try', () => {
+    let s = newFactStat();
+    expect(s.recent).toBeUndefined();
+    s = applyAttempt(s, { ...base, correct: true });
+    expect(s.recent).toBe(0b1);
+    s = applyAttempt(s, { ...base, correct: false });
+    expect(s.recent).toBe(0b10);
+    // A later attempt of the same question (firstTry false) shifts nothing.
+    s = applyAttempt(s, { ...base, correct: true, firstTry: false });
+    expect(s.recent).toBe(0b10);
+    // Old stats without the field start tracking from zero.
+    const old = { ...newFactStat(), box: 2 };
+    expect(applyAttempt(old, { ...base, correct: false }).recent).toBe(0b0);
+  });
 });
