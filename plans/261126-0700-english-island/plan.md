@@ -24,7 +24,7 @@ Playwright on 4 projects, `tap()` only, targets ≥ 44 px).
 | 1A | [Region, level shell, gate, map](phase-01a-island-region-level-shell.md) | Lane A, muse-88 (R52, PR #82) | 0 (rebase only) | 1d | done (merged) |
 | 1B | [Engine + tap-only UI](phase-01b-exercise-engine-and-ui.md) | Lane B, muse-min (R55, PR #81) | 0 | 1.5d | done (merged) |
 | 2A | [Own content, stages 1–8](phase-02a-own-english-content.md) | muse-min (R72, moved: muse-88 quota 84%) | 1A | 1d | assigned |
-| 2C | [Audio clips](phase-02c-audio-clips.md) | Lane A, muse-88 | 2A | 0.75d | pending |
+| 2C | [Audio clips](phase-02c-audio-clips.md) | Lane A, muse-88 (R74, voice: Kokoro af_heart) | 2A | 0.75d | assigned |
 | 3B | [Speech + pack client](phase-03b-speech-and-pack-client.md) | Lane B, muse-min (R62, PR #84) | 1B | 1d | done (merged) |
 | 6 | [English in daily practice](phase-06-english-in-daily-practice.md) | Lane B, muse-min | 3B, 2A | 0.5d | pending |
 | 4 | [Book pack function + deploy](phase-04-book-pack-function-deploy.md) | reviewer | 3B | 1d | pending |
@@ -70,7 +70,6 @@ Phase 1A runs in parallel with Phase 0 (region, map, gate first), then rebases t
 - [Vercel function](research/researcher-02-vercel-function-report.md)
 
 ## Unresolved questions
-- Voice choice after the author's 20-word audition (Kokoro `af_heart` vs Piper ljspeech-high).
 - The family passphrase (the author sets `ENGLISH_PACK_PASSPHRASE`).
 - Whether to include picture crops from the book (needs a manual cropping step by the author).
 
@@ -81,3 +80,4 @@ Session 2026-11-26. All answers took the recommended option.
   during the item (Phase 1B).
 - Island placement → **west bank, near the Bridge**, on existing walkable ground (Phase 1A).
 - Deploy gains the pack-emit step, with a preview test first; prod still waits for "deploy đi" → **confirmed**.
+- Voice audition 2026-11-26 (20 words + 2 sentences via Telegram Q8) → **Kokoro `af_heart`, speed 0.9** (Piper dropped).
