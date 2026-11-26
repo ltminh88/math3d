@@ -1,16 +1,16 @@
-// English run (Phase 1B + 3B): the run the island level shell (1A) calls.
+// English run (Phase 1B + 3B + 2A): the run the island level shell (1A) calls.
 // Eight rounds: the planner picks the weakest skill, the generator builds
 // the item (or a stored pack item joins when skill + kind match), a tap-only
 // widget renders it, the miss budget reveals after 3 misses, hints narrow the
 // choices, and every round records under `sk:en-*`.
-// Only seed unit 1 exists in 1B (2A maps units to stages), so every stage drills
-// it until then — the engine reads its pool from the unit, not from the stage.
+// 2A: each stage drills its own unit (`content/units.ts`) — the engine reads
+// its pool from the unit, not from the stage.
 // R64: the run draws no finish screen and resolves right after round 8 — the
 // level shell owns the ending screen (stars, reward, "Về cổng").
 // 3B: "🔊 Nghe" speaks the item (clip → Web Speech → read item), the "Phụ huynh"
 // button unlocks the book pack, and `signal` lets the shell abort mid-run.
 import './english-widgets.css';
-import { SEED_UNIT_1 } from '../../english/content/seed-unit-1';
+import { unitForStage } from '../../english/content/units';
 import type { EnglishAttempt } from '../../english/engine/answer-check';
 import { checkAnswer } from '../../english/engine/answer-check';
 import { englishWrongFeedback } from '../../english/engine/english-wrong-feedback';
@@ -88,11 +88,6 @@ let live: EnglishRunLive = {
 
 export function getEnglishRunLive(): EnglishRunLive {
   return live;
-}
-
-function unitForStage(_stage: number): EnglishUnit {
-  // 1B: only seed unit 1 exists; 2A maps units to stages.
-  return SEED_UNIT_1;
 }
 
 /** Word → gloss pairs the widget reveals after the item is done. */
