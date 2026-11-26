@@ -89,7 +89,9 @@ describe('session recorder', () => {
     expect(r2.finish().delta.facts['mul:6x7']).toMatchObject({ a: 3, c: 0, box: 4 });
   });
 
-  it('stores a choice bug in local.bugs and counts the pick as an attempt', () => {
+  it('a choice question with a bug keeps the box and gains one bug (R79)', () => {
+    // A wrong choice pick, then correct: on main the box stays (only firstTry
+    // is lost); the bug lands in the bug bank only.
     const r = make({ 'sk:add-sub-1000': { ...newFactStat(), box: 3, attempts: 4 } });
     r.recordQuestion({
       factKey: 'sk:add-sub-1000',
@@ -98,10 +100,10 @@ describe('session recorder', () => {
       firstTry: false,
       usedHint: false,
       wrongAnswers: [],
-      wrongAttempts: [{ bug: 'forgot-carry' }],
+      bugs: ['forgot-carry'],
     });
     const { delta, local } = r.finish();
-    expect(delta.facts['sk:add-sub-1000']).toMatchObject({ a: 2, c: 1, box: 2 });
+    expect(delta.facts['sk:add-sub-1000']).toMatchObject({ a: 1, c: 1, box: 3 });
     expect(local['sk:add-sub-1000']?.bugs).toEqual(['forgot-carry']);
   });
 

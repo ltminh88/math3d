@@ -114,7 +114,7 @@ describe('ReasoningRoundFlow', () => {
     });
   });
 
-  it('a wrong choice that stands for a bug is a recorded attempt carrying the bug', () => {
+  it('a wrong choice that stands for a bug only fills the bug bank (R79)', () => {
     const item: PracticeItem = {
       skillId: 'add-sub-1000',
       tier: 1,
@@ -147,9 +147,11 @@ describe('ReasoningRoundFlow', () => {
     expect(done.outcome).toMatchObject({
       correct: true,
       firstTry: false,
+      // No attempt for either pick: the bug-less pick records nothing, and
+      // the pick with a bug only fills the bug bank.
       wrongAnswers: [],
-      // Only the pick with a bug is an attempt; the bug-less pick records nothing.
-      wrongAttempts: [{ bug: 'forgot-carry' }],
+      wrongAttempts: [],
+      bugs: ['forgot-carry'],
     });
   });
 });

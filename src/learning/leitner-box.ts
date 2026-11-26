@@ -56,13 +56,10 @@ export function applyAttempt(stat: FactStat, attempt: Attempt): FactStat {
     lastSeenSession: attempt.sessionNo,
     lastSeenAt: attempt.at,
   };
-  // The first attempt of a question decides its first try: shift the recent
-  // bitmask once per question (bit 0 = most recent, 1 = correct). The recorder
-  // passes firstTry per attempt, so this runs exactly once per question.
-  if (attempt.firstTry) {
-    const mask = (1 << LEITNER.recentKept) - 1;
-    next.recent = (((stat.recent ?? 0) << 1) | (attempt.correct ? 1 : 0)) & mask;
-  }
+  // `recent` is NOT shifted here: it records one bit per question (1 = solved
+  // first-try), and only the recorder knows where a question ends — a choice
+  // miss with no numeric wrong adds no attempt, so a per-attempt shift would
+  // skip it. The recorder shifts once per question (R79).
   if (!attempt.correct) {
     next.box = Math.max(LEITNER.minBox, stat.box - 1);
     next.streak = 0;

@@ -86,18 +86,11 @@ describe('applyAttempt', () => {
     ]);
   });
 
-  it('shifts recent once per question: bit 0 is the latest first try', () => {
-    let s = newFactStat();
-    expect(s.recent).toBeUndefined();
-    s = applyAttempt(s, { ...base, correct: true });
-    expect(s.recent).toBe(0b1);
-    s = applyAttempt(s, { ...base, correct: false });
-    expect(s.recent).toBe(0b10);
-    // A later attempt of the same question (firstTry false) shifts nothing.
-    s = applyAttempt(s, { ...base, correct: true, firstTry: false });
-    expect(s.recent).toBe(0b10);
-    // Old stats without the field start tracking from zero.
-    const old = { ...newFactStat(), box: 2 };
-    expect(applyAttempt(old, { ...base, correct: false }).recent).toBe(0b0);
+  it('leaves recent alone: the recorder shifts it once per question (R79)', () => {
+    const s = { ...newFactStat(), recent: 0b101 };
+    expect(applyAttempt(s, { ...base, correct: true }).recent).toBe(0b101);
+    expect(applyAttempt(s, { ...base, correct: false }).recent).toBe(0b101);
+    // Old stats without the field stay without it.
+    expect(applyAttempt(newFactStat(), { ...base, correct: true }).recent).toBeUndefined();
   });
 });

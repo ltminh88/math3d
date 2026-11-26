@@ -5,11 +5,9 @@ import { applyAttempt, LEITNER, newFactStat } from './leitner-box';
 import { questionReward, starsFor } from './scoring';
 
 /** One wrong pick inside a question, in the order given. A number wrong carries
- * its value (kept in the error bank); a choice wrong that stands for a bug
- * carries the bug (kept in the bug bank). */
+ * its value (kept in the error bank). */
 export interface WrongAttempt {
   readonly wrongAnswer?: number;
-  readonly bug?: Misconception;
 }
 
 export interface QuestionOutcome {
@@ -27,6 +25,9 @@ export interface QuestionOutcome {
    * recorder derives them from `wrongAnswers` (number wrongs only), so older
    * callers keep working. */
   wrongAttempts?: readonly WrongAttempt[];
+  /** The question's bugs (boost Phase 0, R79): they go only into the bug bank
+   * — they never add an attempt or move the box. */
+  bugs?: readonly Misconception[];
 }
 
 export interface SessionResult {
@@ -73,24 +74,17 @@ export function createSessionRecorder(opts: RecorderOptions): SessionRecorder {
       const at = opts.now();
       const entry = facts[o.factKey] ?? { a: 0, c: 0, ms: 0, box: stat.box, seenAt: at };
 
-      // The first attempt of a question decides its first try. A correct step
-      // keeps the question-level flag (a miss before it blocks the advance);
-      // a wrong step is a first try only when nothing preceded it — so
-      // `recent` shifts exactly once per question (leitner-box).
-      let firstAttempt = true;
       const step = (correct: boolean, wrong?: WrongAttempt): void => {
         const before = stat;
         stat = applyAttempt(stat, {
           correct,
-          firstTry: correct ? o.firstTry : firstAttempt,
+          firstTry: o.firstTry,
           usedHint: o.usedHint,
           ms: perAttemptMs,
           wrongAnswer: wrong?.wrongAnswer,
-          bug: wrong?.bug,
           sessionNo: opts.sessionNo,
           at,
         });
-        firstAttempt = false;
         entry.a += 1;
         entry.c += correct ? 1 : 0;
         entry.ms += stat.totalMs - before.totalMs;
@@ -99,6 +93,19 @@ export function createSessionRecorder(opts: RecorderOptions): SessionRecorder {
       if (o.correct) step(true);
       // Every attempt is counted, but the box moves once per question: any miss is one step down.
       if (wrongs.length > 0) stat = { ...stat, box: Math.max(LEITNER.minBox, boxBefore - 1) };
+      // The question's bugs go only into the bug bank (R79): they never add an
+      // attempt or move the box. `recent` shifts once per question here, not
+      // per attempt — a choice miss with no numeric wrong still counts as a 0
+      // bit (a per-attempt shift would skip it).
+      if (o.bugs && o.bugs.length > 0) {
+        const fresh = [...new Set(o.bugs)];
+        stat = { ...stat, bugs: [...(stat.bugs ?? []), ...fresh].slice(-LEITNER.bugsKept) };
+      }
+      const mask = (1 << LEITNER.recentKept) - 1;
+      stat = {
+        ...stat,
+        recent: (((stat.recent ?? 0) << 1) | (o.correct && o.firstTry ? 1 : 0)) & mask,
+      };
 
       entry.box = stat.box;
       entry.seenAt = at;

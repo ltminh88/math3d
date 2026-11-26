@@ -31,10 +31,12 @@ export class ReasoningRoundFlow {
   private stepIndex = 0;
   private readonly stepCount: number;
   private readonly wrongAnswers: number[] = [];
-  /** Wrong attempts in order: number wrongs carry their value, choice wrongs
-   * that stand for a bug carry the bug (boost Phase 0). Choice/verdict wrongs
-   * without a bug record no attempt, as before. */
+  /** Wrong attempts in order (number wrongs only, as before). */
   private readonly wrongAttempts: WrongAttempt[] = [];
+  /** The question's bugs, in the order first picked (boost Phase 0, R79):
+   * a wrong choice that stands for a bug fills only the bug bank — it adds
+   * no attempt and moves no box. */
+  private readonly questionBugs = new Set<Misconception>();
   private readonly startedAt: number;
 
   constructor(
@@ -61,10 +63,9 @@ export class ReasoningRoundFlow {
       this.wrongAnswers.push(answer);
       this.wrongAttempts.push({ wrongAnswer: answer });
     } else if (typeof answer === 'string') {
-      // A wrong choice pick that stands for a bug is a recorded attempt, so
-      // the bug lands in the fact's bug bank (boost Phase 0).
+      // A wrong choice pick that stands for a bug fills only the bug bank.
       const bug = this.chosenBug(stepIndex, answer);
-      if (bug !== undefined) this.wrongAttempts.push({ bug });
+      if (bug !== undefined) this.questionBugs.add(bug);
     }
     if (!this.budget.miss()) return { verdict: 'wrong' };
     return this.advance('revealed');
@@ -104,6 +105,7 @@ export class ReasoningRoundFlow {
       usedHint: result.usedHint,
       wrongAnswers: [...this.wrongAnswers],
       wrongAttempts: [...this.wrongAttempts],
+      bugs: [...this.questionBugs],
     };
   }
 }
