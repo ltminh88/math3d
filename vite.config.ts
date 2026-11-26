@@ -38,6 +38,24 @@ export default defineConfig({
       },
       workbox: {
         globPatterns: ['**/*.{js,css,html,woff2,png,svg,ico}'],
+        // English audio clips (Phase 2C) are lazy-loaded, never precached:
+        // ~2.5 MB of mp3 would bloat every first load. The ignore is belt
+        // and braces — globPatterns has no mp3 today, but a later pattern
+        // change must not silently precache the clips.
+        globIgnores: ['english-audio/**'],
+        // A played clip works offline: CacheFirst on first play, served
+        // from the cache afterwards. Clips are immutable (the text hash
+        // changes the file only when the text changes), so no expiry.
+        runtimeCaching: [
+          {
+            urlPattern: /\/english-audio\//,
+            handler: 'CacheFirst',
+            options: {
+              cacheName: 'english-audio',
+              expiration: { maxEntries: 500 },
+            },
+          },
+        ],
         navigateFallback: 'index.html',
         // The update prompt relies on this: when the user taps "Tải lại", the
         // waiting worker activates, and only a claiming worker takes control of
