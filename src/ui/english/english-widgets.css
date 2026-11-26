@@ -1,0 +1,209 @@
+/* English Island run + widgets (Phase 1B): glass panel on the level overlay,
+   tap-only widgets. Every choice is a kit-button (56 px min target); states
+   paint through the shared tokens (--ink, --paper, --gold, --radius). */
+.english-run {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  padding: max(16px, env(safe-area-inset-top)) max(16px, env(safe-area-inset-right))
+    max(16px, env(safe-area-inset-bottom)) max(16px, env(safe-area-inset-left));
+  overflow-y: auto;
+  background: var(--paper);
+  color: var(--ink);
+}
+
+.english-run__header {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.english-run__title {
+  margin: 0;
+  font-family: var(--font-display);
+  font-size: 22px;
+}
+
+.english-run__round {
+  margin: 0;
+  font-weight: 800;
+  white-space: nowrap;
+}
+
+.english-run__item {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+}
+
+.english-widget {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  max-width: 560px;
+  width: 100%;
+  margin: 0 auto;
+}
+
+.english-cue {
+  margin: 0;
+  font-size: 17px;
+  font-weight: 700;
+  text-align: center;
+}
+
+.english-prompt {
+  margin: 0;
+  text-align: center;
+  font-family: var(--font-display);
+  font-size: 34px;
+  font-weight: 800;
+}
+
+.english-prompt .english-blank {
+  color: var(--gold-deep);
+  letter-spacing: 2px;
+}
+
+.english-choice-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 12px;
+}
+
+.english-choice-grid .kit-button {
+  min-height: 64px;
+  font-size: 20px;
+}
+
+.english-picture-choice {
+  font-size: 40px;
+}
+
+.english-choice.correct {
+  border-color: #4c9a4c;
+  background: #dff0d2;
+}
+
+.english-choice.wrong {
+  border-color: #c05050;
+  background: #f6d9d9;
+}
+
+.english-choice.eliminated {
+  opacity: 0.35;
+}
+
+.english-choice.selected {
+  border-color: var(--gold-deep);
+  background: #ffe9a8;
+}
+
+.english-choice.matched {
+  border-color: #4c9a4c;
+  background: #dff0d2;
+}
+
+.english-pair-columns {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 16px;
+}
+
+.english-pair-column {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.english-pair-column .kit-button {
+  min-height: 64px;
+  font-size: 20px;
+}
+
+.english-slots {
+  display: flex;
+  gap: 8px;
+  min-height: 64px;
+  padding: 8px;
+  border: 2px dashed #d8c9a8;
+  border-radius: var(--radius);
+}
+
+.english-slot {
+  flex: 1;
+  display: flex;
+  min-height: 56px;
+}
+
+.english-slot .english-tile {
+  flex: 1;
+}
+
+.english-bank {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  justify-content: center;
+}
+
+.english-bank .english-tile {
+  min-width: 72px;
+}
+
+.english-check {
+  align-self: center;
+}
+
+.english-gloss {
+  margin: 0;
+  text-align: center;
+  font-size: 17px;
+  font-weight: 700;
+}
+
+.english-gloss__line {
+  display: block;
+}
+
+.english-feedback {
+  min-height: 24px;
+  margin: 0;
+  text-align: center;
+  font-size: 16px;
+  font-weight: 700;
+}
+
+.english-run__footer {
+  display: flex;
+  gap: 12px;
+  justify-content: center;
+}
+
+.english-finish {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 12px;
+  max-width: 560px;
+  width: 100%;
+  margin: auto;
+  text-align: center;
+}
+
+.english-finish__title {
+  margin: 0;
+  font-family: var(--font-display);
+  font-size: 28px;
+}
+
+.english-finish__score,
+.english-finish__reward {
+  margin: 0;
+  font-size: 18px;
+  font-weight: 700;
+}
