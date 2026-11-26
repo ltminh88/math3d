@@ -6,6 +6,7 @@
 import type { EnglishAttempt } from '../../english/engine/answer-check';
 import type { EnglishItem } from '../../english/english-types';
 import { createUiButton } from '../kit/ui-button';
+import { tei } from './english-strings';
 
 export interface EnglishWidgetHooks {
   /** One user action; the run checks it and returns the verdict. */
@@ -18,6 +19,10 @@ export interface EnglishWidgetOptions {
   /** Word → Vietnamese gloss pairs to reveal after the item is done. */
   readonly glosses: readonly { word: string; vi: string }[];
   readonly doc?: Document;
+  /** "🔊 Nghe" button: the run speaks the item's text (3B). */
+  readonly speak?: { readonly onSpeak: () => void };
+  /** Tier 3 listen-only: hide the word text when audio exists (3B). */
+  readonly hideWord?: boolean;
 }
 
 export interface EnglishWidget {
@@ -59,11 +64,12 @@ export function choiceButton(
   return button;
 }
 
-/** Base root every widget mounts into (cue line + body + gloss line). */
+/** Base root every widget mounts into (cue line + listen button + body + gloss line). */
 export function widgetRoot(
   item: EnglishItem,
   cue: string,
   doc: Document,
+  options?: Pick<EnglishWidgetOptions, 'speak'>,
 ): { root: HTMLElement; body: HTMLElement; gloss: HTMLElement } {
   const root = doc.createElement('div');
   root.className = 'english-widget';
@@ -71,12 +77,22 @@ export function widgetRoot(
   const cueEl = doc.createElement('p');
   cueEl.className = 'english-cue';
   cueEl.textContent = cue;
+  root.appendChild(cueEl);
+  if (options?.speak) {
+    const { onSpeak } = options.speak;
+    const listen = createUiButton(
+      { label: `🔊 ${tei('listen')}`, variant: 'secondary', onClick: onSpeak },
+      doc,
+    );
+    listen.classList.add('english-listen');
+    root.appendChild(listen);
+  }
   const body = doc.createElement('div');
   body.className = 'english-widget__body';
   const gloss = doc.createElement('p');
   gloss.className = 'english-gloss';
   gloss.hidden = true;
-  root.append(cueEl, body, gloss);
+  root.append(body, gloss);
   return { root, body, gloss };
 }
 

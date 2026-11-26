@@ -20,11 +20,12 @@ export function mountPictureChoiceGrid(
   options: EnglishWidgetOptions,
 ): EnglishWidget {
   const doc = options.doc ?? document;
-  const { root, body, gloss } = widgetRoot(item, tei('cueListen'), doc);
+  const { root, body, gloss } = widgetRoot(item, tei('cueListen'), doc, options);
   const prompt = doc.createElement('p');
   prompt.className = 'english-prompt';
   prompt.append(englishWordEl(item.word, doc));
-  body.appendChild(prompt);
+  // Tier 3 listen-only (3B): the word stays hidden while audio exists.
+  if (!options.hideWord) body.appendChild(prompt);
   const grid = doc.createElement('div');
   grid.className = 'english-choice-grid';
   grid.setAttribute('role', 'group');

@@ -19,7 +19,7 @@ export function mountWordTileOrder(
   options: EnglishWidgetOptions,
 ): EnglishWidget {
   const doc = options.doc ?? document;
-  const { root, body, gloss } = widgetRoot(item, tei('cueOrder'), doc);
+  const { root, body, gloss } = widgetRoot(item, tei('cueOrder'), doc, options);
   const slots = doc.createElement('div');
   slots.className = 'english-slots';
   slots.setAttribute('role', 'group');

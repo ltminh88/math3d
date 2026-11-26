@@ -20,7 +20,7 @@ export function mountFillChoice(
   options: EnglishWidgetOptions,
 ): EnglishWidget {
   const doc = options.doc ?? document;
-  const { root, body, gloss } = widgetRoot(item, tei('cueFill'), doc);
+  const { root, body, gloss } = widgetRoot(item, tei('cueFill'), doc, options);
   const sentence = doc.createElement('p');
   sentence.className = 'english-prompt';
   for (const [index, word] of item.sentence.entries()) {
