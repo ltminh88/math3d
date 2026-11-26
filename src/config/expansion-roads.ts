@@ -2,7 +2,7 @@
 // from ROADS (golden, and the scatter's `nearRoad` test reads ROADS during its seeded draws);
 // scatter instances on these roads are removed after the scatter pass instead.
 // Order matches EXPANSION_REGIONS (checked by expansion-region-lookup.test.ts): valley,
-// workshop, cave, market, numberfort.
+// workshop, cave, market, numberfort, island.
 import type { RoadPoint } from './roads';
 
 export const EXPANSION_ROADS: readonly (readonly RoadPoint[])[] = [
@@ -33,5 +33,11 @@ export const EXPANSION_ROADS: readonly (readonly RoadPoint[])[] = [
   [
     [53, -9.55],
     [57, -2],
+  ],
+  // Island (west bank, south of the bridge road): from the bridge road, into the islet.
+  // The road runs clear of the player spawn (-6, 6) and VLM (-3, 1.5).
+  [
+    [-8, 1],
+    [-8, 8],
   ],
 ];

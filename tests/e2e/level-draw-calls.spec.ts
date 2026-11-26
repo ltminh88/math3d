@@ -65,6 +65,12 @@ const LEVELS: LevelDef[] = [
     panel: '.numberfort-panel',
     before: ['field', 'forest', 'city', 'tower', 'garden', 'valley', 'workshop', 'cave'],
   },
+  {
+    id: 'island',
+    gate: 'Vào Cổng Đảo Tiếng Anh',
+    panel: '.island-panel',
+    before: [],
+  },
 ];
 
 for (const level of LEVELS) {

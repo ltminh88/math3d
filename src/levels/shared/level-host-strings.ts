@@ -14,6 +14,7 @@ export const tl = defineStrings('levelHost', {
     gateCave: 'Cổng Hang Đố Vui',
     gateMarket: 'Cổng Chợ Phiên Tí Hon',
     gateNumberfort: 'Cổng Lâu Đài Số',
+    gateIsland: 'Cổng Đảo Tiếng Anh',
     enter: 'Vào {gate}',
     lockReasonBridge: 'Đi qua cầu để mở',
     lockReasonField: 'Hoàn thành Cánh Đồng để mở',
@@ -60,6 +61,7 @@ export const tl = defineStrings('levelHost', {
     gateCave: 'Puzzle Cave Gate',
     gateMarket: 'Tiny Market Fair Gate',
     gateNumberfort: 'Number Castle Gate',
+    gateIsland: 'English Island Gate',
     enter: 'Enter {gate}',
     lockReasonBridge: 'Cross the bridge to open',
     lockReasonField: 'Finish the Meadow to open',
@@ -108,6 +110,7 @@ const GATE_NAME_KEYS = {
   cave: 'gateCave',
   market: 'gateMarket',
   numberfort: 'gateNumberfort',
+  island: 'gateIsland',
 } as const satisfies Record<LevelGate['levelId'], Parameters<typeof tl>[0]>;
 
 /** The gate's display name ("Cổng Thành Phố Con Số"). */
