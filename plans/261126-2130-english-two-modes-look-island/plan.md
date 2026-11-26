@@ -76,3 +76,6 @@ Parallel: 1 ∥ 2; 3's region/gate/map part ∥ 1 (rebase to wire the shared sce
    reading-extra words only in the review stage.** No typing.
 6. Look stickers? → **Own "Look 1" sticker page** (one sticker per unit skill pair), separate
    from the CEC page.
+
+## Validation Log
+Session 2026-11-26 (all took the recommended option): Look grouped into **8 stages** (starter, U1–2 … U11–12, review; no save-code bump) · **per-book spelling** (CEC British, Look American) · **own Look sticker page** · sentence items **light**: 2–3 choices, ≤ 4 tiles, question shown above. Q3 (site L1) and Q4 (parent Phase 6 after Phase 1) keep the recommendation.
