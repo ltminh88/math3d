@@ -98,6 +98,25 @@ describe('generateItem', () => {
     }
   });
 
+  it('what-is items ask What is this/that, and the answer is "It is …"', () => {
+    const seen = new Set<string>();
+    for (let seed = 0; seed < 20; seed++) {
+      const ordered = generateItem('en-pattern-what-is', 'order-words', 1, SEED_UNIT_1, gen(seed));
+      expect(ordered.kind).toBe('order-words');
+      if (ordered.kind !== 'order-words') continue;
+      expect(ordered.question).toMatch(/^What is (this|that)\?$/);
+      expect(ordered.words.slice(0, 2)).toEqual(['It', 'is']);
+      if (ordered.question) seen.add(ordered.question);
+      const filled = generateItem('en-pattern-what-is', 'fill-pattern', 1, SEED_UNIT_1, gen(seed));
+      expect(filled.kind).toBe('fill-pattern');
+      if (filled.kind !== 'fill-pattern') continue;
+      expect(filled.question).toMatch(/^What is (this|that)\?$/);
+      expect(filled.sentence.slice(0, 2)).toEqual(['It', 'is']);
+      if (filled.question) seen.add(filled.question);
+    }
+    expect(seen).toEqual(new Set(['What is this?', 'What is that?']));
+  });
+
   it('is deterministic per seed', () => {
     const a = generateItem('en-words-a-d', 'listen-pick-picture', 1, SEED_UNIT_1, gen(11));
     const b = generateItem('en-words-a-d', 'listen-pick-picture', 1, SEED_UNIT_1, gen(11));

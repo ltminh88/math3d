@@ -46,6 +46,24 @@ export function englishWordEl(text: string, doc: Document): HTMLSpanElement {
   return el;
 }
 
+/**
+ * The displayed question for an item that answers one (what-is: "What is
+ * this?" above the answer tiles). Null when the item carries no question.
+ */
+export function questionParagraph(
+  question: string | undefined,
+  doc: Document,
+): HTMLParagraphElement | null {
+  if (!question) return null;
+  const el = doc.createElement('p');
+  el.className = 'english-question';
+  for (const [index, word] of question.split(' ').entries()) {
+    if (index > 0) el.append(doc.createTextNode(' '));
+    el.appendChild(englishWordEl(word, doc));
+  }
+  return el;
+}
+
 /** A large tap target (kit-button, 56 px) for one choice, labelled for e2e by index. */
 export function choiceButton(
   label: string,

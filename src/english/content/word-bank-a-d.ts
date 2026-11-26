@@ -19,6 +19,7 @@ export const WORD_BANK_A_D: readonly EnglishWord[] = [
   { word: 'blue', gloss: 'màu xanh dương', picture: '🔵' },
   { word: 'boat', gloss: 'thuyền', picture: '⛵' },
   { word: 'book', gloss: 'quyển sách', picture: '📖' },
+  { word: 'box', gloss: 'cái hộp', picture: '📦' },
   { word: 'bread', gloss: 'bánh mì', picture: '🍞' },
   { word: 'brother', gloss: 'anh trai', picture: '👦' },
   { word: 'bus', gloss: 'xe buýt', picture: '🚌' },

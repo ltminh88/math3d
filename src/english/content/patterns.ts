@@ -51,16 +51,19 @@ export const ENGLISH_PATTERN_SENTENCES: Readonly<
   // Every sentence ends with a bank word (its key word), so the gloss line
   // after the item is never empty — a sentence with no bank word would leave
   // `.english-gloss` hidden and the child with nothing to review.
+  // what-is is a question-and-answer pair: the sentence here is the ANSWER
+  // ("It is a cat"); the generator pairs it with the displayed question
+  // "What is this?" (even sentences) or "What is that?" (odd sentences).
   'what-is': [
-    ['What', 'is', 'this', 'cat'],
-    ['What', 'is', 'that', 'dog'],
-    ['What', 'is', 'this', 'ball'],
-    ['What', 'is', 'that', 'bird'],
-    ['What', 'is', 'this', 'fish'],
-    ['What', 'is', 'this', 'apple'],
+    ['It', 'is', 'a', 'cat'],
+    ['It', 'is', 'a', 'dog'],
+    ['It', 'is', 'a', 'ball'],
+    ['It', 'is', 'a', 'bird'],
+    ['It', 'is', 'a', 'fish'],
+    ['It', 'is', 'an', 'apple'],
   ],
   'my-favourite': [
-    ['My', 'favourite', 'color', 'is', 'red'],
+    ['My', 'favourite', 'colour', 'is', 'red'],
     ['My', 'favourite', 'animal', 'is', 'a', 'cat'],
     ['My', 'favourite', 'food', 'is', 'pizza'],
     ['My', 'favourite', 'toy', 'is', 'a', 'ball'],

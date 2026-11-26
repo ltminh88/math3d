@@ -12,7 +12,7 @@ export const WORD_BANK_M_P: readonly EnglishWord[] = [
   { word: 'nest', gloss: 'tổ chim', picture: '🪹' },
   { word: 'night', gloss: 'ban đêm', picture: '🌃' },
   { word: 'nose', gloss: 'mũi', picture: '👃' },
-  { word: 'nut', gloss: 'hạt dẻ', picture: '🥜' },
+  { word: 'nut', gloss: 'hạt', picture: '🥜' },
   { word: 'octopus', gloss: 'con bạch tuộc', picture: '🐙' },
   { word: 'onion', gloss: 'củ hành', picture: '🧅' },
   { word: 'orange', gloss: 'quả cam', picture: '🍊' },

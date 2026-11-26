@@ -10,6 +10,7 @@ import {
   type EnglishWidgetHooks,
   type EnglishWidgetOptions,
   englishWordEl,
+  questionParagraph,
   renderGloss,
   widgetRoot,
 } from './english-widget-layout';
@@ -21,6 +22,8 @@ export function mountFillChoice(
 ): EnglishWidget {
   const doc = options.doc ?? document;
   const { root, body, gloss } = widgetRoot(item, tei('cueFill'), doc, options);
+  const question = questionParagraph(item.question, doc);
+  if (question) body.appendChild(question);
   const sentence = doc.createElement('p');
   sentence.className = 'english-prompt';
   for (const [index, word] of item.sentence.entries()) {

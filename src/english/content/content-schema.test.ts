@@ -162,4 +162,26 @@ describe('units', () => {
       }
     }
   });
+
+  it('what-is items carry a this/that question, other patterns carry none', () => {
+    const seen = new Set<string>();
+    for (const unit of ENGLISH_UNITS) {
+      for (const skillId of unit.skillIds) {
+        if (!skillId.startsWith('en-pattern-')) continue;
+        for (const kind of ['order-words', 'fill-pattern'] as const) {
+          for (let seed = 0; seed < 20; seed++) {
+            const item = generateItem(skillId, kind, 1, unit, mulberry32(seed));
+            if (item.kind !== 'order-words' && item.kind !== 'fill-pattern') continue;
+            if (skillId === 'en-pattern-what-is') {
+              expect(item.question).toMatch(/^What is (this|that)\?$/);
+              if (item.question) seen.add(item.question);
+            } else {
+              expect(item.question).toBeUndefined();
+            }
+          }
+        }
+      }
+    }
+    expect(seen).toEqual(new Set(['What is this?', 'What is that?']));
+  });
 });

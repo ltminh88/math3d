@@ -1,7 +1,7 @@
 // Word bank, block Y–Z (Phase 2A, self-written): simple Pre-A1 words with a
 // short Vietnamese gloss and an emoji picture. Every word has a picture.
 import type { EnglishWord } from '../english-types';
-import { SVG_YOGURT, SVG_ZIGZAG } from './svg-pictures';
+import { SVG_YOGURT, SVG_ZIGZAG, SVG_ZOO } from './svg-pictures';
 
 export const WORD_BANK_Y_Z: readonly EnglishWord[] = [
   { word: 'yellow', gloss: 'màu vàng', picture: '🟡' },
@@ -11,5 +11,5 @@ export const WORD_BANK_Y_Z: readonly EnglishWord[] = [
   { word: 'zebra', gloss: 'ngựa vằn', picture: '🦓' },
   { word: 'zero', gloss: 'số không', picture: '0️⃣' },
   { word: 'zigzag', gloss: 'đường zíc-zắc', picture: SVG_ZIGZAG },
-  { word: 'zoom', gloss: 'phóng to', picture: '🔍' },
+  { word: 'zoo', gloss: 'sở thú', picture: SVG_ZOO },
 ];

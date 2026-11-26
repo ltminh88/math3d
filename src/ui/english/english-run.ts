@@ -128,11 +128,13 @@ function speakTextFor(item: EnglishItem): string {
     case 'letter-pick':
       return item.prompt;
     case 'fill-pattern':
-      return item.sentence.join(' ');
+      return item.question
+        ? `${item.question} ${item.sentence.join(' ')}`
+        : item.sentence.join(' ');
     case 'match-pairs':
       return item.pairs.map((p) => p.word).join(', ');
     case 'order-words':
-      return item.words.join(' ');
+      return item.question ? `${item.question} ${item.words.join(' ')}` : item.words.join(' ');
   }
 }
 

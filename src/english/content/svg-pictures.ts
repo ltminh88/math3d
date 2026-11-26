@@ -39,10 +39,22 @@ export const SVG_YOGURT = svg(
     `%3Cellipse cx='45' cy='6' rx='5' ry='3' fill='%239ca3af'/%3E`,
 );
 
+/** A zoo gate: two posts, a green sign reading ZOO, a fence (word `zoo`). */
+export const SVG_ZOO = svg(
+  `%3Crect x='8' y='20' width='6' height='40' fill='%2378350f'/%3E` +
+    `%3Crect x='50' y='20' width='6' height='40' fill='%2378350f'/%3E` +
+    `%3Crect x='8' y='12' width='48' height='13' rx='3' fill='%2322c55e'/%3E` +
+    `%3Ctext x='32' y='22' font-size='10' text-anchor='middle' fill='%23ffffff' font-family='sans-serif' font-weight='bold'%3EZOO%3C/text%3E` +
+    `%3Cline x1='14' y1='34' x2='50' y2='34' stroke='%2378350f' stroke-width='2'/%3E` +
+    `%3Cline x1='14' y1='46' x2='50' y2='46' stroke='%2378350f' stroke-width='2'/%3E` +
+    `%3Crect x='4' y='58' width='56' height='4' fill='%2322c55e'/%3E`,
+);
+
 /** Word → self-drawn SVG picture, for words with no good emoji. */
 export const SVG_PICTURES: Readonly<Record<string, string>> = {
   quilt: SVG_QUILT,
   xylophone: SVG_XYLOPHONE,
   zigzag: SVG_ZIGZAG,
   yogurt: SVG_YOGURT,
+  zoo: SVG_ZOO,
 };

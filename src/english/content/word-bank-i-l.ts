@@ -3,7 +3,7 @@
 import type { EnglishWord } from '../english-types';
 
 export const WORD_BANK_I_L: readonly EnglishWord[] = [
-  { word: 'ice', gloss: 'đá lạnh', picture: '🧊' },
+  { word: 'ice', gloss: 'nước đá', picture: '🧊' },
   { word: 'insect', gloss: 'con côn trùng', picture: '🐛' },
   { word: 'island', gloss: 'hòn đảo', picture: '🏝️' },
   { word: 'ink', gloss: 'mực', picture: '🖋️' },

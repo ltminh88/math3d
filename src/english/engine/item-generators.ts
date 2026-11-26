@@ -161,12 +161,14 @@ function matchPairs(skillId: EnglishSkillId, unit: EnglishUnit, rng: Rng): Engli
 /**
  * A pattern sentence from the 2A bank: the sentence itself is the item, its
  * last word is the fill-pattern blank. Distractors are the last words of the
- * pattern's other sentences (same slot, same kind of word).
+ * pattern's other sentences (same slot, same kind of word). what-is pairs its
+ * answer sentence with the displayed question ("What is this?" on even
+ * sentences, "What is that?" on odd ones); other patterns have no question.
  */
 function patternWords(
   skillId: EnglishSkillId,
   rng: Rng,
-): { words: string[]; keyWord: string; siblings: string[] } {
+): { words: string[]; keyWord: string; siblings: string[]; question?: string } {
   const pattern = skillId.slice('en-pattern-'.length);
   const sentences = ENGLISH_PATTERN_SENTENCES[pattern as keyof typeof ENGLISH_PATTERN_SENTENCES];
   if (!sentences || sentences.length === 0) {
@@ -176,16 +178,19 @@ function patternWords(
   const words = [...(picked as readonly string[])];
   const keyWord = words[words.length - 1] as string;
   const siblings = sentences.map((s) => s[s.length - 1] as string).filter((w) => w !== keyWord);
-  return { words, keyWord, siblings: [...new Set(siblings)] };
+  if (pattern !== 'what-is') return { words, keyWord, siblings: [...new Set(siblings)] };
+  const index = sentences.indexOf(picked);
+  const question = index % 2 === 0 ? 'What is this?' : 'What is that?';
+  return { words, keyWord, siblings: [...new Set(siblings)], question };
 }
 
 function orderWords(skillId: EnglishSkillId, rng: Rng): EnglishItem {
-  const { words } = patternWords(skillId, rng);
-  return { kind: 'order-words', skillId, source: 'own', words };
+  const { words, question } = patternWords(skillId, rng);
+  return { kind: 'order-words', skillId, source: 'own', words, ...(question ? { question } : {}) };
 }
 
 function fillPattern(skillId: EnglishSkillId, tier: SkillTier, rng: Rng): EnglishItem {
-  const { words, keyWord, siblings } = patternWords(skillId, rng);
+  const { words, keyWord, siblings, question } = patternWords(skillId, rng);
   const blankIndex = words.length - 1;
   const count = tier === 1 ? 1 : tier === 2 ? 2 : 3;
   if (siblings.length < count) {
@@ -194,7 +199,15 @@ function fillPattern(skillId: EnglishSkillId, tier: SkillTier, rng: Rng): Englis
     );
   }
   const options = shuffle(rng, [keyWord, ...shuffle(rng, siblings).slice(0, count)]);
-  return { kind: 'fill-pattern', skillId, source: 'own', sentence: words, blankIndex, options };
+  return {
+    kind: 'fill-pattern',
+    skillId,
+    source: 'own',
+    sentence: words,
+    blankIndex,
+    options,
+    ...(question ? { question } : {}),
+  };
 }
 
 /** Build one item of `kind` for `skillId` at `tier` from the unit's own words. */

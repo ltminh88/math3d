@@ -86,15 +86,24 @@ export interface MatchPairsItem {
   readonly pairs: readonly EnglishPictureChoice[];
 }
 
-/** Tap the word tiles into the one correct order (`words` is that order). */
+/**
+ * Tap the word tiles into the one correct order (`words` is that order).
+ * `question` is the displayed question when the sentence answers one
+ * (what-is: "What is this?" while the child orders "It is a cat").
+ */
 export interface OrderWordsItem {
   readonly kind: 'order-words';
   readonly skillId: EnglishSkillId;
   readonly source: EnglishItemSource;
   readonly words: readonly string[];
+  readonly question?: string;
 }
 
-/** One blank in the sentence, 2–4 options; `options` includes the blank's word. */
+/**
+ * One blank in the sentence, 2–4 options; `options` includes the blank's word.
+ * `question` is the displayed question when the sentence answers one
+ * (what-is: "What is this?" while the child fills "It is a ___").
+ */
 export interface FillPatternItem {
   readonly kind: 'fill-pattern';
   readonly skillId: EnglishSkillId;
@@ -102,6 +111,7 @@ export interface FillPatternItem {
   readonly sentence: readonly string[];
   readonly blankIndex: number;
   readonly options: readonly string[];
+  readonly question?: string;
 }
 
 /** Pick the letter for the cue (`prompt` is the English word or sound label). */

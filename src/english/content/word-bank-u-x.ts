@@ -7,7 +7,7 @@ export const WORD_BANK_U_X: readonly EnglishWord[] = [
   { word: 'umbrella', gloss: 'ô dù', picture: '☂️' },
   { word: 'uncle', gloss: 'chú', picture: '🧔' },
   { word: 'unicorn', gloss: 'kỳ lân', picture: '🦄' },
-  { word: 'ufo', gloss: 'đĩa bay', picture: '🛸' },
+  { word: 'up', gloss: 'lên', picture: '⬆️' },
   { word: 'van', gloss: 'xe tải nhỏ', picture: '🚐' },
   { word: 'vase', gloss: 'lọ hoa', picture: '🏺' },
   { word: 'violin', gloss: 'đàn vi-ô-lông', picture: '🎻' },
@@ -20,7 +20,6 @@ export const WORD_BANK_U_X: readonly EnglishWord[] = [
   { word: 'wolf', gloss: 'chó sói', picture: '🐺' },
   { word: 'write', gloss: 'viết', picture: '✍️' },
   { word: 'six', gloss: 'số sáu', picture: '6️⃣' },
-  { word: 'xmas', gloss: 'Giáng sinh', picture: '🎄' },
   { word: 'x-ray', gloss: 'phim X-quang', picture: '🩻' },
   { word: 'xylophone', gloss: 'đàn mộc cầm', picture: SVG_XYLOPHONE },
 ];

@@ -69,6 +69,14 @@
   letter-spacing: 2px;
 }
 
+.english-question {
+  margin: 0;
+  text-align: center;
+  font-family: var(--font-display);
+  font-size: 26px;
+  font-weight: 800;
+}
+
 .english-choice-grid {
   display: grid;
   grid-template-columns: repeat(2, minmax(0, 1fr));
