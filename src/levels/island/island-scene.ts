@@ -75,25 +75,34 @@ function start(ctx: LevelContext): LevelSession {
     );
   }
 
-  void startEnglishRun({ stage: ctx.stage, ui: panel.runRoot, learning: ctx.learning }).then(
-    (run) => {
-      if (disposed) return;
-      result = run;
-      stars = islandStarsForResult(run);
-      // The celebration's "Về cổng" button sits under the top-bar zoom group on
-      // landscape (the same overlap that went red on #59's tablet-landscape shard 2):
-      // hide the group now — there is nothing left to zoom once the run is done.
-      // dispose() removes the group and its listeners; the session's own dispose()
-      // calls it again on teardown, which is a no-op on the detached group.
-      zoomHandle.dispose();
-      const bonus = run.completed && ctx.firstCompletion ? LEVEL_COMPLETE_BONUS : null;
-      const exit = () => ctx.exit({ completed: run.completed });
-      const stageLine = cs('stageLine', { n: ctx.stage, m: ctx.definition.stages, stars });
-      panel.runRoot.replaceChildren();
-      showIslandCelebration(panel.runRoot, cs, run, stars, exit, bonus, stageLine);
-      frame();
-    },
-  );
+  // R73: abort the run when the level exits mid-run (Phase 3B added `signal`
+  // to the port): without this the engine's promise dangles — its round
+  // waiter never resolves, the speaker is never disposed, and the live state
+  // stays mid-run. The promise resolves `{completed: false}`; the `.then`
+  // below still returns early on `disposed`, so no done card shows.
+  const runAbort = new AbortController();
+  void startEnglishRun({
+    stage: ctx.stage,
+    ui: panel.runRoot,
+    learning: ctx.learning,
+    signal: runAbort.signal,
+  }).then((run) => {
+    if (disposed) return;
+    result = run;
+    stars = islandStarsForResult(run);
+    // The celebration's "Về cổng" button sits under the top-bar zoom group on
+    // landscape (the same overlap that went red on #59's tablet-landscape shard 2):
+    // hide the group now — there is nothing left to zoom once the run is done.
+    // dispose() removes the group and its listeners; the session's own dispose()
+    // calls it again on teardown, which is a no-op on the detached group.
+    zoomHandle.dispose();
+    const bonus = run.completed && ctx.firstCompletion ? LEVEL_COMPLETE_BONUS : null;
+    const exit = () => ctx.exit({ completed: run.completed });
+    const stageLine = cs('stageLine', { n: ctx.stage, m: ctx.definition.stages, stars });
+    panel.runRoot.replaceChildren();
+    showIslandCelebration(panel.runRoot, cs, run, stars, exit, bonus, stageLine);
+    frame();
+  });
 
   let frames = 0;
   let maxCalls = 0;
@@ -117,6 +126,7 @@ function start(ctx: LevelContext): LevelSession {
     },
     dispose() {
       disposed = true;
+      runAbort.abort();
       zoomHandle.dispose();
       panel.destroy();
     },

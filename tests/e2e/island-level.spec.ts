@@ -155,6 +155,13 @@ test('leaving mid-run through "Về thế giới" keeps the gate open', async ({
   if (tap) await leave.tap();
   else await leave.click();
   await expect.poll(() => page.evaluate(() => window.__game?.levelRunning())).toBe(false);
+  // R73: leaving aborts the run, so no run widget may stay in the DOM.
+  await expect(page.locator('.english-run')).toHaveCount(0);
+  // The DOM assert above is green either way — the host disposes the session
+  // (and its panel) on exit — so prove the run itself resolved: pre-fix the
+  // engine's promise dangles and its live state stays mid-run (round 2, not
+  // done); after abort it resolves with the 1 completed round, done.
+  await expect.poll(() => islandState(page)).toMatchObject({ done: true, round: 1 });
   expect(await page.evaluate(() => window.__game?.gateStatus('island'))).toBe('open');
   expect(errors).toEqual([]);
 });
