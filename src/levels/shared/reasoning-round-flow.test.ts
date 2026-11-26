@@ -1,5 +1,6 @@
 import { describe, expect, it } from 'vitest';
 import { mulberry32 } from '../../learning/seeded-rng';
+import type { PracticeItem } from '../../practice/practice-scene';
 import { playableSteps } from '../../reasoning/reasoning-step-answers';
 import { ReasoningRoundFlow } from './reasoning-round-flow';
 import { planReasoningRound } from './reasoning-round-slot';
@@ -110,6 +111,47 @@ describe('ReasoningRoundFlow', () => {
       firstTry: false,
       usedHint: true,
       wrongAnswers: [1, 2, 3],
+    });
+  });
+
+  it('a wrong choice that stands for a bug only fills the bug bank (R79)', () => {
+    const item: PracticeItem = {
+      skillId: 'add-sub-1000',
+      tier: 1,
+      story: { key: 'addCalc', params: { a: 247, b: 158 } },
+      steps: [
+        {
+          kind: 'choice',
+          prompt: { key: 'addPick' },
+          options: [
+            {
+              id: 'w1',
+              label: { key: 'n', params: { n: 305 } },
+              correct: false,
+              misconception: 'forgot-carry',
+            },
+            { id: 'w2', label: { key: 'n', params: { n: 395 } }, correct: false },
+            { id: 'r', label: { key: 'n', params: { n: 405 } }, correct: true },
+          ],
+        },
+      ],
+      work: [],
+    };
+    const flow = new ReasoningRoundFlow(
+      { skillId: 'add-sub-1000', tier: 1, factKey: 'sk:add-sub-1000', item },
+      () => 0,
+    );
+    expect(flow.answer({ stepIndex: 0, correct: false, answer: 'w2' }).verdict).toBe('wrong');
+    expect(flow.answer({ stepIndex: 0, correct: false, answer: 'w1' }).verdict).toBe('wrong');
+    const done = flow.answer({ stepIndex: 0, correct: true, answer: 'r' });
+    expect(done.outcome).toMatchObject({
+      correct: true,
+      firstTry: false,
+      // No attempt for either pick: the bug-less pick records nothing, and
+      // the pick with a bug only fills the bug bank.
+      wrongAnswers: [],
+      wrongAttempts: [],
+      bugs: ['forgot-carry'],
     });
   });
 });

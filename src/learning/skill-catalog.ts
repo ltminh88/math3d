@@ -16,6 +16,7 @@ import { ARITHMETIC_ENTRIES } from '../arithmetic/arithmetic-skill-entries';
 import { DATA_ENTRIES } from '../data/data-skill-entries';
 import { ENGLISH_ENTRIES } from '../english/english-skill-entries';
 import { FRACTION_ENTRIES } from '../fractions/fraction-skill-entries';
+import { LENGTH_SKILL_ENTRIES } from '../measurement/length-skill-entries';
 import { MONEY_ENTRIES } from '../money/money-skill-entries';
 import { NUMBER_ENTRIES } from '../numbers/number-skill-entries';
 import { TIME_ENTRIES } from '../time/time-skill-entries';
@@ -94,6 +95,7 @@ export const SKILL_CATALOG: readonly SkillEntry[] = Object.freeze([
   ...MONEY_ENTRIES,
   ...DATA_ENTRIES,
   ...ENGLISH_ENTRIES,
+  ...LENGTH_SKILL_ENTRIES,
 ]);
 
 const BY_ID: ReadonlyMap<string, SkillEntry> = new Map(SKILL_CATALOG.map((s) => [s.id, s]));

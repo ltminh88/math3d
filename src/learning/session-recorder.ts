@@ -1,7 +1,14 @@
+import type { Misconception } from '../reasoning/reasoning-types';
 import type { FactKey } from './fact-key';
 import type { DeltaFact, FactLocalState, FactStat, SessionDelta } from './learning-types';
 import { applyAttempt, LEITNER, newFactStat } from './leitner-box';
 import { questionReward, starsFor } from './scoring';
+
+/** One wrong pick inside a question, in the order given. A number wrong carries
+ * its value (kept in the error bank). */
+export interface WrongAttempt {
+  readonly wrongAnswer?: number;
+}
 
 export interface QuestionOutcome {
   factKey: FactKey;
@@ -14,6 +21,13 @@ export interface QuestionOutcome {
   usedHint: boolean;
   /** Wrong answers given, in order. */
   wrongAnswers: readonly number[];
+  /** Wrong attempts in the order given (boost Phase 0). When absent, the
+   * recorder derives them from `wrongAnswers` (number wrongs only), so older
+   * callers keep working. */
+  wrongAttempts?: readonly WrongAttempt[];
+  /** The question's bugs (boost Phase 0, R79): they go only into the bug bank
+   * — they never add an attempt or move the box. */
+  bugs?: readonly Misconception[];
 }
 
 export interface SessionResult {
@@ -52,24 +66,22 @@ export function createSessionRecorder(opts: RecorderOptions): SessionRecorder {
       let stat = working.get(o.factKey) ?? opts.getStat(o.factKey) ?? newFactStat();
       const boxBefore = stat.box;
       // A revealed question counts as (at least) one wrong attempt.
-      const wrongs = o.correct
-        ? [...o.wrongAnswers]
-        : o.wrongAnswers.length > 0
-          ? [...o.wrongAnswers]
-          : [undefined];
+      const derived: readonly WrongAttempt[] =
+        o.wrongAttempts ?? o.wrongAnswers.map((wrongAnswer) => ({ wrongAnswer }));
+      const wrongs: readonly WrongAttempt[] = !o.correct && derived.length === 0 ? [{}] : derived;
       const attempts = wrongs.length + (o.correct ? 1 : 0);
       const perAttemptMs = o.ms / attempts;
       const at = opts.now();
       const entry = facts[o.factKey] ?? { a: 0, c: 0, ms: 0, box: stat.box, seenAt: at };
 
-      const step = (correct: boolean, wrongAnswer?: number): void => {
+      const step = (correct: boolean, wrong?: WrongAttempt): void => {
         const before = stat;
         stat = applyAttempt(stat, {
           correct,
           firstTry: o.firstTry,
           usedHint: o.usedHint,
           ms: perAttemptMs,
-          wrongAnswer,
+          wrongAnswer: wrong?.wrongAnswer,
           sessionNo: opts.sessionNo,
           at,
         });
@@ -81,6 +93,19 @@ export function createSessionRecorder(opts: RecorderOptions): SessionRecorder {
       if (o.correct) step(true);
       // Every attempt is counted, but the box moves once per question: any miss is one step down.
       if (wrongs.length > 0) stat = { ...stat, box: Math.max(LEITNER.minBox, boxBefore - 1) };
+      // The question's bugs go only into the bug bank (R79): they never add an
+      // attempt or move the box. `recent` shifts once per question here, not
+      // per attempt — a choice miss with no numeric wrong still counts as a 0
+      // bit (a per-attempt shift would skip it).
+      if (o.bugs && o.bugs.length > 0) {
+        const fresh = [...new Set(o.bugs)];
+        stat = { ...stat, bugs: [...(stat.bugs ?? []), ...fresh].slice(-LEITNER.bugsKept) };
+      }
+      const mask = (1 << LEITNER.recentKept) - 1;
+      stat = {
+        ...stat,
+        recent: (((stat.recent ?? 0) << 1) | (o.correct && o.firstTry ? 1 : 0)) & mask,
+      };
 
       entry.box = stat.box;
       entry.seenAt = at;
@@ -120,7 +145,13 @@ export function createSessionRecorder(opts: RecorderOptions): SessionRecorder {
       };
       const local: Record<FactKey, FactLocalState> = {};
       for (const [key, s] of working)
-        local[key] = { streak: s.streak, fluent: s.fluent, errs: s.errs };
+        local[key] = {
+          streak: s.streak,
+          fluent: s.fluent,
+          errs: s.errs,
+          bugs: s.bugs,
+          recent: s.recent,
+        };
       return { delta, local };
     },
   };

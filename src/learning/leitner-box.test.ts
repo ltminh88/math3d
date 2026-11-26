@@ -62,4 +62,35 @@ describe('applyAttempt', () => {
     expect(s.errs).toEqual([]);
     expect(s.attempts).toBe(0);
   });
+
+  it('keeps the last 5 bugs, oldest first, only on wrong attempts with a bug', () => {
+    let s = newFactStat();
+    s = applyAttempt(s, { ...base, correct: false, bug: 'forgot-carry' });
+    expect(s.bugs).toEqual(['forgot-carry']);
+    s = applyAttempt(s, { ...base, correct: false });
+    expect(s.bugs).toEqual(['forgot-carry']);
+    for (const bug of [
+      'carry-not-added',
+      'smaller-from-larger',
+      'borrow-no-decrement',
+      'zero-borrow-skip',
+      'zero-minus-n-zero',
+    ] as const)
+      s = applyAttempt(s, { ...base, correct: false, bug });
+    expect(s.bugs).toEqual([
+      'carry-not-added',
+      'smaller-from-larger',
+      'borrow-no-decrement',
+      'zero-borrow-skip',
+      'zero-minus-n-zero',
+    ]);
+  });
+
+  it('leaves recent alone: the recorder shifts it once per question (R79)', () => {
+    const s = { ...newFactStat(), recent: 0b101 };
+    expect(applyAttempt(s, { ...base, correct: true }).recent).toBe(0b101);
+    expect(applyAttempt(s, { ...base, correct: false }).recent).toBe(0b101);
+    // Old stats without the field stay without it.
+    expect(applyAttempt(newFactStat(), { ...base, correct: true }).recent).toBeUndefined();
+  });
 });

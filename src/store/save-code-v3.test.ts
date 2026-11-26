@@ -88,6 +88,34 @@ describe('M3D3 save code', () => {
     expect(Object.keys(records.levels).sort()).toEqual(['bridge', 'garden', 'tower']);
   });
 
+  it('drops the device-only bugs/recent fields, like errs, on export', () => {
+    const withBugs = snapshot();
+    withBugs.factStats['sk:div-rem-ceil'] = stat({
+      attempts: 4,
+      correct: 3,
+      totalMs: 52000,
+      box: 4,
+      streak: 2,
+      bugs: ['forgot-carry', 'unit-direction'],
+      recent: 0b101101,
+    });
+    const { records } = importOfDecodedSaveCode(
+      decodeSaveCode(encodeSaveCodeV3(withBugs, audio)),
+      AT,
+    );
+    expect(records.facts['sk:div-rem-ceil']).toEqual({
+      attempts: 4,
+      correct: 3,
+      totalMs: 52000,
+      box: 4,
+      lastSeenSession: 0,
+      lastSeenAt: AT_SEC_MS,
+      streak: 2,
+      fluent: false,
+      errs: [],
+    });
+  });
+
   it('knows every level a gate opens (a new gate needs a new version)', () => {
     for (const gate of LEVEL_GATES) expect(M3D3_LEVELS, gate.levelId).toContain(gate.levelId);
   });

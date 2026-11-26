@@ -1,3 +1,4 @@
+import type { Misconception } from '../reasoning/reasoning-types';
 import type { FactStat } from './learning-types';
 
 /** All tuning knobs in one place; playtesting (phase 10) adjusts these only. */
@@ -9,6 +10,10 @@ export const LEITNER = {
   /** First-try correct under this marks the fact fluent. */
   fluentMs: 3000,
   errsKept: 3,
+  /** Bugs kept per fact (oldest first). */
+  bugsKept: 5,
+  /** First tries kept in the `recent` bitmask. */
+  recentKept: 10,
 } as const;
 
 export interface Attempt {
@@ -19,6 +24,8 @@ export interface Attempt {
   ms: number;
   /** The wrong answer given, kept in the error bank. */
   wrongAnswer?: number;
+  /** The bug the wrong pick stands for, kept in the bug bank (boost Phase 0). */
+  bug?: Misconception;
   sessionNo: number;
   /** epoch ms */
   at: number;
@@ -43,17 +50,25 @@ export function applyAttempt(stat: FactStat, attempt: Attempt): FactStat {
   const next: FactStat = {
     ...stat,
     errs: stat.errs.slice(),
+    bugs: stat.bugs?.slice(),
     attempts: stat.attempts + 1,
     totalMs: stat.totalMs + Math.max(0, Math.round(attempt.ms)),
     lastSeenSession: attempt.sessionNo,
     lastSeenAt: attempt.at,
   };
+  // `recent` is NOT shifted here: it records one bit per question (1 = solved
+  // first-try), and only the recorder knows where a question ends — a choice
+  // miss with no numeric wrong adds no attempt, so a per-attempt shift would
+  // skip it. The recorder shifts once per question (R79).
   if (!attempt.correct) {
     next.box = Math.max(LEITNER.minBox, stat.box - 1);
     next.streak = 0;
     next.fluent = false;
     if (attempt.wrongAnswer !== undefined) {
       next.errs = [...next.errs, attempt.wrongAnswer].slice(-LEITNER.errsKept);
+    }
+    if (attempt.bug !== undefined) {
+      next.bugs = [...(stat.bugs ?? []), attempt.bug].slice(-LEITNER.bugsKept);
     }
     return next;
   }
