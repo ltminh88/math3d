@@ -1,13 +1,17 @@
-// Item generators (Phase 1B, pure; 2A banks): build one `EnglishItem` from a
-// stage unit's own words. Tier rules: tier 1 = 3 choices, tier 2 = 4 choices
-// with a confusable letter (b/d, p/q) on letter-pick, tier 3 = listen-only on
-// listen-pick-picture. Pattern sentences come from the 2A bank in
-// `content/patterns.ts` (all 7 patterns); word pools are filtered by skill so
-// a topic skill only serves its own topic and a block skill only serves words
-// starting in its block.
+// Item generators (Phase 1B, pure; 2A banks; Phase 4 Look banks): build one
+// `EnglishItem` from a stage unit's own words. Tier rules: tier 1 = 3 choices,
+// tier 2 = 4 choices with a confusable letter (b/d, p/q) on letter-pick,
+// tier 3 = listen-only on listen-pick-picture. Pattern sentences come from
+// the 2A bank in `content/patterns.ts` (all 7 patterns) or the Look bank in
+// `content/look/look-patterns.ts` (one per unit); word pools are filtered by
+// skill so a topic skill only serves its own topic, a block skill only serves
+// words starting in its block, and a Look words skill only serves its unit.
 
 import { pick, type Rng, shuffle } from '../../learning/seeded-rng';
 import type { SkillTier } from '../../learning/skill-tiers';
+import { LOOK_PATTERN_SENTENCES, type LookPatternSentence } from '../content/look/look-patterns';
+import { phonicsInitialPool, phonicsShortVowelPool } from '../content/look/look-phonics';
+import { LOOK_SKILL_WORDS } from '../content/look/look-units';
 import { ENGLISH_PATTERN_SENTENCES } from '../content/patterns';
 import { ENGLISH_TOPIC_WORDS } from '../content/topics';
 import type {
@@ -45,10 +49,20 @@ function blockLetters(skillId: EnglishSkillId): string[] {
 
 /**
  * The words a skill may serve: a topic skill serves only its topic's words;
- * a block skill serves only words starting in its block. The schema test
- * checks every pool has enough words; an empty pool is a content bug.
+ * a block skill serves only words starting in its block. A Look words skill
+ * serves only its own unit's words; a Look phonics skill serves its own key
+ * words for the unit's stage. The schema test checks every pool has enough
+ * words; an empty pool is a content bug.
  */
 export function poolFor(skillId: EnglishSkillId, unit: EnglishUnit): EnglishWord[] {
+  if (skillId.startsWith('en-look-')) {
+    if (skillId === 'en-look-phonics-initial') return phonicsInitialPool(unit.stage);
+    if (skillId === 'en-look-phonics-short-vowels') return phonicsShortVowelPool(unit.stage);
+    const words = LOOK_SKILL_WORDS[skillId];
+    if (!words) return [...unit.words];
+    const names = new Set(words.map((w) => w.word));
+    return unit.words.filter((w) => names.has(w.word));
+  }
   if (skillId.startsWith('en-topic-')) {
     const topic = skillId.slice('en-topic-'.length);
     const names = new Set(ENGLISH_TOPIC_WORDS[topic as keyof typeof ENGLISH_TOPIC_WORDS] ?? []);
@@ -112,6 +126,21 @@ function letterPick(
       answer,
     };
   }
+  // Look short vowels (Phase 4): the CVC word shows its vowel as a blank
+  // ("c_t"), and the child picks the vowel from the five vowels.
+  if (skillId === 'en-look-phonics-short-vowels') {
+    const word = pickWord(skillId, unit, rng);
+    const answer = word.word[1] as string;
+    const prompt = `${word.word[0]}_${word.word.slice(2)}`;
+    return {
+      kind: 'letter-pick',
+      skillId,
+      source: 'own',
+      prompt,
+      choices: letterChoices(answer, tier, ['a', 'e', 'i', 'o', 'u'], rng),
+      answer,
+    };
+  }
   const word = pickWord(skillId, unit, rng);
   const answer = word.word[0] as string;
   return {
@@ -169,6 +198,24 @@ function patternWords(
   skillId: EnglishSkillId,
   rng: Rng,
 ): { words: string[]; keyWord: string; siblings: string[]; question?: string } {
+  // Look patterns (Phase 4): one bank per unit, each sentence carrying its
+  // own question prompt; the blank is the sentence's last word.
+  const lookMatch = /^en-look-u(\d+)-pattern$/.exec(skillId);
+  if (lookMatch) {
+    const sentences = LOOK_PATTERN_SENTENCES[Number(lookMatch[1]) as number];
+    if (!sentences || sentences.length === 0) {
+      throw new Error(`generateItem: no sentence bank for ${skillId}`);
+    }
+    const picked = pick(rng, [...sentences]) as LookPatternSentence;
+    const words = [...picked.words];
+    const keyWord = words[words.length - 1] as string;
+    const siblings = [
+      ...new Set(
+        sentences.map((s) => s.words[s.words.length - 1] as string).filter((w) => w !== keyWord),
+      ),
+    ];
+    return { words, keyWord, siblings, question: picked.question };
+  }
   const pattern = skillId.slice('en-pattern-'.length);
   const sentences = ENGLISH_PATTERN_SENTENCES[pattern as keyof typeof ENGLISH_PATTERN_SENTENCES];
   if (!sentences || sentences.length === 0) {
@@ -192,7 +239,16 @@ function orderWords(skillId: EnglishSkillId, rng: Rng): EnglishItem {
 function fillPattern(skillId: EnglishSkillId, tier: SkillTier, rng: Rng): EnglishItem {
   const { words, keyWord, siblings, question } = patternWords(skillId, rng);
   const blankIndex = words.length - 1;
-  const count = tier === 1 ? 1 : tier === 2 ? 2 : 3;
+  // Look fills show 2–3 options (tier 1: 2, tier 2–3: 3); CEC fills go to 4.
+  const count = skillId.startsWith('en-look-')
+    ? tier === 1
+      ? 1
+      : 2
+    : tier === 1
+      ? 1
+      : tier === 2
+        ? 2
+        : 3;
   if (siblings.length < count) {
     throw new Error(
       `generateItem: need ${count + 1} sibling words for ${skillId}, bank has ${siblings.length + 1}`,

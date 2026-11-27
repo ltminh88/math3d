@@ -1,12 +1,14 @@
 import { describe, expect, it } from 'vitest';
 import { mulberry32 } from '../../learning/seeded-rng';
+import { LOOK_PATTERN_SENTENCES } from '../content/look/look-patterns';
+import { LOOK_SKILL_WORDS, lookUnitForStage } from '../content/look/look-units';
 import { ENGLISH_PATTERN_SENTENCES } from '../content/patterns';
 import { SEED_UNIT_1 } from '../content/seed-unit-1';
 import { ENGLISH_TOPIC_WORDS } from '../content/topics';
 import { unitForStage } from '../content/units';
 import type { EnglishItem, EnglishPattern, EnglishSkillId } from '../english-types';
 import { SYNTHETIC_PACK } from '../fixtures/synthetic-pack';
-import { CONFUSABLE_LETTER, generateItem } from './item-generators';
+import { CONFUSABLE_LETTER, generateItem, poolFor } from './item-generators';
 
 const gen = (seed: number) => mulberry32(seed);
 
@@ -167,5 +169,92 @@ describe('generateItem', () => {
     for (const item of SYNTHETIC_PACK.items as readonly EnglishItem[]) {
       expect(item.source).toBe('pack');
     }
+  });
+
+  it('Look word skills only serve their own unit words', () => {
+    const unit2 = lookUnitForStage(2);
+    const u1Names = new Set(LOOK_SKILL_WORDS['en-look-u1-words']?.map((w) => w.word));
+    const u2Names = new Set(LOOK_SKILL_WORDS['en-look-u2-words']?.map((w) => w.word));
+    for (let seed = 0; seed < 20; seed++) {
+      const item = generateItem('en-look-u1-words', 'listen-pick-picture', 1, unit2, gen(seed));
+      if (item.kind !== 'listen-pick-picture') continue;
+      for (const choice of item.choices) expect(u1Names.has(choice.word)).toBe(true);
+      const pairs = generateItem('en-look-u2-words', 'match-pairs', 1, unit2, gen(seed));
+      if (pairs.kind !== 'match-pairs') continue;
+      for (const pair of pairs.pairs) expect(u2Names.has(pair.word)).toBe(true);
+    }
+    expect(poolFor('en-look-u1-words', unit2).length).toBe(
+      LOOK_SKILL_WORDS['en-look-u1-words']?.length,
+    );
+  });
+
+  it('Look order-words builds a bank sentence of ≤ 4 tiles with its question', () => {
+    for (let n = 1; n <= 12; n++) {
+      const skillId = `en-look-u${n}-pattern` as EnglishSkillId;
+      const bank = LOOK_PATTERN_SENTENCES[n] ?? [];
+      for (let seed = 0; seed < 10; seed++) {
+        const item = generateItem(skillId, 'order-words', 1, lookUnitForStage(8), gen(seed));
+        expect(item.kind).toBe('order-words');
+        if (item.kind !== 'order-words') continue;
+        expect(item.words.length).toBeGreaterThanOrEqual(3);
+        expect(item.words.length).toBeLessThanOrEqual(4);
+        expect(bank.map((s) => s.words)).toContainEqual(item.words);
+        const sentence = bank.find((s) => s.words.join(' ') === item.words.join(' '));
+        expect(item.question).toBe(sentence?.question);
+      }
+    }
+  });
+
+  it('Look fill-pattern blanks the last word with 2 options at tier 1, 3 at tier 2–3', () => {
+    for (const tier of [1, 2, 3] as const) {
+      const item = generateItem(
+        'en-look-u1-pattern',
+        'fill-pattern',
+        tier,
+        lookUnitForStage(8),
+        gen(4),
+      );
+      expect(item.kind).toBe('fill-pattern');
+      if (item.kind !== 'fill-pattern') continue;
+      expect(item.blankIndex).toBe(item.sentence.length - 1);
+      expect(item.options).toHaveLength(tier === 1 ? 2 : 3);
+      expect(item.options).toContain(item.sentence[item.blankIndex]);
+      expect(item.question).toBe("What's this?");
+    }
+  });
+
+  it('Look short-vowel letter-pick blanks the middle vowel (c_t) with vowel choices', () => {
+    for (let seed = 0; seed < 20; seed++) {
+      const item = generateItem(
+        'en-look-phonics-short-vowels',
+        'letter-pick',
+        1,
+        lookUnitForStage(5),
+        gen(seed),
+      );
+      if (item.kind !== 'letter-pick') continue;
+      expect(item.prompt).toMatch(/^[a-z]_[a-z]+$/);
+      expect(['a', 'e', 'i', 'o', 'u']).toContain(item.answer);
+      expect(item.choices).toHaveLength(3);
+      for (const choice of item.choices) expect(['a', 'e', 'i', 'o', 'u']).toContain(choice);
+      expect(item.choices).toContain(item.answer);
+    }
+  });
+
+  it('Look phonics-initial letter-pick drills the stage letter range', () => {
+    for (let seed = 0; seed < 20; seed++) {
+      const item = generateItem(
+        'en-look-phonics-initial',
+        'letter-pick',
+        1,
+        lookUnitForStage(2),
+        gen(seed),
+      );
+      if (item.kind !== 'letter-pick') continue;
+      expect(item.prompt[0]).toMatch(/[a-h]/);
+      expect(item.answer).toBe(item.prompt[0]);
+    }
+    expect(poolFor('en-look-phonics-initial', lookUnitForStage(3)).length).toBe(8);
+    expect(poolFor('en-look-phonics-short-vowels', lookUnitForStage(6)).length).toBe(12);
   });
 });

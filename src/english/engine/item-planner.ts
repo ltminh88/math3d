@@ -16,6 +16,13 @@ export function kindsForSkill(skillId: EnglishSkillId): readonly EnglishItemKind
   if (skillId.startsWith('en-words-') || skillId.startsWith('en-topic-')) {
     return ['listen-pick-picture', 'match-pairs'];
   }
+  // Look 1 (Phase 4): pattern skills order/fill their own sentences; phonics
+  // skills pick letters; every other Look skill is a word skill.
+  if (skillId.startsWith('en-look-')) {
+    if (skillId.endsWith('-pattern')) return ['order-words', 'fill-pattern'];
+    if (skillId.startsWith('en-look-phonics-')) return ['letter-pick'];
+    return ['listen-pick-picture', 'match-pairs'];
+  }
   return ['order-words', 'fill-pattern'];
 }
 

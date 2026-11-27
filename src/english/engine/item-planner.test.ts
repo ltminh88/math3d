@@ -26,6 +26,16 @@ describe('kindsForSkill', () => {
     expect(kindsForSkill('en-topic-animals')).toEqual(['listen-pick-picture', 'match-pairs']);
     expect(kindsForSkill('en-pattern-i-like')).toEqual(['order-words', 'fill-pattern']);
   });
+  it('maps Look word skills to listen + pairs, patterns to order + fill, phonics to letter-pick', () => {
+    expect(kindsForSkill('en-look-starter-numbers')).toEqual([
+      'listen-pick-picture',
+      'match-pairs',
+    ]);
+    expect(kindsForSkill('en-look-u3-words')).toEqual(['listen-pick-picture', 'match-pairs']);
+    expect(kindsForSkill('en-look-u3-pattern')).toEqual(['order-words', 'fill-pattern']);
+    expect(kindsForSkill('en-look-phonics-initial')).toEqual(['letter-pick']);
+    expect(kindsForSkill('en-look-phonics-short-vowels')).toEqual(['letter-pick']);
+  });
 });
 
 describe('createItemPlanner', () => {

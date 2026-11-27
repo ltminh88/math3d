@@ -1,8 +1,9 @@
 // English books (two-modes Phase 1): one descriptor per book, so the engine
 // reads its stages, rounds, skills, units and pack key from the book instead
 // of CEC literals. CEC becomes book `cec`, no behaviour change — the
-// descriptor mirrors today's constants (see the test). Look 1 is a
-// placeholder (one seed unit) so Phases 3 and 4 can build against it.
+// descriptor mirrors today's constants (see the test). Look 1 (Phase 4) reads
+// its real units from `content/look/look-units.ts`.
+import { lookUnitForStage } from './content/look/look-units';
 import { unitForStage } from './content/units';
 import { ENGLISH_SKILL_IDS } from './english-skill-entries';
 import type { EnglishBookId, EnglishSkillId, EnglishUnit } from './english-types';
@@ -44,30 +45,6 @@ const LOOK_STAGE_NAMES: readonly string[] = Object.freeze([
   'U11–12',
   'Review',
 ]);
-
-/**
- * The Look 1 seed unit (placeholder): stage 1 Starter, the three starter
- * skills, no words yet — the generator builds nothing from it, so no Look
- * item can play before Phase 4 fills the content. Other stages throw, the
- * way CEC's `unitForStage` throws for an unknown stage.
- */
-const LOOK_SEED_UNIT: EnglishUnit = Object.freeze({
-  id: 'look-starter',
-  stage: 1,
-  title: 'Starter',
-  skillIds: Object.freeze([
-    'en-look-starter-numbers',
-    'en-look-starter-colors',
-    'en-look-starter-greetings',
-  ] as const),
-  words: Object.freeze([]),
-  items: Object.freeze([]),
-});
-
-function lookUnitForStage(stage: number): EnglishUnit {
-  if (stage === 1) return LOOK_SEED_UNIT;
-  throw new Error(`look unitForStage: no unit for stage ${stage} (placeholder)`);
-}
 
 /** The books, by id. CEC keeps the `'current'` pack key (back-compat with already-unlocked devices). */
 export const ENGLISH_BOOKS: Readonly<Record<EnglishBookId, EnglishBook>> = Object.freeze({

@@ -24,7 +24,7 @@ describe('ENGLISH_BOOKS.cec', () => {
 });
 
 describe('ENGLISH_BOOKS.look', () => {
-  it('pins 29 ids in order, 8 stages, pack key look, one seed unit', () => {
+  it('pins 29 ids in order, 8 stages, pack key look, real units', () => {
     const look = ENGLISH_BOOKS.look;
     expect(look.id).toBe('look');
     expect(look.levelId).toBe('look');
@@ -59,15 +59,17 @@ describe('ENGLISH_BOOKS.look', () => {
       'U11–12',
       'Review',
     ]);
-    const seed = look.unitForStage(1);
-    expect(seed.id).toBe('look-starter');
-    expect(seed.stage).toBe(1);
-    expect(seed.skillIds).toEqual([
+    const starter = look.unitForStage(1);
+    expect(starter.id).toBe('look-unit-1');
+    expect(starter.stage).toBe(1);
+    expect(starter.skillIds).toEqual([
       'en-look-starter-numbers',
       'en-look-starter-colors',
       'en-look-starter-greetings',
     ]);
-    expect(seed.words).toEqual([]);
-    expect(() => look.unitForStage(2)).toThrow('no unit for stage 2');
+    expect(starter.words.length).toBeGreaterThan(20);
+    expect(look.unitForStage(8).skillIds).toBe(LOOK_SKILL_IDS);
+    expect(() => look.unitForStage(0)).toThrow('no unit for stage 0');
+    expect(() => look.unitForStage(9)).toThrow('no unit for stage 9');
   });
 });
