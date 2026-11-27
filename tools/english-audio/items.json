@@ -1,0 +1,1162 @@
+[
+  {
+    "text": "apple",
+    "kind": "word",
+    "seed": false
+  },
+  {
+    "text": "ant",
+    "kind": "word",
+    "seed": false
+  },
+  {
+    "text": "arm",
+    "kind": "word",
+    "seed": false
+  },
+  {
+    "text": "astronaut",
+    "kind": "word",
+    "seed": true
+  },
+  {
+    "text": "baby",
+    "kind": "word",
+    "seed": false
+  },
+  {
+    "text": "bag",
+    "kind": "word",
+    "seed": false
+  },
+  {
+    "text": "ball",
+    "kind": "word",
+    "seed": false
+  },
+  {
+    "text": "banana",
+    "kind": "word",
+    "seed": false
+  },
+  {
+    "text": "bed",
+    "kind": "word",
+    "seed": false
+  },
+  {
+    "text": "bike",
+    "kind": "word",
+    "seed": false
+  },
+  {
+    "text": "bird",
+    "kind": "word",
+    "seed": false
+  },
+  {
+    "text": "black",
+    "kind": "word",
+    "seed": false
+  },
+  {
+    "text": "blocks",
+    "kind": "word",
+    "seed": false
+  },
+  {
+    "text": "blue",
+    "kind": "word",
+    "seed": false
+  },
+  {
+    "text": "boat",
+    "kind": "word",
+    "seed": false
+  },
+  {
+    "text": "book",
+    "kind": "word",
+    "seed": false
+  },
+  {
+    "text": "box",
+    "kind": "word",
+    "seed": false
+  },
+  {
+    "text": "bread",
+    "kind": "word",
+    "seed": true
+  },
+  {
+    "text": "brother",
+    "kind": "word",
+    "seed": true
+  },
+  {
+    "text": "bus",
+    "kind": "word",
+    "seed": false
+  },
+  {
+    "text": "cake",
+    "kind": "word",
+    "seed": false
+  },
+  {
+    "text": "cap",
+    "kind": "word",
+    "seed": false
+  },
+  {
+    "text": "car",
+    "kind": "word",
+    "seed": false
+  },
+  {
+    "text": "cat",
+    "kind": "word",
+    "seed": false
+  },
+  {
+    "text": "chair",
+    "kind": "word",
+    "seed": false
+  },
+  {
+    "text": "cheese",
+    "kind": "word",
+    "seed": false
+  },
+  {
+    "text": "clock",
+    "kind": "word",
+    "seed": false
+  },
+  {
+    "text": "cloud",
+    "kind": "word",
+    "seed": false
+  },
+  {
+    "text": "cookie",
+    "kind": "word",
+    "seed": false
+  },
+  {
+    "text": "cow",
+    "kind": "word",
+    "seed": false
+  },
+  {
+    "text": "crayon",
+    "kind": "word",
+    "seed": false
+  },
+  {
+    "text": "dance",
+    "kind": "word",
+    "seed": false
+  },
+  {
+    "text": "dog",
+    "kind": "word",
+    "seed": false
+  },
+  {
+    "text": "doll",
+    "kind": "word",
+    "seed": false
+  },
+  {
+    "text": "door",
+    "kind": "word",
+    "seed": false
+  },
+  {
+    "text": "draw",
+    "kind": "word",
+    "seed": false
+  },
+  {
+    "text": "dress",
+    "kind": "word",
+    "seed": false
+  },
+  {
+    "text": "duck",
+    "kind": "word",
+    "seed": false
+  },
+  {
+    "text": "eat",
+    "kind": "word",
+    "seed": false
+  },
+  {
+    "text": "egg",
+    "kind": "word",
+    "seed": false
+  },
+  {
+    "text": "elephant",
+    "kind": "word",
+    "seed": true
+  },
+  {
+    "text": "eye",
+    "kind": "word",
+    "seed": false
+  },
+  {
+    "text": "ear",
+    "kind": "word",
+    "seed": false
+  },
+  {
+    "text": "father",
+    "kind": "word",
+    "seed": false
+  },
+  {
+    "text": "fish",
+    "kind": "word",
+    "seed": false
+  },
+  {
+    "text": "flower",
+    "kind": "word",
+    "seed": false
+  },
+  {
+    "text": "foot",
+    "kind": "word",
+    "seed": false
+  },
+  {
+    "text": "fox",
+    "kind": "word",
+    "seed": false
+  },
+  {
+    "text": "frog",
+    "kind": "word",
+    "seed": false
+  },
+  {
+    "text": "goat",
+    "kind": "word",
+    "seed": false
+  },
+  {
+    "text": "grapes",
+    "kind": "word",
+    "seed": false
+  },
+  {
+    "text": "green",
+    "kind": "word",
+    "seed": false
+  },
+  {
+    "text": "guitar",
+    "kind": "word",
+    "seed": false
+  },
+  {
+    "text": "grandma",
+    "kind": "word",
+    "seed": false
+  },
+  {
+    "text": "grandpa",
+    "kind": "word",
+    "seed": false
+  },
+  {
+    "text": "hand",
+    "kind": "word",
+    "seed": false
+  },
+  {
+    "text": "hat",
+    "kind": "word",
+    "seed": false
+  },
+  {
+    "text": "horse",
+    "kind": "word",
+    "seed": false
+  },
+  {
+    "text": "house",
+    "kind": "word",
+    "seed": false
+  },
+  {
+    "text": "ice",
+    "kind": "word",
+    "seed": false
+  },
+  {
+    "text": "insect",
+    "kind": "word",
+    "seed": false
+  },
+  {
+    "text": "island",
+    "kind": "word",
+    "seed": true
+  },
+  {
+    "text": "ink",
+    "kind": "word",
+    "seed": false
+  },
+  {
+    "text": "jacket",
+    "kind": "word",
+    "seed": false
+  },
+  {
+    "text": "jellyfish",
+    "kind": "word",
+    "seed": false
+  },
+  {
+    "text": "juice",
+    "kind": "word",
+    "seed": false
+  },
+  {
+    "text": "jump",
+    "kind": "word",
+    "seed": false
+  },
+  {
+    "text": "key",
+    "kind": "word",
+    "seed": false
+  },
+  {
+    "text": "king",
+    "kind": "word",
+    "seed": false
+  },
+  {
+    "text": "kite",
+    "kind": "word",
+    "seed": false
+  },
+  {
+    "text": "koala",
+    "kind": "word",
+    "seed": false
+  },
+  {
+    "text": "lamp",
+    "kind": "word",
+    "seed": false
+  },
+  {
+    "text": "leaf",
+    "kind": "word",
+    "seed": false
+  },
+  {
+    "text": "leg",
+    "kind": "word",
+    "seed": false
+  },
+  {
+    "text": "lemon",
+    "kind": "word",
+    "seed": false
+  },
+  {
+    "text": "lion",
+    "kind": "word",
+    "seed": false
+  },
+  {
+    "text": "look",
+    "kind": "word",
+    "seed": false
+  },
+  {
+    "text": "milk",
+    "kind": "word",
+    "seed": false
+  },
+  {
+    "text": "monkey",
+    "kind": "word",
+    "seed": false
+  },
+  {
+    "text": "moon",
+    "kind": "word",
+    "seed": false
+  },
+  {
+    "text": "mother",
+    "kind": "word",
+    "seed": false
+  },
+  {
+    "text": "mouse",
+    "kind": "word",
+    "seed": false
+  },
+  {
+    "text": "mouth",
+    "kind": "word",
+    "seed": false
+  },
+  {
+    "text": "nest",
+    "kind": "word",
+    "seed": false
+  },
+  {
+    "text": "night",
+    "kind": "word",
+    "seed": false
+  },
+  {
+    "text": "nose",
+    "kind": "word",
+    "seed": false
+  },
+  {
+    "text": "nut",
+    "kind": "word",
+    "seed": false
+  },
+  {
+    "text": "octopus",
+    "kind": "word",
+    "seed": false
+  },
+  {
+    "text": "onion",
+    "kind": "word",
+    "seed": false
+  },
+  {
+    "text": "orange",
+    "kind": "word",
+    "seed": false
+  },
+  {
+    "text": "owl",
+    "kind": "word",
+    "seed": false
+  },
+  {
+    "text": "panda",
+    "kind": "word",
+    "seed": false
+  },
+  {
+    "text": "pants",
+    "kind": "word",
+    "seed": false
+  },
+  {
+    "text": "pen",
+    "kind": "word",
+    "seed": false
+  },
+  {
+    "text": "pencil",
+    "kind": "word",
+    "seed": false
+  },
+  {
+    "text": "pig",
+    "kind": "word",
+    "seed": false
+  },
+  {
+    "text": "pink",
+    "kind": "word",
+    "seed": false
+  },
+  {
+    "text": "pizza",
+    "kind": "word",
+    "seed": false
+  },
+  {
+    "text": "plane",
+    "kind": "word",
+    "seed": false
+  },
+  {
+    "text": "play",
+    "kind": "word",
+    "seed": false
+  },
+  {
+    "text": "question",
+    "kind": "word",
+    "seed": false
+  },
+  {
+    "text": "queen",
+    "kind": "word",
+    "seed": false
+  },
+  {
+    "text": "quilt",
+    "kind": "word",
+    "seed": false
+  },
+  {
+    "text": "quiz",
+    "kind": "word",
+    "seed": false
+  },
+  {
+    "text": "rabbit",
+    "kind": "word",
+    "seed": false
+  },
+  {
+    "text": "rain",
+    "kind": "word",
+    "seed": false
+  },
+  {
+    "text": "rainbow",
+    "kind": "word",
+    "seed": false
+  },
+  {
+    "text": "red",
+    "kind": "word",
+    "seed": false
+  },
+  {
+    "text": "rice",
+    "kind": "word",
+    "seed": false
+  },
+  {
+    "text": "robot",
+    "kind": "word",
+    "seed": false
+  },
+  {
+    "text": "ruler",
+    "kind": "word",
+    "seed": false
+  },
+  {
+    "text": "run",
+    "kind": "word",
+    "seed": false
+  },
+  {
+    "text": "school",
+    "kind": "word",
+    "seed": false
+  },
+  {
+    "text": "ship",
+    "kind": "word",
+    "seed": false
+  },
+  {
+    "text": "shoe",
+    "kind": "word",
+    "seed": false
+  },
+  {
+    "text": "shirt",
+    "kind": "word",
+    "seed": false
+  },
+  {
+    "text": "sing",
+    "kind": "word",
+    "seed": false
+  },
+  {
+    "text": "sister",
+    "kind": "word",
+    "seed": false
+  },
+  {
+    "text": "sleep",
+    "kind": "word",
+    "seed": false
+  },
+  {
+    "text": "snake",
+    "kind": "word",
+    "seed": false
+  },
+  {
+    "text": "snow",
+    "kind": "word",
+    "seed": true
+  },
+  {
+    "text": "sock",
+    "kind": "word",
+    "seed": false
+  },
+  {
+    "text": "star",
+    "kind": "word",
+    "seed": true
+  },
+  {
+    "text": "storm",
+    "kind": "word",
+    "seed": false
+  },
+  {
+    "text": "sun",
+    "kind": "word",
+    "seed": false
+  },
+  {
+    "text": "swim",
+    "kind": "word",
+    "seed": false
+  },
+  {
+    "text": "teacher",
+    "kind": "word",
+    "seed": true
+  },
+  {
+    "text": "teddy",
+    "kind": "word",
+    "seed": false
+  },
+  {
+    "text": "tiger",
+    "kind": "word",
+    "seed": true
+  },
+  {
+    "text": "train",
+    "kind": "word",
+    "seed": false
+  },
+  {
+    "text": "tree",
+    "kind": "word",
+    "seed": false
+  },
+  {
+    "text": "turtle",
+    "kind": "word",
+    "seed": false
+  },
+  {
+    "text": "umbrella",
+    "kind": "word",
+    "seed": true
+  },
+  {
+    "text": "uncle",
+    "kind": "word",
+    "seed": false
+  },
+  {
+    "text": "unicorn",
+    "kind": "word",
+    "seed": true
+  },
+  {
+    "text": "up",
+    "kind": "word",
+    "seed": false
+  },
+  {
+    "text": "van",
+    "kind": "word",
+    "seed": false
+  },
+  {
+    "text": "vase",
+    "kind": "word",
+    "seed": false
+  },
+  {
+    "text": "violin",
+    "kind": "word",
+    "seed": false
+  },
+  {
+    "text": "volcano",
+    "kind": "word",
+    "seed": false
+  },
+  {
+    "text": "water",
+    "kind": "word",
+    "seed": false
+  },
+  {
+    "text": "whale",
+    "kind": "word",
+    "seed": false
+  },
+  {
+    "text": "white",
+    "kind": "word",
+    "seed": false
+  },
+  {
+    "text": "wind",
+    "kind": "word",
+    "seed": false
+  },
+  {
+    "text": "window",
+    "kind": "word",
+    "seed": false
+  },
+  {
+    "text": "wolf",
+    "kind": "word",
+    "seed": false
+  },
+  {
+    "text": "write",
+    "kind": "word",
+    "seed": false
+  },
+  {
+    "text": "six",
+    "kind": "word",
+    "seed": false
+  },
+  {
+    "text": "x-ray",
+    "kind": "word",
+    "seed": false
+  },
+  {
+    "text": "xylophone",
+    "kind": "word",
+    "seed": false
+  },
+  {
+    "text": "yellow",
+    "kind": "word",
+    "seed": true
+  },
+  {
+    "text": "yo-yo",
+    "kind": "word",
+    "seed": false
+  },
+  {
+    "text": "yarn",
+    "kind": "word",
+    "seed": false
+  },
+  {
+    "text": "yogurt",
+    "kind": "word",
+    "seed": false
+  },
+  {
+    "text": "zebra",
+    "kind": "word",
+    "seed": false
+  },
+  {
+    "text": "zero",
+    "kind": "word",
+    "seed": false
+  },
+  {
+    "text": "zigzag",
+    "kind": "word",
+    "seed": false
+  },
+  {
+    "text": "zoo",
+    "kind": "word",
+    "seed": false
+  },
+  {
+    "text": "a",
+    "kind": "letter",
+    "seed": true
+  },
+  {
+    "text": "b",
+    "kind": "letter",
+    "seed": true
+  },
+  {
+    "text": "c",
+    "kind": "letter",
+    "seed": false
+  },
+  {
+    "text": "d",
+    "kind": "letter",
+    "seed": false
+  },
+  {
+    "text": "e",
+    "kind": "letter",
+    "seed": true
+  },
+  {
+    "text": "f",
+    "kind": "letter",
+    "seed": false
+  },
+  {
+    "text": "g",
+    "kind": "letter",
+    "seed": false
+  },
+  {
+    "text": "h",
+    "kind": "letter",
+    "seed": true
+  },
+  {
+    "text": "i",
+    "kind": "letter",
+    "seed": false
+  },
+  {
+    "text": "j",
+    "kind": "letter",
+    "seed": false
+  },
+  {
+    "text": "k",
+    "kind": "letter",
+    "seed": false
+  },
+  {
+    "text": "l",
+    "kind": "letter",
+    "seed": false
+  },
+  {
+    "text": "m",
+    "kind": "letter",
+    "seed": false
+  },
+  {
+    "text": "n",
+    "kind": "letter",
+    "seed": false
+  },
+  {
+    "text": "o",
+    "kind": "letter",
+    "seed": false
+  },
+  {
+    "text": "p",
+    "kind": "letter",
+    "seed": false
+  },
+  {
+    "text": "q",
+    "kind": "letter",
+    "seed": false
+  },
+  {
+    "text": "r",
+    "kind": "letter",
+    "seed": false
+  },
+  {
+    "text": "s",
+    "kind": "letter",
+    "seed": false
+  },
+  {
+    "text": "t",
+    "kind": "letter",
+    "seed": false
+  },
+  {
+    "text": "u",
+    "kind": "letter",
+    "seed": false
+  },
+  {
+    "text": "v",
+    "kind": "letter",
+    "seed": false
+  },
+  {
+    "text": "w",
+    "kind": "letter",
+    "seed": false
+  },
+  {
+    "text": "x",
+    "kind": "letter",
+    "seed": false
+  },
+  {
+    "text": "y",
+    "kind": "letter",
+    "seed": false
+  },
+  {
+    "text": "z",
+    "kind": "letter",
+    "seed": true
+  },
+  {
+    "text": "This is a cat",
+    "kind": "sentence",
+    "seed": true
+  },
+  {
+    "text": "This is a dog",
+    "kind": "sentence",
+    "seed": false
+  },
+  {
+    "text": "This is a red ball",
+    "kind": "sentence",
+    "seed": false
+  },
+  {
+    "text": "This is my book",
+    "kind": "sentence",
+    "seed": false
+  },
+  {
+    "text": "This is a big house",
+    "kind": "sentence",
+    "seed": false
+  },
+  {
+    "text": "This is an apple",
+    "kind": "sentence",
+    "seed": false
+  },
+  {
+    "text": "I like cats",
+    "kind": "sentence",
+    "seed": false
+  },
+  {
+    "text": "I like dogs",
+    "kind": "sentence",
+    "seed": false
+  },
+  {
+    "text": "I like birds",
+    "kind": "sentence",
+    "seed": false
+  },
+  {
+    "text": "I like fish",
+    "kind": "sentence",
+    "seed": true
+  },
+  {
+    "text": "I like apples",
+    "kind": "sentence",
+    "seed": false
+  },
+  {
+    "text": "I like red cars",
+    "kind": "sentence",
+    "seed": false
+  },
+  {
+    "text": "I have a cat",
+    "kind": "sentence",
+    "seed": false
+  },
+  {
+    "text": "I have a dog",
+    "kind": "sentence",
+    "seed": false
+  },
+  {
+    "text": "I have a book",
+    "kind": "sentence",
+    "seed": false
+  },
+  {
+    "text": "I have a pen",
+    "kind": "sentence",
+    "seed": false
+  },
+  {
+    "text": "I have a red ball",
+    "kind": "sentence",
+    "seed": false
+  },
+  {
+    "text": "I have two books",
+    "kind": "sentence",
+    "seed": false
+  },
+  {
+    "text": "I can swim",
+    "kind": "sentence",
+    "seed": false
+  },
+  {
+    "text": "I can run",
+    "kind": "sentence",
+    "seed": false
+  },
+  {
+    "text": "I can jump",
+    "kind": "sentence",
+    "seed": false
+  },
+  {
+    "text": "I can sing",
+    "kind": "sentence",
+    "seed": false
+  },
+  {
+    "text": "I can write",
+    "kind": "sentence",
+    "seed": false
+  },
+  {
+    "text": "I can draw",
+    "kind": "sentence",
+    "seed": false
+  },
+  {
+    "text": "I see a cat",
+    "kind": "sentence",
+    "seed": false
+  },
+  {
+    "text": "I see a bird",
+    "kind": "sentence",
+    "seed": false
+  },
+  {
+    "text": "I see the sun",
+    "kind": "sentence",
+    "seed": false
+  },
+  {
+    "text": "I see a star",
+    "kind": "sentence",
+    "seed": false
+  },
+  {
+    "text": "I see a fish",
+    "kind": "sentence",
+    "seed": false
+  },
+  {
+    "text": "I see a big tree",
+    "kind": "sentence",
+    "seed": false
+  },
+  {
+    "text": "It is a cat",
+    "kind": "sentence",
+    "seed": false
+  },
+  {
+    "text": "It is a dog",
+    "kind": "sentence",
+    "seed": false
+  },
+  {
+    "text": "It is a ball",
+    "kind": "sentence",
+    "seed": false
+  },
+  {
+    "text": "It is a bird",
+    "kind": "sentence",
+    "seed": false
+  },
+  {
+    "text": "It is a fish",
+    "kind": "sentence",
+    "seed": false
+  },
+  {
+    "text": "It is an apple",
+    "kind": "sentence",
+    "seed": false
+  },
+  {
+    "text": "My favourite colour is red",
+    "kind": "sentence",
+    "seed": true
+  },
+  {
+    "text": "My favourite animal is a cat",
+    "kind": "sentence",
+    "seed": false
+  },
+  {
+    "text": "My favourite food is pizza",
+    "kind": "sentence",
+    "seed": false
+  },
+  {
+    "text": "My favourite toy is a ball",
+    "kind": "sentence",
+    "seed": false
+  },
+  {
+    "text": "My favourite fruit is an apple",
+    "kind": "sentence",
+    "seed": false
+  },
+  {
+    "text": "My favourite drink is milk",
+    "kind": "sentence",
+    "seed": false
+  },
+  {
+    "text": "What is this? It is a cat",
+    "kind": "sentence",
+    "seed": true
+  },
+  {
+    "text": "What is that? It is a dog",
+    "kind": "sentence",
+    "seed": false
+  },
+  {
+    "text": "What is this? It is a ball",
+    "kind": "sentence",
+    "seed": false
+  },
+  {
+    "text": "What is that? It is a bird",
+    "kind": "sentence",
+    "seed": false
+  },
+  {
+    "text": "What is this? It is a fish",
+    "kind": "sentence",
+    "seed": false
+  },
+  {
+    "text": "What is that? It is an apple",
+    "kind": "sentence",
+    "seed": false
+  }
+]
