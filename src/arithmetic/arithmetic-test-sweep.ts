@@ -44,18 +44,26 @@ export function sweepArithmeticItem(
   const where = `${skillId} t${tier} #${seed}`;
   expect(item.skillId).toBe(skillId);
   expect(item.tier).toBe(tier);
-  // add-sub-number-line is the one arithmetic item with a scene (its number-line
-  // picture); every other arithmetic item is scene-free.
+  // Three arithmetic items carry a scene: add-sub-number-line (its number-line
+  // picture), add-sub-column and add-sub-find-error T2+ (their column-calc
+  // picture, boost 2A); every other arithmetic item is scene-free.
   if (item.scene !== undefined) {
-    expect(skillId, where).toBe('add-sub-number-line');
-    expect(item.scene.kind, where).toBe('number-line');
+    expect(['add-sub-number-line', 'add-sub-column', 'add-sub-find-error']).toContain(skillId);
+    expect(item.scene.kind, where).toBe(
+      skillId === 'add-sub-number-line' ? 'number-line' : 'column-calc',
+    );
   }
   expect(item.steps.length, where).toBeGreaterThanOrEqual(1);
   // div-2d-1d-wp T3 is the one three-step form (full boxes → leftover → boxes
   // needed); add-sub-bar-model-wp is the other (bar → operation → number pad);
-  // every other arithmetic item has at most two steps.
+  // add-sub-column plays up to five steps (three digits + two verdicts, boost
+  // 2A); every other arithmetic item has at most two steps.
   expect(item.steps.length, where).toBeLessThanOrEqual(
-    (skillId === 'div-2d-1d-wp' && tier === 3) || skillId === 'add-sub-bar-model-wp' ? 3 : 2,
+    skillId === 'add-sub-column'
+      ? 5
+      : (skillId === 'div-2d-1d-wp' && tier === 3) || skillId === 'add-sub-bar-model-wp'
+        ? 3
+        : 2,
   );
   const cap = rangeCapOfSkill(skillId, tier);
   for (const n of allNumbers(item)) {

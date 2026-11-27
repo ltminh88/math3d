@@ -6,6 +6,7 @@ import { pickName } from '../reasoning/reasoning-distractors';
 import type { ReasoningGenerator, ReasoningStep } from '../reasoning/reasoning-types';
 import { bugsFor } from './add-sub-bug-catalogue';
 import { pickAddPair, pickSubPair } from './add-sub-pair-pickers';
+import type { ColumnCalcScene } from './column-calc-scene-types';
 import {
   arithmeticItem,
   numberStep,
@@ -50,12 +51,29 @@ export const findError: ReasoningGenerator = (rng, tier) => {
     answer: truth,
     ...(truth ? {} : { fix: { prompt: ref('askCorrect'), answer: correct } }),
   };
+  // Boost, Phase 2A: from T2 the buggy row shows in the column-calc scene, so
+  // the child reads the worked columns instead of a bare equation. T1 stays
+  // scene-free (the range is small and the equation fits the step card).
+  const scene: ColumnCalcScene | undefined =
+    tier >= 2
+      ? {
+          kind: 'column-calc',
+          op: isAdd ? '+' : '−',
+          top: a,
+          bottom: b,
+          filled: [],
+          carries: [],
+          focusCol: 0,
+          buggy: String(shown).split('').map(Number).reverse(),
+        }
+      : undefined;
   return arithmeticItem(
     'add-sub-find-error',
     tier,
     ref(isAdd ? 'errorAdd' : 'errorSub', { name, a, b, shown }),
     [step],
     truth ? [] : [correct],
+    scene,
   );
 };
 
