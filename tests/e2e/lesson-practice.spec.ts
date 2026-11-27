@@ -357,7 +357,9 @@ test('run B2: replays cover all 11 skills, stars show once covered, coins in sto
   // The pinned profile makes the replay sequence deterministic: B2 is a
   // 'skills' lesson (not 'mix'), so each run shuffles the 11 skills and plays
   // 6 — a replay does NOT prefer the unseen ones. The seed chain (profile +
-  // total attempts) covers all 11 after 5 replays (find-error last).
+  // total attempts) covers all 11 after 5 replays (find-error last); the
+  // assert is ≤ so a planner change that covers faster does not break it
+  // (R105) — the loop's own cap of 8 is the hard bound.
   await pinProfileUuid(page);
   await boot(page);
   await unpinProfileUuid(page);
@@ -383,7 +385,7 @@ test('run B2: replays cover all 11 skills, stars show once covered, coins in sto
       'Bài 2 · Cộng, trừ trong phạm vi 1 000 · Câu 1/6',
     );
   }
-  expect(runs, 'pinned profile covers B2 in 5 replays').toBe(5);
+  expect(runs, 'pinned profile covers B2 in at most 5 replays').toBeLessThanOrEqual(5);
   const content = page.locator('#dialog-content');
   await expect(content).toContainText('Xong bài 2!');
   await expect(content).toContainText('☆☆☆ → ★☆☆');
@@ -470,7 +472,8 @@ test('B2 four-digit answer: a replay contains a 1000 answer and typing it comple
   // plays wp, compare-estimate, bar-model, chain, number-line, missing-digit);
   // the 1000 answer (mental-round, round hundreds) lands in run 2. One run
   // cannot earn the star with 11 skills, so no star assertion here — the
-  // run-B2 coverage test owns that.
+  // run-B2 coverage test owns that. The run assert is ≤ so a planner change
+  // that surfaces the 1000 answer earlier does not break it (R105).
   let sawThousand = false;
   let runs = 0;
   for (let r = 0; r < 4 && !sawThousand; r++) {
@@ -488,7 +491,7 @@ test('B2 four-digit answer: a replay contains a 1000 answer and typing it comple
     }
   }
   expect(sawThousand, 'a B2 run contains a 4-digit answer step').toBe(true);
-  expect(runs, 'pinned profile finds the 1000 answer in run 2').toBe(2);
+  expect(runs, 'pinned profile finds the 1000 answer by run 2').toBeLessThanOrEqual(2);
   const content = page.locator('#dialog-content');
   await expect(content).toContainText('Xong bài 2!');
   await waitDialogSettled(page);
