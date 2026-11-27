@@ -62,7 +62,9 @@
 3. Write `build-pack.mjs` and `check-overlap.mjs`; run overlap against Phase 2A content.
 4. Write `emit-pack-function.mjs` with the static-leak scan.
 5. Update `public/vercel.json` and `vite.config.ts`.
-6. Set `ENGLISH_PACK_PASSPHRASE` (Production scope) once the author picks it.
+6. `ENGLISH_PACK_PASSPHRASE` (Production scope): the author sets it on Vercel themself (decided
+   2026-11-27, Q10). Book picture crops ARE included in the pack (Q10), compressed WebP, split per
+   stage so each response stays < 4.5 MB.
 7. Deploy command: `npx tsc --noEmit && npx vite build --outDir .preview/deploy --emptyOutDir
    && node tools/english-pack/check-overlap.mjs && node tools/english-pack/emit-pack-function.mjs
    .preview/deploy && npx vercel@65.9.0 deploy .preview/deploy ...` (flags unchanged).
