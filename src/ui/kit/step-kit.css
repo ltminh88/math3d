@@ -96,6 +96,11 @@
   display: flex;
 }
 
+.kit-order__tile {
+  flex: 1 1 100px;
+  padding: 10px 14px;
+}
+
 .kit-order__slot .kit-order__tile {
   flex: 1 1 auto;
 }
@@ -104,11 +109,6 @@
   display: flex;
   flex-wrap: wrap;
   gap: 10px;
-}
-
-.kit-order__tile {
-  flex: 1 1 100px;
-  padding: 10px 14px;
 }
 
 .kit-order__done {

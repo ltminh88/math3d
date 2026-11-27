@@ -154,7 +154,9 @@ async function solveSkillItem(page: Page, touch: boolean): Promise<void> {
       for (const ti of step.answer)
         await press(
           page,
-          row.locator('.kit-order__bank').getByRole('button', { name: step.tiles[ti], exact: true }),
+          row
+            .locator('.kit-order__bank')
+            .getByRole('button', { name: step.tiles[ti], exact: true }),
           touch,
         );
       await press(page, row.locator('.kit-order__done'), touch);

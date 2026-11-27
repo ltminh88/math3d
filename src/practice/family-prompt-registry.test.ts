@@ -24,8 +24,7 @@ function promptsOfStep(step: ReasoningStep): PromptRef[] {
     return [step.prompt, ...step.options.map((o) => o.label)];
   if (step.kind === 'set-clock') return [step.prompt];
   if (step.kind === 'order') return [step.prompt, ...step.tiles];
-  if (step.kind === 'match')
-    return [step.prompt, ...step.left, ...step.right.map((o) => o.label)];
+  if (step.kind === 'match') return [step.prompt, ...step.left, ...step.right.map((o) => o.label)];
   return [step.prompt, step.statement, ...(step.fix ? [step.fix.prompt] : [])];
 }
 

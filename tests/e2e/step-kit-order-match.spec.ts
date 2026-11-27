@@ -2,6 +2,7 @@
 // taps alone on every project, every target is at least 44 x 44 px. The
 // fixture item drives both kinds; meas-len-order drives the real skill.
 import { type Locator, type Page, test } from '@playwright/test';
+import type { SkillTier } from '../../src/learning/skill-tiers';
 import { expect, waitForStoreBoot } from './legacy-live-save-fixtures';
 
 test.use({ locale: 'vi-VN' });
@@ -41,7 +42,7 @@ async function mount(
   page: Page,
   skill: string,
   seed: number,
-  tier: number,
+  tier: SkillTier,
 ): Promise<PlannedStep[]> {
   return (await page.evaluate((a) => window.__game?.mountStepCard(a.skill, a.seed, a.tier), {
     skill,
@@ -51,7 +52,6 @@ async function mount(
 }
 
 async function solveOrderRow(
-  page: Page,
   row: Locator,
   order: { tiles: string[]; answer: number[] },
   press: (l: Locator) => Promise<void>,
@@ -119,7 +119,7 @@ test('fixture: match step flashes a wrong pair, then solves by taps', async ({
   // The card reveals the match step only after the order step is solved.
   const order = plan[0];
   if (order?.kind !== 'order') throw new Error('fixture first step is not order');
-  await solveOrderRow(page, card.locator('.kit-step').nth(0), order, press);
+  await solveOrderRow(card.locator('.kit-step').nth(0), order, press);
   const row = card.locator('.kit-step').nth(1);
   expect(await smallTargets(card), 'match step').toEqual([]);
 
@@ -172,6 +172,6 @@ test('meas-len-order is solvable by taps only', async ({ page }, testInfo) => {
   if (order?.kind !== 'order') throw new Error('meas-len-order first step is not order');
   const row = card.locator('.kit-step').nth(0);
   expect(await smallTargets(card), 'meas-len-order').toEqual([]);
-  await solveOrderRow(page, row, order, press);
+  await solveOrderRow(row, order, press);
   await expect(card).toHaveAttribute('data-complete', 'true');
 });
