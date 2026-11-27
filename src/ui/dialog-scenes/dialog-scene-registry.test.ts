@@ -48,6 +48,7 @@ const ALL_KINDS: readonly DialogSceneKind[] = [
   'fraction-set',
   'fraction-pick',
   'length-ladder',
+  'column-calc',
 ];
 
 describe('dialog scene registry', () => {

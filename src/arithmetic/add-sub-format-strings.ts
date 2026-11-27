@@ -24,6 +24,25 @@ export const addSubFormatStrings = {
     askBarOpPart: 'Muốn tìm phần chưa biết, làm phép nào?',
     askBarOpTotal: 'Muốn tìm tất cả, làm phép nào?',
     askUnknownPart: 'Phần chưa biết là bao nhiêu?',
+    // Boost Phase 2A column-calc: one digit step per column, units first.
+    // The digit prompt shows the column's computation as one expression
+    // ({text}): original digits plus the carry/borrow from the previous
+    // column, borrowed top included for subtraction ("13 − 8") — the
+    // expression's value is always the digit asked for (R121). The borrow
+    // question (subtraction only, asked BEFORE the digit) names its column
+    // and shows the raw column instead.
+    columnCalc: 'Đặt tính rồi tính: {a} {op} {b}.',
+    columnDigitOnes: 'Hàng đơn vị: {text} = ?',
+    columnDigitTens: 'Hàng chục: {text} = ?',
+    columnDigitHundreds: 'Hàng trăm: {text} = ?',
+    askCarry: 'Có nhớ 1 không?',
+    askBorrowOnes: 'Hàng đơn vị: {text}. Có phải vay 1 không?',
+    askBorrowTens: 'Hàng chục: {text}. Có phải vay 1 không?',
+    askBorrowHundreds: 'Hàng trăm: {text}. Có phải vay 1 không?',
+    carryYes: 'Có nhớ 1',
+    carryNo: 'Không nhớ',
+    borrowYes: 'Có vay 1',
+    borrowNo: 'Không vay',
   },
   en: {
     askChooseResult: 'Which number is the right answer?',
@@ -45,5 +64,18 @@ export const addSubFormatStrings = {
     askBarOpPart: 'Which operation finds the unknown part?',
     askBarOpTotal: 'Which operation finds the total?',
     askUnknownPart: 'How many are in the unknown part?',
+    // Boost Phase 2A column-calc: one digit step per column, units first.
+    columnCalc: 'Work it out in columns: {a} {op} {b}.',
+    columnDigitOnes: 'Ones: {text} = ?',
+    columnDigitTens: 'Tens: {text} = ?',
+    columnDigitHundreds: 'Hundreds: {text} = ?',
+    askCarry: 'Do you carry 1?',
+    askBorrowOnes: 'Ones: {text}. Do you borrow 1?',
+    askBorrowTens: 'Tens: {text}. Do you borrow 1?',
+    askBorrowHundreds: 'Hundreds: {text}. Do you borrow 1?',
+    carryYes: 'Carry 1',
+    carryNo: 'No carry',
+    borrowYes: 'Borrow 1',
+    borrowNo: 'No borrow',
   },
 } as const;

@@ -154,7 +154,7 @@ describe('skillsOfLesson', () => {
     ]);
   });
 
-  it('returns the eleven arithmetic skills for B2 (phase 09 + boost 1A)', () => {
+  it('returns the twelve arithmetic skills for B2 (phase 09 + boost 1A + 2A)', () => {
     expect(skillsOfLesson(2)).toEqual([
       'sk:add-sub-mental-round',
       'sk:add-sub-1000',
@@ -167,6 +167,7 @@ describe('skillsOfLesson', () => {
       'sk:add-sub-compare-estimate',
       'sk:add-sub-number-line',
       'sk:add-sub-bar-model-wp',
+      'sk:add-sub-column',
     ]);
   });
 

@@ -15,6 +15,7 @@ import {
   wrongSubByNoBorrow,
 } from './arithmetic-distractors';
 import { tierRangeCap } from './arithmetic-ranges';
+import type { ColumnCalcScene } from './column-calc-scene-types';
 
 /** Đúng/Sai on a worked result: half the time the shown result is right, half the time it
  *  is built from the bug catalogue (Phase 1A) when a bug applies, otherwise from the
@@ -50,12 +51,29 @@ export const findError: ReasoningGenerator = (rng, tier) => {
     answer: truth,
     ...(truth ? {} : { fix: { prompt: ref('askCorrect'), answer: correct } }),
   };
+  // Boost, Phase 2A: from T2 the buggy row shows in the column-calc scene, so
+  // the child reads the worked columns instead of a bare equation. T1 stays
+  // scene-free (the range is small and the equation fits the step card).
+  const scene: ColumnCalcScene | undefined =
+    tier >= 2
+      ? {
+          kind: 'column-calc',
+          op: isAdd ? '+' : '−',
+          top: a,
+          bottom: b,
+          filled: [],
+          carries: [],
+          focusCol: 0,
+          buggy: String(shown).split('').map(Number).reverse(),
+        }
+      : undefined;
   return arithmeticItem(
     'add-sub-find-error',
     tier,
     ref(isAdd ? 'errorAdd' : 'errorSub', { name, a, b, shown }),
     [step],
     truth ? [] : [correct],
+    scene,
   );
 };
 
