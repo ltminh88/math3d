@@ -59,6 +59,14 @@ Hạn mức: 41%
 8. Không sửa `.github/workflows`, không chụp lại parity: việc của reviewer.
 9. **`TASK` của reviewer là đã được duyệt**: ACK rồi bắt tay làm ngay, không hỏi lại anh chủ dự án "có bắt đầu không".
 10. **Mỗi khi phải dừng chờ anh chủ dự án** (hỏi trong tab, hiện nút chọn, xin duyệt kế hoạch, xin quyền chạy lệnh): TRƯỚC khi dừng, gửi `WAITING` vào hộp thư này, chép nguyên câu hỏi và các lựa chọn, ghi rõ lựa chọn em đề xuất. Reviewer sẽ báo anh qua Telegram. Vẫn bật `sleep` nền như rule 5.
+11. **Không ngồi chờ CI.** PR vừa push và CI đang chạy → làm luôn việc tiếp theo trong một **worktree mới** (không đụng worktree của PR đang chờ):
+    - Phase kế tiếp trong lane của mình **không** cần PR đang chờ → nhánh từ main mới nhất.
+    - Phase kế tiếp **cần** PR đang chờ → nhánh chồng lên nhánh của PR đó; khi PR đó merge thì rebase lên main trước khi mở PR mới.
+    - Chưa có phase nào làm được → việc nhỏ: nit reviewer đã ghi, test còn thiếu, docs. Ghi vào `REPORT`.
+    - **Ưu tiên:** CI đỏ / `CHANGES` / `QUESTION` của PR đang chờ luôn trước việc mới. Commit WIP việc mới, sửa PR cũ, push, rồi mới quay lại.
+    - **Mỗi Muse giữ 1 chỗ CI:** không mở PR thứ hai khi PR đầu chưa xong CI và chưa merge. Việc mới cứ commit; push nhánh thường không chạy CI (CI chỉ chạy cho PR và main), nên từ 90% hạn mức vẫn push nhánh WIP được, chỉ chưa mở PR.
+    - Chỉ làm phase reviewer đã giao trong `TASK` hoặc phase kế tiếp trong lane của mình trên plan; không lấy phase của Muse kia.
+    - Vẫn kiểm CI + hộp thư theo rule 1 và 5: giữa các đoạn code, mỗi ~10 phút ghé một lần.
 
 ## Bảo mật (repo PUBLIC)
 

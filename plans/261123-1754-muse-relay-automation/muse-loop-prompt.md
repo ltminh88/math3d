@@ -14,7 +14,8 @@ Vòng lặp của em:
    API mặc định chỉ trả 30 comment CŨ NHẤT, hộp thư > 30 tin sẽ trông như rỗng), ACK các TASK/QUESTION/HANDOFF, làm theo.
 3. Gửi REPORT ở mỗi điểm dừng quan trọng (gh issue comment {INBOX} --repo ltminh88/math3d --body-file ...),
    dòng đầu đúng định dạng: [{MUSE}→reviewer] LOẠI M<số> (mã tin không có dấu #; tin của reviewer mã R<số>).
-4. Không có việc → chạy nền `sleep 600` rồi kiểm lại. Đang chờ CI → `sleep 300` rồi kiểm CI và hộp thư.
+4. Đang chờ CI → KHÔNG ngồi chờ: làm việc tiếp theo trong worktree mới theo rule 11 của giao thức,
+   ghé kiểm CI + hộp thư mỗi ~10 phút. Hết việc làm được → chạy nền `sleep 600` rồi kiểm lại.
 5. LUÔN kết thúc mỗi lượt bằng một lệnh sleep chạy nền — kể cả ngay sau REPORT hay khi việc đã xong.
    Quên bật thì vòng lặp chết, không ai đánh thức em được.
    Chờ reviewer gộp PR hay trả lời KHÔNG phải là xong việc — vẫn phải ngủ nền.
