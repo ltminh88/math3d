@@ -6,6 +6,7 @@ import { tmpdir } from 'node:os';
 import { join } from 'node:path';
 import { describe, expect, it } from 'vitest';
 import {
+  clipFileName,
   clipIdFor,
   emitAudioMap,
   emitCredits,
@@ -75,6 +76,29 @@ describe('textHash', () => {
     expect(textHash('cat.')).not.toBe(textHash('dog.'));
     expect(textHash('cat.')).toHaveLength(12);
   });
+
+  // R89 fix 1: the hash must cover voice + speed, or a voice/speed change
+  // leaves planClips on 'skip' and children keep hearing the old clip.
+  it('differs when the voice changes', () => {
+    expect(textHash('cat.', 'af_heart', 0.9)).not.toBe(textHash('cat.', 'af_sarah', 0.9));
+  });
+
+  it('differs when the speed changes', () => {
+    expect(textHash('cat.', 'af_heart', 0.9)).not.toBe(textHash('cat.', 'af_heart', 1.0));
+  });
+
+  it('is stable for the same text + voice + speed', () => {
+    expect(textHash('cat.', 'af_heart', 0.9)).toBe(textHash('cat.', 'af_heart', 0.9));
+  });
+});
+
+describe('clipFileName', () => {
+  // R89 fix 2: the hash rides in the file name, so a regenerated clip is a
+  // new URL and the SW CacheFirst cache cannot serve the stale one.
+  it('is slug + first 8 hash chars + .mp3', () => {
+    expect(clipFileName('cat', 'abcdef012345')).toBe('cat-abcdef01.mp3');
+    expect(clipFileName('letter-b', '0123456789ab')).toBe('letter-b-01234567.mp3');
+  });
 });
 
 describe('planClips', () => {
@@ -84,14 +108,23 @@ describe('planClips', () => {
     expect(plan.map((p) => p.action)).toEqual(['generate', 'generate']);
   });
 
-  it('skips a clip whose mp3 exists and whose hash matches, regenerates the rest', () => {
+  it('skips a clip whose hashed mp3 exists and whose hash matches, regenerates the rest', () => {
     const dir = mkdtempSync(join(tmpdir(), 'clips-'));
     const items = [word('cat'), word('dog')];
-    const catHash = textHash(ttsTextFor(word('cat')));
-    writeFileSync(join(dir, 'cat.mp3'), Buffer.from([0x49, 0x44, 0x33]));
+    const catHash = textHash(ttsTextFor(word('cat')), 'af_heart', 0.9);
+    writeFileSync(join(dir, clipFileName('cat', catHash)), Buffer.from([0x49, 0x44, 0x33]));
     const manifest = { clips: { cat: { text: 'cat', hash: catHash } } };
     const plan = planClips(items, manifest, dir);
     expect(plan.map((p) => p.action)).toEqual(['skip', 'generate']);
+  });
+
+  it('regenerates when only the old bare mp3 exists (hash is now in the file name)', () => {
+    const dir = mkdtempSync(join(tmpdir(), 'clips-'));
+    const items = [word('cat')];
+    const catHash = textHash(ttsTextFor(word('cat')), 'af_heart', 0.9);
+    writeFileSync(join(dir, 'cat.mp3'), Buffer.from([0x49, 0x44, 0x33]));
+    const manifest = { clips: { cat: { text: 'cat', hash: catHash } } };
+    expect(planClips(items, manifest, dir)[0]?.action).toBe('generate');
   });
 
   it('regenerates when the hash changed or the mp3 is missing', () => {
@@ -106,14 +139,14 @@ describe('planClips', () => {
 });
 
 describe('emitAudioMap', () => {
-  it('emits the 3B map shape (text -> mp3 URL) plus the englishClipUrl helper', () => {
+  it('emits the 3B map shape (text -> hashed mp3 URL) plus the englishClipUrl helper', () => {
     const src = emitAudioMap([
-      { text: 'cat', id: 'cat' },
-      { text: 'This is a cat', id: 'this-is-a-cat' },
+      { text: 'cat', id: 'cat', hash: 'abcdef012345' },
+      { text: 'This is a cat', id: 'this-is-a-cat', hash: '0123456789ab' },
     ]);
     expect(src).toContain('ENGLISH_AUDIO_CLIPS');
-    expect(src).toContain(`cat: '/english-audio/cat.mp3'`);
-    expect(src).toContain(`'This is a cat': '/english-audio/this-is-a-cat.mp3'`);
+    expect(src).toContain(`cat: '/english-audio/cat-abcdef01.mp3'`);
+    expect(src).toContain(`'This is a cat': '/english-audio/this-is-a-cat-01234567.mp3'`);
     expect(src).toContain('export function englishClipUrl(text: string): string | null');
   });
 });
