@@ -72,9 +72,7 @@ function renderNumberLine(scene: NumberLineScene): SVGElement {
         class: 'ds-point',
       }),
     );
-    svg.append(
-      dsLabel(midX, LINE_Y - h / 2 - 8, jump.by >= 0 ? `+${jump.by}` : `${jump.by}`),
-    );
+    svg.append(dsLabel(midX, LINE_Y - h / 2 - 8, jump.by >= 0 ? `+${jump.by}` : `${jump.by}`));
   }
   let missingSeen = 0;
   scene.marks.forEach((mark, i) => {

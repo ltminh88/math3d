@@ -246,9 +246,7 @@ describe('add-sub-number-line', () => {
         const start = p.start as number;
         expect(jumps[0]?.from).toBe(start);
         for (let i = 1; i < jumps.length; i++) {
-          expect(jumps[i]?.from).toBe(
-            (jumps[i - 1]?.from ?? 0) + (jumps[i - 1]?.by ?? 0),
-          );
+          expect(jumps[i]?.from).toBe((jumps[i - 1]?.from ?? 0) + (jumps[i - 1]?.by ?? 0));
         }
       }
     }
