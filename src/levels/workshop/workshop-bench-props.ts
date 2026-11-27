@@ -14,6 +14,7 @@ import {
   type Scene,
 } from 'three';
 import type { GeoScene, Point } from '../../geometry/geo-scene-types';
+import type { LengthScene } from '../../measurement/length-scene-types';
 import { BENCH_TOP, WORKSHOP_COLORS as C, STATION_SPOTS, TILE_BOARD } from './workshop-layout';
 import type { WorkshopStation } from './workshop-stations';
 
@@ -82,7 +83,7 @@ export class WorkshopBenchProps {
   }
 
   /** Lights the tool of `station` and shows the round's jug / thermometer values. */
-  setStation(station: WorkshopStation, scene: GeoScene): void {
+  setStation(station: WorkshopStation, scene: GeoScene | LengthScene): void {
     this.target = STATION_SPOTS[station];
     if (this.reducedMotion) this.placeMarker(1);
     if (scene.kind === 'jug') this.setLevels(scene.level / scene.marks, null);

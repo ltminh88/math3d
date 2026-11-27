@@ -91,6 +91,43 @@ async function give(page: Page, step: Planned, touch: boolean, wrong = false): P
   } else if (step.kind === 'multi') {
     for (const i of step.indexes) await press(row.locator('.kit-multi__option').nth(i), touch);
     await press(row.locator('.kit-multi__done'), touch);
+  } else if (step.kind === 'order') {
+    // Tap the bank tiles in the answer's order (reversed when wrong), then Xong.
+    const order = wrong ? [...step.answer].reverse() : step.answer;
+    for (const tileIndex of order) {
+      const label = step.tiles[tileIndex];
+      if (label === undefined) throw new Error('order answer index out of range');
+      await press(
+        row.locator('.kit-order__bank').getByRole('button', { name: label, exact: true }),
+        touch,
+      );
+    }
+    await press(row.locator('.kit-order__done'), touch);
+  } else if (step.kind === 'match') {
+    // Pair every left with its right (shifted by one when wrong), then Xong.
+    const n = step.left.length;
+    for (let i = 0; i < n; i++) {
+      const rightIndex = wrong ? ((step.pairs[i] ?? 0) + 1) % n : (step.pairs[i] ?? 0);
+      const leftLabel = step.left[i];
+      const rightLabel = step.right[rightIndex];
+      if (leftLabel === undefined || rightLabel === undefined)
+        throw new Error('match pair index out of range');
+      await press(
+        row
+          .locator('.kit-match__column')
+          .first()
+          .getByRole('button', { name: leftLabel, exact: true }),
+        touch,
+      );
+      await press(
+        row
+          .locator('.kit-match__column')
+          .nth(1)
+          .getByRole('button', { name: rightLabel, exact: true }),
+        touch,
+      );
+    }
+    await press(row.locator('.kit-match__done'), touch);
   } else {
     throw new Error('workshop spec: set-clock steps are not played (workshop skills only)');
   }
@@ -249,10 +286,12 @@ test('the workshop fills six orders and records the measurement skills', async (
   expect(errors).toEqual([]);
 });
 
-// Stage 4 (phase 09): seed stages 1-3 done, enter stage 4 with no forced plan, so the stage
-// plan decides the rounds. The ruler slot is fixed to cm↔mm, the fence and tiles keep the
-// shared rectangle, the last two rounds are instruments, and only stage 4's stars are added.
-test('stage 4 drills cm-mm and the instruments and records only its own stage stars', async ({
+// Stage 4 (phase 09, boost 3B): seed stages 1-3 done, enter stage 4 with the ruler
+// forced to meas-len-mixed (box 1; the other stage-4 ruler candidates sit at box 5),
+// so the stage plan decides the rounds. The ruler slot drills length (mixed joins
+// cm↔mm), the fence and tiles keep the shared rectangle, the last two rounds are
+// instruments, and only stage 4's stars are added.
+test('stage 4 drills length (mixed) and the instruments and records only its own stage stars', async ({
   page,
 }, info) => {
   const touch = info.project.use.hasTouch === true;
@@ -269,6 +308,21 @@ test('stage 4 drills cm-mm and the instruments and records only its own stage st
     DONE,
   );
   await page.evaluate(() => window.__game?.seedStageProgress('workshop', [3, 3, 3]));
+  // Stage 4's ruler drills length (3B): force meas-len-mixed (box 1) over the
+  // other ruler candidates (box 5).
+  await page.evaluate(() =>
+    window.__game?.seedFactStats({
+      'sk:meas-len-mixed': { box: 1, attempts: 1, correct: 0 },
+      'sk:meas-len-choose-unit': { box: 5, attempts: 5, correct: 5 },
+      'sk:meas-len-ladder': { box: 5, attempts: 5, correct: 5 },
+      'sk:meas-len-convert': { box: 5, attempts: 5, correct: 5 },
+      'sk:meas-len-convert-far': { box: 5, attempts: 5, correct: 5 },
+      'sk:meas-len-compare': { box: 5, attempts: 5, correct: 5 },
+      'sk:meas-len-order': { box: 5, attempts: 5, correct: 5 },
+      'sk:meas-ruler-read': { box: 5, attempts: 5, correct: 5 },
+      'sk:meas-mm-convert': { box: 5, attempts: 5, correct: 5 },
+    }),
+  );
   await expect(page.locator('#gate-workshop-label small')).toHaveText(
     'Đã hoàn thành ★★★ · Chặng 4/5',
   );
@@ -282,7 +336,7 @@ test('stage 4 drills cm-mm and the instruments and records only its own stage st
 
   const plan = (await page.evaluate(() => window.__workshop?.plan())) ?? [];
   expect(plan).toHaveLength(ROUNDS);
-  expect(plan[0]?.skillId).toBe('meas-mm-convert');
+  expect(plan[0]?.skillId).toBe('meas-len-mixed');
   expect(plan[1]?.skillId).toBe('meas-perimeter-rect');
   expect(plan[2]?.skillId).toBe('meas-area-rect');
   expect([
@@ -348,6 +402,77 @@ test('stage 4 drills cm-mm and the instruments and records only its own stage st
     };
   });
   expect(store.completedAt).toBeGreaterThan(0);
+  for (const r of plan) expect(store.keys).toContain(`sk:${r.skillId}`);
+  expect(await page.evaluate(() => window.__workshop)).toBeUndefined();
+  expect(errors).toEqual([]);
+});
+
+// Stage 1 (boost, Phase 3B): seed meas-len-ladder first at the ruler — the other
+// stage-1 ruler candidates sit at box 5 — so round 0 is a length item, played by
+// taps like every other round, and its skill is recorded like the rest.
+test('stage 1 reaches a length item at the ruler', async ({ page }, info) => {
+  const touch = info.project.use.hasTouch === true;
+  const project = info.project.name;
+  const errors: string[] = [];
+  page.on('pageerror', (e) => errors.push(String(e)));
+  await page.goto('/');
+  await waitForStoreBoot(page);
+  await page.waitForFunction(() => '__game' in window);
+  await page.locator('#play').click();
+  await expect(page.locator('body')).toHaveClass(/playing/);
+  await page.evaluate(
+    (done) => window.__game?.seedProgress({ bridgeComplete: true, completedLevels: done }),
+    DONE,
+  );
+  await page.evaluate(() =>
+    window.__game?.seedFactStats({
+      'sk:meas-len-ladder': { box: 1, attempts: 1, correct: 0 },
+      'sk:meas-len-choose-unit': { box: 5, attempts: 5, correct: 5 },
+      'sk:meas-len-convert': { box: 5, attempts: 5, correct: 5 },
+      'sk:meas-ruler-read': { box: 5, attempts: 5, correct: 5 },
+      'sk:meas-mm-convert': { box: 5, attempts: 5, correct: 5 },
+    }),
+  );
+  await page.evaluate(() => window.__game?.teleportToGate('workshop'));
+  const interact = page.locator('#interact');
+  await expect(interact).toContainText('Vào Cổng Xưởng Đo Đạc');
+  if (touch) await interact.tap();
+  else await page.keyboard.press('e');
+  await expect(page.locator('.workshop-panel')).toBeVisible();
+  await shot(page, 'start-stage-1-length', project);
+
+  const plan = (await page.evaluate(() => window.__workshop?.plan())) ?? [];
+  expect(plan).toHaveLength(ROUNDS);
+  expect(plan[0]?.skillId).toBe('meas-len-ladder');
+
+  for (let i = 0; i < ROUNDS; i++) await playRound(page, i, touch, project);
+
+  const done = page.locator('.workshop-done');
+  await expect(done).toBeVisible();
+  await expect(done).toContainText('Giao xong hết đơn hàng!');
+  await expect(done).toContainText('Chặng 1/5');
+  await expect(done.locator('.workshop-bonus')).toHaveText(
+    'Thưởng lần đầu hoàn thành: +50 XP · +10 xu',
+  );
+  await shot(page, 'done-stage-1-length', project);
+
+  const back = page.locator('.workshop-back');
+  if (touch) await back.tap();
+  else {
+    await expect(back).toBeFocused();
+    await page.keyboard.press('Enter');
+  }
+  await expect.poll(() => page.evaluate(() => window.__game?.levelRunning())).toBe(false);
+  await expect
+    .poll(() => page.evaluate(() => window.__game?.gateStatus('workshop')))
+    .toBe('completed');
+  await expect
+    .poll(() => page.evaluate(() => window.__game?.snapshot()?.levelProgress.workshop?.stageStars))
+    .toEqual([expect.any(Number)]);
+  const store = await page.evaluate(() => {
+    const snap = window.__game?.snapshot();
+    return { keys: Object.keys(snap?.factStats ?? {}) };
+  });
   for (const r of plan) expect(store.keys).toContain(`sk:${r.skillId}`);
   expect(await page.evaluate(() => window.__workshop)).toBeUndefined();
   expect(errors).toEqual([]);

@@ -3,8 +3,12 @@
 // child still works out. No rung states an answer; three misses reveal it (round flow). Keys live
 // in workshop-hint-strings.ts.
 import type { GeoItem } from '../../geometry/geo-scene-types';
+import type { LengthItem } from '../../measurement/length-scene-types';
 import { playableSteps } from '../../reasoning/reasoning-step-answers';
 import type { Misconception, PromptRef } from '../../reasoning/reasoning-types';
+
+/** A workshop item: a geometry item, or a length item with its ladder scene. */
+export type WorkshopHintItem = GeoItem | LengthItem;
 
 const PERIMETER = new Set([
   'askPerim',
@@ -44,7 +48,8 @@ const RULE: Readonly<Record<string, string>> = {
 const ref = (key: string, params?: PromptRef['params']): PromptRef =>
   params ? { key, params } : { key };
 
-function rule(item: GeoItem, promptKey: string): PromptRef {
+function rule(item: WorkshopHintItem, promptKey: string): PromptRef {
+  if (item.scene.kind === 'length-ladder') return ref('h2Ladder');
   if (PERIMETER.has(promptKey)) return ref('h2Perim');
   if (/Area|CellCount|YellowSide/.test(promptKey))
     return ref(item.scene.kind === 'cells' ? 'h2AreaCount' : 'h2AreaRect');
@@ -52,7 +57,7 @@ function rule(item: GeoItem, promptKey: string): PromptRef {
 }
 
 /** Rung 3: a partial step built from numbers the child can already see. */
-function partial(item: GeoItem, promptKey: string): PromptRef {
+function partial(item: WorkshopHintItem, promptKey: string): PromptRef {
   const s = item.scene;
   const story = item.story.params ?? {};
   const join = (ns: readonly number[]) => ns.join(' + ');
@@ -65,6 +70,9 @@ function partial(item: GeoItem, promptKey: string): PromptRef {
         ? ref('h3RulerStart', { start: s.fromMm / 10, u: 'cm' })
         : ref('h3RulerStart', { start: s.fromMm, u: 'mm' });
     case 'askNumber':
+      // Length items reuse the shared 'askNumber' prompt; the cm/mm partial
+      // below would name the wrong units for them (3B) — they get h3Look.
+      if (s.kind === 'length-ladder') break;
       return 'n' in story ? ref('h3CmToMm', { n: story.n as number }) : ref('h3MmToCm', story);
     case 'askLonger':
     case 'askToMm':
@@ -149,7 +157,7 @@ function partial(item: GeoItem, promptKey: string): PromptRef {
 }
 
 /** The hint for `rung` (1-3) on playable step `stepIndex` of `item`. */
-export function workshopHint(item: GeoItem, rung: number, stepIndex: number): PromptRef {
+export function workshopHint(item: WorkshopHintItem, rung: number, stepIndex: number): PromptRef {
   const step = playableSteps(item)[stepIndex];
   if (rung <= 1 || !step) return ref('h1');
   return rung === 2 ? rule(item, step.prompt.key) : partial(item, step.prompt.key);

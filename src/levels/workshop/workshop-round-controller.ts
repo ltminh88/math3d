@@ -3,7 +3,7 @@
 // hands over to the celebration after the last order. Rules live in workshop-round-flow.ts.
 import { renderMeasurementPrompt } from '../../measurement/measurement-strings';
 import type { StepAnswer } from '../../reasoning/reasoning-step-answers';
-import { playableSteps } from '../../reasoning/reasoning-step-answers';
+import { playableSteps, wrongAnswerBug } from '../../reasoning/reasoning-step-answers';
 import { createStepCard, type StepAnswerEvent, type StepCard } from '../../ui/kit/step-card';
 import { createLevelRunTally } from '../shared/level-run-tally';
 import type { LevelContext } from '../shared/level-types';
@@ -68,7 +68,13 @@ export class WorkshopRoundController {
 
   private onAnswer(round: WorkshopRound, event: StepAnswerEvent): void {
     const step = playableSteps(round.item)[event.stepIndex];
-    const result = this.flow.answer(event.correct, wrongValue(step, event.answer));
+    // R97: only a NUMBER answer reaches `wrongs` — a wrong choice/order/match
+    // pick records no number (its bug, if any, still goes to the bug bank).
+    const result = this.flow.answer(
+      event.correct,
+      step?.kind === 'number' ? wrongValue(step, event.answer) : undefined,
+      wrongAnswerBug(step, event.answer),
+    );
     if (result === 'correct') {
       if (this.flow.roundComplete) return;
       this.panel.clearHint();

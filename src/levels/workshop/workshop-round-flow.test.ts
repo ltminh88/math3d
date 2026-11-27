@@ -3,6 +3,7 @@ import { skillKey } from '../../learning/fact-key';
 import type { FactStat } from '../../learning/learning-types';
 import { newFactStat } from '../../learning/leitner-box';
 import { mulberry32 } from '../../learning/seeded-rng';
+import { LENGTH_SKILLS } from '../../measurement/length-item-for-skill';
 import { MEASUREMENT_SKILLS } from '../../measurement/measurement-item-for-skill';
 import { playableSteps } from '../../reasoning/reasoning-step-answers';
 import { WorkshopRoundFlow } from './workshop-round-flow';
@@ -17,8 +18,10 @@ const stat = (box: number, lastSeenSession = 1): FactStat => ({
 });
 
 describe('workshop skill plan', () => {
-  it('maps every measurement skill to a station', () => {
-    expect(Object.keys(STATION_OF).sort()).toEqual([...MEASUREMENT_SKILLS].sort());
+  it('maps every measurement and length skill to a station', () => {
+    expect(Object.keys(STATION_OF).sort()).toEqual(
+      [...MEASUREMENT_SKILLS, ...LENGTH_SKILLS].sort(),
+    );
   });
 
   it('plays six rounds in story order: ruler, fence, tiles of the same rectangle, instruments', () => {
@@ -48,6 +51,9 @@ describe('workshop skill plan', () => {
       [skillKey('meas-gram-calc')]: stat(4),
       [skillKey('meas-ml-calc')]: stat(1, 9),
       [skillKey('meas-temperature-compare')]: stat(1, 3),
+      // The length ids join the ruler slot (3B) — seed them mastered so the
+      // weakest-first pick among the legacy pair is still mm-convert.
+      ...Object.fromEntries(LENGTH_SKILLS.map((id) => [skillKey(id), stat(5)])),
     };
     for (let seed = 1; seed <= 20; seed++) {
       const skills = planWorkshopSkills(stats, mulberry32(seed), 6);
@@ -58,16 +64,21 @@ describe('workshop skill plan', () => {
 
   it('every skill is reachable over many runs', () => {
     const seen = new Set<string>();
-    for (let seed = 1; seed <= 300; seed++)
-      for (const s of planWorkshopSkills({}, mulberry32(seed), 6)) seen.add(s);
-    expect([...seen].sort()).toEqual([...MEASUREMENT_SKILLS].sort());
+    // The length ids are stage-gated (3B): S1 only opens three of them, so
+    // sweep every stage, not just the default.
+    for (let stage = 1; stage <= 5; stage++)
+      for (let seed = 1; seed <= 300; seed++)
+        for (const s of planWorkshopSkills({}, mulberry32(seed), 6, stage)) seen.add(s);
+    expect([...seen].sort()).toEqual([...MEASUREMENT_SKILLS, ...LENGTH_SKILLS].sort());
   });
 });
 
 describe('workshop round plan', () => {
   it('uses the tier of each skill box and the same rectangle for perimeter and area', () => {
     for (const box of [1, 3, 5]) {
-      const stats = Object.fromEntries(MEASUREMENT_SKILLS.map((id) => [skillKey(id), stat(box)]));
+      const stats = Object.fromEntries(
+        [...MEASUREMENT_SKILLS, ...LENGTH_SKILLS].map((id) => [skillKey(id), stat(box)]),
+      );
       for (let seed = 1; seed <= 150; seed++) {
         const rng = mulberry32(seed);
         const rounds = planWorkshopRounds(planWorkshopSkills(stats, rng, 6), stats, rng);
@@ -129,6 +140,7 @@ describe('workshop round flow', () => {
       firstTry: true,
       usedHint: false,
       wrongAnswers: [],
+      bugs: [],
     });
     flow.next();
     expect(flow.index).toBe(1);
@@ -153,6 +165,32 @@ describe('workshop round flow', () => {
     expect(outcome.firstTry).toBe(false);
     expect(outcome.usedHint).toBe(true);
     expect(outcome.wrongAnswers).toEqual([12, 13, 14]);
+  });
+
+  it('carries a wrong pick bug into the outcome, and only into its own round', () => {
+    const flow = new WorkshopRoundFlow(rounds(), () => 0);
+    // R97: a wrong pick carries no number — wrongAnswers stays empty, the bug
+    // is the only trace, and firstTry is still false.
+    expect(flow.answer(false, undefined, 'unit-direction')).toBe('wrong');
+    expect(flow.answer(false, undefined, 'unit-direction')).toBe('wrong');
+    while (!flow.roundComplete) flow.answer(true);
+    expect(flow.finishRound()).toMatchObject({
+      bugs: ['unit-direction'],
+      wrongAnswers: [],
+      firstTry: false,
+    });
+    flow.next();
+    // A bug passed with a correct answer is ignored, and the next round
+    // starts with an empty bug bank.
+    while (!flow.roundComplete) flow.answer(true, 0, 'ignore-unit');
+    expect(flow.finishRound()).toMatchObject({ bugs: [] });
+  });
+
+  it('a wrong number still records its value (R97)', () => {
+    const flow = new WorkshopRoundFlow(rounds(), () => 0);
+    expect(flow.answer(false, 42)).toBe('wrong');
+    while (!flow.roundComplete) flow.answer(true);
+    expect(flow.finishRound()).toMatchObject({ wrongAnswers: [42], firstTry: false });
   });
 
   it('is done after the last round', () => {

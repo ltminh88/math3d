@@ -8,7 +8,10 @@
 // of a real item; the scene and the step stay real.)
 import { afterEach, describe, expect, it, vi } from 'vitest';
 import { defineStrings } from '../../i18n/i18n';
+import { skillKey } from '../../learning/fact-key';
+import { newFactStat } from '../../learning/leitner-box';
 import { mulberry32 } from '../../learning/seeded-rng';
+import { LENGTH_BUG_EXPLAINERS } from '../../practice/wrong-answer-length';
 import { playableSteps, type StepAnswer } from '../../reasoning/reasoning-step-answers';
 import type { StepAnswerEvent } from '../../ui/kit/step-card';
 import {
@@ -61,15 +64,16 @@ function fakePanel() {
 
 function runWorkshop(rounds: readonly WorkshopRound[]) {
   stubDom();
+  const ctx = fakeLevelContext();
   const flow = new WorkshopRoundFlow(rounds, () => 1000);
   const panel = fakePanel();
-  const controller = new WorkshopRoundController(fakeLevelContext(), ws, hs, flow, panel as never, {
+  const controller = new WorkshopRoundController(ctx, ws, hs, flow, panel as never, {
     onRound: () => {},
     onTiles: () => {},
     onLevelDone: () => {},
   });
   controller.startRound();
-  return { controller, panel, flow };
+  return { controller, panel, flow, ctx };
 }
 
 function planRound(skillId: string, seed = 7): WorkshopRound {
@@ -226,5 +230,58 @@ describe('workshop round controller — wrong-answer explanations (R42)', () => 
         missNumber: 1,
       }),
     );
+  });
+});
+
+describe('workshop round controller — length bug bank (3B)', () => {
+  afterEach(() => {
+    created.length = 0;
+    vi.unstubAllGlobals();
+  });
+
+  it('records a wrong length pick bug with the round outcome', () => {
+    // Tier 2 (box 3): convert is a choice step whose wrong options are tagged
+    // with the length bugs (unit-direction / ignore-unit).
+    let found: {
+      round: WorkshopRound;
+      stepIndex: number;
+      optionId: string;
+      bug: string;
+    } | null = null;
+    for (let seed = 1; seed <= 20 && !found; seed++) {
+      const stats = {
+        [skillKey('meas-len-convert')]: { ...newFactStat(), box: 3, attempts: 3 },
+      };
+      const [round] = planWorkshopRounds(['meas-len-convert'], stats, mulberry32(seed));
+      if (!round) continue;
+      const steps = playableSteps(round.item);
+      const stepIndex = steps.findIndex(
+        (s) =>
+          s.kind === 'choice' &&
+          s.options.some(
+            (o) => !o.correct && o.misconception && LENGTH_BUG_EXPLAINERS.has(o.misconception),
+          ),
+      );
+      if (stepIndex < 0) continue;
+      const step = steps[stepIndex];
+      if (step?.kind !== 'choice') continue;
+      const option = step.options.find(
+        (o) => !o.correct && o.misconception && LENGTH_BUG_EXPLAINERS.has(o.misconception),
+      );
+      if (!option?.misconception) continue;
+      found = { round, stepIndex, optionId: option.id, bug: option.misconception };
+    }
+    if (!found) throw new Error('no tier-2 convert item with a tagged wrong option');
+    const { round, stepIndex, optionId, bug } = found;
+
+    const { controller, panel, ctx } = runWorkshop([round]);
+    answerTargetWrong(controller, round, stepIndex, optionId);
+    // The length explainer answers, not the generic sentence.
+    expect(panel.feedback).toHaveLength(1);
+    expect(panel.feedback[0]).not.toBe(ws('wrong'));
+    (controller as unknown as { finishRound(): void }).finishRound();
+    const record = ctx.learning.record as unknown as ReturnType<typeof vi.fn>;
+    expect(record).toHaveBeenCalledTimes(1);
+    expect(record).toHaveBeenCalledWith(expect.objectContaining({ bugs: [bug] }));
   });
 });
