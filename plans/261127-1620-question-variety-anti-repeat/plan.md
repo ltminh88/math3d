@@ -56,6 +56,11 @@ Lane B (muse-min, after English 6): 1 → 6 → 5 → 7 → 2 → 3. Lane A (mus
 - **T1** no exact repeat inside one run (lesson 6, daily 10, level round).
 - **T2** every played skill × tier ≥ 60 distinct exact items in 2000 draws, except an allow-list
   of curriculum-bound skills (money notes, roman, fraction-read, clock hour/half) with a reason.
+  Added 2026-11-27 (R112): `meas-mm-convert` T1 — số ≤100, 1–10 cm ↔ 10–100 mm, không thập
+  phân → tối đa 20 cặp; 4 danh từ T1 chỉ làm câu hỏi cảm giác khác nhau, không tăng số cặp.
+  Added 2026-11-27 (R113): `meas-len-convert-far` — D1: số nguyên ≤ 1000, không thập phân →
+  tối đa 42 cặp ([m,cm] 20, [dm,mm] 20, [m,mm] 2); 4 danh từ chỉ làm câu hỏi cảm giác
+  khác nhau, không tăng số cặp. Không nới D1.
 - **T3** focus skills (add/sub, `meas-len-*`, ruler, mm, mul/div): ≥ 4 shapes where a story fits,
   ≥ 2 forms for pure calc.
 - **T4** simulated 10 replays of one lesson: ≤ 2 % of items seen in the previous 5 runs.

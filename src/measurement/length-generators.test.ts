@@ -10,7 +10,7 @@ import type { SkillTier } from '../learning/skill-tiers';
 import { numbersOfItem } from '../reasoning/reasoning-test-oracles';
 import type { Misconception, ReasoningItem, ReasoningStep } from '../reasoning/reasoning-types';
 import { bugConvertValue, bugMixedPair, bugMixedValue } from './length-bug-catalogue';
-import { OBJECTS } from './length-compare-order-generators';
+import { OBJECTS } from './length-everyday-objects';
 import { LENGTH_SKILLS, lengthItemForSkill } from './length-item-for-skill';
 import {
   convertLength,
@@ -87,6 +87,29 @@ function checkBugValue(
   expect(value, `${where}: bug ${bug}`).toBe(expected);
 }
 
+const lenConvertOracle = (item: ReasoningItem, tier: SkillTier, seed: number): void => {
+  const where = `${item.skillId} t${tier} #${seed}`;
+  const from = ps(item, 'from') as LengthUnit;
+  const to = ps(item, 'to') as LengthUnit;
+  const answer = convertLength(pn(item, 'n'), from, to) as number;
+  const step = item.steps[0];
+  if (step?.kind === 'number') {
+    expect(step.answer, where).toBe(answer);
+    return;
+  }
+  expect(Number(correctParams(item).n), where).toBe(answer);
+  for (const o of (choiceSteps(item)[0] as Extract<ReasoningStep, { kind: 'choice' }>).options) {
+    if (o.correct) continue;
+    checkBugValue(
+      item,
+      o.misconception as Misconception,
+      Number(o.label.params?.n),
+      bugConvertValue(o.misconception as Misconception, pn(item, 'n'), from, to),
+      where,
+    );
+  }
+};
+
 const ORACLE: Record<string, (item: ReasoningItem, tier: SkillTier, seed: number) => void> = {
   lenLadder: (item, _tier, seed) => {
     const where = `meas-len-ladder #${seed}`;
@@ -119,28 +142,10 @@ const ORACLE: Record<string, (item: ReasoningItem, tier: SkillTier, seed: number
       expect(item.work[blank], where).toBe(step.answer);
     }
   },
-  lenConvert: (item, tier, seed) => {
-    const where = `meas-len-convert t${tier} #${seed}`;
-    const from = ps(item, 'from') as LengthUnit;
-    const to = ps(item, 'to') as LengthUnit;
-    const answer = convertLength(pn(item, 'n'), from, to) as number;
-    const step = item.steps[0];
-    if (step?.kind === 'number') {
-      expect(step.answer, where).toBe(answer);
-      return;
-    }
-    expect(Number(correctParams(item).n), where).toBe(answer);
-    for (const o of (choiceSteps(item)[0] as Extract<ReasoningStep, { kind: 'choice' }>).options) {
-      if (o.correct) continue;
-      checkBugValue(
-        item,
-        o.misconception as Misconception,
-        Number(o.label.params?.n),
-        bugConvertValue(o.misconception as Misconception, pn(item, 'n'), from, to),
-        where,
-      );
-    }
-  },
+  // lenConvertFar shares the oracle: same params (n/from/to) and step shape,
+  // only the story carries a noun (R113).
+  lenConvert: lenConvertOracle,
+  lenConvertFar: lenConvertOracle,
   lenCompare: (item, _tier, seed) => {
     const where = `meas-len-compare #${seed}`;
     const aMm = pn(item, 'a') * MM_PER_UNIT[ps(item, 'ua') as LengthUnit];
@@ -193,6 +198,9 @@ const ORACLE: Record<string, (item: ReasoningItem, tier: SkillTier, seed: number
     const found = OBJECTS.find((o) => o.item === ps(item, 'item'));
     expect(found, where).toBeDefined();
     expect(String(correctParams(item).unit), where).toBe(found?.unit);
+    // The shown number is drawn inside the object's realistic range.
+    expect(pn(item, 'n'), where).toBeGreaterThanOrEqual(found?.lo ?? 0);
+    expect(pn(item, 'n'), where).toBeLessThanOrEqual(found?.hi ?? 0);
     const units = (choiceSteps(item)[0] as Extract<ReasoningStep, { kind: 'choice' }>).options.map(
       (o) => String(o.label.params?.unit),
     );

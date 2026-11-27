@@ -11,6 +11,9 @@ import { RULER_MAX_CM } from './measurement-ranges';
 
 const MAX_MM = RULER_MAX_CM * 10;
 
+/** Small objects that fit the T1 mm-convert range (1–10 cm). */
+const MM_T1_NOUNS = ['i:pencil', 'i:eraser', 'i:leaf', 'i:crayon'] as const;
+
 const ruler = (fromMm: number, toMm: number, showMmLabels = false) =>
   scene(
     { kind: 'ruler', maxCm: RULER_MAX_CM, fromMm, toMm, ...(showMmLabels ? { showMmLabels } : {}) },
@@ -89,13 +92,16 @@ function compareItem(rng: Rng) {
 export const measMmConvert: GeoGenerator = (rng, tier) => {
   if (tier === 2) return compareItem(rng);
   if (tier === 1) {
+    // R112: four small nouns so each T1 question feels different (the 20
+    // conversion pairs themselves are curriculum-bound — see plan.md T2).
+    const item = pick(rng, MM_T1_NOUNS);
     const n = randInt(rng, 1, RULER_MAX_CM);
     const s = ruler(0, n * 10);
     if (rng() < 0.5)
       return geoItem(
         'meas-mm-convert',
         tier,
-        ref('cmToMm', { n }),
+        ref('cmToMm', { item, n }),
         [numberStep(ref('askNumber'), n * 10)],
         s,
         'mm',
@@ -104,7 +110,7 @@ export const measMmConvert: GeoGenerator = (rng, tier) => {
     return geoItem(
       'meas-mm-convert',
       tier,
-      ref('mmToCm', { m }),
+      ref('mmToCm', { item, m }),
       [numberStep(ref('askNumber'), n)],
       s,
       'cm',

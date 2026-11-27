@@ -6,6 +6,7 @@ import type { SkillTier } from '../learning/skill-tiers';
 import { type Candidate, reasoningItem, ref } from '../reasoning/reasoning-distractors';
 import type { Misconception } from '../reasoning/reasoning-types';
 import { lenTextChoiceStep } from './length-bug-catalogue';
+import { OBJECTS, randomObjectLength } from './length-everyday-objects';
 import { type LengthItem, lengthItem, plainLadderScene } from './length-scene-types';
 import { formatQty, LENGTH_LADDER, type LengthUnit, MM_PER_UNIT } from './length-units';
 
@@ -97,39 +98,14 @@ export const measLenOrder = (rng: Rng, tier: SkillTier, ladder: number): LengthI
   );
 };
 
-interface LenObject {
-  readonly item: string;
-  readonly unit: LengthUnit;
-  readonly n: number;
-}
-
-/** Everyday objects and their true length (exported for the sweep oracle). */
-export const OBJECTS: readonly LenObject[] = [
-  { item: 'i:pencil', unit: 'cm', n: 15 },
-  { item: 'i:eraser', unit: 'cm', n: 4 },
-  { item: 'i:ribbon', unit: 'cm', n: 50 },
-  { item: 'i:leaf', unit: 'cm', n: 8 },
-  { item: 'i:crayon', unit: 'cm', n: 10 },
-  { item: 'i:book', unit: 'cm', n: 25 },
-  { item: 'i:ruler', unit: 'cm', n: 30 },
-  { item: 'i:notebook', unit: 'dm', n: 2 },
-  { item: 'i:handspan', unit: 'dm', n: 2 },
-  { item: 'i:desk', unit: 'm', n: 1 },
-  { item: 'i:door', unit: 'm', n: 2 },
-  { item: 'i:rope', unit: 'm', n: 3 },
-  { item: 'i:cloth', unit: 'm', n: 2 },
-  { item: 'i:road', unit: 'm', n: 50 },
-  { item: 'i:ant', unit: 'mm', n: 3 },
-  { item: 'i:rice', unit: 'mm', n: 5 },
-];
-
 /** meas-len-choose-unit: an everyday object, pick its unit (mm objects at L2+). */
 export const measLenChooseUnit = (rng: Rng, tier: SkillTier, ladder: number): LengthItem => {
   const pool = ladder >= 2 ? OBJECTS : OBJECTS.filter((o) => o.unit !== 'mm');
   const obj = pick(rng, pool);
+  const n = randomObjectLength(rng, obj);
   const wrong = (['m', 'dm', 'cm', 'mm'] as const).filter((u) => u !== obj.unit);
   return lengthItem(
-    reasoningItem('meas-len-choose-unit', tier, ref('lenChooseObj', { item: obj.item, n: obj.n }), [
+    reasoningItem('meas-len-choose-unit', tier, ref('lenChooseObj', { item: obj.item, n }), [
       lenTextChoiceStep(
         rng,
         ref('lenPickUnit'),
