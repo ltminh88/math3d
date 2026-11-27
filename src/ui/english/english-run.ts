@@ -1,36 +1,27 @@
-// English run (Phase 1B + 3B + 2A): the run the island level shell (1A) calls.
-// Eight rounds: the planner picks the weakest skill, the generator builds
-// the item (or a stored pack item joins when skill + kind match), a tap-only
-// widget renders it, the miss budget reveals after 3 misses, hints narrow the
-// choices, and every round records under `sk:en-*`.
-// 2A: each stage drills its own unit (`content/units.ts`) — the engine reads
-// its pool from the unit, not from the stage.
-// R64: the run draws no finish screen and resolves right after round 8 — the
-// level shell owns the ending screen (stars, reward, "Về cổng").
-// 3B: "🔊 Nghe" speaks the item (clip → Web Speech → read item), the "Phụ huynh"
-// button unlocks the book pack, and `signal` lets the shell abort mid-run.
-import './english-widgets.css';
+// English run (Phase 1B + 3B + 2A, split in two-modes Phase 1): the run the
+// island level shell (1A) calls. Eight rounds: the planner picks the weakest
+// skill, the round builds the item (or a stored pack item joins when skill +
+// kind match), a tap-only widget renders it, the miss budget reveals after
+// 3 misses, hints narrow the choices, and every round records under
+// `sk:en-*`. 2A: each stage drills its own unit — the engine reads its pool
+// from the unit, not from the stage. R64: the run draws no finish screen
+// and resolves right after round 8 — the level shell owns the ending screen.
+// 3B: "🔊 Nghe" speaks the item, the "Phụ huynh" button unlocks the book
+// pack, and `signal` lets the shell abort mid-run. The round body lives in
+// `english-run-round.ts`, the shell DOM in `english-run-widgets.ts`, the
+// speech behaviour in `english-run-speech.ts`.
 import { unitForStage } from '../../english/content/units';
-import type { EnglishAttempt } from '../../english/engine/answer-check';
-import { checkAnswer } from '../../english/engine/answer-check';
-import { englishWrongFeedback } from '../../english/engine/english-wrong-feedback';
-import { generateItem } from '../../english/engine/item-generators';
 import { createItemPlanner, type PlannedRound } from '../../english/engine/item-planner';
 import type { EnglishItem, EnglishPack } from '../../english/english-types';
 import { fetchEnglishPack } from '../../english/pack/pack-client';
 import { openPackStore } from '../../english/pack/pack-storage';
-import { skillKey } from '../../learning/fact-key';
-import type { QuestionOutcome } from '../../learning/session-recorder';
-import { skillTierOf } from '../../learning/skill-tiers';
 import type { LevelLearning } from '../../levels/shared/level-types';
-import { StepMissBudget } from '../../levels/shared/step-miss-budget';
 import { appSettings } from '../../store/app-settings';
-import { announce } from '../kit/aria-announcer';
-import { createUiButton } from '../kit/ui-button';
+import { playEnglishRound } from './english-run-round';
+import { createEnglishRunSpeech } from './english-run-speech';
+import { buildEnglishRunShell } from './english-run-widgets';
 import { createBrowserEnglishSpeaker } from './english-speaker';
 import { tei } from './english-strings';
-import type { EnglishWidget, EnglishWidgetHooks } from './english-widget-layout';
-import { mountWidget } from './english-widget-mount';
 import { openPackUnlockDialog } from './pack-unlock-dialog';
 
 /** What the island level shell hands the run: its stage, DOM root and learning services. */
@@ -84,10 +75,8 @@ export function getEnglishRunLive(): EnglishRunLive {
 
 /**
  * Daily practice (Phase 6) plays one English item outside the island run:
- * it reports the item here so the same test hook (`window.__game.island`,
- * `currentAnswer()`) answers it. The island run and the daily run never play
- * at once (a level owns the screen; daily is a world dialog), so they share
- * this state safely.
+ * it reports the item here so the same test hook (`window.__game.island`)
+ * answers it. The two runs never play at once, so they share this state.
  */
 export function setEnglishRunLive(next: EnglishRunLive): void {
   live = next;
@@ -103,221 +92,79 @@ export async function startEnglishRun(port: EnglishRunPort): Promise<EnglishRunR
   });
   const doc = port.ui.ownerDocument ?? document;
   // 3B: the speaker reads the game's sound setting; the pack loads in the
-  // background so the first item mounts at once (a stored pack joins from
-  // the next round — the pool is read per round).
+  // background so the first item mounts at once (a stored pack joins later).
   const speaker = createBrowserEnglishSpeaker(() => !appSettings.get().sound);
   const packStorePromise = openPackStore();
   let packItems: EnglishItem[] = [];
   const usedPack = new Set<number>();
+
+  const shell = buildEnglishRunShell(doc, {
+    onParentUnlock: () => {
+      openPackUnlockDialog({
+        mount: port.ui,
+        doc,
+        unlock: async (passphrase) => {
+          const store = await packStorePromise;
+          const result = await fetchEnglishPack(passphrase, { stage: port.stage });
+          if (!result.ok) {
+            if (result.error === 'bad-passphrase') await store.clearPassphrase();
+            return { ok: false, error: result.error };
+          }
+          await store.save(passphrase, result.pack);
+          return { ok: true, pack: result.pack };
+        },
+        onUnlocked: (pack: EnglishPack) => {
+          packItems = [...packItems, ...pack.items];
+          shell.root.dataset.packLoaded = 'true';
+          shell.say(tei('packLoaded'));
+        },
+      });
+    },
+  });
+  port.ui.appendChild(shell.root);
+  const speech = createEnglishRunSpeech(speaker, shell.say);
   void packStorePromise.then(async (store) => {
     const stored = await store.load();
     if (stored) {
       packItems = [...stored.pack.items];
-      root.dataset.packLoaded = 'true';
+      shell.root.dataset.packLoaded = 'true';
     }
   });
-
-  const root = doc.createElement('div');
-  root.className = 'english-run';
-  const header = doc.createElement('div');
-  header.className = 'english-run__header';
-  const title = doc.createElement('h2');
-  title.className = 'english-run__title';
-  title.textContent = tei('runTitle');
-  const roundEl = doc.createElement('p');
-  roundEl.className = 'english-run__round';
-  const parentButton = createUiButton(
-    {
-      label: tei('parentUnlock'),
-      variant: 'secondary',
-      onClick: () => {
-        openPackUnlockDialog({
-          mount: port.ui,
-          doc,
-          unlock: async (passphrase) => {
-            const store = await packStorePromise;
-            const result = await fetchEnglishPack(passphrase, { stage: port.stage });
-            if (!result.ok) {
-              if (result.error === 'bad-passphrase') await store.clearPassphrase();
-              return { ok: false, error: result.error };
-            }
-            await store.save(passphrase, result.pack);
-            return { ok: true, pack: result.pack };
-          },
-          onUnlocked: (pack: EnglishPack) => {
-            packItems = [...packItems, ...pack.items];
-            root.dataset.packLoaded = 'true';
-            say(tei('packLoaded'));
-          },
-        });
-      },
-    },
-    doc,
-  );
-  parentButton.classList.add('english-parent-unlock');
-  header.append(title, roundEl, parentButton);
-  const itemArea = doc.createElement('div');
-  itemArea.className = 'english-run__item';
-  const feedback = doc.createElement('p');
-  feedback.className = 'english-feedback';
-  feedback.setAttribute('role', 'status');
-  const footer = doc.createElement('div');
-  footer.className = 'english-run__footer';
-  const hintButton = createUiButton(
-    { label: `💡 ${tei('hint')}`, variant: 'secondary', onClick: () => {} },
-    doc,
-  );
-  hintButton.classList.add('english-hint');
-  const nextButton = createUiButton({ label: tei('next'), onClick: () => {} }, doc);
-  nextButton.classList.add('english-next');
-  nextButton.hidden = true;
-  footer.append(hintButton, nextButton);
-  root.append(header, itemArea, feedback, footer);
-  port.ui.appendChild(root);
-
-  const say = (text: string) => {
-    feedback.textContent = text;
-    announce(text, doc);
-  };
 
   let correctCount = 0;
   let completedRounds = 0;
   let last: PlannedRound | null = null;
-  let resolveRound: (() => void) | null = null;
   let aborted = false;
   const onAbort = () => {
     aborted = true;
-    resolveRound?.();
+    shell.resolveNext();
   };
-  nextButton.addEventListener('click', () => resolveRound?.());
   port.signal?.addEventListener('abort', onAbort, { once: true });
   if (port.signal?.aborted) aborted = true;
 
-  // 3B: one "bật âm thanh" prompt per run while muted, one parent notice
-  // per run when an item has no audio at all. Both go through the feedback
-  // line so the child (and the parent) never meets a silent item unawares.
-  let mutedPromptShown = false;
-  let audioNoticeShown = false;
-  let unlockPrimed = false;
-  const onSpeak = async (text: string) => {
-    if (!unlockPrimed) {
-      unlockPrimed = true;
-      speaker.unlock();
-    }
-    const result = await speaker.speak(text);
-    if (!result.played && result.reason === 'muted') say(tei('soundOff'));
-    else if (!result.played && result.reason === 'unavailable' && !audioNoticeShown) {
-      audioNoticeShown = true;
-      say(tei('noAudio'));
-    }
-  };
-
   for (let round = 0; round < ENGLISH_ROUNDS; round++) {
     if (aborted) break;
-    const planned = planner.next(last);
-    last = planned;
-    const tier = skillTierOf(learning.stats()[`sk:${planned.skillId}`]);
-    // A stored pack item joins when its skill + kind match the planned round.
-    const packIndex = packItems.findIndex(
-      (p, i) => !usedPack.has(i) && p.skillId === planned.skillId && p.kind === planned.kind,
-    );
-    let item: EnglishItem;
-    if (packIndex >= 0) {
-      usedPack.add(packIndex);
-      item = packItems[packIndex] as EnglishItem;
-    } else {
-      item = generateItem(planned.skillId, planned.kind, tier, unit, learning.rng);
-    }
-    const budget = new StepMissBudget();
-    const startedAt = performance.now();
-    const wrongAnswers: number[] = [];
-    roundEl.textContent = tei('roundOf', { n: round + 1, total: ENGLISH_ROUNDS });
-    live = {
-      round: round + 1,
+    const played = await playEnglishRound({
+      round,
       total: ENGLISH_ROUNDS,
-      done: false,
-      skillId: planned.skillId,
-      item,
-      hintRung: 0,
-    };
-    feedback.textContent = '';
-    nextButton.hidden = true;
-    hintButton.disabled = true;
-
-    let widget: EnglishWidget | null = null;
-    const hooks: EnglishWidgetHooks = {
-      onAttempt: (attempt: EnglishAttempt) => {
-        const checked = checkAnswer(item, attempt);
-        if (checked.correct) return { correct: true, reveal: false };
-        if (checked.wrongPickIndex !== null) wrongAnswers.push(checked.wrongPickIndex);
-        if (budget.miss()) {
-          widget?.revealAnswer();
-          widget?.showGloss();
-          say(tei('revealed'));
-          hintButton.disabled = true;
-          nextButton.hidden = false;
-          return { correct: false, reveal: true };
-        }
-        say(tei(englishWrongFeedback(item)));
-        hintButton.disabled = false;
-        return { correct: false, reveal: false };
+      planner,
+      last,
+      unit,
+      learning,
+      packItems,
+      usedPack,
+      shell,
+      speaker,
+      speech,
+      aborted: () => aborted,
+      setLive: (next) => {
+        live = next;
       },
-      onSolved: () => {
-        say(tei('correct'));
-        widget?.showGloss();
-        hintButton.disabled = true;
-        nextButton.hidden = false;
-      },
-    };
-    // Tier 3 listen-only (3B): hide the word once audio exists for it.
-    const hideWord =
-      item.kind === 'listen-pick-picture' &&
-      item.listenOnly === true &&
-      speaker.isAvailable(item.word);
-    widget = mountWidget(item, hooks, onSpeak, hideWord);
-    itemArea.appendChild(widget.element);
-    if (!appSettings.get().sound && !mutedPromptShown) {
-      mutedPromptShown = true;
-      say(tei('soundOff'));
-    }
-
-    hintButton.onclick = () => {
-      if (!widget || nextButton.hidden === false) return;
-      const rung = budget.takeHint(2);
-      live = { ...live, hintRung: rung };
-      if (rung === 1) say(tei('hintEncourage'));
-      else if (rung === 2) {
-        widget.helpOnce();
-        say(tei('hintNarrowed'));
-      }
-      hintButton.disabled = budget.hint.rung >= 2;
-    };
-
-    await new Promise<void>((resolve) => {
-      resolveRound = resolve;
     });
-    resolveRound = null;
-    // Aborted mid-round: the round is not recorded.
-    if (aborted) {
-      widget.destroy();
-      itemArea.textContent = '';
-      break;
-    }
-
-    const result = budget.result();
-    const outcome: QuestionOutcome = {
-      factKey: skillKey(planned.skillId),
-      ms: Math.round(performance.now() - startedAt),
-      correct: result.correct,
-      firstTry: result.firstTry,
-      usedHint: result.usedHint,
-      wrongAnswers,
-    };
-    learning.record(outcome);
+    last = played.last;
+    if (played.aborted) break;
     completedRounds += 1;
-    if (result.correct) correctCount += 1;
-    widget.destroy();
-    itemArea.textContent = '';
+    if (played.correct) correctCount += 1;
   }
 
   if (aborted) {
@@ -331,7 +178,7 @@ export async function startEnglishRun(port: EnglishRunPort): Promise<EnglishRunR
       item: null,
       hintRung: 0,
     };
-    root.remove();
+    shell.root.remove();
     return { completed: false, roundsPlayed: completedRounds, correctCount };
   }
 
@@ -344,8 +191,8 @@ export async function startEnglishRun(port: EnglishRunPort): Promise<EnglishRunR
     hintRung: 0,
   };
   // R64: no finish screen — resolve at once so the level shell can show its
-  // own ending card. Clear the run's controls so nothing stale stays tappable.
-  root.textContent = '';
+  // own ending card. Clear the controls so nothing stale stays tappable.
+  shell.root.textContent = '';
   port.signal?.removeEventListener('abort', onAbort);
   speaker.dispose();
   return { completed: true, roundsPlayed: ENGLISH_ROUNDS, correctCount };
