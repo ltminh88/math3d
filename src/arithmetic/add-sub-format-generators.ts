@@ -1,31 +1,20 @@
 // Format generators (boost, Phase 1A): the five new add/sub formats. Every pair
 // comes from the ladder picker at the tier's ladder step, every wrong option
 // from the bug catalogue when a bug applies (a near-miss slip only fills a gap).
-import { pick, shuffle, type Rng } from '../learning/seeded-rng';
+import { pick, type Rng, shuffle } from '../learning/seeded-rng';
 import type { SkillTier } from '../learning/skill-tiers';
 import type { NumberScene } from '../numbers/numbers-scene-types';
 import { pickName } from '../reasoning/reasoning-distractors';
-import type {
-  ChoiceOption,
-  ReasoningGenerator,
-  ReasoningStep,
-} from '../reasoning/reasoning-types';
-import {
-  arithmeticItem,
-  numberChoiceStepCapped,
-  numberStep,
-  ref,
-  wrongBySlip,
-} from './arithmetic-distractors';
-import { RANGE_1000 } from './arithmetic-ranges';
+import type { ChoiceOption, ReasoningGenerator, ReasoningStep } from '../reasoning/reasoning-types';
 import { barModelWp } from './add-sub-bar-model-word-problems';
-import { bugsFor, type AddSubBug, type AddSubOp } from './add-sub-bug-catalogue';
+import { type AddSubBug, type AddSubOp, bugsFor } from './add-sub-bug-catalogue';
 import { ladderOfSkillTier, pickLadderPair } from './add-sub-pair-pickers';
+import { arithmeticItem, numberChoiceStepCapped, ref, wrongBySlip } from './arithmetic-distractors';
+import { RANGE_1000 } from './arithmetic-ranges';
 
 const CAP = RANGE_1000;
 
-const correctOf = (a: number, b: number, op: AddSubOp): number =>
-  op === '+' ? a + b : a - b;
+const correctOf = (a: number, b: number, op: AddSubOp): number => (op === '+' ? a + b : a - b);
 
 /** One pair from the tier's ladder step, with the operation picked at random. */
 const formatPair = (rng: Rng, tier: SkillTier): { a: number; b: number; op: AddSubOp } => {
@@ -51,7 +40,9 @@ const formatPairWithTrap = (
 
 /** Pick the right answer out of four: the correct value plus up to three bug values. */
 export const bugChoice: ReasoningGenerator = (rng, tier) => {
-  let best: { a: number; b: number; op: AddSubOp; bugs: readonly { bug: AddSubBug; value: number }[] } | undefined;
+  let best:
+    | { a: number; b: number; op: AddSubOp; bugs: readonly { bug: AddSubBug; value: number }[] }
+    | undefined;
   for (let t = 0; t < 200; t++) {
     const pair = formatPair(rng, tier);
     const bugs = bugsFor(pair.a, pair.b, pair.op).filter((f) => f.value <= CAP);
@@ -60,9 +51,7 @@ export const bugChoice: ReasoningGenerator = (rng, tier) => {
   }
   const { a, b, op, bugs } = best ?? { a: 100, b: 100, op: '+' as AddSubOp, bugs: [] };
   const correct = correctOf(a, b, op);
-  const candidates = bugs
-    .slice(0, 3)
-    .map((f) => ({ value: f.value, misconception: f.bug }));
+  const candidates = bugs.slice(0, 3).map((f) => ({ value: f.value, misconception: f.bug }));
   return arithmeticItem(
     'add-sub-bug-choice',
     tier,
@@ -123,17 +112,10 @@ export const compareEstimate: ReasoningGenerator = (rng, tier) => {
         misconception: key === 'cmpEq' ? hit.bug : ('wrong-sign' as const),
       };
     };
-    const options = shuffle(rng, [
-      mk('cmpLt', 0),
-      mk('cmpEq', 1),
-      mk('cmpGt', 2),
+    const options = shuffle(rng, [mk('cmpLt', 0), mk('cmpEq', 1), mk('cmpGt', 2)]);
+    return arithmeticItem('add-sub-compare-estimate', tier, ref('compareCalc', { a, op, b, c }), [
+      { kind: 'choice', prompt: ref('askCompareSign'), options },
     ]);
-    return arithmeticItem(
-      'add-sub-compare-estimate',
-      tier,
-      ref('compareCalc', { a, op, b, c }),
-      [{ kind: 'choice', prompt: ref('askCompareSign'), options }],
-    );
   }
   const correctHundred = nearest100(correct);
   const seen = new Set<number>([correctHundred]);
@@ -151,32 +133,18 @@ export const compareEstimate: ReasoningGenerator = (rng, tier) => {
     seen.add(hundred);
     candidates.push({ value: hundred, misconception: 'near-miss' });
   }
-  return arithmeticItem(
-    'add-sub-compare-estimate',
-    tier,
-    ref('estimateCalc', { a, op, b }),
-    [
-      numberChoiceStepCapped(
-        rng,
-        ref('askNearestHundred'),
-        correctHundred,
-        candidates,
-        CAP,
-        3,
-      ),
-    ],
-  );
+  return arithmeticItem('add-sub-compare-estimate', tier, ref('estimateCalc', { a, op, b }), [
+    numberChoiceStepCapped(rng, ref('askNearestHundred'), correctHundred, candidates, CAP, 3),
+  ]);
 };
 
 /** Number-line jumps of 100/10/1: the scene shows the jumps, the last landing is '?'. */
 export const numberLine: ReasoningGenerator = (rng, tier) => {
   const { a, b, op } = formatPair(rng, tier);
   const isAdd = op === '+';
-  const parts = [
-    Math.floor(b / 100) * 100,
-    Math.floor((b % 100) / 10) * 10,
-    b % 10,
-  ].filter((part) => part > 0);
+  const parts = [Math.floor(b / 100) * 100, Math.floor((b % 100) / 10) * 10, b % 10].filter(
+    (part) => part > 0,
+  );
   const jumps: { from: number; by: number }[] = [];
   let landing = a;
   for (const part of parts) {

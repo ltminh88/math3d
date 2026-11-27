@@ -13,8 +13,7 @@ export const addSubFormatStrings = {
     cmpGt: '>',
     numberLineJumps: 'Trên tia số, từ {start} nhảy {jumps}.',
     askLanding: 'Sau các bước nhảy, bạn dừng ở số nào?',
-    barModelPart:
-      '{name} có {a} {item}. Sau khi mua thêm, {name} có tất cả {total} {item}.',
+    barModelPart: '{name} có {a} {item}. Sau khi mua thêm, {name} có tất cả {total} {item}.',
     barModelTotal: '{name} có {a} {item}. {name} mua thêm {b} {item}.',
     askUnknownBar: 'Thanh nào chưa biết?',
     barWhole: 'Thanh tổng: {n}',
@@ -34,8 +33,7 @@ export const addSubFormatStrings = {
     cmpGt: '>',
     numberLineJumps: 'On the number line, jump from {start}: {jumps}.',
     askLanding: 'After the jumps, which number do you land on?',
-    barModelPart:
-      '{name} has {a} {item}. After buying more, {name} has {total} {item} in all.',
+    barModelPart: '{name} has {a} {item}. After buying more, {name} has {total} {item} in all.',
     barModelTotal: '{name} has {a} {item}. {name} buys {b} more {item}.',
     askUnknownBar: 'Which bar is unknown?',
     barWhole: 'Whole bar: {n}',

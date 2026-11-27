@@ -3,13 +3,9 @@
 import type { Rng } from '../learning/seeded-rng';
 import type { SkillTier } from '../learning/skill-tiers';
 import type { PracticeItem, PracticeScene } from '../practice/practice-scene';
-import { numberStep, optionsFrom, reasoningItem, ref } from '../reasoning/reasoning-distractors';
 import type { Candidate } from '../reasoning/reasoning-distractors';
-import type {
-  ChoiceOption,
-  PromptRef,
-  ReasoningStep,
-} from '../reasoning/reasoning-types';
+import { numberStep, optionsFrom, reasoningItem, ref } from '../reasoning/reasoning-distractors';
+import type { ChoiceOption, PromptRef, ReasoningStep } from '../reasoning/reasoning-types';
 import { digitsOf, fromDigits } from './arithmetic-ranges';
 
 export { numberStep, ref };

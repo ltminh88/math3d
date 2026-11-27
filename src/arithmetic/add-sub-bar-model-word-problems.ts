@@ -2,7 +2,7 @@
 // choose + or −, then the number pad. Two shapes: unknown part (a + ? = total,
 // so the operation is −) and unknown total (a + b = ?, so the operation is +).
 // Numbers stay under 1 000, so the story uses personal items (le's rule).
-import { shuffle, type Rng } from '../learning/seeded-rng';
+import { type Rng, shuffle } from '../learning/seeded-rng';
 import { expressionChoiceStep, pickName, pickNoun } from '../reasoning/reasoning-distractors';
 import type {
   ChoiceOption,
@@ -10,8 +10,8 @@ import type {
   ReasoningGenerator,
   ReasoningStep,
 } from '../reasoning/reasoning-types';
-import { arithmeticItem, numberStep, ref } from './arithmetic-distractors';
 import { ladderOfSkillTier, pickLadderPair } from './add-sub-pair-pickers';
+import { arithmeticItem, numberStep, ref } from './arithmetic-distractors';
 
 const barOptions = (
   rng: Rng,
@@ -51,20 +51,15 @@ export const barModelWp: ReasoningGenerator = (rng, tier) => {
   }
   // Unknown total: {name} has {a}, buys {b} more — find the total.
   const [a, b] = pickLadderPair(rng, '+', ladder);
-  return arithmeticItem(
-    'add-sub-bar-model-wp',
-    tier,
-    ref('barModelTotal', { name, item, a, b }),
-    [
-      barOptions(rng, [
-        { label: ref('barKnown', { n: a }), correct: false },
-        { label: ref('barKnown', { n: b }), correct: false },
-        { label: ref('barWhole', { n: '?' }), correct: true },
-      ]),
-      expressionChoiceStep(rng, ref('askBarOp'), '+', [
-        { value: '−', misconception: 'wrong-inverse' },
-      ]),
-      numberStep(ref('askTotal', { name, item }), a + b),
-    ],
-  );
+  return arithmeticItem('add-sub-bar-model-wp', tier, ref('barModelTotal', { name, item, a, b }), [
+    barOptions(rng, [
+      { label: ref('barKnown', { n: a }), correct: false },
+      { label: ref('barKnown', { n: b }), correct: false },
+      { label: ref('barWhole', { n: '?' }), correct: true },
+    ]),
+    expressionChoiceStep(rng, ref('askBarOp'), '+', [
+      { value: '−', misconception: 'wrong-inverse' },
+    ]),
+    numberStep(ref('askTotal', { name, item }), a + b),
+  ]);
 };

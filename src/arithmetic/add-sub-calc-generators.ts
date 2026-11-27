@@ -2,9 +2,9 @@
 // change): mental round numbers, plain add/sub, and the two-operation chain.
 import { pick, randInt } from '../learning/seeded-rng';
 import type { ReasoningGenerator } from '../reasoning/reasoning-types';
+import { pickAddPair, pickChainTriple, pickSubPair } from './add-sub-pair-pickers';
 import { arithmeticItem, numberStep, ref } from './arithmetic-distractors';
 import { RANGE_1000, RANGE_10000, RANGE_100000 } from './arithmetic-ranges';
-import { pickAddPair, pickChainTriple, pickSubPair } from './add-sub-pair-pickers';
 
 /** Round hundreds (T1), round tens (T2), or a three-term chain of round numbers (T3). */
 export const mentalRound: ReasoningGenerator = (rng, tier) => {
@@ -92,7 +92,6 @@ export const addSubChain: ReasoningGenerator = (rng, tier) => {
     [first],
   );
 };
-
 
 export const ADD_SUB_CALC_GENERATORS: Record<string, ReasoningGenerator> = {
   'add-sub-mental-round': mentalRound,

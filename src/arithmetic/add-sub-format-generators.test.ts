@@ -1,18 +1,19 @@
 // Format generators (boost, Phase 1A): the five new add/sub formats.
 // RED-first: the generators do not exist yet.
 import { describe, expect, it } from 'vitest';
-import { mulberry32, type Rng } from '../learning/seeded-rng';
+import { mulberry32 } from '../learning/seeded-rng';
 import type { SkillTier } from '../learning/skill-tiers';
 import type { NumberScene } from '../numbers/numbers-scene-types';
+import type { PracticeItem } from '../practice/practice-scene';
 import type { ChoiceOption, ReasoningStep } from '../reasoning/reasoning-types';
 import { bugsFor, bugValue } from './add-sub-bug-catalogue';
 import { ADD_SUB_FORMAT_GENERATORS } from './add-sub-format-generators';
-import { sweepArithmeticItem } from './arithmetic-test-sweep';
 import {
   oracleAddCarries,
   oracleBorrowAcrossZero,
   oracleSubBorrows,
 } from './arithmetic-test-oracles';
+import { sweepArithmeticItem } from './arithmetic-test-sweep';
 import { countAddCarries, countSubBorrows } from './carry-count';
 
 const SKILLS = [
@@ -25,18 +26,26 @@ const SKILLS = [
 
 const CAP = 1000;
 
-const generate = (skillId: (typeof SKILLS)[number], tier: SkillTier, seed: number) =>
-  ADD_SUB_FORMAT_GENERATORS[skillId](mulberry32(seed), tier);
+const generate = (skillId: (typeof SKILLS)[number], tier: SkillTier, seed: number): PracticeItem => {
+  const gen = ADD_SUB_FORMAT_GENERATORS[skillId];
+  if (!gen) throw new Error(`no generator for ${skillId}`);
+  return gen(mulberry32(seed), tier) as PracticeItem;
+};
 
 const params = (item: ReturnType<typeof generate>) =>
   item.story.params as Record<string, number | string>;
 
 const numOf = (option: ChoiceOption): number => {
   expect(option.label.key).toBe('num');
-  return (option.label.params as Record<string, number>).n;
+  const n = option.label.params?.n;
+  if (typeof n !== 'number') throw new Error('option has no number label');
+  return n;
 };
 
-const choiceStep = (item: ReturnType<typeof generate>, index = 0): ReasoningStep & {
+const choiceStep = (
+  item: ReturnType<typeof generate>,
+  index = 0,
+): ReasoningStep & {
   kind: 'choice';
 } => {
   const step = item.steps[index];
@@ -97,9 +106,7 @@ describe('add-sub-bug-choice', () => {
         expect(numOf(right[0] as ChoiceOption)).toBe(correct);
         for (const o of step.options) {
           if (o.misconception && o.misconception !== 'near-miss') {
-            expect(numOf(o)).toBe(
-              bugValue(o.misconception as never, a, b, op),
-            );
+            expect(numOf(o)).toBe(bugValue(o.misconception as never, a, b, op));
           }
         }
       }
@@ -174,9 +181,7 @@ describe('add-sub-compare-estimate', () => {
         expect(numOf(right[0] as ChoiceOption)).toBe(nearest100(correct));
         for (const o of step.options) {
           if (o.misconception && o.misconception !== 'near-miss') {
-            expect(numOf(o)).toBe(
-              nearest100(bugValue(o.misconception as never, a, b, op)),
-            );
+            expect(numOf(o)).toBe(nearest100(bugValue(o.misconception as never, a, b, op)));
           }
         }
       }
@@ -227,9 +232,7 @@ describe('add-sub-number-line', () => {
         const correct = start + jumps.reduce((sum, j) => sum + j, 0);
         expect(correct).toBeGreaterThanOrEqual(0);
         expect(correct).toBeLessThanOrEqual(CAP);
-        const scene = item.scene as
-          | Extract<NumberScene, { kind: 'number-line' }>
-          | undefined;
+        const scene = item.scene as Extract<NumberScene, { kind: 'number-line' }> | undefined;
         expect(scene).toBeDefined();
         expect(scene?.kind).toBe('number-line');
         if (scene?.kind !== 'number-line') continue;

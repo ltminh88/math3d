@@ -2,15 +2,15 @@
 // pattern matches the ladder step, so each SkillTier practices one regroup shape.
 // RED-first: the picker does not exist yet.
 import { describe, expect, it } from 'vitest';
-import { countAddCarries, countSubBorrows, hasBorrowAcrossZero } from './carry-count';
 import { mulberry32 } from '../learning/seeded-rng';
 import {
   addCarryAt,
+  type Ladder,
   ladderOfSkillTier,
   pickLadderPair,
   subBorrowAt,
-  type Ladder,
 } from './add-sub-pair-pickers';
+import { countAddCarries, countSubBorrows, hasBorrowAcrossZero } from './carry-count';
 
 const checkPair = (a: number, b: number, op: '+' | '−') => {
   expect(a).toBeGreaterThanOrEqual(10);

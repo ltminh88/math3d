@@ -92,7 +92,7 @@ export type Ladder = 0 | 1 | 2 | 3 | 4;
 export const addCarryAt = (a: number, b: number, col: number): boolean => {
   let carry = 0;
   for (let i = 0; i <= col; i++) {
-    const sum = Math.floor(a / 10 ** i) % 10 + Math.floor(b / 10 ** i) % 10 + carry;
+    const sum = (Math.floor(a / 10 ** i) % 10) + (Math.floor(b / 10 ** i) % 10) + carry;
     carry = Math.floor(sum / 10);
   }
   return carry > 0;
@@ -102,7 +102,7 @@ export const addCarryAt = (a: number, b: number, col: number): boolean => {
 export const subBorrowAt = (a: number, b: number, col: number): boolean => {
   let borrow = 0;
   for (let i = 0; i <= col; i++) {
-    const raw = Math.floor(a / 10 ** i) % 10 - Math.floor(b / 10 ** i) % 10 - borrow;
+    const raw = (Math.floor(a / 10 ** i) % 10) - (Math.floor(b / 10 ** i) % 10) - borrow;
     borrow = raw < 0 ? 1 : 0;
   }
   return borrow > 0;

@@ -287,8 +287,7 @@ export const twa = defineStrings('wrongAnswer', {
       'Bạn mượn 1 rồi nhưng quên bớt 1 ở số cho mượn. Mình bớt 1 ở hàng cho mượn rồi tính lại nhé.',
     bugZeroBorrowSkip:
       'Bạn gặp số 0 thì dừng mượn. Số 0 mượn 1 thành 9 rồi mượn tiếp sang hàng bên trái nhé.',
-    bugZeroMinusNZero:
-      'Bạn thấy 0 trừ một số thì viết 0. Mình mượn 1 cho số 0 rồi tính lại nhé.',
+    bugZeroMinusNZero: 'Bạn thấy 0 trừ một số thì viết 0. Mình mượn 1 cho số 0 rồi tính lại nhé.',
     bugMisalignedColumns:
       'Bạn đặt các chữ số chưa thẳng hàng. Mình viết số dưới sao cho hàng đơn vị thẳng hàng đơn vị nhé.',
     bugSecondRegroupDropped:

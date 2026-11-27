@@ -4,8 +4,7 @@
 // 403−158→355, 305−127→202, 146+29→436, 385+247→532.
 import { describe, expect, it } from 'vitest';
 import { mulberry32 } from '../learning/seeded-rng';
-import type { Misconception } from '../reasoning/reasoning-types';
-import { bugValue, bugsFor, type AddSubBug } from './add-sub-bug-catalogue';
+import { type AddSubBug, bugsFor, bugValue } from './add-sub-bug-catalogue';
 
 const ADD_BUGS: readonly AddSubBug[] = [
   'forgot-carry',
@@ -87,10 +86,7 @@ describe('bugsFor', () => {
       const rng = mulberry32(seed);
       const op = rng() < 0.5 ? '+' : '−';
       const a = 100 + Math.floor(rng() * 800);
-      const b =
-        op === '+'
-          ? 10 + Math.floor(rng() * 90)
-          : 10 + Math.floor(rng() * (a - 10));
+      const b = op === '+' ? 10 + Math.floor(rng() * 90) : 10 + Math.floor(rng() * (a - 10));
       const correct = op === '+' ? a + b : a - b;
       const found = bugsFor(a, b, op as '+' | '−');
       const values = new Set<number>();

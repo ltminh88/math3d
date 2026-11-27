@@ -4,6 +4,8 @@
 import { pick, randInt } from '../learning/seeded-rng';
 import { pickName } from '../reasoning/reasoning-distractors';
 import type { ReasoningGenerator, ReasoningStep } from '../reasoning/reasoning-types';
+import { bugsFor } from './add-sub-bug-catalogue';
+import { pickAddPair, pickSubPair } from './add-sub-pair-pickers';
 import {
   arithmeticItem,
   numberStep,
@@ -13,8 +15,6 @@ import {
   wrongSubByNoBorrow,
 } from './arithmetic-distractors';
 import { tierRangeCap } from './arithmetic-ranges';
-import { bugsFor } from './add-sub-bug-catalogue';
-import { pickAddPair, pickSubPair } from './add-sub-pair-pickers';
 
 /** Đúng/Sai on a worked result: half the time the shown result is right, half the time it
  *  is built from the bug catalogue (Phase 1A) when a bug applies, otherwise from the

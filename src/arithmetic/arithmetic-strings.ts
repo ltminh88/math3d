@@ -93,6 +93,8 @@ const vi = {
   item_ml: 'ml',
   item_gram: 'g',
   item_riceKg: 'kg gạo',
+  // Boost Phase 1A formats (add-sub-format-strings.ts).
+  ...addSubFormatStrings.vi,
 };
 
 const en = {
@@ -186,12 +188,11 @@ const en = {
   item_ml: 'ml',
   item_gram: 'g',
   item_riceKg: 'kg of rice',
+  // Boost Phase 1A formats (add-sub-format-strings.ts).
+  ...addSubFormatStrings.en,
 };
 
-const ns = defineStrings('arithmetic', {
-  vi: { ...vi, ...addSubFormatStrings.vi },
-  en: { ...en, ...addSubFormatStrings.en },
-});
+const ns = defineStrings('arithmetic', { vi, en });
 
 type Key = Parameters<typeof ns>[0];
 

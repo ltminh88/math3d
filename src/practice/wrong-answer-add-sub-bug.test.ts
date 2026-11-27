@@ -3,9 +3,9 @@
 // today's per-skill routing. No explainer ever states the answer (the hint
 // ladder may lead to it from rung 2, the explanation itself never does).
 import { describe, expect, it } from 'vitest';
+import { type AddSubBug, type AddSubOp, bugValue } from '../arithmetic/add-sub-bug-catalogue';
 import type { StepAnswer } from '../reasoning/reasoning-step-answers';
 import type { Misconception, ReasoningStep } from '../reasoning/reasoning-types';
-import { bugValue, type AddSubBug, type AddSubOp } from '../arithmetic/add-sub-bug-catalogue';
 import type { PracticeItem } from './practice-scene';
 import { explainWrongAnswer } from './wrong-answer-explanation';
 import { twa } from './wrong-answer-strings';

@@ -7,11 +7,16 @@ import { ADD_SUB_CALC_GENERATORS } from './add-sub-calc-generators';
 import { ADD_SUB_ERROR_GENERATORS } from './add-sub-error-generators';
 import { ADD_SUB_FORMAT_GENERATORS } from './add-sub-format-generators';
 
-export { pickAddPair, pickSubPair, pickChainTriple, type ChainTriple } from './add-sub-pair-pickers';
-export { mentalRound, addSubChain } from './add-sub-calc-generators';
-export { findError, missingDigit } from './add-sub-error-generators';
-export { bugChoice, trueFalse, compareEstimate, numberLine } from './add-sub-format-generators';
 export { barModelWp } from './add-sub-bar-model-word-problems';
+export { addSubChain, mentalRound } from './add-sub-calc-generators';
+export { findError, missingDigit } from './add-sub-error-generators';
+export { bugChoice, compareEstimate, numberLine, trueFalse } from './add-sub-format-generators';
+export {
+  type ChainTriple,
+  pickAddPair,
+  pickChainTriple,
+  pickSubPair,
+} from './add-sub-pair-pickers';
 
 export const ADD_SUB_GENERATORS: Record<string, ReasoningGenerator> = {
   ...ADD_SUB_CALC_GENERATORS,

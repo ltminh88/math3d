@@ -12,8 +12,9 @@
 // (smaller-from-larger, borrow-no-decrement, zero-borrow-skip); bugsFor keeps
 // the first in catalogue order. Per-bug function tests assert each rule on its
 // own research example, independently of tagging order.
-import { wrongAddByForgotCarry, wrongSubByNoBorrow } from './arithmetic-distractors';
+
 import type { Misconception } from '../reasoning/reasoning-types';
+import { wrongAddByForgotCarry, wrongSubByNoBorrow } from './arithmetic-distractors';
 
 export type AddSubBug = Extract<
   Misconception,
@@ -52,7 +53,7 @@ const digitsOf = (n: number): readonly number[] => {
 
 const fromDigits = (digits: readonly number[]): number => {
   let value = 0;
-  for (let i = digits.length - 1; i >= 0; i--) value = value * 10 + digits[i];
+  for (let i = digits.length - 1; i >= 0; i--) value = value * 10 + (digits[i] ?? 0);
   return value;
 };
 
@@ -106,7 +107,7 @@ const zeroBorrowSkip = (a: number, b: number): number => {
       borrowIn = false;
       continue;
     }
-    const raw = daDigit - dbDigit - (borrowIn ? 1 : 0);
+    const raw: number = daDigit - dbDigit - (borrowIn ? 1 : 0);
     out.push(((raw % 10) + 10) % 10);
     borrowIn = raw < 0;
   }
@@ -139,7 +140,14 @@ const misalignedColumns = (a: number, b: number, op: AddSubOp): number => {
   const d = Math.abs(lenA - lenB);
   if (d === 0) return op === '+' ? a + b : a - b;
   const factor = 10 ** d;
-  const value = lenA > lenB ? (op === '+' ? a + b * factor : a - b * factor) : op === '+' ? a * factor + b : a * factor - b;
+  const value =
+    lenA > lenB
+      ? op === '+'
+        ? a + b * factor
+        : a - b * factor
+      : op === '+'
+        ? a * factor + b
+        : a * factor - b;
   return value < 0 ? (op === '+' ? a + b : a - b) : value;
 };
 
