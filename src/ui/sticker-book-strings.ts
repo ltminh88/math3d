@@ -19,6 +19,7 @@ export const ts = defineStrings('stickerBook', {
     topicMoney: 'Tiền',
     topicData: 'Thống kê',
     topicEnglish: 'Tiếng Anh',
+    topicEnglishLook: 'Look 1',
     prevPage: 'Trang trước',
     nextPage: 'Trang sau',
     earnedLine: '{name} — bạn đã thuộc!',
@@ -127,6 +128,13 @@ export const ts = defineStrings('stickerBook', {
     skillEnPatternISee: 'Mẫu câu: I see…',
     skillEnPatternWhatIs: 'Mẫu câu: What is…?',
     skillEnPatternMyFavourite: 'Mẫu câu: My favourite…',
+    skillEnLookStarterNumbers: 'Số đếm 1–10',
+    skillEnLookStarterColors: 'Màu sắc',
+    skillEnLookStarterGreetings: 'Chào hỏi',
+    skillEnLookWords: 'Từ mới · Bài {n}',
+    skillEnLookPattern: 'Mẫu câu · Bài {n}',
+    skillEnLookPhonicsInitial: 'Âm đầu A–Z',
+    skillEnLookPhonicsShortVowels: 'Nguyên âm ngắn',
   },
   en: {
     title: 'Sticker book',
@@ -145,6 +153,7 @@ export const ts = defineStrings('stickerBook', {
     topicMoney: 'Money',
     topicData: 'Data and chance',
     topicEnglish: 'English',
+    topicEnglishLook: 'Look 1',
     prevPage: 'Previous page',
     nextPage: 'Next page',
     earnedLine: '{name} — you know it!',
@@ -253,6 +262,13 @@ export const ts = defineStrings('stickerBook', {
     skillEnPatternISee: 'Pattern: I see…',
     skillEnPatternWhatIs: 'Pattern: What is…?',
     skillEnPatternMyFavourite: 'Pattern: My favourite…',
+    skillEnLookStarterNumbers: 'Numbers 1–10',
+    skillEnLookStarterColors: 'Colors',
+    skillEnLookStarterGreetings: 'Greetings',
+    skillEnLookWords: 'New words · Unit {n}',
+    skillEnLookPattern: 'Pattern · Unit {n}',
+    skillEnLookPhonicsInitial: 'Beginning sounds A–Z',
+    skillEnLookPhonicsShortVowels: 'Short vowels',
   },
 });
 
@@ -357,11 +373,21 @@ const SKILL_NAME_KEY: Record<string, StickerKey> = {
   'en-pattern-i-see': 'skillEnPatternISee',
   'en-pattern-what-is': 'skillEnPatternWhatIs',
   'en-pattern-my-favourite': 'skillEnPatternMyFavourite',
+  'en-look-starter-numbers': 'skillEnLookStarterNumbers',
+  'en-look-starter-colors': 'skillEnLookStarterColors',
+  'en-look-starter-greetings': 'skillEnLookStarterGreetings',
+  'en-look-phonics-initial': 'skillEnLookPhonicsInitial',
+  'en-look-phonics-short-vowels': 'skillEnLookPhonicsShortVowels',
 };
 
 /** Child-facing name of a sticker ('table:3' or 'sk:<skillId>'). */
 export function stickerName(id: string): string {
   if (id.startsWith('table:')) return ts('tableName', { n: id.slice(6) });
+  // Look unit skills share one label per unit (words + pattern are a pair).
+  const lookWords = /^en-look-u(\d+)-words$/.exec(id.slice(3));
+  if (lookWords) return ts('skillEnLookWords', { n: lookWords[1] as string });
+  const lookPattern = /^en-look-u(\d+)-pattern$/.exec(id.slice(3));
+  if (lookPattern) return ts('skillEnLookPattern', { n: lookPattern[1] as string });
   const key = SKILL_NAME_KEY[id.slice(3)];
   return key ? ts(key) : id;
 }

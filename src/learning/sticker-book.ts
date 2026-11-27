@@ -1,6 +1,8 @@
 // Sticker book derivation (phase 12, pure): a sticker is earned ⟺ its unit reached Leitner
 // box 4+. The book reads the fact/skill stats the store already holds, so stickers need no
 // storage: an old save's boxes *are* its stickers, and nothing can desync from real mastery.
+import { ENGLISH_SKILL_IDS } from '../english/english-skill-entries';
+import { LOOK_SKILL_IDS } from '../english/look-skill-ids';
 import { divFactsForTables, mulFactsForTables } from './curriculum-tables';
 import { type FactKey, skillKey } from './fact-key';
 import type { FactStat } from './learning-types';
@@ -26,7 +28,8 @@ export type StickerTopic =
   | 'time'
   | 'money'
   | 'data'
-  | 'english';
+  | 'english'
+  | 'english-look';
 
 /** Book order of the topic pages (family topics stay hidden until their skills exist). */
 export const STICKER_TOPICS: readonly StickerTopic[] = [
@@ -43,6 +46,7 @@ export const STICKER_TOPICS: readonly StickerTopic[] = [
   'money',
   'data',
   'english',
+  'english-look',
 ];
 
 export interface Sticker {
@@ -132,7 +136,10 @@ export const TOPIC_SKILLS: Readonly<Record<Exclude<StickerTopic, 'tables'>, read
   time: skillsOfFamily('time'),
   money: skillsOfFamily('money'),
   data: skillsOfFamily('data'),
-  english: skillsOfFamily('english'),
+  // English is two books on two pages: CEC's 41 skills stay on the English
+  // page; the 29 Look skills get their own "Look 1" page (Phase 4).
+  english: ENGLISH_SKILL_IDS,
+  'english-look': LOOK_SKILL_IDS,
 };
 
 type Stats = Readonly<Record<FactKey, FactStat | undefined>>;

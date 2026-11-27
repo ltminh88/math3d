@@ -33,6 +33,7 @@ const TOPIC_TITLE: Record<StickerTopic, Parameters<typeof ts>[0]> = {
   money: 'topicMoney',
   data: 'topicData',
   english: 'topicEnglish',
+  'english-look': 'topicEnglishLook',
 };
 
 /** One emoji per sticker, in derivation order (TOPIC_SKILLS order per topic, tables 2–9). */
@@ -51,6 +52,39 @@ const TOPIC_EMOJI: Record<StickerTopic, readonly string[]> = {
   money: [],
   data: [],
   english: [],
+  // Look 1, in LOOK_SKILL_IDS order: Starter (numbers, colours, greetings),
+  // one unit emoji per words skill, 💬 per pattern skill, phonics last.
+  'english-look': [
+    '🔢',
+    '🎨',
+    '👋',
+    '🎒',
+    '🧸',
+    '👩‍🏫',
+    '👨‍👩‍👧',
+    '🖐️',
+    '🏠',
+    '🏪',
+    '🐄',
+    '👕',
+    '🍎',
+    '🏖️',
+    '⚽',
+    '💬',
+    '💬',
+    '💬',
+    '💬',
+    '💬',
+    '💬',
+    '💬',
+    '💬',
+    '💬',
+    '💬',
+    '💬',
+    '💬',
+    '🔤',
+    '🔡',
+  ],
 };
 
 function stickerEmoji(sticker: Sticker): string {

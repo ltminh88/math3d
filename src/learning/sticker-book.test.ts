@@ -2,6 +2,8 @@ import { expect, it } from 'vitest';
 
 // Sticker book derivation (phase 12): a skill at box 4 is earned, a table at 13 of its 18
 // mul+div facts; a fresh profile owns nothing; an old save's boxes derive the same stickers.
+import { ENGLISH_SKILL_IDS } from '../english/english-skill-entries';
+import { LOOK_SKILL_IDS } from '../english/look-skill-ids';
 import { divFactsForTables, mulFactsForTables } from './curriculum-tables';
 import type { FactKey } from './fact-key';
 import type { FactStat } from './learning-types';
@@ -85,6 +87,20 @@ it('a skill at box 4 is earned, at box 3 it is not, at box 5 it stays earned', (
   );
 });
 
+it('a Look skill at box 4 is earned on the Look 1 page, at box 3 it is not', () => {
+  const at4 = deriveStickers({ 'sk:en-look-u1-words': stat(4) });
+  expect(at4.find((s) => s.id === 'sk:en-look-u1-words')).toMatchObject({
+    earned: true,
+    box: 4,
+    topic: 'english-look',
+  });
+  expect(deriveStickers({ 'sk:en-look-u1-words': stat(3) })).toContainEqual(
+    expect.objectContaining({ id: 'sk:en-look-u1-words', earned: false, box: 3 }),
+  );
+  expect(topicProgress(deriveStickers({}), 'english-look')).toEqual({ earned: 0, total: 29 });
+  expect(topicProgress(deriveStickers({}), 'english')).toEqual({ earned: 0, total: 41 });
+});
+
 it('a table needs 13 of 18 facts at box 4 (70%): 13 earns, 12 does not', () => {
   const earned = deriveStickers(tableStats(3, 13));
   expect(earned.find((s) => s.id === 'table:3')).toMatchObject({
@@ -153,14 +169,21 @@ it('empty family topics stay hidden until their skills exist', () => {
     'data',
     // English landed in Phase 0: 41 stickers, none earned yet (the island opens in 1A/1B).
     'english',
+    // Look 1 landed in two-modes Phase 4: 29 stickers on their own page.
+    'english-look',
   ]);
   // Arithmetic landed in phase 09: twelve stickers, none earned yet.
   expect(topicProgress(stickers, 'arithmetic')).toEqual({
     earned: 0,
     total: skillsOfFamily('arithmetic').length,
   });
+  // The English page holds only the 41 CEC skills; the Look page holds the 29.
   expect(topicProgress(stickers, 'english')).toEqual({
     earned: 0,
-    total: skillsOfFamily('english').length,
+    total: ENGLISH_SKILL_IDS.length,
+  });
+  expect(topicProgress(stickers, 'english-look')).toEqual({
+    earned: 0,
+    total: LOOK_SKILL_IDS.length,
   });
 });
