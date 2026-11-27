@@ -1,6 +1,7 @@
 // Round flow of the workshop (pure): which round and step is live, misses and hint rungs per step,
 // the reveal after three misses, and the outcome recorded under the skill's `sk:` key. The step
-// card checks each answer; the controller reports it here with `answer(correct, wrongValue)`.
+// card checks each answer; the controller reports it here with
+// `answer(correct, wrongValue?, bug?)` — `wrongValue` only when the answer is a number.
 import type { QuestionOutcome } from '../../learning/session-recorder';
 import { playableSteps } from '../../reasoning/reasoning-step-answers';
 import type { Misconception } from '../../reasoning/reasoning-types';
@@ -21,6 +22,9 @@ export class WorkshopRoundFlow {
   private wrongs: number[] = [];
   private usedHint = false;
   private revealed = false;
+  /** Any miss on this round (R97): `firstTry` must stay false after a wrong
+   * choice/order/match pick even though it records no number in `wrongs`. */
+  private missed = false;
   /** The question's bugs, in the order first picked (boost Phase 0, R79):
    * a wrong pick that stands for a bug fills only the bug bank — it adds
    * no attempt and moves no box. */
@@ -54,16 +58,19 @@ export class WorkshopRoundFlow {
     return this.misses > 0 && !this.roundComplete;
   }
 
-  /** One try on the live step; a wrong try counts `wrongValue` (0..) and, when
-   * the pick stands for a bug, that bug (3B: passed in by the controller). */
-  answer(correct: boolean, wrongValue = 0, bug?: Misconception): TryResult {
+  /** One try on the live step. A wrong NUMBER try counts `wrongValue` (0..);
+   * a wrong choice/order/match pick carries no number — it only adds its bug
+   * when it stands for one (R97, R79: only numbers reach `wrongAnswers`, so
+   * the recorder makes exactly one wrong attempt for a failed question). */
+  answer(correct: boolean, wrongValue?: number, bug?: Misconception): TryResult {
     if (this.done || this.roundComplete) return 'correct';
     if (correct) {
       this.nextStep();
       return 'correct';
     }
     if (bug !== undefined) this.questionBugs.add(bug);
-    this.wrongs.push(wrongValue);
+    if (wrongValue !== undefined) this.wrongs.push(wrongValue);
+    this.missed = true;
     this.misses += 1;
     if (this.misses < MAX_MISSES) return 'wrong';
     this.revealed = true;
@@ -83,7 +90,7 @@ export class WorkshopRoundFlow {
       factKey: this.round?.factKey ?? '',
       ms: Math.max(0, this.now() - this.startedAt),
       correct: !this.revealed,
-      firstTry: this.wrongs.length === 0,
+      firstTry: !this.missed,
       usedHint: this.usedHint,
       wrongAnswers: [...this.wrongs],
       bugs: [...this.questionBugs],
@@ -96,6 +103,7 @@ export class WorkshopRoundFlow {
     this.misses = 0;
     this.hintRung = 0;
     this.wrongs = [];
+    this.missed = false;
     this.questionBugs.clear();
     this.usedHint = false;
     this.revealed = false;

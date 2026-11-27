@@ -68,9 +68,11 @@ export class WorkshopRoundController {
 
   private onAnswer(round: WorkshopRound, event: StepAnswerEvent): void {
     const step = playableSteps(round.item)[event.stepIndex];
+    // R97: only a NUMBER answer reaches `wrongs` — a wrong choice/order/match
+    // pick records no number (its bug, if any, still goes to the bug bank).
     const result = this.flow.answer(
       event.correct,
-      wrongValue(step, event.answer),
+      step?.kind === 'number' ? wrongValue(step, event.answer) : undefined,
       wrongAnswerBug(step, event.answer),
     );
     if (result === 'correct') {

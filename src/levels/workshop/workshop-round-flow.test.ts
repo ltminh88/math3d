@@ -169,15 +169,28 @@ describe('workshop round flow', () => {
 
   it('carries a wrong pick bug into the outcome, and only into its own round', () => {
     const flow = new WorkshopRoundFlow(rounds(), () => 0);
-    expect(flow.answer(false, 0, 'unit-direction')).toBe('wrong');
-    expect(flow.answer(false, 0, 'unit-direction')).toBe('wrong');
+    // R97: a wrong pick carries no number — wrongAnswers stays empty, the bug
+    // is the only trace, and firstTry is still false.
+    expect(flow.answer(false, undefined, 'unit-direction')).toBe('wrong');
+    expect(flow.answer(false, undefined, 'unit-direction')).toBe('wrong');
     while (!flow.roundComplete) flow.answer(true);
-    expect(flow.finishRound()).toMatchObject({ bugs: ['unit-direction'] });
+    expect(flow.finishRound()).toMatchObject({
+      bugs: ['unit-direction'],
+      wrongAnswers: [],
+      firstTry: false,
+    });
     flow.next();
     // A bug passed with a correct answer is ignored, and the next round
     // starts with an empty bug bank.
     while (!flow.roundComplete) flow.answer(true, 0, 'ignore-unit');
     expect(flow.finishRound()).toMatchObject({ bugs: [] });
+  });
+
+  it('a wrong number still records its value (R97)', () => {
+    const flow = new WorkshopRoundFlow(rounds(), () => 0);
+    expect(flow.answer(false, 42)).toBe('wrong');
+    while (!flow.roundComplete) flow.answer(true);
+    expect(flow.finishRound()).toMatchObject({ wrongAnswers: [42], firstTry: false });
   });
 
   it('is done after the last round', () => {
