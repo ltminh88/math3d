@@ -1,0 +1,4178 @@
+{
+  "seed": 20261113,
+  "windowK": 5,
+  "lessonReplays": 10,
+  "dailyDays": 30,
+  "levelRounds": 50,
+  "below60": 40,
+  "tableA": [
+    {
+      "skill": "div-tens-mental",
+      "family": "arithmetic",
+      "lesson": "T1 B26",
+      "t1": {
+        "distinct": 11,
+        "draws": 2000,
+        "firstRepeatAt": 2,
+        "medianBeforeRepeat": 4.5
+      },
+      "t2": {
+        "distinct": 3,
+        "draws": 2000,
+        "firstRepeatAt": 3,
+        "medianBeforeRepeat": 3
+      },
+      "t3": {
+        "distinct": 126,
+        "draws": 2000,
+        "firstRepeatAt": 12,
+        "medianBeforeRepeat": 16.5
+      },
+      "shapes": 1
+    },
+    {
+      "skill": "fraction-read",
+      "family": "fraction",
+      "lesson": "T1 B14",
+      "t1": {
+        "distinct": 3,
+        "draws": 2000,
+        "firstRepeatAt": 4,
+        "medianBeforeRepeat": 3
+      },
+      "t2": {
+        "distinct": 8,
+        "draws": 2000,
+        "firstRepeatAt": 4,
+        "medianBeforeRepeat": 5
+      },
+      "t3": {
+        "distinct": 56,
+        "draws": 2000,
+        "firstRepeatAt": 15,
+        "medianBeforeRepeat": 10
+      },
+      "shapes": 3
+    },
+    {
+      "skill": "money-recognize",
+      "family": "money",
+      "lesson": "T2 B68",
+      "t1": {
+        "distinct": 4,
+        "draws": 2000,
+        "firstRepeatAt": 3,
+        "medianBeforeRepeat": 3
+      },
+      "t2": {
+        "distinct": 3,
+        "draws": 2000,
+        "firstRepeatAt": 3,
+        "medianBeforeRepeat": 3
+      },
+      "t3": {
+        "distinct": 3,
+        "draws": 2000,
+        "firstRepeatAt": 2,
+        "medianBeforeRepeat": 3
+      },
+      "shapes": 1
+    },
+    {
+      "skill": "money-exchange",
+      "family": "money",
+      "lesson": "T2 B68",
+      "t1": {
+        "distinct": 4,
+        "draws": 2000,
+        "firstRepeatAt": 4,
+        "medianBeforeRepeat": 3
+      },
+      "t2": {
+        "distinct": 4,
+        "draws": 2000,
+        "firstRepeatAt": 4,
+        "medianBeforeRepeat": 3
+      },
+      "t3": {
+        "distinct": 7,
+        "draws": 2000,
+        "firstRepeatAt": 4,
+        "medianBeforeRepeat": 3.5
+      },
+      "shapes": 1
+    },
+    {
+      "skill": "mul-hundreds-mental",
+      "family": "arithmetic",
+      "lesson": "T1 B36",
+      "t1": {
+        "distinct": 5,
+        "draws": 2000,
+        "firstRepeatAt": 4,
+        "medianBeforeRepeat": 3.5
+      },
+      "t2": {
+        "distinct": 9,
+        "draws": 2000,
+        "firstRepeatAt": 5,
+        "medianBeforeRepeat": 5
+      },
+      "t3": {
+        "distinct": 126,
+        "draws": 2000,
+        "firstRepeatAt": 10,
+        "medianBeforeRepeat": 14.5
+      },
+      "shapes": 1
+    },
+    {
+      "skill": "mul-thousands-mental",
+      "family": "arithmetic",
+      "lesson": "T2 B56",
+      "t1": {
+        "distinct": 5,
+        "draws": 2000,
+        "firstRepeatAt": 4,
+        "medianBeforeRepeat": 3.5
+      },
+      "t2": {
+        "distinct": 11,
+        "draws": 2000,
+        "firstRepeatAt": 5,
+        "medianBeforeRepeat": 5
+      },
+      "t3": {
+        "distinct": 158,
+        "draws": 2000,
+        "firstRepeatAt": 12,
+        "medianBeforeRepeat": 16.5
+      },
+      "shapes": 1
+    },
+    {
+      "skill": "div-hundreds-mental",
+      "family": "arithmetic",
+      "lesson": "T1 B37",
+      "t1": {
+        "distinct": 8,
+        "draws": 2000,
+        "firstRepeatAt": 4,
+        "medianBeforeRepeat": 5
+      },
+      "t2": {
+        "distinct": 6,
+        "draws": 2000,
+        "firstRepeatAt": 2,
+        "medianBeforeRepeat": 4
+      },
+      "t3": {
+        "distinct": 126,
+        "draws": 2000,
+        "firstRepeatAt": 12,
+        "medianBeforeRepeat": 16.5
+      },
+      "shapes": 1
+    },
+    {
+      "skill": "div-thousands-mental",
+      "family": "arithmetic",
+      "lesson": "T2 B57",
+      "t1": {
+        "distinct": 8,
+        "draws": 2000,
+        "firstRepeatAt": 4,
+        "medianBeforeRepeat": 5
+      },
+      "t2": {
+        "distinct": 6,
+        "draws": 2000,
+        "firstRepeatAt": 2,
+        "medianBeforeRepeat": 4
+      },
+      "t3": {
+        "distinct": 140,
+        "draws": 2000,
+        "firstRepeatAt": 12,
+        "medianBeforeRepeat": 19
+      },
+      "shapes": 1
+    },
+    {
+      "skill": "fraction-shaded",
+      "family": "fraction",
+      "lesson": "T1 B14",
+      "t1": {
+        "distinct": 6,
+        "draws": 2000,
+        "firstRepeatAt": 6,
+        "medianBeforeRepeat": 4
+      },
+      "t2": {
+        "distinct": 13,
+        "draws": 2000,
+        "firstRepeatAt": 8,
+        "medianBeforeRepeat": 4
+      },
+      "t3": {
+        "distinct": 30,
+        "draws": 2000,
+        "firstRepeatAt": 2,
+        "medianBeforeRepeat": 7
+      },
+      "shapes": 1
+    },
+    {
+      "skill": "mul-tens-mental",
+      "family": "arithmetic",
+      "lesson": "T1 B23",
+      "t1": {
+        "distinct": 6,
+        "draws": 2000,
+        "firstRepeatAt": 4,
+        "medianBeforeRepeat": 4
+      },
+      "t2": {
+        "distinct": 8,
+        "draws": 2000,
+        "firstRepeatAt": 5,
+        "medianBeforeRepeat": 4
+      },
+      "t3": {
+        "distinct": 126,
+        "draws": 2000,
+        "firstRepeatAt": 10,
+        "medianBeforeRepeat": 14.5
+      },
+      "shapes": 1
+    },
+    {
+      "skill": "geo-midpoint-length",
+      "family": "geometry",
+      "lesson": "T1 B16",
+      "t1": {
+        "distinct": 66,
+        "draws": 2000,
+        "firstRepeatAt": 7,
+        "medianBeforeRepeat": 6.5
+      },
+      "t2": {
+        "distinct": 36,
+        "draws": 2000,
+        "firstRepeatAt": 11,
+        "medianBeforeRepeat": 8.5
+      },
+      "t3": {
+        "distinct": 9,
+        "draws": 2000,
+        "firstRepeatAt": 6,
+        "medianBeforeRepeat": 4
+      },
+      "shapes": 1
+    },
+    {
+      "skill": "money-total-notes",
+      "family": "money",
+      "lesson": "T2 B68",
+      "t1": {
+        "distinct": 9,
+        "draws": 2000,
+        "firstRepeatAt": 2,
+        "medianBeforeRepeat": 3.5
+      },
+      "t2": {
+        "distinct": 125,
+        "draws": 2000,
+        "firstRepeatAt": 3,
+        "medianBeforeRepeat": 14
+      },
+      "t3": {
+        "distinct": 238,
+        "draws": 2000,
+        "firstRepeatAt": 48,
+        "medianBeforeRepeat": 14
+      },
+      "shapes": 1
+    },
+    {
+      "skill": "number-to-roman",
+      "family": "number",
+      "lesson": "T2 B47",
+      "t1": {
+        "distinct": 10,
+        "draws": 2000,
+        "firstRepeatAt": 3,
+        "medianBeforeRepeat": 4.5
+      },
+      "t2": {
+        "distinct": 10,
+        "draws": 2000,
+        "firstRepeatAt": 3,
+        "medianBeforeRepeat": 3.5
+      },
+      "t3": {
+        "distinct": 20,
+        "draws": 2000,
+        "firstRepeatAt": 5,
+        "medianBeforeRepeat": 4
+      },
+      "shapes": 1
+    },
+    {
+      "skill": "roman-to-number",
+      "family": "number",
+      "lesson": "T2 B47",
+      "t1": {
+        "distinct": 10,
+        "draws": 2000,
+        "firstRepeatAt": 3,
+        "medianBeforeRepeat": 4.5
+      },
+      "t2": {
+        "distinct": 10,
+        "draws": 2000,
+        "firstRepeatAt": 3,
+        "medianBeforeRepeat": 3.5
+      },
+      "t3": {
+        "distinct": 20,
+        "draws": 2000,
+        "firstRepeatAt": 5,
+        "medianBeforeRepeat": 4
+      },
+      "shapes": 1
+    },
+    {
+      "skill": "roman-clock-hour",
+      "family": "time",
+      "lesson": "T2 B47",
+      "t1": {
+        "distinct": 14,
+        "draws": 2000,
+        "firstRepeatAt": 8,
+        "medianBeforeRepeat": 5
+      },
+      "t2": {
+        "distinct": 14,
+        "draws": 2000,
+        "firstRepeatAt": 8,
+        "medianBeforeRepeat": 5
+      },
+      "t3": {
+        "distinct": 11,
+        "draws": 2000,
+        "firstRepeatAt": 4,
+        "medianBeforeRepeat": 4.5
+      },
+      "shapes": 1
+    },
+    {
+      "skill": "fraction-of-set-circle",
+      "family": "fraction",
+      "lesson": "T1 B14",
+      "t1": {
+        "distinct": 12,
+        "draws": 2000,
+        "firstRepeatAt": 4,
+        "medianBeforeRepeat": 5
+      },
+      "t2": {
+        "distinct": 80,
+        "draws": 2000,
+        "firstRepeatAt": 3,
+        "medianBeforeRepeat": 10
+      },
+      "t3": {
+        "distinct": 286,
+        "draws": 2000,
+        "firstRepeatAt": 5,
+        "medianBeforeRepeat": 21.5
+      },
+      "shapes": 1
+    },
+    {
+      "skill": "geo-midpoint",
+      "family": "geometry",
+      "lesson": "T1 B16",
+      "t1": {
+        "distinct": 12,
+        "draws": 2000,
+        "firstRepeatAt": 6,
+        "medianBeforeRepeat": 4.5
+      },
+      "t2": {
+        "distinct": 12,
+        "draws": 2000,
+        "firstRepeatAt": 4,
+        "medianBeforeRepeat": 3.5
+      },
+      "t3": {
+        "distinct": 57,
+        "draws": 2000,
+        "firstRepeatAt": 7,
+        "medianBeforeRepeat": 6
+      },
+      "shapes": 1
+    },
+    {
+      "skill": "geo-radius-diameter",
+      "family": "geometry",
+      "lesson": "T1 B17",
+      "t1": {
+        "distinct": 12,
+        "draws": 2000,
+        "firstRepeatAt": 6,
+        "medianBeforeRepeat": 4.5
+      },
+      "t2": {
+        "distinct": 24,
+        "draws": 2000,
+        "firstRepeatAt": 4,
+        "medianBeforeRepeat": 6
+      },
+      "t3": {
+        "distinct": 32,
+        "draws": 2000,
+        "firstRepeatAt": 2,
+        "medianBeforeRepeat": 8.5
+      },
+      "shapes": 1
+    },
+    {
+      "skill": "meas-ml",
+      "family": "measurement",
+      "lesson": "T1 B32",
+      "t1": {
+        "distinct": 13,
+        "draws": 2000,
+        "firstRepeatAt": 4,
+        "medianBeforeRepeat": 5
+      },
+      "t2": {
+        "distinct": 16,
+        "draws": 2000,
+        "firstRepeatAt": 5,
+        "medianBeforeRepeat": 4.5
+      },
+      "t3": {
+        "distinct": 93,
+        "draws": 2000,
+        "firstRepeatAt": 18,
+        "medianBeforeRepeat": 9
+      },
+      "shapes": 1
+    },
+    {
+      "skill": "meas-area-square",
+      "family": "measurement",
+      "lesson": "T2 B52",
+      "t1": {
+        "distinct": 27,
+        "draws": 2000,
+        "firstRepeatAt": 7,
+        "medianBeforeRepeat": 7
+      },
+      "t2": {
+        "distinct": 27,
+        "draws": 2000,
+        "firstRepeatAt": 9,
+        "medianBeforeRepeat": 8.5
+      },
+      "t3": {
+        "distinct": 14,
+        "draws": 2000,
+        "firstRepeatAt": 2,
+        "medianBeforeRepeat": 5
+      },
+      "shapes": 3
+    },
+    {
+      "skill": "meas-len-choose-unit",
+      "family": "measurement",
+      "lesson": "T1 B7, T1 B30",
+      "t1": {
+        "distinct": 14,
+        "draws": 2000,
+        "firstRepeatAt": 3,
+        "medianBeforeRepeat": 4
+      },
+      "t2": {
+        "distinct": 16,
+        "draws": 2000,
+        "firstRepeatAt": 3,
+        "medianBeforeRepeat": 6
+      },
+      "t3": {
+        "distinct": 16,
+        "draws": 2000,
+        "firstRepeatAt": 3,
+        "medianBeforeRepeat": 6
+      },
+      "shapes": 1
+    },
+    {
+      "skill": "meas-perimeter-square",
+      "family": "measurement",
+      "lesson": "T2 B50",
+      "t1": {
+        "distinct": 19,
+        "draws": 2000,
+        "firstRepeatAt": 6,
+        "medianBeforeRepeat": 5
+      },
+      "t2": {
+        "distinct": 19,
+        "draws": 2000,
+        "firstRepeatAt": 4,
+        "medianBeforeRepeat": 5.5
+      },
+      "t3": {
+        "distinct": 19,
+        "draws": 2000,
+        "firstRepeatAt": 4,
+        "medianBeforeRepeat": 5.5
+      },
+      "shapes": 1
+    },
+    {
+      "skill": "meas-mm-convert",
+      "family": "measurement",
+      "lesson": "T1 B30",
+      "t1": {
+        "distinct": 20,
+        "draws": 2000,
+        "firstRepeatAt": 5,
+        "medianBeforeRepeat": 6
+      },
+      "t2": {
+        "distinct": 1572,
+        "draws": 2000,
+        "firstRepeatAt": 52,
+        "medianBeforeRepeat": 47
+      },
+      "t3": {
+        "distinct": 1712,
+        "draws": 2000,
+        "firstRepeatAt": 105,
+        "medianBeforeRepeat": 88.5
+      },
+      "shapes": 2
+    },
+    {
+      "skill": "mul-2d-1d",
+      "family": "arithmetic",
+      "lesson": "T1 B23",
+      "t1": {
+        "distinct": 40,
+        "draws": 2000,
+        "firstRepeatAt": 7,
+        "medianBeforeRepeat": 8.5
+      },
+      "t2": {
+        "distinct": 36,
+        "draws": 2000,
+        "firstRepeatAt": 7,
+        "medianBeforeRepeat": 5.5
+      },
+      "t3": {
+        "distinct": 22,
+        "draws": 2000,
+        "firstRepeatAt": 4,
+        "medianBeforeRepeat": 8
+      },
+      "shapes": 1
+    },
+    {
+      "skill": "clock-read-hour-half",
+      "family": "time",
+      "lesson": "T2 B66",
+      "t1": {
+        "distinct": 24,
+        "draws": 2000,
+        "firstRepeatAt": 2,
+        "medianBeforeRepeat": 6
+      },
+      "t2": {
+        "distinct": 24,
+        "draws": 2000,
+        "firstRepeatAt": 2,
+        "medianBeforeRepeat": 6
+      },
+      "t3": {
+        "distinct": 24,
+        "draws": 2000,
+        "firstRepeatAt": 2,
+        "medianBeforeRepeat": 6
+      },
+      "shapes": 1
+    },
+    {
+      "skill": "geo-solid-parts",
+      "family": "geometry",
+      "lesson": "T1 B21",
+      "t1": {
+        "distinct": 27,
+        "draws": 2000,
+        "firstRepeatAt": 4,
+        "medianBeforeRepeat": 6.5
+      },
+      "t2": {
+        "distinct": 1110,
+        "draws": 2000,
+        "firstRepeatAt": 95,
+        "medianBeforeRepeat": 56
+      },
+      "t3": {
+        "distinct": 207,
+        "draws": 2000,
+        "firstRepeatAt": 3,
+        "medianBeforeRepeat": 13.5
+      },
+      "shapes": 3
+    },
+    {
+      "skill": "num-neighbors-1000",
+      "family": "number",
+      "lesson": "T1 B1",
+      "t1": {
+        "distinct": 591,
+        "draws": 2000,
+        "firstRepeatAt": 41,
+        "medianBeforeRepeat": 26.5
+      },
+      "t2": {
+        "distinct": 27,
+        "draws": 2000,
+        "firstRepeatAt": 6,
+        "medianBeforeRepeat": 5
+      },
+      "t3": {
+        "distinct": 1171,
+        "draws": 2000,
+        "firstRepeatAt": 19,
+        "medianBeforeRepeat": 14
+      },
+      "shapes": 1
+    },
+    {
+      "skill": "div-2d-1d",
+      "family": "arithmetic",
+      "lesson": "T1 B26",
+      "t1": {
+        "distinct": 37,
+        "draws": 2000,
+        "firstRepeatAt": 8,
+        "medianBeforeRepeat": 11
+      },
+      "t2": {
+        "distinct": 54,
+        "draws": 2000,
+        "firstRepeatAt": 8,
+        "medianBeforeRepeat": 8.5
+      },
+      "t3": {
+        "distinct": 31,
+        "draws": 2000,
+        "firstRepeatAt": 3,
+        "medianBeforeRepeat": 7
+      },
+      "shapes": 1
+    },
+    {
+      "skill": "fraction-of-set-number",
+      "family": "fraction",
+      "lesson": "T1 B14",
+      "t1": {
+        "distinct": 32,
+        "draws": 2000,
+        "firstRepeatAt": 5,
+        "medianBeforeRepeat": 6.5
+      },
+      "t2": {
+        "distinct": 152,
+        "draws": 2000,
+        "firstRepeatAt": 3,
+        "medianBeforeRepeat": 12
+      },
+      "t3": {
+        "distinct": 665,
+        "draws": 2000,
+        "firstRepeatAt": 27,
+        "medianBeforeRepeat": 27
+      },
+      "shapes": 1
+    },
+    {
+      "skill": "clock-sang-chieu-24h",
+      "family": "time",
+      "lesson": "T2 B66",
+      "t1": {
+        "distinct": 33,
+        "draws": 2000,
+        "firstRepeatAt": 2,
+        "medianBeforeRepeat": 10
+      },
+      "t2": {
+        "distinct": 392,
+        "draws": 2000,
+        "firstRepeatAt": 3,
+        "medianBeforeRepeat": 22.5
+      },
+      "t3": {
+        "distinct": 1267,
+        "draws": 2000,
+        "firstRepeatAt": 3,
+        "medianBeforeRepeat": 62
+      },
+      "shapes": 3
+    },
+    {
+      "skill": "meas-area-rect",
+      "family": "measurement",
+      "lesson": "T2 B52",
+      "t1": {
+        "distinct": 36,
+        "draws": 2000,
+        "firstRepeatAt": 7,
+        "medianBeforeRepeat": 6
+      },
+      "t2": {
+        "distinct": 36,
+        "draws": 2000,
+        "firstRepeatAt": 7,
+        "medianBeforeRepeat": 7
+      },
+      "t3": {
+        "distinct": 117,
+        "draws": 2000,
+        "firstRepeatAt": 3,
+        "medianBeforeRepeat": 6.5
+      },
+      "shapes": 1
+    },
+    {
+      "skill": "meas-ml-calc",
+      "family": "measurement",
+      "lesson": "T1 B32",
+      "t1": {
+        "distinct": 45,
+        "draws": 2000,
+        "firstRepeatAt": 7,
+        "medianBeforeRepeat": 7
+      },
+      "t2": {
+        "distinct": 40,
+        "draws": 2000,
+        "firstRepeatAt": 2,
+        "medianBeforeRepeat": 6.5
+      },
+      "t3": {
+        "distinct": 36,
+        "draws": 2000,
+        "firstRepeatAt": 2,
+        "medianBeforeRepeat": 6
+      },
+      "shapes": 1
+    },
+    {
+      "skill": "meas-len-convert-far",
+      "family": "measurement",
+      "lesson": "T1 B7, T1 B30",
+      "t1": {
+        "distinct": 40,
+        "draws": 2000,
+        "firstRepeatAt": 11,
+        "medianBeforeRepeat": 6.5
+      },
+      "t2": {
+        "distinct": 42,
+        "draws": 2000,
+        "firstRepeatAt": 4,
+        "medianBeforeRepeat": 6
+      },
+      "t3": {
+        "distinct": 42,
+        "draws": 2000,
+        "firstRepeatAt": 4,
+        "medianBeforeRepeat": 6
+      },
+      "shapes": 1
+    },
+    {
+      "skill": "months-days-count",
+      "family": "time",
+      "lesson": "T2 B66",
+      "t1": {
+        "distinct": 44,
+        "draws": 2000,
+        "firstRepeatAt": 11,
+        "medianBeforeRepeat": 10.5
+      },
+      "t2": {
+        "distinct": 47,
+        "draws": 2000,
+        "firstRepeatAt": 11,
+        "medianBeforeRepeat": 9
+      },
+      "t3": {
+        "distinct": 45,
+        "draws": 2000,
+        "firstRepeatAt": 16,
+        "medianBeforeRepeat": 6.5
+      },
+      "shapes": 1
+    },
+    {
+      "skill": "meas-ruler-read",
+      "family": "measurement",
+      "lesson": "T1 B7, T1 B30",
+      "t1": {
+        "distinct": 45,
+        "draws": 2000,
+        "firstRepeatAt": 4,
+        "medianBeforeRepeat": 11
+      },
+      "t2": {
+        "distinct": 403,
+        "draws": 2000,
+        "firstRepeatAt": 7,
+        "medianBeforeRepeat": 31
+      },
+      "t3": {
+        "distinct": 1055,
+        "draws": 2000,
+        "firstRepeatAt": 5,
+        "medianBeforeRepeat": 54.5
+      },
+      "shapes": 1
+    },
+    {
+      "skill": "chance-dice",
+      "family": "data",
+      "lesson": "T2 B74",
+      "t1": {
+        "distinct": 48,
+        "draws": 2000,
+        "firstRepeatAt": 16,
+        "medianBeforeRepeat": 5
+      },
+      "t2": {
+        "distinct": 266,
+        "draws": 2000,
+        "firstRepeatAt": 6,
+        "medianBeforeRepeat": 15.5
+      },
+      "t3": {
+        "distinct": 1171,
+        "draws": 2000,
+        "firstRepeatAt": 46,
+        "medianBeforeRepeat": 51.5
+      },
+      "shapes": 1
+    },
+    {
+      "skill": "clock-read-5min",
+      "family": "time",
+      "lesson": "T2 B66",
+      "t1": {
+        "distinct": 48,
+        "draws": 2000,
+        "firstRepeatAt": 11,
+        "medianBeforeRepeat": 11
+      },
+      "t2": {
+        "distinct": 144,
+        "draws": 2000,
+        "firstRepeatAt": 24,
+        "medianBeforeRepeat": 20.5
+      },
+      "t3": {
+        "distinct": 144,
+        "draws": 2000,
+        "firstRepeatAt": 24,
+        "medianBeforeRepeat": 20.5
+      },
+      "shapes": 1
+    },
+    {
+      "skill": "div-reduce-times",
+      "family": "arithmetic",
+      "lesson": "T1 B37",
+      "t1": {
+        "distinct": 48,
+        "draws": 2000,
+        "firstRepeatAt": 9,
+        "medianBeforeRepeat": 10
+      },
+      "t2": {
+        "distinct": 1336,
+        "draws": 2000,
+        "firstRepeatAt": 55,
+        "medianBeforeRepeat": 70.5
+      },
+      "t3": {
+        "distinct": 801,
+        "draws": 2000,
+        "firstRepeatAt": 15,
+        "medianBeforeRepeat": 33.5
+      },
+      "shapes": 1
+    },
+    {
+      "skill": "meas-temperature",
+      "family": "measurement",
+      "lesson": "T1 B33",
+      "t1": {
+        "distinct": 48,
+        "draws": 2000,
+        "firstRepeatAt": 7,
+        "medianBeforeRepeat": 12
+      },
+      "t2": {
+        "distinct": 1998,
+        "draws": 2000,
+        "firstRepeatAt": 378,
+        "medianBeforeRepeat": null
+      },
+      "t3": {
+        "distinct": 296,
+        "draws": 2000,
+        "firstRepeatAt": 40,
+        "medianBeforeRepeat": 21
+      },
+      "shapes": 1
+    },
+    {
+      "skill": "time-set-clock",
+      "family": "time",
+      "lesson": "T2 B66",
+      "t1": {
+        "distinct": 48,
+        "draws": 2000,
+        "firstRepeatAt": 7,
+        "medianBeforeRepeat": 8
+      },
+      "t2": {
+        "distinct": 144,
+        "draws": 2000,
+        "firstRepeatAt": 7,
+        "medianBeforeRepeat": 12
+      },
+      "t3": {
+        "distinct": 675,
+        "draws": 2000,
+        "firstRepeatAt": 7,
+        "medianBeforeRepeat": 26.5
+      },
+      "shapes": 2
+    },
+    {
+      "skill": "roman-sequence",
+      "family": "number",
+      "lesson": "T2 B47",
+      "t1": {
+        "distinct": 64,
+        "draws": 2000,
+        "firstRepeatAt": 5,
+        "medianBeforeRepeat": 12.5
+      },
+      "t2": {
+        "distinct": 64,
+        "draws": 2000,
+        "firstRepeatAt": 5,
+        "medianBeforeRepeat": 12.5
+      },
+      "t3": {
+        "distinct": 128,
+        "draws": 2000,
+        "firstRepeatAt": 15,
+        "medianBeforeRepeat": 11
+      },
+      "shapes": 2
+    },
+    {
+      "skill": "add-sub-mental-round",
+      "family": "arithmetic",
+      "lesson": "T1 B2",
+      "t1": {
+        "distinct": 90,
+        "draws": 2000,
+        "firstRepeatAt": 5,
+        "medianBeforeRepeat": 6
+      },
+      "t2": {
+        "distinct": 1524,
+        "draws": 2000,
+        "firstRepeatAt": 5,
+        "medianBeforeRepeat": 74
+      },
+      "t3": {
+        "distinct": 1769,
+        "draws": 2000,
+        "firstRepeatAt": 226,
+        "medianBeforeRepeat": 112
+      },
+      "shapes": 1
+    },
+    {
+      "skill": "div-2d-1d-remainder",
+      "family": "arithmetic",
+      "lesson": "T1 B26",
+      "t1": {
+        "distinct": 92,
+        "draws": 2000,
+        "firstRepeatAt": 5,
+        "medianBeforeRepeat": 9
+      },
+      "t2": {
+        "distinct": 256,
+        "draws": 2000,
+        "firstRepeatAt": 5,
+        "medianBeforeRepeat": 16
+      },
+      "t3": {
+        "distinct": 139,
+        "draws": 2000,
+        "firstRepeatAt": 5,
+        "medianBeforeRepeat": 22
+      },
+      "shapes": 1
+    },
+    {
+      "skill": "geo-right-angle",
+      "family": "geometry",
+      "lesson": "T1 B18",
+      "t1": {
+        "distinct": 96,
+        "draws": 2000,
+        "firstRepeatAt": 16,
+        "medianBeforeRepeat": 15
+      },
+      "t2": {
+        "distinct": 2000,
+        "draws": 2000,
+        "firstRepeatAt": null,
+        "medianBeforeRepeat": null
+      },
+      "t3": {
+        "distinct": 1998,
+        "draws": 2000,
+        "firstRepeatAt": 1236,
+        "medianBeforeRepeat": null
+      },
+      "shapes": 1
+    },
+    {
+      "skill": "meas-len-ladder",
+      "family": "measurement",
+      "lesson": "T1 B7, T1 B30",
+      "t1": {
+        "distinct": 610,
+        "draws": 2000,
+        "firstRepeatAt": 62,
+        "medianBeforeRepeat": 28
+      },
+      "t2": {
+        "distinct": 114,
+        "draws": 2000,
+        "firstRepeatAt": 15,
+        "medianBeforeRepeat": 18
+      },
+      "t3": {
+        "distinct": 114,
+        "draws": 2000,
+        "firstRepeatAt": 15,
+        "medianBeforeRepeat": 18
+      },
+      "shapes": 1
+    },
+    {
+      "skill": "unknown-mul-div",
+      "family": "unknown",
+      "lesson": "T1 B13",
+      "t1": {
+        "distinct": 128,
+        "draws": 2000,
+        "firstRepeatAt": 10,
+        "medianBeforeRepeat": 14.5
+      },
+      "t2": {
+        "distinct": 552,
+        "draws": 2000,
+        "firstRepeatAt": 33,
+        "medianBeforeRepeat": 24.5
+      },
+      "t3": {
+        "distinct": 1480,
+        "draws": 2000,
+        "firstRepeatAt": 49,
+        "medianBeforeRepeat": 71
+      },
+      "shapes": 2
+    },
+    {
+      "skill": "clock-read-minute",
+      "family": "time",
+      "lesson": "T2 B66",
+      "t1": {
+        "distinct": 144,
+        "draws": 2000,
+        "firstRepeatAt": 24,
+        "medianBeforeRepeat": 20.5
+      },
+      "t2": {
+        "distinct": 679,
+        "draws": 2000,
+        "firstRepeatAt": 40,
+        "medianBeforeRepeat": 24
+      },
+      "t3": {
+        "distinct": 679,
+        "draws": 2000,
+        "firstRepeatAt": 40,
+        "medianBeforeRepeat": 24
+      },
+      "shapes": 1
+    },
+    {
+      "skill": "money-change-back",
+      "family": "money",
+      "lesson": "T2 B68",
+      "t1": {
+        "distinct": 144,
+        "draws": 2000,
+        "firstRepeatAt": 5,
+        "medianBeforeRepeat": 12.5
+      },
+      "t2": {
+        "distinct": 216,
+        "draws": 2000,
+        "firstRepeatAt": 4,
+        "medianBeforeRepeat": 20.5
+      },
+      "t3": {
+        "distinct": 428,
+        "draws": 2000,
+        "firstRepeatAt": 4,
+        "medianBeforeRepeat": 24
+      },
+      "shapes": 1
+    },
+    {
+      "skill": "pattern-skip-count",
+      "family": "pattern",
+      "lesson": "T1 B4-B6, B9-B12",
+      "t1": {
+        "distinct": 222,
+        "draws": 2000,
+        "firstRepeatAt": 5,
+        "medianBeforeRepeat": 22.5
+      },
+      "t2": {
+        "distinct": 289,
+        "draws": 2000,
+        "firstRepeatAt": 5,
+        "medianBeforeRepeat": 26
+      },
+      "t3": {
+        "distinct": 148,
+        "draws": 2000,
+        "firstRepeatAt": 7,
+        "medianBeforeRepeat": 18.5
+      },
+      "shapes": 1
+    },
+    {
+      "skill": "meas-len-mixed",
+      "family": "measurement",
+      "lesson": "T1 B7, T1 B30",
+      "t1": {
+        "distinct": 162,
+        "draws": 2000,
+        "firstRepeatAt": 11,
+        "medianBeforeRepeat": 14.5
+      },
+      "t2": {
+        "distinct": 344,
+        "draws": 2000,
+        "firstRepeatAt": 12,
+        "medianBeforeRepeat": 15.5
+      },
+      "t3": {
+        "distinct": 344,
+        "draws": 2000,
+        "firstRepeatAt": 12,
+        "medianBeforeRepeat": 15.5
+      },
+      "shapes": 1
+    },
+    {
+      "skill": "meas-wp-fence",
+      "family": "measurement",
+      "lesson": "T2 B50, B53",
+      "t1": {
+        "distinct": 170,
+        "draws": 2000,
+        "firstRepeatAt": 7,
+        "medianBeforeRepeat": 16
+      },
+      "t2": {
+        "distinct": 485,
+        "draws": 2000,
+        "firstRepeatAt": 3,
+        "medianBeforeRepeat": 23
+      },
+      "t3": {
+        "distinct": 170,
+        "draws": 2000,
+        "firstRepeatAt": 16,
+        "medianBeforeRepeat": 18
+      },
+      "shapes": 1
+    },
+    {
+      "skill": "mul-3d-1d",
+      "family": "arithmetic",
+      "lesson": "T1 B36",
+      "t1": {
+        "distinct": 178,
+        "draws": 2000,
+        "firstRepeatAt": 18,
+        "medianBeforeRepeat": 12.5
+      },
+      "t2": {
+        "distinct": 447,
+        "draws": 2000,
+        "firstRepeatAt": 23,
+        "medianBeforeRepeat": 26
+      },
+      "t3": {
+        "distinct": 528,
+        "draws": 2000,
+        "firstRepeatAt": 45,
+        "medianBeforeRepeat": 50.5
+      },
+      "shapes": 1
+    },
+    {
+      "skill": "meas-perimeter-rect",
+      "family": "measurement",
+      "lesson": "T2 B50",
+      "t1": {
+        "distinct": 189,
+        "draws": 2000,
+        "firstRepeatAt": 7,
+        "medianBeforeRepeat": 15
+      },
+      "t2": {
+        "distinct": 189,
+        "draws": 2000,
+        "firstRepeatAt": 29,
+        "medianBeforeRepeat": 18.5
+      },
+      "t3": {
+        "distinct": 189,
+        "draws": 2000,
+        "firstRepeatAt": 29,
+        "medianBeforeRepeat": 18.5
+      },
+      "shapes": 1
+    },
+    {
+      "skill": "geo-shape-count",
+      "family": "geometry",
+      "lesson": "T1 B7, T1 B19",
+      "t1": {
+        "distinct": 195,
+        "draws": 2000,
+        "firstRepeatAt": 23,
+        "medianBeforeRepeat": 16
+      },
+      "t2": {
+        "distinct": 393,
+        "draws": 2000,
+        "firstRepeatAt": 28,
+        "medianBeforeRepeat": 9
+      },
+      "t3": {
+        "distinct": 543,
+        "draws": 2000,
+        "firstRepeatAt": 11,
+        "medianBeforeRepeat": 8
+      },
+      "shapes": 2
+    },
+    {
+      "skill": "div-rem-ceil",
+      "family": "remainder",
+      "lesson": "T1 B25",
+      "t1": {
+        "distinct": 215,
+        "draws": 2000,
+        "firstRepeatAt": 22,
+        "medianBeforeRepeat": 14.5
+      },
+      "t2": {
+        "distinct": 1140,
+        "draws": 2000,
+        "firstRepeatAt": 63,
+        "medianBeforeRepeat": 46
+      },
+      "t3": {
+        "distinct": 964,
+        "draws": 2000,
+        "firstRepeatAt": 51,
+        "medianBeforeRepeat": 45.5
+      },
+      "shapes": 3
+    },
+    {
+      "skill": "money-wp",
+      "family": "money",
+      "lesson": "T2 B68",
+      "t1": {
+        "distinct": 216,
+        "draws": 2000,
+        "firstRepeatAt": 11,
+        "medianBeforeRepeat": 20
+      },
+      "t2": {
+        "distinct": 1386,
+        "draws": 2000,
+        "firstRepeatAt": 27,
+        "medianBeforeRepeat": 74
+      },
+      "t3": {
+        "distinct": 216,
+        "draws": 2000,
+        "firstRepeatAt": 33,
+        "medianBeforeRepeat": 19
+      },
+      "shapes": 1
+    },
+    {
+      "skill": "div-3d-1d",
+      "family": "arithmetic",
+      "lesson": "T1 B37",
+      "t1": {
+        "distinct": 425,
+        "draws": 2000,
+        "firstRepeatAt": 44,
+        "medianBeforeRepeat": 28.5
+      },
+      "t2": {
+        "distinct": 593,
+        "draws": 2000,
+        "firstRepeatAt": 6,
+        "medianBeforeRepeat": 42.5
+      },
+      "t3": {
+        "distinct": 224,
+        "draws": 2000,
+        "firstRepeatAt": 20,
+        "medianBeforeRepeat": 21
+      },
+      "shapes": 1
+    },
+    {
+      "skill": "fraction-wp",
+      "family": "fraction",
+      "lesson": "T1 B14",
+      "t1": {
+        "distinct": 227,
+        "draws": 2000,
+        "firstRepeatAt": 4,
+        "medianBeforeRepeat": 12
+      },
+      "t2": {
+        "distinct": 424,
+        "draws": 2000,
+        "firstRepeatAt": 9,
+        "medianBeforeRepeat": 20
+      },
+      "t3": {
+        "distinct": 514,
+        "draws": 2000,
+        "firstRepeatAt": 49,
+        "medianBeforeRepeat": 25.5
+      },
+      "shapes": 4
+    },
+    {
+      "skill": "geo-count-right-angles",
+      "family": "geometry",
+      "lesson": "T1 B18",
+      "t1": {
+        "distinct": 278,
+        "draws": 2000,
+        "firstRepeatAt": 23,
+        "medianBeforeRepeat": 12.5
+      },
+      "t2": {
+        "distinct": 1841,
+        "draws": 2000,
+        "firstRepeatAt": 83,
+        "medianBeforeRepeat": 118
+      },
+      "t3": {
+        "distinct": 2000,
+        "draws": 2000,
+        "firstRepeatAt": null,
+        "medianBeforeRepeat": null
+      },
+      "shapes": 1
+    },
+    {
+      "skill": "wp-difference-compare",
+      "family": "word-problem",
+      "lesson": "T1 B39",
+      "t1": {
+        "distinct": 311,
+        "draws": 2000,
+        "firstRepeatAt": 11,
+        "medianBeforeRepeat": 26.5
+      },
+      "t2": {
+        "distinct": 866,
+        "draws": 2000,
+        "firstRepeatAt": 66,
+        "medianBeforeRepeat": 23
+      },
+      "t3": {
+        "distinct": 1194,
+        "draws": 2000,
+        "firstRepeatAt": 66,
+        "medianBeforeRepeat": 31.5
+      },
+      "shapes": 4
+    },
+    {
+      "skill": "wp-times-compare",
+      "family": "word-problem",
+      "lesson": "T1 B39",
+      "t1": {
+        "distinct": 311,
+        "draws": 2000,
+        "firstRepeatAt": 11,
+        "medianBeforeRepeat": 26.5
+      },
+      "t2": {
+        "distinct": 866,
+        "draws": 2000,
+        "firstRepeatAt": 66,
+        "medianBeforeRepeat": 23
+      },
+      "t3": {
+        "distinct": 1194,
+        "draws": 2000,
+        "firstRepeatAt": 66,
+        "medianBeforeRepeat": 31.5
+      },
+      "shapes": 4
+    },
+    {
+      "skill": "pattern-add",
+      "family": "pattern",
+      "lesson": "T1 B8",
+      "t1": {
+        "distinct": 331,
+        "draws": 2000,
+        "firstRepeatAt": 7,
+        "medianBeforeRepeat": 19
+      },
+      "t2": {
+        "distinct": 404,
+        "draws": 2000,
+        "firstRepeatAt": 7,
+        "medianBeforeRepeat": 27
+      },
+      "t3": {
+        "distinct": 506,
+        "draws": 2000,
+        "firstRepeatAt": 7,
+        "medianBeforeRepeat": 27
+      },
+      "shapes": 1
+    },
+    {
+      "skill": "pattern-sub",
+      "family": "pattern",
+      "lesson": "T1 B8",
+      "t1": {
+        "distinct": 331,
+        "draws": 2000,
+        "firstRepeatAt": 7,
+        "medianBeforeRepeat": 19
+      },
+      "t2": {
+        "distinct": 404,
+        "draws": 2000,
+        "firstRepeatAt": 7,
+        "medianBeforeRepeat": 27
+      },
+      "t3": {
+        "distinct": 506,
+        "draws": 2000,
+        "firstRepeatAt": 7,
+        "medianBeforeRepeat": 27
+      },
+      "shapes": 1
+    },
+    {
+      "skill": "calendar-weekday",
+      "family": "time",
+      "lesson": "T2 B66",
+      "t1": {
+        "distinct": 336,
+        "draws": 2000,
+        "firstRepeatAt": 3,
+        "medianBeforeRepeat": 32
+      },
+      "t2": {
+        "distinct": 1081,
+        "draws": 2000,
+        "firstRepeatAt": 3,
+        "medianBeforeRepeat": 50
+      },
+      "t3": {
+        "distinct": 484,
+        "draws": 2000,
+        "firstRepeatAt": 3,
+        "medianBeforeRepeat": 32.5
+      },
+      "shapes": 1
+    },
+    {
+      "skill": "num-read-write-1000",
+      "family": "number",
+      "lesson": "T1 B1",
+      "t1": {
+        "distinct": 1089,
+        "draws": 2000,
+        "firstRepeatAt": 19,
+        "medianBeforeRepeat": 64.5
+      },
+      "t2": {
+        "distinct": 342,
+        "draws": 2000,
+        "firstRepeatAt": 9,
+        "medianBeforeRepeat": 24.5
+      },
+      "t3": {
+        "distinct": 446,
+        "draws": 2000,
+        "firstRepeatAt": 47,
+        "medianBeforeRepeat": 22.5
+      },
+      "shapes": 2
+    },
+    {
+      "skill": "money-pick-notes",
+      "family": "money",
+      "lesson": "T2 B68",
+      "t1": {
+        "distinct": 359,
+        "draws": 2000,
+        "firstRepeatAt": 28,
+        "medianBeforeRepeat": 14.5
+      },
+      "t2": {
+        "distinct": 1520,
+        "draws": 2000,
+        "firstRepeatAt": 169,
+        "medianBeforeRepeat": 50
+      },
+      "t3": {
+        "distinct": 1886,
+        "draws": 2000,
+        "firstRepeatAt": 51,
+        "medianBeforeRepeat": 135.5
+      },
+      "shapes": 1
+    },
+    {
+      "skill": "div-rem-floor",
+      "family": "remainder",
+      "lesson": "T1 B25",
+      "t1": {
+        "distinct": 427,
+        "draws": 2000,
+        "firstRepeatAt": 27,
+        "medianBeforeRepeat": 24
+      },
+      "t2": {
+        "distinct": 1473,
+        "draws": 2000,
+        "firstRepeatAt": 58,
+        "medianBeforeRepeat": 54
+      },
+      "t3": {
+        "distinct": 1343,
+        "draws": 2000,
+        "firstRepeatAt": 67,
+        "medianBeforeRepeat": 83.5
+      },
+      "shapes": 1
+    },
+    {
+      "skill": "geo-solid-identify",
+      "family": "geometry",
+      "lesson": "T1 B7, T1 B21",
+      "t1": {
+        "distinct": 452,
+        "draws": 2000,
+        "firstRepeatAt": 9,
+        "medianBeforeRepeat": 9
+      },
+      "t2": {
+        "distinct": 2000,
+        "draws": 2000,
+        "firstRepeatAt": null,
+        "medianBeforeRepeat": null
+      },
+      "t3": {
+        "distinct": 2000,
+        "draws": 2000,
+        "firstRepeatAt": null,
+        "medianBeforeRepeat": null
+      },
+      "shapes": 1
+    },
+    {
+      "skill": "meas-gram",
+      "family": "measurement",
+      "lesson": "T1 B31",
+      "t1": {
+        "distinct": 532,
+        "draws": 2000,
+        "firstRepeatAt": 25,
+        "medianBeforeRepeat": 27
+      },
+      "t2": {
+        "distinct": 1981,
+        "draws": 2000,
+        "firstRepeatAt": 300,
+        "medianBeforeRepeat": null
+      },
+      "t3": {
+        "distinct": 483,
+        "draws": 2000,
+        "firstRepeatAt": 3,
+        "medianBeforeRepeat": 31
+      },
+      "shapes": 1
+    },
+    {
+      "skill": "mul-3d-1d-wp",
+      "family": "arithmetic",
+      "lesson": "T1 B36",
+      "t1": {
+        "distinct": 511,
+        "draws": 2000,
+        "firstRepeatAt": 21,
+        "medianBeforeRepeat": 34.5
+      },
+      "t2": {
+        "distinct": 1669,
+        "draws": 2000,
+        "firstRepeatAt": 48,
+        "medianBeforeRepeat": 98.5
+      },
+      "t3": {
+        "distinct": 1896,
+        "draws": 2000,
+        "firstRepeatAt": 306,
+        "medianBeforeRepeat": 217.5
+      },
+      "shapes": 3
+    },
+    {
+      "skill": "clock-elapsed-minutes",
+      "family": "time",
+      "lesson": "T2 B66",
+      "t1": {
+        "distinct": 529,
+        "draws": 2000,
+        "firstRepeatAt": 3,
+        "medianBeforeRepeat": 25
+      },
+      "t2": {
+        "distinct": 1123,
+        "draws": 2000,
+        "firstRepeatAt": 3,
+        "medianBeforeRepeat": 65.5
+      },
+      "t3": {
+        "distinct": 1385,
+        "draws": 2000,
+        "firstRepeatAt": 3,
+        "medianBeforeRepeat": 70.5
+      },
+      "shapes": 1
+    },
+    {
+      "skill": "meas-len-compare",
+      "family": "measurement",
+      "lesson": "T1 B7, T1 B30",
+      "t1": {
+        "distinct": 541,
+        "draws": 2000,
+        "firstRepeatAt": 8,
+        "medianBeforeRepeat": 7
+      },
+      "t2": {
+        "distinct": 927,
+        "draws": 2000,
+        "firstRepeatAt": 43,
+        "medianBeforeRepeat": 15.5
+      },
+      "t3": {
+        "distinct": 927,
+        "draws": 2000,
+        "firstRepeatAt": 43,
+        "medianBeforeRepeat": 15.5
+      },
+      "shapes": 1
+    },
+    {
+      "skill": "meas-len-convert",
+      "family": "measurement",
+      "lesson": "T1 B7, T1 B30",
+      "t1": {
+        "distinct": 575,
+        "draws": 2000,
+        "firstRepeatAt": 46,
+        "medianBeforeRepeat": 25.5
+      },
+      "t2": {
+        "distinct": 577,
+        "draws": 2000,
+        "firstRepeatAt": 28,
+        "medianBeforeRepeat": 26
+      },
+      "t3": {
+        "distinct": 577,
+        "draws": 2000,
+        "firstRepeatAt": 28,
+        "medianBeforeRepeat": 26
+      },
+      "shapes": 1
+    },
+    {
+      "skill": "chance-bag",
+      "family": "data",
+      "lesson": "T2 B74",
+      "t1": {
+        "distinct": 755,
+        "draws": 2000,
+        "firstRepeatAt": 2,
+        "medianBeforeRepeat": 18
+      },
+      "t2": {
+        "distinct": 604,
+        "draws": 2000,
+        "firstRepeatAt": 2,
+        "medianBeforeRepeat": 14
+      },
+      "t3": {
+        "distinct": 1379,
+        "draws": 2000,
+        "firstRepeatAt": 12,
+        "medianBeforeRepeat": 19
+      },
+      "shapes": 1
+    },
+    {
+      "skill": "num-place-value-1000",
+      "family": "number",
+      "lesson": "T1 B1",
+      "t1": {
+        "distinct": 1363,
+        "draws": 2000,
+        "firstRepeatAt": 40,
+        "medianBeforeRepeat": 58.5
+      },
+      "t2": {
+        "distinct": 616,
+        "draws": 2000,
+        "firstRepeatAt": 28,
+        "medianBeforeRepeat": 31.5
+      },
+      "t3": {
+        "distinct": 849,
+        "draws": 2000,
+        "firstRepeatAt": 32,
+        "medianBeforeRepeat": 33
+      },
+      "shapes": 2
+    },
+    {
+      "skill": "tf-explain",
+      "family": "logic",
+      "lesson": "T1 B25, B38, B39",
+      "t1": {
+        "distinct": 673,
+        "draws": 2000,
+        "firstRepeatAt": 53,
+        "medianBeforeRepeat": 31
+      },
+      "t2": {
+        "distinct": 1211,
+        "draws": 2000,
+        "firstRepeatAt": 21,
+        "medianBeforeRepeat": 67
+      },
+      "t3": {
+        "distinct": 1239,
+        "draws": 2000,
+        "firstRepeatAt": 59,
+        "medianBeforeRepeat": 52
+      },
+      "shapes": 3
+    },
+    {
+      "skill": "wp-divide-then-add",
+      "family": "word-problem",
+      "lesson": "T1 B27, B28",
+      "t1": {
+        "distinct": 705,
+        "draws": 2000,
+        "firstRepeatAt": 21,
+        "medianBeforeRepeat": 29.5
+      },
+      "t2": {
+        "distinct": 1369,
+        "draws": 2000,
+        "firstRepeatAt": 57,
+        "medianBeforeRepeat": 59
+      },
+      "t3": {
+        "distinct": 1582,
+        "draws": 2000,
+        "firstRepeatAt": 36,
+        "medianBeforeRepeat": 73.5
+      },
+      "shapes": 4
+    },
+    {
+      "skill": "wp-divide-then-sub",
+      "family": "word-problem",
+      "lesson": "T1 B27, B28",
+      "t1": {
+        "distinct": 705,
+        "draws": 2000,
+        "firstRepeatAt": 21,
+        "medianBeforeRepeat": 29.5
+      },
+      "t2": {
+        "distinct": 1369,
+        "draws": 2000,
+        "firstRepeatAt": 57,
+        "medianBeforeRepeat": 59
+      },
+      "t3": {
+        "distinct": 1582,
+        "draws": 2000,
+        "firstRepeatAt": 36,
+        "medianBeforeRepeat": 73.5
+      },
+      "shapes": 4
+    },
+    {
+      "skill": "mul-4d-1d",
+      "family": "arithmetic",
+      "lesson": "T2 B56",
+      "t1": {
+        "distinct": 719,
+        "draws": 2000,
+        "firstRepeatAt": 56,
+        "medianBeforeRepeat": 28
+      },
+      "t2": {
+        "distinct": 1432,
+        "draws": 2000,
+        "firstRepeatAt": 53,
+        "medianBeforeRepeat": 52
+      },
+      "t3": {
+        "distinct": 1769,
+        "draws": 2000,
+        "firstRepeatAt": 168,
+        "medianBeforeRepeat": 119
+      },
+      "shapes": 1
+    },
+    {
+      "skill": "mul-2d-1d-wp",
+      "family": "arithmetic",
+      "lesson": "T1 B23",
+      "t1": {
+        "distinct": 1071,
+        "draws": 2000,
+        "firstRepeatAt": 66,
+        "medianBeforeRepeat": 50.5
+      },
+      "t2": {
+        "distinct": 1022,
+        "draws": 2000,
+        "firstRepeatAt": 53,
+        "medianBeforeRepeat": 36.5
+      },
+      "t3": {
+        "distinct": 725,
+        "draws": 2000,
+        "firstRepeatAt": 46,
+        "medianBeforeRepeat": 32
+      },
+      "shapes": 1
+    },
+    {
+      "skill": "meas-len-add-sub",
+      "family": "measurement",
+      "lesson": "T1 B7, T1 B30",
+      "t1": {
+        "distinct": 751,
+        "draws": 2000,
+        "firstRepeatAt": 19,
+        "medianBeforeRepeat": 28.5
+      },
+      "t2": {
+        "distinct": 1674,
+        "draws": 2000,
+        "firstRepeatAt": 37,
+        "medianBeforeRepeat": 102
+      },
+      "t3": {
+        "distinct": 1344,
+        "draws": 2000,
+        "firstRepeatAt": 54,
+        "medianBeforeRepeat": 42.5
+      },
+      "shapes": 2
+    },
+    {
+      "skill": "num-sequence-1000",
+      "family": "number",
+      "lesson": "T1 B1",
+      "t1": {
+        "distinct": 807,
+        "draws": 2000,
+        "firstRepeatAt": 52,
+        "medianBeforeRepeat": 33.5
+      },
+      "t2": {
+        "distinct": 794,
+        "draws": 2000,
+        "firstRepeatAt": 67,
+        "medianBeforeRepeat": 28
+      },
+      "t3": {
+        "distinct": 1222,
+        "draws": 2000,
+        "firstRepeatAt": 31,
+        "medianBeforeRepeat": 43
+      },
+      "shapes": 1
+    },
+    {
+      "skill": "div-3d-1d-remainder",
+      "family": "arithmetic",
+      "lesson": "T1 B37",
+      "t1": {
+        "distinct": 895,
+        "draws": 2000,
+        "firstRepeatAt": 43,
+        "medianBeforeRepeat": 45.5
+      },
+      "t2": {
+        "distinct": 1459,
+        "draws": 2000,
+        "firstRepeatAt": 5,
+        "medianBeforeRepeat": 84.5
+      },
+      "t3": {
+        "distinct": 844,
+        "draws": 2000,
+        "firstRepeatAt": 41,
+        "medianBeforeRepeat": 44
+      },
+      "shapes": 1
+    },
+    {
+      "skill": "num-order-1000",
+      "family": "number",
+      "lesson": "T1 B1",
+      "t1": {
+        "distinct": 2000,
+        "draws": 2000,
+        "firstRepeatAt": null,
+        "medianBeforeRepeat": null
+      },
+      "t2": {
+        "distinct": 862,
+        "draws": 2000,
+        "firstRepeatAt": 30,
+        "medianBeforeRepeat": 33.5
+      },
+      "t3": {
+        "distinct": 1610,
+        "draws": 2000,
+        "firstRepeatAt": 29,
+        "medianBeforeRepeat": 15
+      },
+      "shapes": 4
+    },
+    {
+      "skill": "tally-count",
+      "family": "data",
+      "lesson": "T2 B73",
+      "t1": {
+        "distinct": 889,
+        "draws": 2000,
+        "firstRepeatAt": 15,
+        "medianBeforeRepeat": 36.5
+      },
+      "t2": {
+        "distinct": 1828,
+        "draws": 2000,
+        "firstRepeatAt": 37,
+        "medianBeforeRepeat": 119.5
+      },
+      "t3": {
+        "distinct": 1983,
+        "draws": 2000,
+        "firstRepeatAt": 348,
+        "medianBeforeRepeat": null
+      },
+      "shapes": 1
+    },
+    {
+      "skill": "round-which-place",
+      "family": "number",
+      "lesson": "T2 B61",
+      "t1": {
+        "distinct": 1046,
+        "draws": 2000,
+        "firstRepeatAt": 11,
+        "medianBeforeRepeat": 44
+      },
+      "t2": {
+        "distinct": 1898,
+        "draws": 2000,
+        "firstRepeatAt": 208,
+        "medianBeforeRepeat": 185.5
+      },
+      "t3": {
+        "distinct": 1991,
+        "draws": 2000,
+        "firstRepeatAt": 334,
+        "medianBeforeRepeat": null
+      },
+      "shapes": 1
+    },
+    {
+      "skill": "fraction-pick-picture",
+      "family": "fraction",
+      "lesson": "T1 B14",
+      "t1": {
+        "distinct": 1056,
+        "draws": 2000,
+        "firstRepeatAt": 20,
+        "medianBeforeRepeat": 37
+      },
+      "t2": {
+        "distinct": 1959,
+        "draws": 2000,
+        "firstRepeatAt": 138,
+        "medianBeforeRepeat": 231
+      },
+      "t3": {
+        "distinct": 1959,
+        "draws": 2000,
+        "firstRepeatAt": 138,
+        "medianBeforeRepeat": 231
+      },
+      "shapes": 3
+    },
+    {
+      "skill": "meas-gram-calc",
+      "family": "measurement",
+      "lesson": "T1 B31",
+      "t1": {
+        "distinct": 1091,
+        "draws": 2000,
+        "firstRepeatAt": 42,
+        "medianBeforeRepeat": 44.5
+      },
+      "t2": {
+        "distinct": 1068,
+        "draws": 2000,
+        "firstRepeatAt": 34,
+        "medianBeforeRepeat": 31.5
+      },
+      "t3": {
+        "distinct": 1877,
+        "draws": 2000,
+        "firstRepeatAt": 284,
+        "medianBeforeRepeat": 168.5
+      },
+      "shapes": 1
+    },
+    {
+      "skill": "round-hundreds",
+      "family": "number",
+      "lesson": "T2 B48",
+      "t1": {
+        "distinct": 1119,
+        "draws": 2000,
+        "firstRepeatAt": 45,
+        "medianBeforeRepeat": 38
+      },
+      "t2": {
+        "distinct": 1189,
+        "draws": 2000,
+        "firstRepeatAt": 45,
+        "medianBeforeRepeat": 31
+      },
+      "t3": {
+        "distinct": 1174,
+        "draws": 2000,
+        "firstRepeatAt": 47,
+        "medianBeforeRepeat": 37
+      },
+      "shapes": 2
+    },
+    {
+      "skill": "round-tens",
+      "family": "number",
+      "lesson": "T2 B48",
+      "t1": {
+        "distinct": 1120,
+        "draws": 2000,
+        "firstRepeatAt": 85,
+        "medianBeforeRepeat": 67.5
+      },
+      "t2": {
+        "distinct": 1165,
+        "draws": 2000,
+        "firstRepeatAt": 85,
+        "medianBeforeRepeat": 44
+      },
+      "t3": {
+        "distinct": 1146,
+        "draws": 2000,
+        "firstRepeatAt": 37,
+        "medianBeforeRepeat": 32.5
+      },
+      "shapes": 2
+    },
+    {
+      "skill": "mul-div-find-error",
+      "family": "arithmetic",
+      "lesson": "T1 B26, T1 B37",
+      "t1": {
+        "distinct": 1186,
+        "draws": 2000,
+        "firstRepeatAt": 79,
+        "medianBeforeRepeat": 53.5
+      },
+      "t2": {
+        "distinct": 1858,
+        "draws": 2000,
+        "firstRepeatAt": 141,
+        "medianBeforeRepeat": 99.5
+      },
+      "t3": {
+        "distinct": 1748,
+        "draws": 2000,
+        "firstRepeatAt": 127,
+        "medianBeforeRepeat": 90
+      },
+      "shapes": 2
+    },
+    {
+      "skill": "wp-times-then-add",
+      "family": "word-problem",
+      "lesson": "T1 B24, B28",
+      "t1": {
+        "distinct": 1283,
+        "draws": 2000,
+        "firstRepeatAt": 72,
+        "medianBeforeRepeat": 39.5
+      },
+      "t2": {
+        "distinct": 1499,
+        "draws": 2000,
+        "firstRepeatAt": 21,
+        "medianBeforeRepeat": 68
+      },
+      "t3": {
+        "distinct": 1463,
+        "draws": 2000,
+        "firstRepeatAt": 36,
+        "medianBeforeRepeat": 64.5
+      },
+      "shapes": 4
+    },
+    {
+      "skill": "mul-div-large-wp",
+      "family": "arithmetic",
+      "lesson": "T2 B56, T2 B57, T2 B70, T2 B71",
+      "t1": {
+        "distinct": 1326,
+        "draws": 2000,
+        "firstRepeatAt": 25,
+        "medianBeforeRepeat": 44
+      },
+      "t2": {
+        "distinct": 1309,
+        "draws": 2000,
+        "firstRepeatAt": 5,
+        "medianBeforeRepeat": 7.5
+      },
+      "t3": {
+        "distinct": 1844,
+        "draws": 2000,
+        "firstRepeatAt": 122,
+        "medianBeforeRepeat": 125
+      },
+      "shapes": 3
+    },
+    {
+      "skill": "wp-times-then-sub",
+      "family": "word-problem",
+      "lesson": "T1 B24, B28",
+      "t1": {
+        "distinct": 1319,
+        "draws": 2000,
+        "firstRepeatAt": 72,
+        "medianBeforeRepeat": 47
+      },
+      "t2": {
+        "distinct": 1548,
+        "draws": 2000,
+        "firstRepeatAt": 101,
+        "medianBeforeRepeat": 72.5
+      },
+      "t3": {
+        "distinct": 1520,
+        "draws": 2000,
+        "firstRepeatAt": 67,
+        "medianBeforeRepeat": 72.5
+      },
+      "shapes": 4
+    },
+    {
+      "skill": "unknown-mul-div-wp",
+      "family": "unknown",
+      "lesson": "T1 B13",
+      "t1": {
+        "distinct": 1330,
+        "draws": 2000,
+        "firstRepeatAt": 35,
+        "medianBeforeRepeat": 76
+      },
+      "t2": {
+        "distinct": 1813,
+        "draws": 2000,
+        "firstRepeatAt": 169,
+        "medianBeforeRepeat": 111
+      },
+      "t3": {
+        "distinct": 1924,
+        "draws": 2000,
+        "firstRepeatAt": 237,
+        "medianBeforeRepeat": 130
+      },
+      "shapes": 4
+    },
+    {
+      "skill": "unknown-add-sub",
+      "family": "unknown",
+      "lesson": "T1 B3",
+      "t1": {
+        "distinct": 1377,
+        "draws": 2000,
+        "firstRepeatAt": 99,
+        "medianBeforeRepeat": 56.5
+      },
+      "t2": {
+        "distinct": 1871,
+        "draws": 2000,
+        "firstRepeatAt": 99,
+        "medianBeforeRepeat": 146.5
+      },
+      "t3": {
+        "distinct": 1780,
+        "draws": 2000,
+        "firstRepeatAt": 49,
+        "medianBeforeRepeat": 177.5
+      },
+      "shapes": 2
+    },
+    {
+      "skill": "mul-5d-1d",
+      "family": "arithmetic",
+      "lesson": "T2 B70",
+      "t1": {
+        "distinct": 1400,
+        "draws": 2000,
+        "firstRepeatAt": 13,
+        "medianBeforeRepeat": 22.5
+      },
+      "t2": {
+        "distinct": 1861,
+        "draws": 2000,
+        "firstRepeatAt": 120,
+        "medianBeforeRepeat": 121.5
+      },
+      "t3": {
+        "distinct": 1974,
+        "draws": 2000,
+        "firstRepeatAt": 185,
+        "medianBeforeRepeat": null
+      },
+      "shapes": 1
+    },
+    {
+      "skill": "div-4d-1d",
+      "family": "arithmetic",
+      "lesson": "T2 B57",
+      "t1": {
+        "distinct": 1581,
+        "draws": 2000,
+        "firstRepeatAt": 113,
+        "medianBeforeRepeat": 101
+      },
+      "t2": {
+        "distinct": 1700,
+        "draws": 2000,
+        "firstRepeatAt": 91,
+        "medianBeforeRepeat": 76.5
+      },
+      "t3": {
+        "distinct": 1476,
+        "draws": 2000,
+        "firstRepeatAt": 38,
+        "medianBeforeRepeat": 68
+      },
+      "shapes": 1
+    },
+    {
+      "skill": "num-read-write-10000",
+      "family": "number",
+      "lesson": "T2 B45",
+      "t1": {
+        "distinct": 1835,
+        "draws": 2000,
+        "firstRepeatAt": 79,
+        "medianBeforeRepeat": 137.5
+      },
+      "t2": {
+        "distinct": 1642,
+        "draws": 2000,
+        "firstRepeatAt": 139,
+        "medianBeforeRepeat": 97
+      },
+      "t3": {
+        "distinct": 1533,
+        "draws": 2000,
+        "firstRepeatAt": 50,
+        "medianBeforeRepeat": 35.5
+      },
+      "shapes": 2
+    },
+    {
+      "skill": "times-order-digital",
+      "family": "time",
+      "lesson": "T2 B66",
+      "t1": {
+        "distinct": 1555,
+        "draws": 2000,
+        "firstRepeatAt": 74,
+        "medianBeforeRepeat": 81
+      },
+      "t2": {
+        "distinct": 2000,
+        "draws": 2000,
+        "firstRepeatAt": null,
+        "medianBeforeRepeat": null
+      },
+      "t3": {
+        "distinct": 1946,
+        "draws": 2000,
+        "firstRepeatAt": 132,
+        "medianBeforeRepeat": 230.5
+      },
+      "shapes": 1
+    },
+    {
+      "skill": "num-order-10000",
+      "family": "number",
+      "lesson": "T2 B46",
+      "t1": {
+        "distinct": 2000,
+        "draws": 2000,
+        "firstRepeatAt": null,
+        "medianBeforeRepeat": null
+      },
+      "t2": {
+        "distinct": 2000,
+        "draws": 2000,
+        "firstRepeatAt": null,
+        "medianBeforeRepeat": null
+      },
+      "t3": {
+        "distinct": 1582,
+        "draws": 2000,
+        "firstRepeatAt": 5,
+        "medianBeforeRepeat": 12
+      },
+      "shapes": 4
+    },
+    {
+      "skill": "div-2d-1d-wp",
+      "family": "arithmetic",
+      "lesson": "T1 B26",
+      "t1": {
+        "distinct": 1592,
+        "draws": 2000,
+        "firstRepeatAt": 81,
+        "medianBeforeRepeat": 79
+      },
+      "t2": {
+        "distinct": 1889,
+        "draws": 2000,
+        "firstRepeatAt": 293,
+        "medianBeforeRepeat": 120
+      },
+      "t3": {
+        "distinct": 1889,
+        "draws": 2000,
+        "firstRepeatAt": 293,
+        "medianBeforeRepeat": 120
+      },
+      "shapes": 1
+    },
+    {
+      "skill": "num-expand-100000",
+      "family": "number",
+      "lesson": "T2 B59",
+      "t1": {
+        "distinct": 1954,
+        "draws": 2000,
+        "firstRepeatAt": 369,
+        "medianBeforeRepeat": null
+      },
+      "t2": {
+        "distinct": 1598,
+        "draws": 2000,
+        "firstRepeatAt": 44,
+        "medianBeforeRepeat": 100
+      },
+      "t3": {
+        "distinct": 1956,
+        "draws": 2000,
+        "firstRepeatAt": 174,
+        "medianBeforeRepeat": 252.5
+      },
+      "shapes": 1
+    },
+    {
+      "skill": "choose-all-correct",
+      "family": "logic",
+      "lesson": "T1 B25, B38, B39",
+      "t1": {
+        "distinct": 1695,
+        "draws": 2000,
+        "firstRepeatAt": 53,
+        "medianBeforeRepeat": 56
+      },
+      "t2": {
+        "distinct": 1838,
+        "draws": 2000,
+        "firstRepeatAt": 30,
+        "medianBeforeRepeat": 102
+      },
+      "t3": {
+        "distinct": 1826,
+        "draws": 2000,
+        "firstRepeatAt": 289,
+        "medianBeforeRepeat": 117.5
+      },
+      "shapes": 1
+    },
+    {
+      "skill": "expr-brackets",
+      "family": "expression",
+      "lesson": "T1 B38",
+      "t1": {
+        "distinct": 1778,
+        "draws": 2000,
+        "firstRepeatAt": 58,
+        "medianBeforeRepeat": 105
+      },
+      "t2": {
+        "distinct": 1717,
+        "draws": 2000,
+        "firstRepeatAt": 40,
+        "medianBeforeRepeat": 82.5
+      },
+      "t3": {
+        "distinct": 1886,
+        "draws": 2000,
+        "firstRepeatAt": 183,
+        "medianBeforeRepeat": 166.5
+      },
+      "shapes": 1
+    },
+    {
+      "skill": "mul-chain-operators",
+      "family": "arithmetic",
+      "lesson": "T2 B56, T2 B57, T2 B70, T2 B71",
+      "t1": {
+        "distinct": 1725,
+        "draws": 2000,
+        "firstRepeatAt": 110,
+        "medianBeforeRepeat": 57
+      },
+      "t2": {
+        "distinct": 1981,
+        "draws": 2000,
+        "firstRepeatAt": 111,
+        "medianBeforeRepeat": null
+      },
+      "t3": {
+        "distinct": 1980,
+        "draws": 2000,
+        "firstRepeatAt": 103,
+        "medianBeforeRepeat": null
+      },
+      "shapes": 1
+    },
+    {
+      "skill": "expr-order",
+      "family": "expression",
+      "lesson": "T1 B38",
+      "t1": {
+        "distinct": 1729,
+        "draws": 2000,
+        "firstRepeatAt": 75,
+        "medianBeforeRepeat": 97.5
+      },
+      "t2": {
+        "distinct": 1729,
+        "draws": 2000,
+        "firstRepeatAt": 97,
+        "medianBeforeRepeat": 119
+      },
+      "t3": {
+        "distinct": 1995,
+        "draws": 2000,
+        "firstRepeatAt": 1124,
+        "medianBeforeRepeat": null
+      },
+      "shapes": 1
+    },
+    {
+      "skill": "wp-unit-then-times",
+      "family": "word-problem",
+      "lesson": "T1 B28",
+      "t1": {
+        "distinct": 1739,
+        "draws": 2000,
+        "firstRepeatAt": 166,
+        "medianBeforeRepeat": 86
+      },
+      "t2": {
+        "distinct": 1910,
+        "draws": 2000,
+        "firstRepeatAt": 183,
+        "medianBeforeRepeat": 197
+      },
+      "t3": {
+        "distinct": 1917,
+        "draws": 2000,
+        "firstRepeatAt": 176,
+        "medianBeforeRepeat": 178
+      },
+      "shapes": 4
+    },
+    {
+      "skill": "calendar-days-between",
+      "family": "time",
+      "lesson": "T2 B66",
+      "t1": {
+        "distinct": 1765,
+        "draws": 2000,
+        "firstRepeatAt": 82,
+        "medianBeforeRepeat": 92.5
+      },
+      "t2": {
+        "distinct": 1846,
+        "draws": 2000,
+        "firstRepeatAt": 82,
+        "medianBeforeRepeat": 126
+      },
+      "t3": {
+        "distinct": 1846,
+        "draws": 2000,
+        "firstRepeatAt": 82,
+        "medianBeforeRepeat": 126
+      },
+      "shapes": 1
+    },
+    {
+      "skill": "geo-circle-parts",
+      "family": "geometry",
+      "lesson": "T1 B17",
+      "t1": {
+        "distinct": 1772,
+        "draws": 2000,
+        "firstRepeatAt": 66,
+        "medianBeforeRepeat": 114.5
+      },
+      "t2": {
+        "distinct": 1772,
+        "draws": 2000,
+        "firstRepeatAt": 66,
+        "medianBeforeRepeat": 114.5
+      },
+      "t3": {
+        "distinct": 1797,
+        "draws": 2000,
+        "firstRepeatAt": 72,
+        "medianBeforeRepeat": 117
+      },
+      "shapes": 1
+    },
+    {
+      "skill": "num-compare-1000",
+      "family": "number",
+      "lesson": "T1 B1",
+      "t1": {
+        "distinct": 1999,
+        "draws": 2000,
+        "firstRepeatAt": 489,
+        "medianBeforeRepeat": null
+      },
+      "t2": {
+        "distinct": 1974,
+        "draws": 2000,
+        "firstRepeatAt": 345,
+        "medianBeforeRepeat": null
+      },
+      "t3": {
+        "distinct": 1775,
+        "draws": 2000,
+        "firstRepeatAt": 22,
+        "medianBeforeRepeat": 122
+      },
+      "shapes": 1
+    },
+    {
+      "skill": "num-place-value-10000",
+      "family": "number",
+      "lesson": "T2 B45",
+      "t1": {
+        "distinct": 1895,
+        "draws": 2000,
+        "firstRepeatAt": 47,
+        "medianBeforeRepeat": 151.5
+      },
+      "t2": {
+        "distinct": 1780,
+        "draws": 2000,
+        "firstRepeatAt": 105,
+        "medianBeforeRepeat": 96.5
+      },
+      "t3": {
+        "distinct": 1783,
+        "draws": 2000,
+        "firstRepeatAt": 43,
+        "medianBeforeRepeat": 92.5
+      },
+      "shapes": 2
+    },
+    {
+      "skill": "round-thousands",
+      "family": "number",
+      "lesson": "T2 B61",
+      "t1": {
+        "distinct": 1873,
+        "draws": 2000,
+        "firstRepeatAt": 142,
+        "medianBeforeRepeat": 162
+      },
+      "t2": {
+        "distinct": 1880,
+        "draws": 2000,
+        "firstRepeatAt": 338,
+        "medianBeforeRepeat": 201.5
+      },
+      "t3": {
+        "distinct": 1802,
+        "draws": 2000,
+        "firstRepeatAt": 62,
+        "medianBeforeRepeat": 38
+      },
+      "shapes": 2
+    },
+    {
+      "skill": "div-4d-1d-remainder",
+      "family": "arithmetic",
+      "lesson": "T2 B57",
+      "t1": {
+        "distinct": 1821,
+        "draws": 2000,
+        "firstRepeatAt": 84,
+        "medianBeforeRepeat": 150.5
+      },
+      "t2": {
+        "distinct": 1931,
+        "draws": 2000,
+        "firstRepeatAt": 145,
+        "medianBeforeRepeat": 271.5
+      },
+      "t3": {
+        "distinct": 1866,
+        "draws": 2000,
+        "firstRepeatAt": 151,
+        "medianBeforeRepeat": 119.5
+      },
+      "shapes": 1
+    },
+    {
+      "skill": "wp-more-less-then-total",
+      "family": "word-problem",
+      "lesson": "T1 B28",
+      "t1": {
+        "distinct": 1821,
+        "draws": 2000,
+        "firstRepeatAt": 43,
+        "medianBeforeRepeat": 127
+      },
+      "t2": {
+        "distinct": 1945,
+        "draws": 2000,
+        "firstRepeatAt": 43,
+        "medianBeforeRepeat": 155
+      },
+      "t3": {
+        "distinct": 1954,
+        "draws": 2000,
+        "firstRepeatAt": 495,
+        "medianBeforeRepeat": null
+      },
+      "shapes": 6
+    },
+    {
+      "skill": "expr-from-story",
+      "family": "expression",
+      "lesson": "T1 B38, B42",
+      "t1": {
+        "distinct": 1843,
+        "draws": 2000,
+        "firstRepeatAt": 188,
+        "medianBeforeRepeat": 106
+      },
+      "t2": {
+        "distinct": 1840,
+        "draws": 2000,
+        "firstRepeatAt": 105,
+        "medianBeforeRepeat": 173.5
+      },
+      "t3": {
+        "distinct": 1970,
+        "draws": 2000,
+        "firstRepeatAt": 354,
+        "medianBeforeRepeat": 289
+      },
+      "shapes": 2
+    },
+    {
+      "skill": "num-read-write-100000",
+      "family": "number",
+      "lesson": "T2 B59",
+      "t1": {
+        "distinct": 1983,
+        "draws": 2000,
+        "firstRepeatAt": 535,
+        "medianBeforeRepeat": 259.5
+      },
+      "t2": {
+        "distinct": 1975,
+        "draws": 2000,
+        "firstRepeatAt": 117,
+        "medianBeforeRepeat": 264.5
+      },
+      "t3": {
+        "distinct": 1856,
+        "draws": 2000,
+        "firstRepeatAt": 94,
+        "medianBeforeRepeat": 41.5
+      },
+      "shapes": 2
+    },
+    {
+      "skill": "meas-perimeter-polygon",
+      "family": "measurement",
+      "lesson": "T2 B50",
+      "t1": {
+        "distinct": 1871,
+        "draws": 2000,
+        "firstRepeatAt": 240,
+        "medianBeforeRepeat": 125
+      },
+      "t2": {
+        "distinct": 1879,
+        "draws": 2000,
+        "firstRepeatAt": 125,
+        "medianBeforeRepeat": 184
+      },
+      "t3": {
+        "distinct": 1956,
+        "draws": 2000,
+        "firstRepeatAt": 203,
+        "medianBeforeRepeat": null
+      },
+      "shapes": 1
+    },
+    {
+      "skill": "num-order-100000",
+      "family": "number",
+      "lesson": "T2 B60",
+      "t1": {
+        "distinct": 2000,
+        "draws": 2000,
+        "firstRepeatAt": null,
+        "medianBeforeRepeat": null
+      },
+      "t2": {
+        "distinct": 2000,
+        "draws": 2000,
+        "firstRepeatAt": null,
+        "medianBeforeRepeat": null
+      },
+      "t3": {
+        "distinct": 1875,
+        "draws": 2000,
+        "firstRepeatAt": 105,
+        "medianBeforeRepeat": 138
+      },
+      "shapes": 4
+    },
+    {
+      "skill": "round-ten-thousands",
+      "family": "number",
+      "lesson": "T2 B61",
+      "t1": {
+        "distinct": 1983,
+        "draws": 2000,
+        "firstRepeatAt": 599,
+        "medianBeforeRepeat": null
+      },
+      "t2": {
+        "distinct": 1985,
+        "draws": 2000,
+        "firstRepeatAt": 615,
+        "medianBeforeRepeat": null
+      },
+      "t3": {
+        "distinct": 1891,
+        "draws": 2000,
+        "firstRepeatAt": 59,
+        "medianBeforeRepeat": 38
+      },
+      "shapes": 2
+    },
+    {
+      "skill": "unknown-add-sub-wp",
+      "family": "unknown",
+      "lesson": "T1 B3",
+      "t1": {
+        "distinct": 1901,
+        "draws": 2000,
+        "firstRepeatAt": 200,
+        "medianBeforeRepeat": 234
+      },
+      "t2": {
+        "distinct": 1989,
+        "draws": 2000,
+        "firstRepeatAt": 269,
+        "medianBeforeRepeat": null
+      },
+      "t3": {
+        "distinct": 1983,
+        "draws": 2000,
+        "firstRepeatAt": 355,
+        "medianBeforeRepeat": 262.5
+      },
+      "shapes": 2
+    },
+    {
+      "skill": "meas-temperature-compare",
+      "family": "measurement",
+      "lesson": "T1 B33",
+      "t1": {
+        "distinct": 1940,
+        "draws": 2000,
+        "firstRepeatAt": 349,
+        "medianBeforeRepeat": 261
+      },
+      "t2": {
+        "distinct": 2000,
+        "draws": 2000,
+        "firstRepeatAt": null,
+        "medianBeforeRepeat": null
+      },
+      "t3": {
+        "distinct": 1999,
+        "draws": 2000,
+        "firstRepeatAt": 1433,
+        "medianBeforeRepeat": null
+      },
+      "shapes": 1
+    },
+    {
+      "skill": "add-sub-1000",
+      "family": "arithmetic",
+      "lesson": "T1 B2",
+      "t1": {
+        "distinct": 1977,
+        "draws": 2000,
+        "firstRepeatAt": 307,
+        "medianBeforeRepeat": 243.5
+      },
+      "t2": {
+        "distinct": 1989,
+        "draws": 2000,
+        "firstRepeatAt": 498,
+        "medianBeforeRepeat": null
+      },
+      "t3": {
+        "distinct": 1942,
+        "draws": 2000,
+        "firstRepeatAt": 358,
+        "medianBeforeRepeat": 203.5
+      },
+      "shapes": 2
+    },
+    {
+      "skill": "add-sub-100000-wp",
+      "family": "arithmetic",
+      "lesson": "T2 B63, T2 B64",
+      "t1": {
+        "distinct": 2000,
+        "draws": 2000,
+        "firstRepeatAt": null,
+        "medianBeforeRepeat": null
+      },
+      "t2": {
+        "distinct": 1944,
+        "draws": 2000,
+        "firstRepeatAt": 133,
+        "medianBeforeRepeat": 172
+      },
+      "t3": {
+        "distinct": 2000,
+        "draws": 2000,
+        "firstRepeatAt": null,
+        "medianBeforeRepeat": null
+      },
+      "shapes": 5
+    },
+    {
+      "skill": "div-5d-1d",
+      "family": "arithmetic",
+      "lesson": "T2 B71",
+      "t1": {
+        "distinct": 1949,
+        "draws": 2000,
+        "firstRepeatAt": 112,
+        "medianBeforeRepeat": 237.5
+      },
+      "t2": {
+        "distinct": 1973,
+        "draws": 2000,
+        "firstRepeatAt": 91,
+        "medianBeforeRepeat": null
+      },
+      "t3": {
+        "distinct": 1946,
+        "draws": 2000,
+        "firstRepeatAt": 216,
+        "medianBeforeRepeat": 214
+      },
+      "shapes": 1
+    },
+    {
+      "skill": "meas-area-count",
+      "family": "measurement",
+      "lesson": "T2 B51",
+      "t1": {
+        "distinct": 1972,
+        "draws": 2000,
+        "firstRepeatAt": 283,
+        "medianBeforeRepeat": 152.5
+      },
+      "t2": {
+        "distinct": 2000,
+        "draws": 2000,
+        "firstRepeatAt": null,
+        "medianBeforeRepeat": null
+      },
+      "t3": {
+        "distinct": 2000,
+        "draws": 2000,
+        "firstRepeatAt": null,
+        "medianBeforeRepeat": null
+      },
+      "shapes": 1
+    },
+    {
+      "skill": "div-5d-1d-remainder",
+      "family": "arithmetic",
+      "lesson": "T2 B71",
+      "t1": {
+        "distinct": 1984,
+        "draws": 2000,
+        "firstRepeatAt": 256,
+        "medianBeforeRepeat": null
+      },
+      "t2": {
+        "distinct": 1995,
+        "draws": 2000,
+        "firstRepeatAt": 600,
+        "medianBeforeRepeat": null
+      },
+      "t3": {
+        "distinct": 1987,
+        "draws": 2000,
+        "firstRepeatAt": 185,
+        "medianBeforeRepeat": null
+      },
+      "shapes": 1
+    },
+    {
+      "skill": "num-compare-10000",
+      "family": "number",
+      "lesson": "T2 B46",
+      "t1": {
+        "distinct": 2000,
+        "draws": 2000,
+        "firstRepeatAt": null,
+        "medianBeforeRepeat": null
+      },
+      "t2": {
+        "distinct": 2000,
+        "draws": 2000,
+        "firstRepeatAt": null,
+        "medianBeforeRepeat": null
+      },
+      "t3": {
+        "distinct": 1987,
+        "draws": 2000,
+        "firstRepeatAt": 665,
+        "medianBeforeRepeat": null
+      },
+      "shapes": 1
+    },
+    {
+      "skill": "add-missing-digit",
+      "family": "arithmetic",
+      "lesson": "T1 B2, T2 B54, T2 B55, T2 B63, T2 B64",
+      "t1": {
+        "distinct": 1992,
+        "draws": 2000,
+        "firstRepeatAt": 454,
+        "medianBeforeRepeat": null
+      },
+      "t2": {
+        "distinct": 2000,
+        "draws": 2000,
+        "firstRepeatAt": null,
+        "medianBeforeRepeat": null
+      },
+      "t3": {
+        "distinct": 2000,
+        "draws": 2000,
+        "firstRepeatAt": null,
+        "medianBeforeRepeat": null
+      },
+      "shapes": 1
+    },
+    {
+      "skill": "num-compare-100000",
+      "family": "number",
+      "lesson": "T2 B60",
+      "t1": {
+        "distinct": 2000,
+        "draws": 2000,
+        "firstRepeatAt": null,
+        "medianBeforeRepeat": null
+      },
+      "t2": {
+        "distinct": 2000,
+        "draws": 2000,
+        "firstRepeatAt": null,
+        "medianBeforeRepeat": null
+      },
+      "t3": {
+        "distinct": 1997,
+        "draws": 2000,
+        "firstRepeatAt": 1389,
+        "medianBeforeRepeat": null
+      },
+      "shapes": 1
+    },
+    {
+      "skill": "add-sub-find-error",
+      "family": "arithmetic",
+      "lesson": "T1 B2, T2 B54, T2 B55, T2 B63, T2 B64",
+      "t1": {
+        "distinct": 1998,
+        "draws": 2000,
+        "firstRepeatAt": 1033,
+        "medianBeforeRepeat": null
+      },
+      "t2": {
+        "distinct": 2000,
+        "draws": 2000,
+        "firstRepeatAt": null,
+        "medianBeforeRepeat": null
+      },
+      "t3": {
+        "distinct": 2000,
+        "draws": 2000,
+        "firstRepeatAt": null,
+        "medianBeforeRepeat": null
+      },
+      "shapes": 2
+    },
+    {
+      "skill": "meas-len-order",
+      "family": "measurement",
+      "lesson": "T1 B7, T1 B30",
+      "t1": {
+        "distinct": 1998,
+        "draws": 2000,
+        "firstRepeatAt": 270,
+        "medianBeforeRepeat": null
+      },
+      "t2": {
+        "distinct": 1998,
+        "draws": 2000,
+        "firstRepeatAt": 270,
+        "medianBeforeRepeat": null
+      },
+      "t3": {
+        "distinct": 1998,
+        "draws": 2000,
+        "firstRepeatAt": 270,
+        "medianBeforeRepeat": null
+      },
+      "shapes": 1
+    },
+    {
+      "skill": "sub-4digit",
+      "family": "arithmetic",
+      "lesson": "T2 B55",
+      "t1": {
+        "distinct": 1998,
+        "draws": 2000,
+        "firstRepeatAt": 477,
+        "medianBeforeRepeat": null
+      },
+      "t2": {
+        "distinct": 2000,
+        "draws": 2000,
+        "firstRepeatAt": null,
+        "medianBeforeRepeat": null
+      },
+      "t3": {
+        "distinct": 1999,
+        "draws": 2000,
+        "firstRepeatAt": 699,
+        "medianBeforeRepeat": null
+      },
+      "shapes": 1
+    },
+    {
+      "skill": "add-4digit",
+      "family": "arithmetic",
+      "lesson": "T2 B54",
+      "t1": {
+        "distinct": 2000,
+        "draws": 2000,
+        "firstRepeatAt": null,
+        "medianBeforeRepeat": null
+      },
+      "t2": {
+        "distinct": 1999,
+        "draws": 2000,
+        "firstRepeatAt": 1628,
+        "medianBeforeRepeat": null
+      },
+      "t3": {
+        "distinct": 1999,
+        "draws": 2000,
+        "firstRepeatAt": 1815,
+        "medianBeforeRepeat": null
+      },
+      "shapes": 1
+    },
+    {
+      "skill": "add-sub-1000-wp",
+      "family": "arithmetic",
+      "lesson": "T1 B2",
+      "t1": {
+        "distinct": 1999,
+        "draws": 2000,
+        "firstRepeatAt": 922,
+        "medianBeforeRepeat": null
+      },
+      "t2": {
+        "distinct": 2000,
+        "draws": 2000,
+        "firstRepeatAt": null,
+        "medianBeforeRepeat": null
+      },
+      "t3": {
+        "distinct": 1999,
+        "draws": 2000,
+        "firstRepeatAt": 1531,
+        "medianBeforeRepeat": null
+      },
+      "shapes": 3
+    },
+    {
+      "skill": "add-sub-10000-wp",
+      "family": "arithmetic",
+      "lesson": "T2 B54, T2 B55",
+      "t1": {
+        "distinct": 2000,
+        "draws": 2000,
+        "firstRepeatAt": null,
+        "medianBeforeRepeat": null
+      },
+      "t2": {
+        "distinct": 2000,
+        "draws": 2000,
+        "firstRepeatAt": null,
+        "medianBeforeRepeat": null
+      },
+      "t3": {
+        "distinct": 1999,
+        "draws": 2000,
+        "firstRepeatAt": 1305,
+        "medianBeforeRepeat": null
+      },
+      "shapes": 5
+    },
+    {
+      "skill": "add-5digit",
+      "family": "arithmetic",
+      "lesson": "T2 B63",
+      "t1": {
+        "distinct": 2000,
+        "draws": 2000,
+        "firstRepeatAt": null,
+        "medianBeforeRepeat": null
+      },
+      "t2": {
+        "distinct": 2000,
+        "draws": 2000,
+        "firstRepeatAt": null,
+        "medianBeforeRepeat": null
+      },
+      "t3": {
+        "distinct": 2000,
+        "draws": 2000,
+        "firstRepeatAt": null,
+        "medianBeforeRepeat": null
+      },
+      "shapes": 1
+    },
+    {
+      "skill": "add-sub-1000-chain",
+      "family": "arithmetic",
+      "lesson": "T1 B2",
+      "t1": {
+        "distinct": 2000,
+        "draws": 2000,
+        "firstRepeatAt": null,
+        "medianBeforeRepeat": null
+      },
+      "t2": {
+        "distinct": 2000,
+        "draws": 2000,
+        "firstRepeatAt": null,
+        "medianBeforeRepeat": null
+      },
+      "t3": {
+        "distinct": 2000,
+        "draws": 2000,
+        "firstRepeatAt": null,
+        "medianBeforeRepeat": null
+      },
+      "shapes": 1
+    },
+    {
+      "skill": "geo-shape-classify",
+      "family": "geometry",
+      "lesson": "T1 B7, T1 B19",
+      "t1": {
+        "distinct": 2000,
+        "draws": 2000,
+        "firstRepeatAt": null,
+        "medianBeforeRepeat": null
+      },
+      "t2": {
+        "distinct": 2000,
+        "draws": 2000,
+        "firstRepeatAt": null,
+        "medianBeforeRepeat": null
+      },
+      "t3": {
+        "distinct": 2000,
+        "draws": 2000,
+        "firstRepeatAt": null,
+        "medianBeforeRepeat": null
+      },
+      "shapes": 4
+    },
+    {
+      "skill": "meas-area-equal",
+      "family": "measurement",
+      "lesson": "T2 B51",
+      "t1": {
+        "distinct": 2000,
+        "draws": 2000,
+        "firstRepeatAt": null,
+        "medianBeforeRepeat": null
+      },
+      "t2": {
+        "distinct": 2000,
+        "draws": 2000,
+        "firstRepeatAt": null,
+        "medianBeforeRepeat": null
+      },
+      "t3": {
+        "distinct": 2000,
+        "draws": 2000,
+        "firstRepeatAt": null,
+        "medianBeforeRepeat": null
+      },
+      "shapes": 1
+    },
+    {
+      "skill": "sub-5digit",
+      "family": "arithmetic",
+      "lesson": "T2 B64",
+      "t1": {
+        "distinct": 2000,
+        "draws": 2000,
+        "firstRepeatAt": null,
+        "medianBeforeRepeat": null
+      },
+      "t2": {
+        "distinct": 2000,
+        "draws": 2000,
+        "firstRepeatAt": null,
+        "medianBeforeRepeat": null
+      },
+      "t3": {
+        "distinct": 2000,
+        "draws": 2000,
+        "firstRepeatAt": null,
+        "medianBeforeRepeat": null
+      },
+      "shapes": 1
+    },
+    {
+      "skill": "table-fill-missing",
+      "family": "data",
+      "lesson": "T2 B73",
+      "t1": {
+        "distinct": 2000,
+        "draws": 2000,
+        "firstRepeatAt": null,
+        "medianBeforeRepeat": null
+      },
+      "t2": {
+        "distinct": 2000,
+        "draws": 2000,
+        "firstRepeatAt": null,
+        "medianBeforeRepeat": null
+      },
+      "t3": {
+        "distinct": 2000,
+        "draws": 2000,
+        "firstRepeatAt": null,
+        "medianBeforeRepeat": null
+      },
+      "shapes": 1
+    },
+    {
+      "skill": "table-max-min",
+      "family": "data",
+      "lesson": "T2 B73",
+      "t1": {
+        "distinct": 2000,
+        "draws": 2000,
+        "firstRepeatAt": null,
+        "medianBeforeRepeat": null
+      },
+      "t2": {
+        "distinct": 2000,
+        "draws": 2000,
+        "firstRepeatAt": null,
+        "medianBeforeRepeat": null
+      },
+      "t3": {
+        "distinct": 2000,
+        "draws": 2000,
+        "firstRepeatAt": null,
+        "medianBeforeRepeat": null
+      },
+      "shapes": 10
+    },
+    {
+      "skill": "table-read",
+      "family": "data",
+      "lesson": "T2 B73",
+      "t1": {
+        "distinct": 2000,
+        "draws": 2000,
+        "firstRepeatAt": null,
+        "medianBeforeRepeat": null
+      },
+      "t2": {
+        "distinct": 2000,
+        "draws": 2000,
+        "firstRepeatAt": null,
+        "medianBeforeRepeat": null
+      },
+      "t3": {
+        "distinct": 2000,
+        "draws": 2000,
+        "firstRepeatAt": null,
+        "medianBeforeRepeat": null
+      },
+      "shapes": 5
+    },
+    {
+      "skill": "table-sums",
+      "family": "data",
+      "lesson": "T2 B73",
+      "t1": {
+        "distinct": 2000,
+        "draws": 2000,
+        "firstRepeatAt": null,
+        "medianBeforeRepeat": null
+      },
+      "t2": {
+        "distinct": 2000,
+        "draws": 2000,
+        "firstRepeatAt": null,
+        "medianBeforeRepeat": null
+      },
+      "t3": {
+        "distinct": 2000,
+        "draws": 2000,
+        "firstRepeatAt": null,
+        "medianBeforeRepeat": null
+      },
+      "shapes": 5
+    }
+  ],
+  "tableB": [
+    {
+      "name": "B4 Bảng nhân 2, 5 và bảng chia 2, 5",
+      "items": 60,
+      "inRun": 0,
+      "seenPrev": 46,
+      "seenPct": 0.7666666666666667
+    },
+    {
+      "name": "B5 Bảng nhân 3, bảng chia 3",
+      "items": 60,
+      "inRun": 0,
+      "seenPrev": 43,
+      "seenPct": 0.7166666666666667
+    },
+    {
+      "name": "B9 Bảng nhân 6, bảng chia 6",
+      "items": 60,
+      "inRun": 0,
+      "seenPrev": 43,
+      "seenPct": 0.7166666666666667
+    },
+    {
+      "name": "B10 Bảng nhân 7, bảng chia 7",
+      "items": 60,
+      "inRun": 0,
+      "seenPrev": 43,
+      "seenPct": 0.7166666666666667
+    },
+    {
+      "name": "B11 Bảng nhân 8, bảng chia 8",
+      "items": 60,
+      "inRun": 0,
+      "seenPrev": 43,
+      "seenPct": 0.7166666666666667
+    },
+    {
+      "name": "B12 Bảng nhân 9, bảng chia 9",
+      "items": 60,
+      "inRun": 0,
+      "seenPrev": 43,
+      "seenPct": 0.7166666666666667
+    },
+    {
+      "name": "B6 Bảng nhân 4, bảng chia 4",
+      "items": 60,
+      "inRun": 0,
+      "seenPrev": 42,
+      "seenPct": 0.7
+    },
+    {
+      "name": "B41 Ôn tập nhân, chia phạm vi 100, 1 000",
+      "items": 60,
+      "inRun": 0,
+      "seenPrev": 37,
+      "seenPct": 0.6166666666666667
+    },
+    {
+      "name": "B15 Luyện tập chung",
+      "items": 60,
+      "inRun": 0,
+      "seenPrev": 34,
+      "seenPct": 0.5666666666666667
+    },
+    {
+      "name": "B32 Mi-li-lít",
+      "items": 60,
+      "inRun": 4,
+      "seenPrev": 22,
+      "seenPct": 0.36666666666666664
+    },
+    {
+      "name": "B52 Diện tích hình chữ nhật, hình vuông",
+      "items": 60,
+      "inRun": 0,
+      "seenPrev": 22,
+      "seenPct": 0.36666666666666664
+    },
+    {
+      "name": "B47 Số La Mã",
+      "items": 60,
+      "inRun": 5,
+      "seenPrev": 18,
+      "seenPct": 0.3
+    },
+    {
+      "name": "B68 Tiền Việt Nam",
+      "items": 60,
+      "inRun": 0,
+      "seenPrev": 18,
+      "seenPct": 0.3
+    },
+    {
+      "name": "B16 Điểm ở giữa, trung điểm",
+      "items": 60,
+      "inRun": 8,
+      "seenPrev": 15,
+      "seenPct": 0.25
+    },
+    {
+      "name": "B17 Hình tròn, tâm, bán kính, đường kính",
+      "items": 60,
+      "inRun": 3,
+      "seenPrev": 15,
+      "seenPct": 0.25
+    },
+    {
+      "name": "B21 Khối lập phương, khối hộp chữ nhật",
+      "items": 60,
+      "inRun": 2,
+      "seenPrev": 14,
+      "seenPct": 0.23333333333333334
+    },
+    {
+      "name": "B36 Nhân số ba chữ số với số một chữ số",
+      "items": 60,
+      "inRun": 1,
+      "seenPrev": 14,
+      "seenPct": 0.23333333333333334
+    },
+    {
+      "name": "B69 Luyện tập chung",
+      "items": 60,
+      "inRun": 0,
+      "seenPrev": 14,
+      "seenPct": 0.23333333333333334
+    },
+    {
+      "name": "B56 Nhân số bốn chữ số với số một chữ số",
+      "items": 60,
+      "inRun": 1,
+      "seenPrev": 13,
+      "seenPct": 0.21666666666666667
+    },
+    {
+      "name": "B23 Nhân số hai chữ số với số một chữ số",
+      "items": 60,
+      "inRun": 3,
+      "seenPrev": 12,
+      "seenPct": 0.2
+    },
+    {
+      "name": "B14 Một phần mấy",
+      "items": 60,
+      "inRun": 0,
+      "seenPrev": 12,
+      "seenPct": 0.2
+    },
+    {
+      "name": "B26 Chia số hai chữ số cho số một chữ số",
+      "items": 60,
+      "inRun": 0,
+      "seenPrev": 12,
+      "seenPct": 0.2
+    },
+    {
+      "name": "B78 Ôn tập nhân, chia trong phạm vi 100 000",
+      "items": 60,
+      "inRun": 0,
+      "seenPrev": 12,
+      "seenPct": 0.2
+    },
+    {
+      "name": "B8 Luyện tập chung",
+      "items": 60,
+      "inRun": 0,
+      "seenPrev": 11,
+      "seenPct": 0.18333333333333332
+    },
+    {
+      "name": "B40 Luyện tập chung",
+      "items": 60,
+      "inRun": 0,
+      "seenPrev": 10,
+      "seenPct": 0.16666666666666666
+    },
+    {
+      "name": "B18 Góc vuông, góc không vuông",
+      "items": 60,
+      "inRun": 0,
+      "seenPrev": 9,
+      "seenPct": 0.15
+    },
+    {
+      "name": "B74 Khả năng xảy ra của một sự kiện",
+      "items": 60,
+      "inRun": 2,
+      "seenPrev": 8,
+      "seenPct": 0.13333333333333333
+    },
+    {
+      "name": "B58 Luyện tập chung",
+      "items": 60,
+      "inRun": 0,
+      "seenPrev": 8,
+      "seenPct": 0.13333333333333333
+    },
+    {
+      "name": "B44 Ôn tập chung",
+      "items": 60,
+      "inRun": 0,
+      "seenPrev": 7,
+      "seenPct": 0.11666666666666667
+    },
+    {
+      "name": "B37 Chia số ba chữ số cho số một chữ số",
+      "items": 60,
+      "inRun": 0,
+      "seenPrev": 6,
+      "seenPct": 0.1
+    },
+    {
+      "name": "B76 Ôn tập các số đến 100 000",
+      "items": 60,
+      "inRun": 0,
+      "seenPrev": 6,
+      "seenPct": 0.1
+    },
+    {
+      "name": "B33 Nhiệt độ",
+      "items": 60,
+      "inRun": 1,
+      "seenPrev": 5,
+      "seenPct": 0.08333333333333333
+    },
+    {
+      "name": "B19 Các hình phẳng cơ bản",
+      "items": 60,
+      "inRun": 0,
+      "seenPrev": 5,
+      "seenPct": 0.08333333333333333
+    },
+    {
+      "name": "B22 Luyện tập chung",
+      "items": 60,
+      "inRun": 0,
+      "seenPrev": 5,
+      "seenPct": 0.08333333333333333
+    },
+    {
+      "name": "B57 Chia số bốn chữ số cho số một chữ số",
+      "items": 60,
+      "inRun": 0,
+      "seenPrev": 5,
+      "seenPct": 0.08333333333333333
+    },
+    {
+      "name": "B13 Tìm thành phần trong phép nhân, chia",
+      "items": 60,
+      "inRun": 0,
+      "seenPrev": 4,
+      "seenPct": 0.06666666666666667
+    },
+    {
+      "name": "B29 Luyện tập chung",
+      "items": 60,
+      "inRun": 0,
+      "seenPrev": 4,
+      "seenPct": 0.06666666666666667
+    },
+    {
+      "name": "B43 Ôn tập hình học và đo lường",
+      "items": 60,
+      "inRun": 0,
+      "seenPrev": 4,
+      "seenPct": 0.06666666666666667
+    },
+    {
+      "name": "B66 Xem đồng hồ, tháng – năm",
+      "items": 60,
+      "inRun": 0,
+      "seenPrev": 4,
+      "seenPct": 0.06666666666666667
+    },
+    {
+      "name": "B20 Thực hành vẽ hình",
+      "items": 60,
+      "inRun": 0,
+      "seenPrev": 3,
+      "seenPct": 0.05
+    },
+    {
+      "name": "B30 Mi-li-mét",
+      "items": 60,
+      "inRun": 0,
+      "seenPrev": 3,
+      "seenPct": 0.05
+    },
+    {
+      "name": "B49 Luyện tập chung",
+      "items": 60,
+      "inRun": 0,
+      "seenPrev": 3,
+      "seenPct": 0.05
+    },
+    {
+      "name": "B50 Chu vi các hình phẳng",
+      "items": 60,
+      "inRun": 0,
+      "seenPrev": 3,
+      "seenPct": 0.05
+    },
+    {
+      "name": "B53 Luyện tập chung",
+      "items": 60,
+      "inRun": 0,
+      "seenPrev": 3,
+      "seenPct": 0.05
+    },
+    {
+      "name": "B67 Thực hành xem đồng hồ, xem lịch",
+      "items": 60,
+      "inRun": 0,
+      "seenPrev": 3,
+      "seenPct": 0.05
+    },
+    {
+      "name": "B7 Ôn tập hình học và đo lường",
+      "items": 60,
+      "inRun": 0,
+      "seenPrev": 2,
+      "seenPct": 0.03333333333333333
+    },
+    {
+      "name": "B27 Giảm một số đi một số lần",
+      "items": 60,
+      "inRun": 0,
+      "seenPrev": 2,
+      "seenPct": 0.03333333333333333
+    },
+    {
+      "name": "B39 Số lớn gấp mấy lần số bé",
+      "items": 60,
+      "inRun": 0,
+      "seenPrev": 2,
+      "seenPct": 0.03333333333333333
+    },
+    {
+      "name": "B80 Ôn tập bảng số liệu, khả năng xảy ra",
+      "items": 60,
+      "inRun": 0,
+      "seenPrev": 2,
+      "seenPct": 0.03333333333333333
+    },
+    {
+      "name": "B81 Ôn tập chung",
+      "items": 60,
+      "inRun": 0,
+      "seenPrev": 2,
+      "seenPct": 0.03333333333333333
+    },
+    {
+      "name": "B31 Gam",
+      "items": 60,
+      "inRun": 1,
+      "seenPrev": 1,
+      "seenPct": 0.016666666666666666
+    },
+    {
+      "name": "B1 Ôn các số đến 1 000",
+      "items": 60,
+      "inRun": 0,
+      "seenPrev": 1,
+      "seenPct": 0.016666666666666666
+    },
+    {
+      "name": "B3 Tìm thành phần trong phép cộng, trừ",
+      "items": 60,
+      "inRun": 0,
+      "seenPrev": 1,
+      "seenPct": 0.016666666666666666
+    },
+    {
+      "name": "B34 Thực hành với các đơn vị đo",
+      "items": 60,
+      "inRun": 0,
+      "seenPrev": 1,
+      "seenPct": 0.016666666666666666
+    },
+    {
+      "name": "B48 Làm tròn số đến hàng chục, hàng trăm",
+      "items": 60,
+      "inRun": 0,
+      "seenPrev": 1,
+      "seenPct": 0.016666666666666666
+    },
+    {
+      "name": "B70 Nhân số năm chữ số với số một chữ số",
+      "items": 60,
+      "inRun": 0,
+      "seenPrev": 1,
+      "seenPct": 0.016666666666666666
+    },
+    {
+      "name": "B75 Thực hành thu thập, đọc bảng số liệu",
+      "items": 60,
+      "inRun": 0,
+      "seenPrev": 1,
+      "seenPct": 0.016666666666666666
+    },
+    {
+      "name": "B79 Ôn tập hình học và đo lường",
+      "items": 60,
+      "inRun": 0,
+      "seenPrev": 1,
+      "seenPct": 0.016666666666666666
+    },
+    {
+      "name": "B72 Luyện tập chung",
+      "items": 60,
+      "inRun": 1,
+      "seenPrev": 0,
+      "seenPct": 0
+    },
+    {
+      "name": "B2 Cộng, trừ trong phạm vi 1 000",
+      "items": 60,
+      "inRun": 0,
+      "seenPrev": 0,
+      "seenPct": 0
+    },
+    {
+      "name": "B24 Gấp một số lên một số lần",
+      "items": 60,
+      "inRun": 0,
+      "seenPrev": 0,
+      "seenPct": 0
+    },
+    {
+      "name": "B25 Phép chia hết, phép chia có dư",
+      "items": 60,
+      "inRun": 0,
+      "seenPrev": 0,
+      "seenPct": 0
+    },
+    {
+      "name": "B28 Bài toán giải bằng hai bước tính",
+      "items": 60,
+      "inRun": 0,
+      "seenPrev": 0,
+      "seenPct": 0
+    },
+    {
+      "name": "B35 Luyện tập chung",
+      "items": 60,
+      "inRun": 0,
+      "seenPrev": 0,
+      "seenPct": 0
+    },
+    {
+      "name": "B38 Biểu thức số",
+      "items": 60,
+      "inRun": 0,
+      "seenPrev": 0,
+      "seenPct": 0
+    },
+    {
+      "name": "B42 Ôn tập biểu thức số",
+      "items": 60,
+      "inRun": 0,
+      "seenPrev": 0,
+      "seenPct": 0
+    },
+    {
+      "name": "B45 Các số có bốn chữ số, số 10 000",
+      "items": 60,
+      "inRun": 0,
+      "seenPrev": 0,
+      "seenPct": 0
+    },
+    {
+      "name": "B46 So sánh các số trong phạm vi 10 000",
+      "items": 60,
+      "inRun": 0,
+      "seenPrev": 0,
+      "seenPct": 0
+    },
+    {
+      "name": "B51 Diện tích, xăng-ti-mét vuông",
+      "items": 60,
+      "inRun": 0,
+      "seenPrev": 0,
+      "seenPct": 0
+    },
+    {
+      "name": "B54 Phép cộng trong phạm vi 10 000",
+      "items": 60,
+      "inRun": 0,
+      "seenPrev": 0,
+      "seenPct": 0
+    },
+    {
+      "name": "B55 Phép trừ trong phạm vi 10 000",
+      "items": 60,
+      "inRun": 0,
+      "seenPrev": 0,
+      "seenPct": 0
+    },
+    {
+      "name": "B59 Các số có năm chữ số, số 100 000",
+      "items": 60,
+      "inRun": 0,
+      "seenPrev": 0,
+      "seenPct": 0
+    },
+    {
+      "name": "B60 So sánh các số trong phạm vi 100 000",
+      "items": 60,
+      "inRun": 0,
+      "seenPrev": 0,
+      "seenPct": 0
+    },
+    {
+      "name": "B61 Làm tròn đến hàng nghìn, chục nghìn",
+      "items": 60,
+      "inRun": 0,
+      "seenPrev": 0,
+      "seenPct": 0
+    },
+    {
+      "name": "B62 Luyện tập chung",
+      "items": 60,
+      "inRun": 0,
+      "seenPrev": 0,
+      "seenPct": 0
+    },
+    {
+      "name": "B63 Phép cộng trong phạm vi 100 000",
+      "items": 60,
+      "inRun": 0,
+      "seenPrev": 0,
+      "seenPct": 0
+    },
+    {
+      "name": "B64 Phép trừ trong phạm vi 100 000",
+      "items": 60,
+      "inRun": 0,
+      "seenPrev": 0,
+      "seenPct": 0
+    },
+    {
+      "name": "B65 Luyện tập chung",
+      "items": 60,
+      "inRun": 0,
+      "seenPrev": 0,
+      "seenPct": 0
+    },
+    {
+      "name": "B71 Chia số năm chữ số cho số một chữ số",
+      "items": 60,
+      "inRun": 0,
+      "seenPrev": 0,
+      "seenPct": 0
+    },
+    {
+      "name": "B73 Thu thập số liệu, bảng số liệu",
+      "items": 60,
+      "inRun": 0,
+      "seenPrev": 0,
+      "seenPct": 0
+    },
+    {
+      "name": "B77 Ôn tập cộng, trừ trong phạm vi 100 000",
+      "items": 60,
+      "inRun": 0,
+      "seenPrev": 0,
+      "seenPct": 0
+    }
+  ],
+  "tableC": {
+    "name": "daily (30 days)",
+    "items": 300,
+    "inRun": 0,
+    "seenPrev": 5,
+    "seenPct": 0.016666666666666666
+  },
+  "tableD": [
+    {
+      "name": "field",
+      "items": 50,
+      "inRun": 0,
+      "seenPrev": 0,
+      "seenPct": 0
+    },
+    {
+      "name": "forest",
+      "items": 50,
+      "inRun": 0,
+      "seenPrev": 0,
+      "seenPct": 0
+    },
+    {
+      "name": "city",
+      "items": 50,
+      "inRun": 0,
+      "seenPrev": 1,
+      "seenPct": 0.02
+    },
+    {
+      "name": "tower",
+      "items": 50,
+      "inRun": 0,
+      "seenPrev": 0,
+      "seenPct": 0
+    }
+  ],
+  "topRepeaters": [
+    {
+      "signature": "div:49/7",
+      "count": 17
+    },
+    {
+      "signature": "mul:6x6",
+      "count": 17
+    },
+    {
+      "signature": "div:42/6",
+      "count": 15
+    },
+    {
+      "signature": "mul:6x7",
+      "count": 15
+    },
+    {
+      "signature": "div:12/6",
+      "count": 14
+    },
+    {
+      "signature": "div:14/7",
+      "count": 13
+    },
+    {
+      "signature": "div:56/8",
+      "count": 13
+    },
+    {
+      "signature": "mul:6x9",
+      "count": 13
+    },
+    {
+      "signature": "mul:2x6",
+      "count": 12
+    },
+    {
+      "signature": "div:16/8",
+      "count": 10
+    },
+    {
+      "signature": "div:18/9",
+      "count": 10
+    },
+    {
+      "signature": "div:21/3",
+      "count": 10
+    },
+    {
+      "signature": "div:24/3",
+      "count": 10
+    },
+    {
+      "signature": "div:25/5",
+      "count": 10
+    },
+    {
+      "signature": "div:28/4",
+      "count": 10
+    },
+    {
+      "signature": "div:6/3",
+      "count": 10
+    },
+    {
+      "signature": "div:63/9",
+      "count": 10
+    },
+    {
+      "signature": "div:8/4",
+      "count": 10
+    },
+    {
+      "signature": "mul:3x6",
+      "count": 10
+    },
+    {
+      "signature": "mul:3x7",
+      "count": 10
+    }
+  ]
+}
