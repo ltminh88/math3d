@@ -129,3 +129,12 @@ export function unitForStage(stage: number): EnglishUnit {
   if (!found) throw new Error(`unitForStage: no unit for stage ${stage}`);
   return found;
 }
+
+/**
+ * The earliest unit that teaches a skill — its home stage (stage 8 reviews
+ * every skill, so this always finds one). Daily practice uses it to build one
+ * item for a learned skill without knowing which stage taught it.
+ */
+export function unitForSkill(skillId: EnglishSkillId): EnglishUnit {
+  return ENGLISH_UNITS.find((u) => u.skillIds.includes(skillId)) ?? unitForStage(8);
+}

@@ -6,6 +6,7 @@ import { defineStrings } from '../../i18n/i18n';
 export const tei = defineStrings('english-island', {
   vi: {
     runTitle: 'Đảo Tiếng Anh',
+    dailyBadge: 'Tiếng Anh',
     roundOf: 'Câu {n}/{total}',
     correct: 'Đúng rồi! Giỏi lắm.',
     revealed: 'Hết 3 lần thử rồi, bạn xem đáp án đúng nhé.',
@@ -40,6 +41,7 @@ export const tei = defineStrings('english-island', {
   },
   en: {
     runTitle: 'English Island',
+    dailyBadge: 'English',
     roundOf: 'Question {n} of {total}',
     correct: 'Correct! Well done.',
     revealed: 'Out of tries — look at the right answer.',

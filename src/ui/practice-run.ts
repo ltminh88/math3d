@@ -4,13 +4,18 @@
 // correct answer, no XP. Leaving mid-run keeps the answered items; the batch is committed
 // either way. Daily and lesson both call it; only their title, note and finish differ —
 // the caller passes those in, and the run calls back when it finishes.
+
+import { unitForSkill } from '../english/content/units';
+import { generateItem } from '../english/engine/item-generators';
+import { kindsForSkill } from '../english/engine/item-planner';
+import type { EnglishItemKind, EnglishSkillId } from '../english/english-types';
 import { type FactKey, isSkillKey, parseKey } from '../learning/fact-key';
 import { COINS_PER_CORRECT } from '../learning/scoring';
 import { mulberry32, type Rng } from '../learning/seeded-rng';
 import type { QuestionOutcome } from '../learning/session-recorder';
 import { skillTierOf } from '../learning/skill-tiers';
 import type { ReasoningRoundPlan } from '../levels/shared/reasoning-round-slot';
-import { dialogRenderable, itemForSkill } from '../practice/item-for-skill';
+import { dialogRenderable, familyOfSkill, itemForSkill } from '../practice/item-for-skill';
 import { buildDailyQuestion } from '../quiz/daily-question';
 import { createQuizAnswerBatch, type QuizAnswerBatch } from '../quiz/quiz-answer-batch';
 import type { GameStore } from '../store/game-store-api';
@@ -79,6 +84,25 @@ export function isKeyRenderable(key: FactKey, box: number): boolean {
   if (!isSkillKey(key)) return true;
   const parsed = parseKey(key);
   const id = parsed?.op === 'skill' ? parsed.id : '';
+  // English Island (Phase 6): an English skill renders when its generator can
+  // build an item for it from its home unit. The widget itself loads lazily
+  // at render time, so this check only proves the content exists.
+  if (familyOfSkill(id) === 'english') {
+    try {
+      const skillId = id as EnglishSkillId;
+      const kinds = kindsForSkill(skillId);
+      generateItem(
+        skillId,
+        kinds[0] as EnglishItemKind,
+        skillTierOf({ box }),
+        unitForSkill(skillId),
+        mulberry32(0),
+      );
+      return true;
+    } catch {
+      return false;
+    }
+  }
   try {
     const item = itemForSkill(id, mulberry32(0), skillTierOf({ box }));
     return dialogRenderable(item);
@@ -152,6 +176,13 @@ function renderItem(): void {
   if (isSkillKey(key)) {
     const parsed = parseKey(key);
     const id = parsed?.op === 'skill' ? parsed.id : '';
+    // English Island (Phase 6): one English item in the shared dialog. The
+    // widgets load lazily (dynamic import) so the daily dialog's chunk does
+    // not carry them until the first English item is shown.
+    if (familyOfSkill(id) === 'english') {
+      void renderEnglishItem(key, id as EnglishSkillId, title, isLast);
+      return;
+    }
     const plan = skillPlan(id, store.getSnapshot().factStats[key]?.box ?? 1, run.rng);
     run.plan = plan;
     openDialog(title, skillItemHtml(index, keys.length, run.alreadyCounted), run.kind);
@@ -171,6 +202,33 @@ function renderItem(): void {
     onLeave: () => void leaveRun(),
   });
   run.current = { destroy: () => {}, missed };
+}
+
+/** The English branch of renderItem: the import resolves after the dialog's */
+async function renderEnglishItem(
+  key: FactKey,
+  skillId: EnglishSkillId,
+  title: string,
+  isLast: boolean,
+): Promise<void> {
+  const mod = await import('./english/english-daily-item');
+  // The run may have ended (leave / finish) while the import was in flight.
+  if (!run || run.keys[run.index] !== key) return;
+  const { store } = run;
+  openDialog(title, mod.englishItemHtml(run.index, run.keys.length, run.alreadyCounted), run.kind);
+  const mounted = mod.mountEnglishDailyItem({
+    skillId,
+    box: store.getSnapshot().factStats[key]?.box ?? 1,
+    isLast,
+    rng: run.rng,
+    signal: run.signal.signal,
+    cb: {
+      onAnswered,
+      onNext,
+      onLeave: () => void leaveRun(),
+    },
+  });
+  run.current = { destroy: () => mounted.destroy(), missed: () => null };
 }
 
 async function finishRun(): Promise<void> {

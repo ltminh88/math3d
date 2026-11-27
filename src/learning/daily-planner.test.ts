@@ -119,3 +119,65 @@ describe('dailyUnlocked', () => {
     expect(dailyUnlocked({ field: { stars: 3 } })).toBe(true);
   });
 });
+
+describe('English in daily practice (Phase 6)', () => {
+  const enDue = statsOf({
+    'sk:en-letters-a-d': stat(1, [2026, 10, 20]),
+    'sk:en-words-a-d': stat(1, [2026, 10, 20]),
+    'sk:en-topic-animals': stat(1, [2026, 10, 20]),
+  });
+  const mathDue = statsOf({
+    'mul:3x4': stat(1, [2026, 10, 20]),
+    'mul:3x5': stat(1, [2026, 10, 20]),
+    'mul:3x6': stat(1, [2026, 10, 20]),
+    'mul:3x7': stat(1, [2026, 10, 20]),
+    'mul:4x4': stat(1, [2026, 10, 20]),
+    'mul:4x5': stat(1, [2026, 10, 20]),
+    'mul:4x6': stat(1, [2026, 10, 20]),
+    'mul:4x7': stat(1, [2026, 10, 20]),
+    'div:12/3': stat(1, [2026, 10, 20]),
+    'div:20/4': stat(1, [2026, 10, 20]),
+  });
+
+  it('locked island (default and explicit): no English items', () => {
+    const stats = statsOf({ ...enDue, ...mathDue });
+    for (const input of [
+      { stats, today: TODAY, seed: 7 },
+      { stats, today: TODAY, seed: 7, islandUnlocked: false },
+    ]) {
+      const set = planDailySet(input);
+      expect(set).not.toContain('sk:en-letters-a-d');
+      expect(set).not.toContain('sk:en-words-a-d');
+      expect(set).not.toContain('sk:en-topic-animals');
+    }
+  });
+
+  it('unlocked island: at most 2 English items, the day stays full', () => {
+    const stats = statsOf({ ...enDue, ...mathDue });
+    const set = planDailySet({ stats, today: TODAY, seed: 7, islandUnlocked: true });
+    expect(set).toHaveLength(DAILY_LENGTH);
+    expect(set.filter((k) => k.startsWith('sk:en-'))).toHaveLength(2);
+  });
+
+  it('unlocked island with only English learned: the day is 2 items, both English', () => {
+    const set = planDailySet({ stats: enDue, today: TODAY, seed: 7, islandUnlocked: true });
+    expect(set).toHaveLength(2);
+    expect(set.every((k) => k.startsWith('sk:en-'))).toBe(true);
+  });
+
+  it('an untaught English skill never appears, unlocked or not', () => {
+    const stats = statsOf({
+      'sk:en-letters-a-d': { ...newFactStat(), attempts: 0, box: 1, lastSeenAt: 0 },
+      'mul:3x4': stat(1, [2026, 10, 20]),
+    });
+    expect(planDailySet({ stats, today: TODAY, seed: 7, islandUnlocked: true })).toEqual([
+      'mul:3x4',
+    ]);
+  });
+
+  it('is deterministic for (seed, today, stats, islandUnlocked)', () => {
+    const stats = statsOf({ ...enDue, ...mathDue });
+    const input = { stats, today: TODAY, seed: 11, islandUnlocked: true };
+    expect(planDailySet(input)).toEqual(planDailySet(input));
+  });
+});
