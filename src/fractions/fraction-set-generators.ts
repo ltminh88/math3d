@@ -8,7 +8,19 @@ import { fractionItem, fractionSceneItem, setScene } from './fraction-distractor
 import { DENOMINATORS, SET_MAX } from './fraction-ranges';
 import type { FractionGenerator } from './fraction-scene-types';
 
-const NOUNS = ['i:marble', 'i:candy', 'i:apple', 'i:flower'] as const;
+/** Nouns a set can be made of: shareable and edible, so both the share and the
+ *  eat stories read right (Phase 5: was 4). */
+const NOUNS = [
+  'i:marble',
+  'i:candy',
+  'i:apple',
+  'i:orange',
+  'i:banana',
+  'i:mango',
+  'i:cake',
+  'i:fish',
+  'i:chicken',
+] as const;
 
 /** A set size N divisible by n, at least 2n (so one part is at least 2), at most `max`. */
 const setSize = (rng: Rng, n: number, max: number): number => {
@@ -98,12 +110,14 @@ export const fractionOfSetNumber: FractionGenerator = (rng, tier) => {
   ]);
 };
 
-type WpContext = 'share' | 'eat' | 'class' | 'read';
+type WpContext = 'share' | 'eat' | 'class' | 'read' | 'give' | 'pack';
 const WP_STORIES: Record<WpContext, { story: string; ask: string }> = {
   share: { story: 'wpShare', ask: 'askWpGive' },
   eat: { story: 'wpEat', ask: 'askWpEat' },
   class: { story: 'wpClass', ask: 'askWpClass' },
   read: { story: 'wpRead', ask: 'askWpRead' },
+  give: { story: 'wpGive', ask: 'askWpGive' },
+  pack: { story: 'wpPack', ask: 'askWpPack' },
 };
 
 export const fractionWp: FractionGenerator = (rng, tier) => {
@@ -116,15 +130,15 @@ export const fractionWp: FractionGenerator = (rng, tier) => {
   const max = tier === 1 ? 24 : tier === 2 ? 36 : SET_MAX;
   const total = setSize(rng, n, max);
   const part = total / n;
-  // Tier 3 asks a second step ("how many are left?"), which only the share/eat stories can
-  // phrase with the same noun.
+  // Tier 3 asks a second step ("how many are left?"), which only the stories
+  // with a noun can phrase (share/eat/give/pack).
   const ctx =
     tier === 3
-      ? pick(rng, ['share', 'eat'] as const)
-      : pick(rng, ['share', 'eat', 'class', 'read'] as const);
+      ? pick(rng, ['share', 'eat', 'give', 'pack'] as const)
+      : pick(rng, ['share', 'eat', 'class', 'read', 'give', 'pack'] as const);
   const { story, ask } = WP_STORIES[ctx];
   const item = pick(rng, NOUNS);
-  const withNoun = ctx === 'share' || ctx === 'eat';
+  const withNoun = ctx !== 'class' && ctx !== 'read';
   const storyRef = ref(story, withNoun ? { item, count: total, n } : { count: total, n });
   const askRef = ref(ask, withNoun ? { item } : undefined);
   if (tier === 3) {

@@ -78,10 +78,10 @@ const firstOf = (ref: PromptRef | undefined): string | null =>
 export function firstStepExpression(chamber: CaveChamber): string | null {
   const first = chamber.steps[0];
   if (chamber.format === 'tf-explain' && first?.kind === 'verdict') return firstOf(first.statement);
-  // Phase 02: the three compare frames are shared by both compare skills, so the
+  // Phase 02: the compare frames are shared by both compare skills, so the
   // operation comes from the chamber's skill, not the story key.
   const key = chamber.item.story.key;
-  if (key === 'wpCompareCrates' || key === 'wpCompareClasses' || key === 'wpCompareGardens') {
+  if (key.startsWith('wpCompare')) {
     const p = chamber.item.story.params ?? {};
     return chamber.skillId === 'wp-difference-compare'
       ? `${p.big} − ${p.small}`

@@ -132,6 +132,41 @@ export const COMPARE_CONTEXTS: readonly CompareContext[] = [
     askTimes: 'askTimesGarden',
     askMore: 'askMoreGarden',
   },
+  {
+    key: 'wpCompareStalls',
+    nouns: ['i:banana', 'i:mango', 'i:cake'],
+    lesson: 'T1 B39',
+    askTimes: 'askTimesStall',
+    askMore: 'askMoreStall',
+  },
+  {
+    key: 'wpCompareGiftBoxes',
+    nouns: ['i:ball', 'i:marble', 'i:candy'],
+    lesson: 'T1 B39',
+    askTimes: 'askTimesGiftBox',
+    askMore: 'askMoreGiftBox',
+  },
+  {
+    key: 'wpCompareDesks',
+    nouns: ['i:pencil', 'i:eraser', 'i:notebook'],
+    lesson: 'T1 B39',
+    askTimes: 'askTimesDesk',
+    askMore: 'askMoreDesk',
+  },
+  {
+    key: 'wpCompareBaskets',
+    nouns: ['i:apple', 'i:banana', 'i:mango'],
+    lesson: 'T1 B39',
+    askTimes: 'askTimesBasket',
+    askMore: 'askMoreBasket',
+  },
+  {
+    key: 'wpCompareShops',
+    nouns: ['i:pencil', 'i:notebook', 'i:eraser'],
+    lesson: 'T1 B39',
+    askTimes: 'askTimesShop',
+    askMore: 'askMoreShop',
+  },
 ];
 
 const BASKETS: CompareContext = {

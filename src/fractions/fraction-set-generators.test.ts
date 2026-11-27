@@ -60,6 +60,19 @@ const ORACLE: Record<string, (i: FractionItem, tier: SkillTier) => void> = {
     expect(lastValue(i)).toBe(tier === 3 ? total - part : part);
     if (tier === 3) expect(stepValue(i.steps[0])).toBe(part);
   },
+  // Same shape as wpShare/wpEat: one noun step, then "how many are left" at T3.
+  wpGive: (i, tier) => {
+    expect(i.scene).toBeUndefined();
+    const [, total, part] = partOf(i);
+    expect(lastValue(i)).toBe(tier === 3 ? total - part : part);
+    if (tier === 3) expect(stepValue(i.steps[0])).toBe(part);
+  },
+  wpPack: (i, tier) => {
+    expect(i.scene).toBeUndefined();
+    const [, total, part] = partOf(i);
+    expect(lastValue(i)).toBe(tier === 3 ? total - part : part);
+    if (tier === 3) expect(stepValue(i.steps[0])).toBe(part);
+  },
   wpClass: (i) => {
     expect(i.scene).toBeUndefined();
     const [, , part] = partOf(i);

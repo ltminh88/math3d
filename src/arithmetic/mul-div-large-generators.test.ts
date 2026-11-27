@@ -210,7 +210,17 @@ function tierCheck(skillId: string, item: PracticeItem, tier: SkillTier): void {
   }
   if (skillId === 'mul-div-large-wp') {
     if (tier === 3) {
-      expect(['wpMoneyChange', 'wpCompareLarge'], where).toContain(key);
+      // T3: money change, compare results, or a two-step with a carry (Phase 5).
+      expect(
+        [
+          'wpMoneyChange',
+          'wpCompareLarge',
+          'wpMulThenSubRice',
+          'wpMulThenSubBooks',
+          'wpMulThenSubSchool',
+        ],
+        where,
+      ).toContain(key);
       return;
     }
     expect(key.startsWith('wpMulTimes') || key.startsWith('wpMulThenSub'), `${where}: ${key}`).toBe(

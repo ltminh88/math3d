@@ -123,7 +123,12 @@ function compareLarge(rng: Rng) {
 /** Large mul WP: T1 one step, T2 one step or two steps with no carry, T3 two steps
  *  with a carry, money change, or compare results. */
 const mulDivLargeWp: ReasoningGenerator = (rng, tier) => {
-  if (tier === 3) return rng() < 0.5 ? moneyChange(rng) : compareLarge(rng);
+  if (tier === 3) {
+    const r = rng();
+    if (r < 1 / 3) return moneyChange(rng);
+    if (r < 2 / 3) return compareLarge(rng);
+    return mulThenSubLarge(rng, tier, false);
+  }
   const twoStepAt = tier === 1 ? false : tier === 2 ? rng() < 0.5 : rng() < 0.7;
   return twoStepAt ? mulThenSubLarge(rng, tier, tier === 2) : mulTimesLarge(rng, tier);
 };
