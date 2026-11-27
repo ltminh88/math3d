@@ -1,8 +1,11 @@
 // English Island Phase 3B: the pack unlock dialog + the speaker, driven through
 // the test-build hook `window.__game.island`. The pack endpoint is faked with
-// `page.route` (the synthetic fixture); `speechSynthesis` is faked so the
-// "🔊 Nghe" tap is observable without a real voice.
+// `page.route` (the synthetic fixture); `speechSynthesis` is faked and Audio
+// plays are recorded so the "🔊 Nghe" tap is observable without a real voice
+// — since Phase 2C step 2 every word has a clip, so Nghe normally plays the
+// mp3 and never calls speechSynthesis.
 import { type Page, test } from '@playwright/test';
+import { englishClipUrl } from '../../src/english/content/audio-map';
 import { SYNTHETIC_PACK } from '../../src/english/fixtures/synthetic-pack';
 import { expect, SLOW_TEST_MS, waitForStoreBoot } from './legacy-live-save-fixtures';
 
@@ -120,6 +123,29 @@ const spokenTexts = (page: Page) =>
   page.evaluate(() => (window as unknown as { __spoken?: string[] }).__spoken ?? []) as Promise<
     string[]
   >;
+
+/** Record every Audio URL the page constructs (the 2C clip path) on `window.__playedClips`. */
+async function recordClipPlays(page: Page): Promise<void> {
+  await page.addInitScript(() => {
+    const w = window as unknown as {
+      __playedClips: string[];
+      Audio: typeof Audio;
+    };
+    w.__playedClips = [];
+    const RealAudio = w.Audio;
+    w.Audio = class extends RealAudio {
+      constructor(url?: string) {
+        super(url);
+        if (url) w.__playedClips.push(url);
+      }
+    } as typeof Audio;
+  });
+}
+
+const playedClips = (page: Page) =>
+  page.evaluate(
+    () => (window as unknown as { __playedClips?: string[] }).__playedClips ?? [],
+  ) as Promise<string[]>;
 
 /** Read the stored pack row out of the pack's own IndexedDB database. */
 const readStoredPack = (page: Page) =>
@@ -241,9 +267,10 @@ test('reload offline keeps the pack', async ({ page }, testInfo) => {
   expect(requests).toBe(1);
 });
 
-test('Nghe speaks the shown word through speechSynthesis', async ({ page }, testInfo) => {
+test('Nghe speaks the shown word through a clip or speechSynthesis', async ({ page }, testInfo) => {
   const tap = !!testInfo.project.use.hasTouch;
   await fakeSpeech(page);
+  await recordClipPlays(page);
   await boot(page);
   await startIsland(page);
   // Find a listen/letter round (its word is on screen as the prompt).
@@ -256,8 +283,24 @@ test('Nghe speaks the shown word through speechSynthesis', async ({ page }, test
   }
   const prompt = (await page.locator('.english-prompt').textContent())?.trim() ?? '';
   expect(prompt.length).toBeGreaterThan(0);
+  // The speaker plays the pre-generated clip first and only falls back to
+  // speechSynthesis when the word has no clip — since step 2 every word has
+  // one, so either signal proves Nghe spoke the shown word.
+  const clipUrl = englishClipUrl(prompt);
+  const playedBefore = (await playedClips(page)).length;
   await tapOrClick(page.locator('.english-listen'), tap);
-  await expect.poll(() => spokenTexts(page), { timeout: 10_000 }).toContain(prompt);
+  await expect
+    .poll(
+      async () => {
+        const spoken = await spokenTexts(page);
+        if (spoken.includes(prompt)) return true;
+        if (clipUrl === null) return false;
+        const played = await playedClips(page);
+        return played.slice(playedBefore).includes(clipUrl);
+      },
+      { timeout: 10_000 },
+    )
+    .toBe(true);
 });
 
 test('abort mid-run removes the widget and records nothing', async ({ page }) => {

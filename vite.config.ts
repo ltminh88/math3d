@@ -44,8 +44,8 @@ export default defineConfig({
         // change must not silently precache the clips.
         globIgnores: ['english-audio/**'],
         // A played clip works offline: CacheFirst on first play, served
-        // from the cache afterwards. Clips are immutable (the text hash
-        // changes the file only when the text changes), so no expiry.
+        // from the cache afterwards. Clips are immutable (the hash in the
+        // file name changes when the text, voice or speed change), so no expiry.
         runtimeCaching: [
           {
             urlPattern: /\/english-audio\//,

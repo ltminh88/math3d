@@ -5,87 +5,931 @@
   "clips": {
     "astronaut": {
       "text": "astronaut",
-      "hash": "d4c8dea0b232"
+      "hash": "0efda331f1a1"
     },
     "bread": {
       "text": "bread",
-      "hash": "3b17e9bc1608"
+      "hash": "0cf12f74605f"
     },
     "brother": {
       "text": "brother",
-      "hash": "f0c0dab3ed5f"
+      "hash": "f9383a418d7d"
     },
     "elephant": {
       "text": "elephant",
-      "hash": "a0a585828a26"
+      "hash": "4c94bbc85cc6"
     },
     "island": {
       "text": "island",
-      "hash": "b259ac018ae6"
+      "hash": "7e79a7ff4862"
     },
     "snow": {
       "text": "snow",
-      "hash": "a596ad5b6a84"
+      "hash": "862bf37d1a06"
     },
     "star": {
       "text": "star",
-      "hash": "99941e98f252"
+      "hash": "8205feb237cf"
     },
     "teacher": {
       "text": "teacher",
-      "hash": "b246a7d2f9cf"
+      "hash": "6a9868fe76ae"
     },
     "tiger": {
       "text": "tiger",
-      "hash": "656ef1e17b97"
+      "hash": "e23991424749"
     },
     "umbrella": {
       "text": "umbrella",
-      "hash": "1fb7455d6754"
+      "hash": "8ae82a085b79"
     },
     "unicorn": {
       "text": "unicorn",
-      "hash": "57f0c939ecc4"
+      "hash": "7eff9e47ee4c"
     },
     "yellow": {
       "text": "yellow",
-      "hash": "0a87781ec14a"
+      "hash": "cc70b1a797e6"
     },
     "letter-a": {
       "text": "a",
-      "hash": "07b809aa0f35"
+      "hash": "d1d25f5391c2"
     },
     "letter-b": {
       "text": "b",
-      "hash": "aba969a3a030"
+      "hash": "a753cea1064f"
     },
     "letter-e": {
       "text": "e",
-      "hash": "7237c23bb5c9"
+      "hash": "14e2a03b4506"
     },
     "letter-h": {
       "text": "h",
-      "hash": "c7fd41b20f70"
+      "hash": "ec7b2b5105ca"
     },
     "letter-z": {
       "text": "z",
-      "hash": "f1843fa75fa7"
+      "hash": "05605dddedf9"
     },
     "this-is-a-cat": {
       "text": "This is a cat",
-      "hash": "5c8a08ae0d9a"
+      "hash": "f4d5e9a49c79"
     },
     "i-like-fish": {
       "text": "I like fish",
-      "hash": "72c1c138e6ea"
+      "hash": "a056dc7b2c82"
     },
     "my-favourite-colour-is-red": {
       "text": "My favourite colour is red",
-      "hash": "007d5539ae53"
+      "hash": "f3d0cb8e8208"
     },
     "what-is-this-it-is-a-cat": {
       "text": "What is this? It is a cat",
-      "hash": "91e79d3e2943"
+      "hash": "f03a93d7e3c7"
+    },
+    "apple": {
+      "text": "apple",
+      "hash": "3f1254a11940"
+    },
+    "ant": {
+      "text": "ant",
+      "hash": "570fc21b548c"
+    },
+    "arm": {
+      "text": "arm",
+      "hash": "9d71a457f68e"
+    },
+    "baby": {
+      "text": "baby",
+      "hash": "1b69ecf2de06"
+    },
+    "bag": {
+      "text": "bag",
+      "hash": "b6f7805c802f"
+    },
+    "ball": {
+      "text": "ball",
+      "hash": "1c5dbc3c75dd"
+    },
+    "banana": {
+      "text": "banana",
+      "hash": "6cba664cdfad"
+    },
+    "bed": {
+      "text": "bed",
+      "hash": "59d8709e2082"
+    },
+    "bike": {
+      "text": "bike",
+      "hash": "8c40b44e018e"
+    },
+    "bird": {
+      "text": "bird",
+      "hash": "26c1af67c215"
+    },
+    "black": {
+      "text": "black",
+      "hash": "db3496ff8242"
+    },
+    "blocks": {
+      "text": "blocks",
+      "hash": "dda9a7e21504"
+    },
+    "blue": {
+      "text": "blue",
+      "hash": "a2f228edffb4"
+    },
+    "boat": {
+      "text": "boat",
+      "hash": "8ca63ecd7740"
+    },
+    "book": {
+      "text": "book",
+      "hash": "5202b38f8001"
+    },
+    "box": {
+      "text": "box",
+      "hash": "219690c4fd22"
+    },
+    "bus": {
+      "text": "bus",
+      "hash": "72d1b326c689"
+    },
+    "cake": {
+      "text": "cake",
+      "hash": "77380dfac45b"
+    },
+    "cap": {
+      "text": "cap",
+      "hash": "e7c17541acff"
+    },
+    "car": {
+      "text": "car",
+      "hash": "e545c538a8dc"
+    },
+    "cat": {
+      "text": "cat",
+      "hash": "1fd6647cab41"
+    },
+    "chair": {
+      "text": "chair",
+      "hash": "a43b054de30e"
+    },
+    "cheese": {
+      "text": "cheese",
+      "hash": "5b2e746c23e8"
+    },
+    "clock": {
+      "text": "clock",
+      "hash": "19b5e5eacd3e"
+    },
+    "cloud": {
+      "text": "cloud",
+      "hash": "f555063a8ac2"
+    },
+    "cookie": {
+      "text": "cookie",
+      "hash": "9a553c16b356"
+    },
+    "cow": {
+      "text": "cow",
+      "hash": "d2dc4321fd0a"
+    },
+    "crayon": {
+      "text": "crayon",
+      "hash": "0be15c6d637c"
+    },
+    "dance": {
+      "text": "dance",
+      "hash": "bde00273d211"
+    },
+    "dog": {
+      "text": "dog",
+      "hash": "239d9ada684d"
+    },
+    "doll": {
+      "text": "doll",
+      "hash": "baf427c1c92d"
+    },
+    "door": {
+      "text": "door",
+      "hash": "164c972af4a0"
+    },
+    "draw": {
+      "text": "draw",
+      "hash": "72bb79801cec"
+    },
+    "dress": {
+      "text": "dress",
+      "hash": "6757286aba7e"
+    },
+    "duck": {
+      "text": "duck",
+      "hash": "5963b2b3b4e9"
+    },
+    "eat": {
+      "text": "eat",
+      "hash": "3525511eaf29"
+    },
+    "egg": {
+      "text": "egg",
+      "hash": "21afb31baaf6"
+    },
+    "eye": {
+      "text": "eye",
+      "hash": "03687c8cf37d"
+    },
+    "ear": {
+      "text": "ear",
+      "hash": "4269cf30ade1"
+    },
+    "father": {
+      "text": "father",
+      "hash": "c1b1fb193e77"
+    },
+    "fish": {
+      "text": "fish",
+      "hash": "750e9fa069db"
+    },
+    "flower": {
+      "text": "flower",
+      "hash": "8812aef44c53"
+    },
+    "foot": {
+      "text": "foot",
+      "hash": "42338a799fd8"
+    },
+    "fox": {
+      "text": "fox",
+      "hash": "9854e5253f64"
+    },
+    "frog": {
+      "text": "frog",
+      "hash": "2b70e335ff12"
+    },
+    "goat": {
+      "text": "goat",
+      "hash": "4413a21f1e89"
+    },
+    "grapes": {
+      "text": "grapes",
+      "hash": "4d012e2270ff"
+    },
+    "green": {
+      "text": "green",
+      "hash": "351478340622"
+    },
+    "guitar": {
+      "text": "guitar",
+      "hash": "fce132b8a74d"
+    },
+    "grandma": {
+      "text": "grandma",
+      "hash": "8ce8956a944e"
+    },
+    "grandpa": {
+      "text": "grandpa",
+      "hash": "033f9653b031"
+    },
+    "hand": {
+      "text": "hand",
+      "hash": "b300d3975ba2"
+    },
+    "hat": {
+      "text": "hat",
+      "hash": "6d99d9ca14e5"
+    },
+    "horse": {
+      "text": "horse",
+      "hash": "c985373e354c"
+    },
+    "house": {
+      "text": "house",
+      "hash": "7f6f8814ccbb"
+    },
+    "ice": {
+      "text": "ice",
+      "hash": "e4523e497111"
+    },
+    "insect": {
+      "text": "insect",
+      "hash": "f6ddf519e66f"
+    },
+    "ink": {
+      "text": "ink",
+      "hash": "a4bfcaf9659d"
+    },
+    "jacket": {
+      "text": "jacket",
+      "hash": "22c7158d40ae"
+    },
+    "jellyfish": {
+      "text": "jellyfish",
+      "hash": "38f32b438b7e"
+    },
+    "juice": {
+      "text": "juice",
+      "hash": "05abe9b9fa0b"
+    },
+    "jump": {
+      "text": "jump",
+      "hash": "e2a62a7f072f"
+    },
+    "key": {
+      "text": "key",
+      "hash": "34438e1e99f2"
+    },
+    "king": {
+      "text": "king",
+      "hash": "8d2a13105ccd"
+    },
+    "kite": {
+      "text": "kite",
+      "hash": "5157546caa2f"
+    },
+    "koala": {
+      "text": "koala",
+      "hash": "9b6380defb29"
+    },
+    "lamp": {
+      "text": "lamp",
+      "hash": "68e6fb0abc12"
+    },
+    "leaf": {
+      "text": "leaf",
+      "hash": "8736b587b172"
+    },
+    "leg": {
+      "text": "leg",
+      "hash": "e6a98f793f77"
+    },
+    "lemon": {
+      "text": "lemon",
+      "hash": "7186e1bc0e1e"
+    },
+    "lion": {
+      "text": "lion",
+      "hash": "63e09342ea0f"
+    },
+    "look": {
+      "text": "look",
+      "hash": "50348234267c"
+    },
+    "milk": {
+      "text": "milk",
+      "hash": "dac243752dac"
+    },
+    "monkey": {
+      "text": "monkey",
+      "hash": "18055e29ce94"
+    },
+    "moon": {
+      "text": "moon",
+      "hash": "e5437e95ebbb"
+    },
+    "mother": {
+      "text": "mother",
+      "hash": "d18a537f2295"
+    },
+    "mouse": {
+      "text": "mouse",
+      "hash": "69427551e7b3"
+    },
+    "mouth": {
+      "text": "mouth",
+      "hash": "0fc66bb5aed7"
+    },
+    "nest": {
+      "text": "nest",
+      "hash": "191fa3f9a483"
+    },
+    "night": {
+      "text": "night",
+      "hash": "04b961c023ed"
+    },
+    "nose": {
+      "text": "nose",
+      "hash": "50aa5df39c0a"
+    },
+    "nut": {
+      "text": "nut",
+      "hash": "cf409d84a5c5"
+    },
+    "octopus": {
+      "text": "octopus",
+      "hash": "50d47ac82c25"
+    },
+    "onion": {
+      "text": "onion",
+      "hash": "47b4e9fc6818"
+    },
+    "orange": {
+      "text": "orange",
+      "hash": "cd12031d94bc"
+    },
+    "owl": {
+      "text": "owl",
+      "hash": "12ba0df7d10e"
+    },
+    "panda": {
+      "text": "panda",
+      "hash": "928cd196ce22"
+    },
+    "pants": {
+      "text": "pants",
+      "hash": "5702acbb6b3c"
+    },
+    "pen": {
+      "text": "pen",
+      "hash": "858fe64a8984"
+    },
+    "pencil": {
+      "text": "pencil",
+      "hash": "300aaa216f66"
+    },
+    "pig": {
+      "text": "pig",
+      "hash": "fa15b2295725"
+    },
+    "pink": {
+      "text": "pink",
+      "hash": "656e4eff165a"
+    },
+    "pizza": {
+      "text": "pizza",
+      "hash": "dfcca0819a9e"
+    },
+    "plane": {
+      "text": "plane",
+      "hash": "e6be128cd052"
+    },
+    "play": {
+      "text": "play",
+      "hash": "12374e413955"
+    },
+    "question": {
+      "text": "question",
+      "hash": "9e66743e87f2"
+    },
+    "queen": {
+      "text": "queen",
+      "hash": "0d6892d55959"
+    },
+    "quilt": {
+      "text": "quilt",
+      "hash": "8830b1f0030c"
+    },
+    "quiz": {
+      "text": "quiz",
+      "hash": "4be2088fc9fd"
+    },
+    "rabbit": {
+      "text": "rabbit",
+      "hash": "58e24ee3b031"
+    },
+    "rain": {
+      "text": "rain",
+      "hash": "d4a529a1ef6f"
+    },
+    "rainbow": {
+      "text": "rainbow",
+      "hash": "d08971d41f62"
+    },
+    "red": {
+      "text": "red",
+      "hash": "f0fae619e47d"
+    },
+    "rice": {
+      "text": "rice",
+      "hash": "2d924a9a0187"
+    },
+    "robot": {
+      "text": "robot",
+      "hash": "c402706102c7"
+    },
+    "ruler": {
+      "text": "ruler",
+      "hash": "cc74ade0ab7e"
+    },
+    "run": {
+      "text": "run",
+      "hash": "1f40f57c0499"
+    },
+    "school": {
+      "text": "school",
+      "hash": "99b04ce56c7e"
+    },
+    "ship": {
+      "text": "ship",
+      "hash": "ccc601b795ff"
+    },
+    "shoe": {
+      "text": "shoe",
+      "hash": "23359161c88e"
+    },
+    "shirt": {
+      "text": "shirt",
+      "hash": "3068549cfbdf"
+    },
+    "sing": {
+      "text": "sing",
+      "hash": "e7fadeb6ba61"
+    },
+    "sister": {
+      "text": "sister",
+      "hash": "7baebee0dd4f"
+    },
+    "sleep": {
+      "text": "sleep",
+      "hash": "e50f0b08d832"
+    },
+    "snake": {
+      "text": "snake",
+      "hash": "580a8c3ace92"
+    },
+    "sock": {
+      "text": "sock",
+      "hash": "49ff76bb6d58"
+    },
+    "storm": {
+      "text": "storm",
+      "hash": "f01fcd137471"
+    },
+    "sun": {
+      "text": "sun",
+      "hash": "6c75e688e217"
+    },
+    "swim": {
+      "text": "swim",
+      "hash": "9c039acdee12"
+    },
+    "teddy": {
+      "text": "teddy",
+      "hash": "e5eb3fe03493"
+    },
+    "train": {
+      "text": "train",
+      "hash": "185ff13a6860"
+    },
+    "tree": {
+      "text": "tree",
+      "hash": "78a23dc3324b"
+    },
+    "turtle": {
+      "text": "turtle",
+      "hash": "2c08054a2992"
+    },
+    "uncle": {
+      "text": "uncle",
+      "hash": "91483b087852"
+    },
+    "up": {
+      "text": "up",
+      "hash": "58523a0832f4"
+    },
+    "van": {
+      "text": "van",
+      "hash": "3cb9902a8e7a"
+    },
+    "vase": {
+      "text": "vase",
+      "hash": "33be05bdc26c"
+    },
+    "violin": {
+      "text": "violin",
+      "hash": "3e9b5dd843a7"
+    },
+    "volcano": {
+      "text": "volcano",
+      "hash": "4c61afbefdc8"
+    },
+    "water": {
+      "text": "water",
+      "hash": "ed5d3b40c783"
+    },
+    "whale": {
+      "text": "whale",
+      "hash": "d5c78f6eae73"
+    },
+    "white": {
+      "text": "white",
+      "hash": "1e1f542ef75d"
+    },
+    "wind": {
+      "text": "wind",
+      "hash": "c7a1efd3e556"
+    },
+    "window": {
+      "text": "window",
+      "hash": "29b2bde5d2ed"
+    },
+    "wolf": {
+      "text": "wolf",
+      "hash": "549bdca5d75b"
+    },
+    "write": {
+      "text": "write",
+      "hash": "b828d26150d7"
+    },
+    "six": {
+      "text": "six",
+      "hash": "2c0196147884"
+    },
+    "x-ray": {
+      "text": "x-ray",
+      "hash": "e4b1d089e2d0"
+    },
+    "xylophone": {
+      "text": "xylophone",
+      "hash": "91a5a942099d"
+    },
+    "yo-yo": {
+      "text": "yo-yo",
+      "hash": "c1d31b59cce5"
+    },
+    "yarn": {
+      "text": "yarn",
+      "hash": "59044ce755e2"
+    },
+    "yogurt": {
+      "text": "yogurt",
+      "hash": "cf8c03bbeb9d"
+    },
+    "zebra": {
+      "text": "zebra",
+      "hash": "7968a81afb46"
+    },
+    "zero": {
+      "text": "zero",
+      "hash": "7e0b15860b3d"
+    },
+    "zigzag": {
+      "text": "zigzag",
+      "hash": "308630a67e3b"
+    },
+    "zoo": {
+      "text": "zoo",
+      "hash": "5f3a39186e1e"
+    },
+    "letter-c": {
+      "text": "c",
+      "hash": "be03268779f8"
+    },
+    "letter-d": {
+      "text": "d",
+      "hash": "66da2ad46794"
+    },
+    "letter-f": {
+      "text": "f",
+      "hash": "2ab8633f4976"
+    },
+    "letter-g": {
+      "text": "g",
+      "hash": "3074f59d4f7d"
+    },
+    "letter-i": {
+      "text": "i",
+      "hash": "03687c8cf37d"
+    },
+    "letter-j": {
+      "text": "j",
+      "hash": "bebe55452d8f"
+    },
+    "letter-k": {
+      "text": "k",
+      "hash": "c55c753585e1"
+    },
+    "letter-l": {
+      "text": "l",
+      "hash": "daac9bdb85b2"
+    },
+    "letter-m": {
+      "text": "m",
+      "hash": "ab90ee5a24f1"
+    },
+    "letter-n": {
+      "text": "n",
+      "hash": "a4b9b815cff9"
+    },
+    "letter-o": {
+      "text": "o",
+      "hash": "560f109ba093"
+    },
+    "letter-p": {
+      "text": "p",
+      "hash": "0edae205ead6"
+    },
+    "letter-q": {
+      "text": "q",
+      "hash": "d4956fb1f873"
+    },
+    "letter-r": {
+      "text": "r",
+      "hash": "ae212bcad6d0"
+    },
+    "letter-s": {
+      "text": "s",
+      "hash": "0dee200bd506"
+    },
+    "letter-t": {
+      "text": "t",
+      "hash": "7d1b7276e9a4"
+    },
+    "letter-u": {
+      "text": "u",
+      "hash": "a9b2d8b4e311"
+    },
+    "letter-v": {
+      "text": "v",
+      "hash": "771eb0806a02"
+    },
+    "letter-w": {
+      "text": "w",
+      "hash": "ebd6c6dd6db3"
+    },
+    "letter-x": {
+      "text": "x",
+      "hash": "d83873cff4de"
+    },
+    "letter-y": {
+      "text": "y",
+      "hash": "da493b4a3a72"
+    },
+    "this-is-a-dog": {
+      "text": "This is a dog",
+      "hash": "c667bdc4087a"
+    },
+    "this-is-a-red-ball": {
+      "text": "This is a red ball",
+      "hash": "4d9907d05087"
+    },
+    "this-is-my-book": {
+      "text": "This is my book",
+      "hash": "1771dc1cdef6"
+    },
+    "this-is-a-big-house": {
+      "text": "This is a big house",
+      "hash": "e62c5a22b66d"
+    },
+    "this-is-an-apple": {
+      "text": "This is an apple",
+      "hash": "bd197492a020"
+    },
+    "i-like-cats": {
+      "text": "I like cats",
+      "hash": "5caf6e7e0699"
+    },
+    "i-like-dogs": {
+      "text": "I like dogs",
+      "hash": "84a68136c382"
+    },
+    "i-like-birds": {
+      "text": "I like birds",
+      "hash": "28bd35004427"
+    },
+    "i-like-apples": {
+      "text": "I like apples",
+      "hash": "e3bd49134530"
+    },
+    "i-like-red-cars": {
+      "text": "I like red cars",
+      "hash": "f48bfc648a40"
+    },
+    "i-have-a-cat": {
+      "text": "I have a cat",
+      "hash": "188befc8c681"
+    },
+    "i-have-a-dog": {
+      "text": "I have a dog",
+      "hash": "57d8f447b863"
+    },
+    "i-have-a-book": {
+      "text": "I have a book",
+      "hash": "473539157cdd"
+    },
+    "i-have-a-pen": {
+      "text": "I have a pen",
+      "hash": "94d2fad76832"
+    },
+    "i-have-a-red-ball": {
+      "text": "I have a red ball",
+      "hash": "0a80c1b691cb"
+    },
+    "i-have-two-books": {
+      "text": "I have two books",
+      "hash": "5a7e032c2aa3"
+    },
+    "i-can-swim": {
+      "text": "I can swim",
+      "hash": "5cbf64eaf119"
+    },
+    "i-can-run": {
+      "text": "I can run",
+      "hash": "cf79076ff609"
+    },
+    "i-can-jump": {
+      "text": "I can jump",
+      "hash": "baa14fdc6560"
+    },
+    "i-can-sing": {
+      "text": "I can sing",
+      "hash": "ae483938c3f0"
+    },
+    "i-can-write": {
+      "text": "I can write",
+      "hash": "b13b6545f96d"
+    },
+    "i-can-draw": {
+      "text": "I can draw",
+      "hash": "d7c9022dbcb2"
+    },
+    "i-see-a-cat": {
+      "text": "I see a cat",
+      "hash": "06de0dac7012"
+    },
+    "i-see-a-bird": {
+      "text": "I see a bird",
+      "hash": "8ba7331d05e3"
+    },
+    "i-see-the-sun": {
+      "text": "I see the sun",
+      "hash": "eef0ed128b3b"
+    },
+    "i-see-a-star": {
+      "text": "I see a star",
+      "hash": "84d0a2494d57"
+    },
+    "i-see-a-fish": {
+      "text": "I see a fish",
+      "hash": "86897d9588ff"
+    },
+    "i-see-a-big-tree": {
+      "text": "I see a big tree",
+      "hash": "ffaaa4db2133"
+    },
+    "it-is-a-cat": {
+      "text": "It is a cat",
+      "hash": "abe92d45de51"
+    },
+    "it-is-a-dog": {
+      "text": "It is a dog",
+      "hash": "0a50eb68c2fb"
+    },
+    "it-is-a-ball": {
+      "text": "It is a ball",
+      "hash": "f54b4c4dc045"
+    },
+    "it-is-a-bird": {
+      "text": "It is a bird",
+      "hash": "d7e252323440"
+    },
+    "it-is-a-fish": {
+      "text": "It is a fish",
+      "hash": "1a352191771d"
+    },
+    "it-is-an-apple": {
+      "text": "It is an apple",
+      "hash": "e4232cde23c7"
+    },
+    "my-favourite-animal-is-a-cat": {
+      "text": "My favourite animal is a cat",
+      "hash": "28759e5ede0b"
+    },
+    "my-favourite-food-is-pizza": {
+      "text": "My favourite food is pizza",
+      "hash": "027b2b5ea51b"
+    },
+    "my-favourite-toy-is-a-ball": {
+      "text": "My favourite toy is a ball",
+      "hash": "9faeade583e2"
+    },
+    "my-favourite-fruit-is-an-apple": {
+      "text": "My favourite fruit is an apple",
+      "hash": "3c2dcdc23761"
+    },
+    "my-favourite-drink-is-milk": {
+      "text": "My favourite drink is milk",
+      "hash": "29044e173015"
+    },
+    "what-is-that-it-is-a-dog": {
+      "text": "What is that? It is a dog",
+      "hash": "4009fc8e432b"
+    },
+    "what-is-this-it-is-a-ball": {
+      "text": "What is this? It is a ball",
+      "hash": "9eacbe2a6df3"
+    },
+    "what-is-that-it-is-a-bird": {
+      "text": "What is that? It is a bird",
+      "hash": "02260150f739"
+    },
+    "what-is-this-it-is-a-fish": {
+      "text": "What is this? It is a fish",
+      "hash": "166e184df9c6"
+    },
+    "what-is-that-it-is-an-apple": {
+      "text": "What is that? It is an apple",
+      "hash": "6a53b2ab407a"
     }
   }
 }
