@@ -1,7 +1,6 @@
 // Pool counter CLI (phase 01): writes the before-report (or prints raw counts with
 // `--json`). The counting itself lives in `pool-counting.ts`.
-// Run: `npx tsx tools/practice/pool-counter.ts` (writes the before-report) or with
-// `--json` (prints the raw counts).
+// Run: via vitest — tsx crashes on import.meta.glob (see anti-repeat phase 01).
 import { writeFileSync } from 'node:fs';
 import { SKILL_CATALOG } from '../../src/learning/skill-catalog';
 import type { SkillTier } from '../../src/learning/skill-tiers';
