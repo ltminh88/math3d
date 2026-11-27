@@ -117,6 +117,26 @@ describe('add-sub-bug-choice', () => {
     }
   });
 
+  it('picks the pair from the normal distribution, then the bugs in it (R103.4)', () => {
+    for (const tier of [1, 2, 3] as const) {
+      let plus = 0;
+      let mismatch = 0;
+      const n = 200;
+      for (let seed = 0; seed < n; seed++) {
+        const item = generate('add-sub-bug-choice', tier, seed);
+        const p = params(item);
+        if (item.story.key === 'addCalc') plus++;
+        if (String(p.a).length !== String(p.b).length) mismatch++;
+      }
+      // Near the natural rates (measured: + ~50%, mismatch ~33%): neither
+      // all-subtraction at T2 nor all digit-mismatched pairs at T1.
+      expect(plus / n).toBeGreaterThanOrEqual(0.3);
+      expect(plus / n).toBeLessThanOrEqual(0.7);
+      expect(mismatch / n).toBeGreaterThanOrEqual(0.1);
+      expect(mismatch / n).toBeLessThanOrEqual(0.6);
+    }
+  });
+
   it('at tier 3 the three wrong options are usually bug values, not slips', () => {
     let bugTagged = 0;
     let total = 0;

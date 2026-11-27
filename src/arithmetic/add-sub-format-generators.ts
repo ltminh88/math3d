@@ -40,16 +40,14 @@ const formatPairWithTrap = (
 
 /** Pick the right answer out of four: the correct value plus up to three bug values. */
 export const bugChoice: ReasoningGenerator = (rng, tier) => {
-  let best:
-    | { a: number; b: number; op: AddSubOp; bugs: readonly { bug: AddSubBug; value: number }[] }
-    | undefined;
-  for (let t = 0; t < 200; t++) {
-    const pair = formatPair(rng, tier);
-    const bugs = bugsFor(pair.a, pair.b, pair.op).filter((f) => f.value <= CAP);
-    if (!best || bugs.length > best.bugs.length) best = { ...pair, bugs };
-    if (bugs.length >= 3) break;
-  }
-  const { a, b, op, bugs } = best ?? { a: 100, b: 100, op: '+' as AddSubOp, bugs: [] };
+  // The pair comes from the normal distribution first (op + ladder pair),
+  // then the bugs that apply to it — the old 200-trial search for the pair
+  // with the most bugs skewed T2 to all-subtraction and T1 to all
+  // digit-mismatched pairs (R103.4). At T1 most pairs have no bug at all
+  // (only misaligned-columns can apply with no regroup), so the near-miss
+  // slips fill the gap there.
+  const { a, b, op } = formatPair(rng, tier);
+  const bugs = bugsFor(a, b, op).filter((f) => f.value <= CAP);
   const correct = correctOf(a, b, op);
   const candidates = bugs.slice(0, 3).map((f) => ({ value: f.value, misconception: f.bug }));
   return arithmeticItem(
