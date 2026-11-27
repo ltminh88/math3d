@@ -7,8 +7,7 @@ import {
   type EnglishPackPart,
   isEnglishPack,
 } from '../english-pack-contract';
-import type { EnglishBookId } from '../english-types';
-import type { EnglishPack } from '../english-types';
+import type { EnglishBookId, EnglishPack } from '../english-types';
 
 export type EnglishPackFetchError = 'bad-passphrase' | 'pack-unavailable' | 'offline' | 'malformed';
 
