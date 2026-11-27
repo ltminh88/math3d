@@ -25,12 +25,19 @@ export const addSubFormatStrings = {
     askBarOpTotal: 'Muốn tìm tất cả, làm phép nào?',
     askUnknownPart: 'Phần chưa biết là bao nhiêu?',
     // Boost Phase 2A column-calc: one digit step per column, units first.
+    // The digit prompt shows the column's computation as one expression
+    // ({text}): original digits plus the carry/borrow from the previous
+    // column — never the borrowed top digit, never the result (R119.2/3).
     columnCalc: 'Đặt tính rồi tính: {a} {op} {b}.',
-    columnDigitOnes: 'Hàng đơn vị: {a} {op} {b} = ?',
-    columnDigitTens: 'Hàng chục: {a} {op} {b} = ?',
-    columnDigitHundreds: 'Hàng trăm: {a} {op} {b} = ?',
+    columnDigitOnes: 'Hàng đơn vị: {text} = ?',
+    columnDigitTens: 'Hàng chục: {text} = ?',
+    columnDigitHundreds: 'Hàng trăm: {text} = ?',
     askCarry: 'Có nhớ 1 không?',
     askBorrow: 'Có phải vay 1 không?',
+    carryYes: 'Có nhớ 1',
+    carryNo: 'Không nhớ',
+    borrowYes: 'Có vay 1',
+    borrowNo: 'Không vay',
   },
   en: {
     askChooseResult: 'Which number is the right answer?',
@@ -54,10 +61,14 @@ export const addSubFormatStrings = {
     askUnknownPart: 'How many are in the unknown part?',
     // Boost Phase 2A column-calc: one digit step per column, units first.
     columnCalc: 'Work it out in columns: {a} {op} {b}.',
-    columnDigitOnes: 'Ones: {a} {op} {b} = ?',
-    columnDigitTens: 'Tens: {a} {op} {b} = ?',
-    columnDigitHundreds: 'Hundreds: {a} {op} {b} = ?',
+    columnDigitOnes: 'Ones: {text} = ?',
+    columnDigitTens: 'Tens: {text} = ?',
+    columnDigitHundreds: 'Hundreds: {text} = ?',
     askCarry: 'Do you carry 1?',
     askBorrow: 'Do you borrow 1?',
+    carryYes: 'Carry 1',
+    carryNo: 'No carry',
+    borrowYes: 'Borrow 1',
+    borrowNo: 'No borrow',
   },
 } as const;

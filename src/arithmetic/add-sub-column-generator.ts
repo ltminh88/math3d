@@ -1,34 +1,36 @@
 // Column-calc generator (boost, Phase 2A): skill `add-sub-column`. The child
 // fills the result right→left one digit at a time (one `number` step per column,
-// 0–9 pad), with a verdict step after every column but the last — "Có nhớ 1
+// 0–9 pad), with a two-option choice after every column but the last — "Có nhớ 1
 // không?" for addition, "Có phải vay 1 không?" for subtraction.
 //
 // Two deliberate choices, both against leaking the answer through the item
 // itself:
-//   1. A verdict follows EVERY column but the last, whether it regroups or
-//      not. A verdict only after regrouping columns would teach the child that
-//      "verdict ⟺ carry" and answer itself. No verdict follows the most
+//   1. A choice follows EVERY column but the last, whether it regroups or
+//      not. A choice only after regrouping columns would teach the child that
+//      "choice ⟺ carry" and answer itself. No choice follows the most
 //      significant column: the capped result never regroups out of it, so the
 //      question would always be "Không".
-//   2. The verdict's statement shows the column the child JUST computed (the
-//      addends with the carry-in / the borrowed top digit, and its result) —
-//      their own finished work, never the next column's answer. The scene
-//      likewise never pre-draws the true carry marks (see column-calc-
-//      scene-types.ts).
+//   2. The digit prompt shows the column the child is computing with its
+//      ORIGINAL digits plus the carry/borrow from the previous column
+//      ("3 + 4 + 1", "0 − 1 − 5") — never the borrowed top digit ("13 − 8"
+//      would give the borrow away) and never the result. The scene likewise
+//      never pre-draws the true carry marks (see column-calc-
+//      scene-types.ts). The carry question is a choice, not a verdict: a
+//      verdict would ask the child to call a correct calculation "Sai"
+//      whenever the column does not regroup (R119.1).
 //
 // Pairs come from the Phase 1A ladder picker at the tier's ladder step, then
 // rejection-sampled to a result ≤ 999: column items stay within three columns
 // (phase 2A risk mitigation — 4/5-digit skills keep the single-answer pad).
-//
-// Wrong-digit diagnosis: `bugForDigit` maps a wrong digit in one column to the
-// bug whose wrong value carries that digit (catalogue order, as in `bugsFor`).
-// It is pure and tested here; wiring it into the round flow's bug bank needs a
-// hook in reasoning-round-flow.ts, outside this phase's ownership — recorded as
-// a question for the reviewer instead of guessed here.
 import type { Rng } from '../learning/seeded-rng';
 import type { SkillTier } from '../learning/skill-tiers';
-import type { ReasoningGenerator, ReasoningStep } from '../reasoning/reasoning-types';
-import { type AddSubBug, type AddSubOp, bugsFor } from './add-sub-bug-catalogue';
+import type {
+  ChoiceOption,
+  Misconception,
+  ReasoningGenerator,
+  ReasoningStep,
+} from '../reasoning/reasoning-types';
+import type { AddSubOp } from './add-sub-bug-catalogue';
 import { ladderOfSkillTier, pickLadderPair } from './add-sub-pair-pickers';
 import { arithmeticItem, ref } from './arithmetic-distractors';
 import { RANGE_1000 } from './arithmetic-ranges';
@@ -46,7 +48,7 @@ export interface ColumnStep {
   readonly digit: number;
   /** Whether this column regroups out (carry for +, borrow for −). */
   readonly carryOut: boolean;
-  /** The column's computation as the child performs it ("5 + 7", "13 − 8"). */
+  /** The column's computation as the child performs it ("5 + 7", "3 − 8"). */
   readonly sumText: string;
   /** The column's computed value (the sum for +, the borrowed difference for −). */
   readonly sumValue: number;
@@ -80,7 +82,6 @@ export function columnsOf(a: number, b: number, op: AddSubOp): readonly ColumnSt
     } else {
       const raw = topDigit - carryIn - bottomDigit;
       const borrow = raw < 0;
-      const effTop = topDigit + (borrow ? 10 : 0);
       out.push({
         col,
         topDigit,
@@ -88,7 +89,9 @@ export function columnsOf(a: number, b: number, op: AddSubOp): readonly ColumnSt
         carryIn,
         digit: borrow ? raw + 10 : raw,
         carryOut: borrow,
-        sumText: carryIn ? `${effTop} − 1 − ${bottomDigit}` : `${effTop} − ${bottomDigit}`,
+        // Original digits only: the borrowed top ("13 − 8") would give the
+        // borrow away (R119.2). The carry-in shows as "− 1" (R119.3).
+        sumText: carryIn ? `${topDigit} − 1 − ${bottomDigit}` : `${topDigit} − ${bottomDigit}`,
         sumValue: borrow ? raw + 10 : raw,
       });
       carry = borrow ? 1 : 0;
@@ -99,8 +102,34 @@ export function columnsOf(a: number, b: number, op: AddSubOp): readonly ColumnSt
 
 const PLACE_KEYS = ['columnDigitOnes', 'columnDigitTens', 'columnDigitHundreds'] as const;
 
-/** The steps for `a op b`: one digit step per column, one verdict after every
- *  column but the last. At most three columns (see columnPair's cap). */
+/**
+ * The carry/borrow question as a two-option choice, yes first, always in that
+ * order (R119.1): the kit renders options in the order given, so the child
+ * cannot learn the answer from the position. A verdict would ask the child to
+ * call a correct calculation "Sai" whenever the column does not regroup. The
+ * wrong option carries the bug it matches, when one fits: missing a carry is
+ * 'forgot-carry', subtracting without borrowing is 'smaller-from-larger';
+ * claiming a regroup that is not there is a near-miss.
+ */
+const carryOptions = (op: AddSubOp, carryOut: boolean): readonly ChoiceOption[] => {
+  const missed: Misconception = op === '+' ? 'forgot-carry' : 'smaller-from-larger';
+  const yes: ChoiceOption = {
+    id: 'yes',
+    label: ref(op === '+' ? 'carryYes' : 'borrowYes'),
+    correct: carryOut,
+    ...(!carryOut ? { misconception: 'near-miss' as const } : {}),
+  };
+  const no: ChoiceOption = {
+    id: 'no',
+    label: ref(op === '+' ? 'carryNo' : 'borrowNo'),
+    correct: !carryOut,
+    ...(carryOut ? { misconception: missed } : {}),
+  };
+  return [yes, no];
+};
+
+/** The steps for `a op b`: one digit step per column, one carry/borrow choice
+ *  after every column but the last. At most three columns (see columnPair's cap). */
 export function buildColumnSteps(a: number, b: number, op: AddSubOp): ReasoningStep[] {
   const cols = columnsOf(a, b, op);
   if (cols.length > 3) throw new Error(`column-calc: ${a} ${op} ${b} has ${cols.length} columns`);
@@ -108,40 +137,18 @@ export function buildColumnSteps(a: number, b: number, op: AddSubOp): ReasoningS
   cols.forEach((c, i) => {
     steps.push({
       kind: 'number',
-      prompt: ref(PLACE_KEYS[i] as string, { a: c.topDigit, op, b: c.bottomDigit }),
+      prompt: ref(PLACE_KEYS[i] as string, { text: c.sumText }),
       answer: c.digit,
     });
     if (i < cols.length - 1) {
       steps.push({
-        kind: 'verdict',
+        kind: 'choice',
         prompt: ref(op === '+' ? 'askCarry' : 'askBorrow'),
-        statement: ref('stmtEq', { text: c.sumText, value: c.sumValue }),
-        answer: c.carryOut,
-        ...(c.carryOut ? {} : { fix: { prompt: ref('askCorrect'), answer: c.sumValue } }),
+        options: carryOptions(op, c.carryOut),
       });
     }
   });
   return steps;
-}
-
-/**
- * The bug whose wrong value carries `digit` in column `col` — the first in
- * catalogue order, as in `bugsFor`. Undefined when the digit is the correct
- * one, or when no bug produces it there.
- */
-export function bugForDigit(
-  a: number,
-  b: number,
-  op: AddSubOp,
-  col: number,
-  digit: number,
-): AddSubBug | undefined {
-  const correct = op === '+' ? a + b : a - b;
-  if (digit === digitAt(correct, col)) return undefined;
-  for (const { bug, value } of bugsFor(a, b, op)) {
-    if (digitAt(value, col) === digit) return bug;
-  }
-  return undefined;
 }
 
 /** A ladder pair whose operands and result all fit in three columns. */

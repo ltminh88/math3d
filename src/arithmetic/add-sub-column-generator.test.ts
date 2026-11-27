@@ -1,19 +1,13 @@
 // Column-calc generator (boost, Phase 2A): the child fills the result
 // right→left one digit at a time, with a "Có nhớ 1 không?" / "Có phải vay 1
-// không?" verdict after every column but the last. RED-first: the generator
+// không?" choice after every column but the last. RED-first: the generator
 // does not exist yet.
 import { describe, expect, it } from 'vitest';
 import { mulberry32 } from '../learning/seeded-rng';
 import type { SkillTier } from '../learning/skill-tiers';
 import type { PracticeItem } from '../practice/practice-scene';
 import type { ReasoningStep } from '../reasoning/reasoning-types';
-import { bugsFor } from './add-sub-bug-catalogue';
-import {
-  ADD_SUB_COLUMN_GENERATORS,
-  bugForDigit,
-  buildColumnSteps,
-  columnsOf,
-} from './add-sub-column-generator';
+import { ADD_SUB_COLUMN_GENERATORS, buildColumnSteps, columnsOf } from './add-sub-column-generator';
 import { findError } from './add-sub-error-generators';
 import {
   oracleAddCarries,
@@ -35,9 +29,9 @@ const numStep = (step: ReasoningStep | undefined) => {
   return step as ReasoningStep & { kind: 'number' };
 };
 
-const verdictStep = (step: ReasoningStep | undefined) => {
-  expect(step?.kind).toBe('verdict');
-  return step as ReasoningStep & { kind: 'verdict' };
+const choiceStep = (step: ReasoningStep | undefined) => {
+  expect(step?.kind).toBe('choice');
+  return step as ReasoningStep & { kind: 'choice' };
 };
 
 /** The tier's ladder rule, re-derived from the operands (oracle-local). */
@@ -102,9 +96,9 @@ describe('columnsOf fixtures', () => {
     const cols = columnsOf(403, 158, '−');
     expect(cols.map((c) => c.digit)).toEqual([5, 4, 2]);
     expect(cols.map((c) => c.carryOut)).toEqual([true, true, false]);
-    expect(cols[0]?.sumText).toBe('13 − 8');
+    expect(cols[0]?.sumText).toBe('3 − 8');
     expect(cols[0]?.sumValue).toBe(5);
-    expect(cols[1]?.sumText).toBe('10 − 1 − 5');
+    expect(cols[1]?.sumText).toBe('0 − 1 − 5');
     expect(cols[1]?.sumValue).toBe(4);
     expect(cols[2]?.sumText).toBe('4 − 1 − 1');
     expect(cols[2]?.sumValue).toBe(2);
@@ -118,57 +112,78 @@ describe('columnsOf fixtures', () => {
 });
 
 describe('column item steps', () => {
-  it('385 + 247 plays digit, verdict, digit, verdict, digit', () => {
+  it('385 + 247 plays digit, carry choice, digit, carry choice, digit', () => {
     const steps = buildColumnSteps(385, 247, '+');
     expect(steps).toHaveLength(5);
     expect(numStep(steps[0]).answer).toBe(2);
     expect(numStep(steps[0]).prompt.key).toBe('columnDigitOnes');
-    const v0 = verdictStep(steps[1]);
-    expect(v0.answer).toBe(true);
-    expect(v0.prompt.key).toBe('askCarry');
-    expect(v0.statement.params).toEqual({ text: '5 + 7', value: 12 });
+    const c0 = choiceStep(steps[1]);
+    expect(c0.prompt.key).toBe('askCarry');
+    expect(c0.options.map((o) => o.label.key)).toEqual(['carryYes', 'carryNo']);
+    expect(c0.options.map((o) => o.correct)).toEqual([true, false]);
     expect(numStep(steps[2]).answer).toBe(3);
     expect(numStep(steps[2]).prompt.key).toBe('columnDigitTens');
-    const v1 = verdictStep(steps[3]);
-    expect(v1.answer).toBe(true);
-    expect(v1.statement.params).toEqual({ text: '8 + 4 + 1', value: 13 });
+    const c1 = choiceStep(steps[3]);
+    expect(c1.prompt.key).toBe('askCarry');
+    expect(c1.options.map((o) => o.label.key)).toEqual(['carryYes', 'carryNo']);
+    expect(c1.options.map((o) => o.correct)).toEqual([true, false]);
     expect(numStep(steps[4]).answer).toBe(6);
     expect(numStep(steps[4]).prompt.key).toBe('columnDigitHundreds');
   });
 
-  it('403 − 158 plays digit, borrow verdict, digit, borrow verdict, digit', () => {
+  it('403 − 158 plays digit, borrow choice, digit, borrow choice, digit', () => {
     const steps = buildColumnSteps(403, 158, '−');
     expect(steps).toHaveLength(5);
     expect(numStep(steps[0]).answer).toBe(5);
-    const v0 = verdictStep(steps[1]);
-    expect(v0.answer).toBe(true);
-    expect(v0.prompt.key).toBe('askBorrow');
-    expect(v0.statement.params).toEqual({ text: '13 − 8', value: 5 });
+    const c0 = choiceStep(steps[1]);
+    expect(c0.prompt.key).toBe('askBorrow');
+    expect(c0.options.map((o) => o.label.key)).toEqual(['borrowYes', 'borrowNo']);
+    expect(c0.options.map((o) => o.correct)).toEqual([true, false]);
     expect(numStep(steps[2]).answer).toBe(4);
-    const v1 = verdictStep(steps[3]);
-    expect(v1.answer).toBe(true);
-    expect(v1.statement.params).toEqual({ text: '10 − 1 − 5', value: 4 });
+    const c1 = choiceStep(steps[3]);
+    expect(c1.prompt.key).toBe('askBorrow');
+    expect(c1.options.map((o) => o.label.key)).toEqual(['borrowYes', 'borrowNo']);
+    expect(c1.options.map((o) => o.correct)).toEqual([true, false]);
     expect(numStep(steps[4]).answer).toBe(2);
   });
 
-  it('123 + 234: false verdicts carry a fix asking the column sum', () => {
+  it('123 + 234: no-carry columns offer "Không nhớ" as the correct choice', () => {
     const steps = buildColumnSteps(123, 234, '+');
     expect(steps).toHaveLength(5);
-    const v0 = verdictStep(steps[1]);
-    expect(v0.answer).toBe(false);
-    expect(v0.fix).toEqual({ prompt: { key: 'askCorrect' }, answer: 7 });
-    const v1 = verdictStep(steps[3]);
-    expect(v1.answer).toBe(false);
-    expect(v1.fix).toEqual({ prompt: { key: 'askCorrect' }, answer: 5 });
+    const c0 = choiceStep(steps[1]);
+    expect(c0.options.map((o) => o.label.key)).toEqual(['carryYes', 'carryNo']);
+    expect(c0.options.map((o) => o.correct)).toEqual([false, true]);
+    const c1 = choiceStep(steps[3]);
+    expect(c1.options.map((o) => o.correct)).toEqual([false, true]);
   });
 
-  it('verdict steps carry the column equation and a fix when false', () => {
-    const item = generate(1, 0);
-    const verdicts = item.steps.filter((s) => s.kind === 'verdict');
-    for (const step of verdicts) {
-      const v = verdictStep(step);
-      expect(v.statement.key).toBe('stmtEq');
-      if (!v.answer) expect(v.fix).toBeDefined();
+  it('digit prompts show the column computation with original digits and the carry-in', () => {
+    // 403 − 158: the units prompt shows "3 − 8", never the borrowed "13 − 8";
+    // the tens prompt carries the borrow ("0 − 1 − 5").
+    const sub = buildColumnSteps(403, 158, '−');
+    expect(numStep(sub[0]).prompt.params).toEqual({ text: '3 − 8' });
+    expect(numStep(sub[2]).prompt.params).toEqual({ text: '0 − 1 − 5' });
+    expect(numStep(sub[4]).prompt.params).toEqual({ text: '4 − 1 − 1' });
+    // 385 + 247: the tens prompt adds the carry ("8 + 4 + 1").
+    const add = buildColumnSteps(385, 247, '+');
+    expect(numStep(add[0]).prompt.params).toEqual({ text: '5 + 7' });
+    expect(numStep(add[2]).prompt.params).toEqual({ text: '8 + 4 + 1' });
+    expect(numStep(add[4]).prompt.params).toEqual({ text: '3 + 2 + 1' });
+  });
+
+  it('carry questions are choices, never verdicts, with the yes-option first', () => {
+    for (const tier of [1, 2, 3] as const) {
+      for (let seed = 0; seed < 40; seed++) {
+        const item = generate(tier, seed);
+        expect(item.steps.some((s) => s.kind === 'verdict')).toBe(false);
+        for (const step of item.steps) {
+          if (step.kind !== 'choice') continue;
+          const c = choiceStep(step);
+          expect(c.options).toHaveLength(2);
+          expect(c.options.filter((o) => o.correct)).toHaveLength(1);
+          expect(c.options[0]?.label.key).toMatch(/Yes$/);
+        }
+      }
     }
   });
 
@@ -190,46 +205,6 @@ describe('column item steps', () => {
     expect(scene.focusCol).toBe(0);
     expect(scene.top).toBe(params(item).a);
     expect(scene.bottom).toBe(params(item).b);
-  });
-});
-
-describe('bugForDigit', () => {
-  it('tags the tens digit of the forgot-carry value 522 for 385 + 247', () => {
-    expect(bugForDigit(385, 247, '+', 1, 2)).toBe('forgot-carry');
-    // The units digit 2 is the correct digit: no bug owns it.
-    expect(bugForDigit(385, 247, '+', 0, 2)).toBeUndefined();
-    // No bug produces a 9 in any column of 385 + 247.
-    expect(bugForDigit(385, 247, '+', 0, 9)).toBeUndefined();
-  });
-
-  it('tags 403 − 158 with the first bug whose digit matches (catalogue order)', () => {
-    // 355 comes from smaller-from-larger, borrow-no-decrement and
-    // zero-borrow-skip; the first in catalogue order wins, as in bugsFor.
-    expect(bugForDigit(403, 158, '−', 1, 5)).toBe('smaller-from-larger');
-    expect(bugForDigit(403, 158, '−', 2, 3)).toBe('smaller-from-larger');
-    expect(bugForDigit(403, 158, '−', 0, 5)).toBeUndefined();
-  });
-
-  it('agrees with bugsFor on every bug value digit', () => {
-    for (const [a, b, op] of [
-      [385, 247, '+'],
-      [403, 158, '−'],
-      [500, 236, '−'],
-      [186, 172, '+'],
-    ] as const) {
-      for (const hit of bugsFor(a, b, op)) {
-        const correct = op === '+' ? a + b : a - b;
-        const digits = String(hit.value).split('').map(Number).reverse();
-        for (let col = 0; col < digits.length; col++) {
-          // A bug value's digit can coincide with the correct digit in a
-          // column the bug does not touch — only differing digits tag a bug.
-          const correctDigit = Math.floor(correct / 10 ** col) % 10;
-          if (digits[col] === correctDigit) continue;
-          const tagged = bugForDigit(a, b, op, col, digits[col] as number);
-          expect(tagged).toBeDefined();
-        }
-      }
-    }
   });
 });
 

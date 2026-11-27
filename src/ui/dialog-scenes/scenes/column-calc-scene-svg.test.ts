@@ -124,4 +124,27 @@ describe('column-calc scene', () => {
     // Focus rect behind the leftmost column (centre 110, x = 82).
     expect(svg).toContain('x="82"');
   });
+
+  it('fits six columns (find-error T3, result up to 100 000) inside the viewBox', () => {
+    const svg = render({
+      kind: 'column-calc',
+      op: '−',
+      top: 99999,
+      bottom: 1,
+      filled: [],
+      carries: [],
+      focusCol: 5,
+      buggy: [0, 0, 0, 0, 0, 1],
+    });
+    // Every x coordinate in the picture stays inside the 420-wide viewBox
+    // (the ` x=` / ` x1=` / ` x2=` attributes; `rx=` is not an x position).
+    const xs = [...svg.matchAll(/ x[12]?="(-?\d+)"/g)].map((m) => Number(m[1]));
+    expect(xs.length).toBeGreaterThan(0);
+    for (const x of xs) {
+      expect(x).toBeGreaterThanOrEqual(0);
+      expect(x).toBeLessThanOrEqual(420);
+    }
+    // The leftmost focus rect starts inside the frame (n = 6, centre 88, x = 62).
+    expect(svg).toContain('x="62"');
+  });
 });

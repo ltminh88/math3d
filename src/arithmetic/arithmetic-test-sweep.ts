@@ -56,7 +56,7 @@ export function sweepArithmeticItem(
   expect(item.steps.length, where).toBeGreaterThanOrEqual(1);
   // div-2d-1d-wp T3 is the one three-step form (full boxes → leftover → boxes
   // needed); add-sub-bar-model-wp is the other (bar → operation → number pad);
-  // add-sub-column plays up to five steps (three digits + two verdicts, boost
+  // add-sub-column plays up to five steps (three digits + two carry choices, boost
   // 2A); every other arithmetic item has at most two steps.
   expect(item.steps.length, where).toBeLessThanOrEqual(
     skillId === 'add-sub-column'

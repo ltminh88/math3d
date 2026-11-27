@@ -1,6 +1,6 @@
 // Column-calc scene (boost, Phase 2A): B2 replays reach the add-sub-column skill,
 // its column picture draws (operands, rule, '?' result row, units focused), and
-// the digit + verdict steps solve it. The pinned profile puts the column skill
+// the digit + carry-choice steps solve it. The pinned profile puts the column skill
 // in run 1 (verified offline with lessonSeed + planLessonRun), but the spec
 // replays up to 8 runs so it does not depend on that.
 import { type Locator, type Page, test } from '@playwright/test';
@@ -133,7 +133,7 @@ async function clickNext(page: Page, touch: boolean): Promise<void> {
   else await next.click();
 }
 
-test('column-calc: B2 reaches the column skill, its scene draws, digits + verdicts solve it', async ({
+test('column-calc: B2 reaches the column skill, its scene draws, digits + carry choices solve it', async ({
   page,
 }, info) => {
   const touch = isTouch(info);

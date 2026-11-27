@@ -36,18 +36,22 @@ function renderColumnCalc(scene: ColumnCalcScene): SVGElement {
     digitCount(result),
     scene.buggy === undefined ? 0 : digitCount(fromDigits(scene.buggy)),
   );
-  const blockW = n * PITCH + 56;
+  // The pitch shrinks so the block always fits the 420-wide viewBox: a
+  // six-digit result (find-error T3, up to 100 000) at PITCH 64 would be
+  // 6×64+56 = 440 wide and overflow (R119.5). Five columns and fewer keep 64.
+  const pitch = Math.min(PITCH, Math.floor((WIDTH - 56) / n));
+  const blockW = n * pitch + 56;
   const x0 = (WIDTH - blockW) / 2;
   const opX = x0 + 20;
-  const colCenter = (col: number): number => x0 + 56 + (n - 1 - col) * PITCH + PITCH / 2;
+  const colCenter = (col: number): number => x0 + 56 + (n - 1 - col) * pitch + pitch / 2;
   const svg = sceneRoot(WIDTH, HEIGHT, `Đặt tính: ${scene.top} ${scene.op} ${scene.bottom}`);
 
   // Focus column: a gold rect behind the whole column.
   svg.append(
     svgEl('rect', {
-      x: colCenter(scene.focusCol) - PITCH / 2 + 4,
+      x: colCenter(scene.focusCol) - pitch / 2 + 4,
       y: 14,
-      width: PITCH - 8,
+      width: pitch - 8,
       height: 168,
       rx: 8,
       class: 'ds-shape ds-highlight',
