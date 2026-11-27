@@ -29,11 +29,14 @@ export interface Manifest {
 
 export declare function clipIdFor(item: ClipItem): string;
 export declare function ttsTextFor(item: ClipItem): string;
-export declare function textHash(ttsText: string): string;
+export declare function textHash(ttsText: string, voice?: string, speed?: number): string;
+export declare function clipFileName(id: string, hash: string): string;
 export declare function planClips(
   items: readonly ClipItem[],
   manifest: Manifest,
   outDir: string,
 ): PlannedClip[];
-export declare function emitAudioMap(entries: readonly { text: string; id: string }[]): string;
+export declare function emitAudioMap(
+  entries: readonly { text: string; id: string; hash: string }[],
+): string;
 export declare function emitCredits(args: { kokoroVersion: string; speed: number }): string;

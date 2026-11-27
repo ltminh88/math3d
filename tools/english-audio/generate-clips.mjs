@@ -14,7 +14,14 @@
 
 import { execFileSync } from 'node:child_process';
 import { createHash } from 'node:crypto';
-import { existsSync, mkdirSync, readdirSync, readFileSync, unlinkSync, writeFileSync } from 'node:fs';
+import {
+  existsSync,
+  mkdirSync,
+  readdirSync,
+  readFileSync,
+  unlinkSync,
+  writeFileSync,
+} from 'node:fs';
 import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
 
@@ -98,7 +105,9 @@ export function planClips(items, manifest, outDir) {
     const hash = textHash(ttsTextFor(item), VOICE, SPEED);
     const stored = manifest.clips[id];
     const action =
-      stored !== undefined && stored.hash === hash && existsSync(join(outDir, clipFileName(id, hash)))
+      stored !== undefined &&
+      stored.hash === hash &&
+      existsSync(join(outDir, clipFileName(id, hash)))
         ? 'skip'
         : 'generate';
     return { ...item, id, hash, action };
@@ -276,7 +285,10 @@ function main() {
   for (const p of plan) {
     const current = clipFileName(p.id, p.hash);
     for (const f of onDisk) {
-      if (f !== current && (f === `${p.id}.mp3` || (f.startsWith(`${p.id}-`) && f.endsWith('.mp3')))) {
+      if (
+        f !== current &&
+        (f === `${p.id}.mp3` || (f.startsWith(`${p.id}-`) && f.endsWith('.mp3')))
+      ) {
         unlinkSync(join(outDir, f));
       }
     }
