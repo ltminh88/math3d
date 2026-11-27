@@ -10,7 +10,7 @@ import { barModelWp } from './add-sub-bar-model-word-problems';
 import { type AddSubBug, type AddSubOp, bugsFor } from './add-sub-bug-catalogue';
 import { ladderOfSkillTier, pickLadderPair } from './add-sub-pair-pickers';
 import { arithmeticItem, numberChoiceStepCapped, ref, wrongBySlip } from './arithmetic-distractors';
-import { RANGE_1000 } from './arithmetic-ranges';
+import { RANGE_1000, RANGE_10000, RANGE_100000 } from './arithmetic-ranges';
 
 const CAP = RANGE_1000;
 
@@ -39,24 +39,33 @@ const formatPairWithTrap = (
 };
 
 /** Pick the right answer out of four: the correct value plus up to three bug values. */
-export const bugChoice: ReasoningGenerator = (rng, tier) => {
-  // The pair comes from the normal distribution first (op + ladder pair),
-  // then the bugs that apply to it — the old 200-trial search for the pair
-  // with the most bugs skewed T2 to all-subtraction and T1 to all
-  // digit-mismatched pairs (R103.4). At T1 most pairs have no bug at all
-  // (only misaligned-columns can apply with no regroup), so the near-miss
-  // slips fill the gap there.
-  const { a, b, op } = formatPair(rng, tier);
-  const bugs = bugsFor(a, b, op).filter((f) => f.value <= CAP);
-  const correct = correctOf(a, b, op);
-  const candidates = bugs.slice(0, 3).map((f) => ({ value: f.value, misconception: f.bug }));
-  return arithmeticItem(
-    'add-sub-bug-choice',
-    tier,
-    ref(op === '+' ? 'addCalc' : 'subCalc', { a, b }),
-    [numberChoiceStepCapped(rng, ref('askChooseResult'), correct, candidates, CAP)],
-  );
-};
+export const bugChoice: ReasoningGenerator = (rng, tier) =>
+  bugChoiceFor('add-sub-bug-choice', CAP)(rng, tier);
+
+/** The bug-choice format at a range: the pair comes from the tier's ladder step at that cap, the wrong options are that pair's bug values, capped at the same range. */
+export const bugChoiceFor =
+  (skillId: string, cap: number): ReasoningGenerator =>
+  (rng, tier) => {
+    const ladder = ladderOfSkillTier(rng, tier);
+    const op: AddSubOp = rng() < 0.5 ? '+' : '−';
+    const [a, b] = pickLadderPair(rng, op, ladder, cap);
+    const bugs = bugsFor(a, b, op).filter((f) => f.value <= cap);
+    const correct = correctOf(a, b, op);
+    const candidates = bugs.slice(0, 3).map((f) => ({ value: f.value, misconception: f.bug }));
+    return arithmeticItem(skillId, tier, ref(op === '+' ? 'addCalc' : 'subCalc', { a, b }), [
+      numberChoiceStepCapped(rng, ref('askChooseResult'), correct, candidates, cap),
+    ]);
+  };
+
+export const bugChoice10000: ReasoningGenerator = bugChoiceFor(
+  'add-sub-10000-bug-choice',
+  RANGE_10000,
+);
+
+export const bugChoice100000: ReasoningGenerator = bugChoiceFor(
+  'add-sub-100000-bug-choice',
+  RANGE_100000,
+);
 
 /** Đúng/Sai on a worked result: the false value is a bug value when one applies. */
 export const trueFalse: ReasoningGenerator = (rng, tier) => {
@@ -178,6 +187,8 @@ export const numberLine: ReasoningGenerator = (rng, tier) => {
 
 export const ADD_SUB_FORMAT_GENERATORS: Record<string, ReasoningGenerator> = {
   'add-sub-bug-choice': bugChoice,
+  'add-sub-10000-bug-choice': bugChoice10000,
+  'add-sub-100000-bug-choice': bugChoice100000,
   'add-sub-true-false': trueFalse,
   'add-sub-compare-estimate': compareEstimate,
   'add-sub-number-line': numberLine,

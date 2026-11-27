@@ -1,6 +1,10 @@
 import { describe, expect, it } from 'vitest';
+import { bugsFor } from '../../arithmetic/add-sub-bug-catalogue';
+import { bugChoice } from '../../arithmetic/add-sub-format-generators';
+import { matchAddSub } from '../../arithmetic/add-sub-match-generator';
 import type { FactStat } from '../../learning/learning-types';
 import { mulberry32 } from '../../learning/seeded-rng';
+import type { PracticeItem } from '../../practice/practice-scene';
 import { playableSteps } from '../../reasoning/reasoning-step-answers';
 import type { ReasoningStep } from '../../reasoning/reasoning-types';
 import { firstOperation } from './garden-expression-steps';
@@ -243,5 +247,103 @@ describe('garden round flow', () => {
     const last = flow.submit(rightAnswer(steps[2] as ReasoningStep));
     expect(last.verdict).toBe('correct');
     expect(last.outcome).toMatchObject({ correct: false, firstTry: false, usedHint: true });
+  });
+});
+
+describe('garden round flow passes bugs to the outcome (Phase 3A)', () => {
+  it('a wrong bug-tagged choice pick records the bug, and only the bug bank', () => {
+    // Find a tier-3 bug-choice item with a bug-tagged wrong option.
+    let item: PracticeItem | undefined;
+    let wrongId = '';
+    let bug: string | undefined;
+    for (let seed = 0; seed < 50 && !item; seed++) {
+      const candidate = bugChoice(mulberry32(seed), 3) as PracticeItem;
+      const step = candidate.steps[0];
+      if (step?.kind !== 'choice') continue;
+      const tagged = step.options.find(
+        (o) => o.misconception && o.misconception !== 'near-miss' && !o.correct,
+      );
+      if (!tagged) continue;
+      item = candidate;
+      wrongId = tagged.id;
+      bug = tagged.misconception;
+    }
+    expect(item).toBeDefined();
+    expect(bug).toBeDefined();
+    const flow = new GardenRoundFlow(
+      [
+        {
+          kind: 'addsub',
+          skillId: 'add-sub-bug-choice',
+          factKey: 'sk:add-sub-bug-choice',
+          item: item as PracticeItem,
+        },
+      ],
+      () => 0,
+    );
+    const step = flow.steps[0] as ReasoningStep & { kind: 'choice' };
+    expect(flow.submit(wrongId).verdict).toBe('wrong');
+    const right = step.options.find((o) => o.correct)?.id as string;
+    const done = flow.submit(right);
+    expect(done.outcome).toBeDefined();
+    expect(done.outcome?.bugs).toEqual([bug]);
+    // A bug-tagged pick adds no wrong answer and moves no box (R79 rule).
+    expect(done.outcome?.wrongAnswers).toEqual([]);
+  });
+
+  it('a wrong match pairing with the decoy records the decoy bug', () => {
+    // Find a seed where the culprit left comes before the target left, so
+    // the first wrong pair of the swapped answer is the decoy pairing.
+    let found: { item: PracticeItem; culprit: number; target: number; tag: string } | undefined;
+    for (let seed = 0; seed < 50 && !found; seed++) {
+      const item = matchAddSub(mulberry32(seed), 2) as PracticeItem;
+      const step = item.steps[0] as ReasoningStep & { kind: 'match' };
+      const taggedRight = step.right.findIndex((o) => o.misconception !== undefined);
+      const target = step.pairs.indexOf(taggedRight);
+      const taggedValue = (step.right[taggedRight]?.label.params?.n ?? -1) as number;
+      const tag = step.right[taggedRight]?.misconception as string;
+      const culprit = step.left.findIndex(({ params }) => {
+        const m = String(params?.text ?? '').match(/^(\d+) ([+−]) (\d+)$/);
+        if (!m) return false;
+        const a = Number(m[1]);
+        const b = Number(m[3]);
+        const op = m[2] as '+' | '−';
+        return bugsFor(a, b, op).some((f) => f.value === taggedValue && f.bug === tag);
+      });
+      if (culprit >= 0 && culprit < target) found = { item, culprit, target, tag };
+    }
+    expect(found).toBeDefined();
+    const { item, culprit, target, tag } = found as NonNullable<typeof found>;
+    const step = item.steps[0] as ReasoningStep & { kind: 'match' };
+    const flow = new GardenRoundFlow(
+      [{ kind: 'addsub', skillId: 'add-sub-match', factKey: 'sk:add-sub-match', item }],
+      () => 0,
+    );
+    // Swap the culprit's pair with the target's: the culprit takes the decoy.
+    const wrong = [...step.pairs];
+    [wrong[culprit], wrong[target]] = [wrong[target] as number, wrong[culprit] as number];
+    expect(flow.submit(wrong).verdict).toBe('wrong');
+    const done = flow.submit([...step.pairs]);
+    expect(done.outcome).toBeDefined();
+    expect(done.outcome?.bugs).toEqual([tag]);
+  });
+
+  it('a correct round records no bugs', () => {
+    const item = bugChoice(mulberry32(3), 1) as PracticeItem;
+    const flow = new GardenRoundFlow(
+      [
+        {
+          kind: 'addsub',
+          skillId: 'add-sub-bug-choice',
+          factKey: 'sk:add-sub-bug-choice',
+          item,
+        },
+      ],
+      () => 0,
+    );
+    const step = flow.steps[0] as ReasoningStep & { kind: 'choice' };
+    const right = step.options.find((o) => o.correct)?.id as string;
+    const done = flow.submit(right);
+    expect(done.outcome?.bugs ?? []).toEqual([]);
   });
 });

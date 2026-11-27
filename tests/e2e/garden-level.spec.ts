@@ -138,8 +138,8 @@ test('the garden plays six rotating rounds and records sk: skills', async ({ pag
   const factKeys = (await page.evaluate(() => window.__garden?.factKeys())) ?? [];
   expect(kinds).toHaveLength(ROUNDS);
   for (let i = 1; i < kinds.length; i++) expect(kinds[i]).not.toBe(kinds[i - 1]);
-  expect(new Set(kinds)).toEqual(new Set(['pattern', 'balance', 'bag']));
-  for (const key of factKeys) expect(key).toMatch(/^sk:(pattern|unknown|expr)-/);
+  expect(new Set(kinds)).toEqual(new Set(['pattern', 'balance', 'bag', 'addsub']));
+  for (const key of factKeys) expect(key).toMatch(/^sk:(pattern|unknown|expr|add-sub)-/);
   expect((await gardenState(page)).tier).toBe(1);
   if (touch) await expectTouchFriendly(page);
 
@@ -251,7 +251,7 @@ test('stage 2 drills seven skills and records only its own stage stars', async (
   const factKeys = (await page.evaluate(() => window.__garden?.factKeys())) ?? [];
   expect(factKeys).toHaveLength(ROUNDS);
   expect(new Set(factKeys).size).toBe(ROUNDS);
-  for (const key of factKeys) expect(STAGE2_SKILLS).toContain(key);
+  for (const key of factKeys) expect([...STAGE2_SKILLS, 'sk:add-sub-bug-choice']).toContain(key);
 
   for (let i = 0; i < ROUNDS; i++) {
     await playRound(page, i, touch);
@@ -302,7 +302,7 @@ test('stage 3 drills brackets and stories and records only its own stage stars',
   const factKeys = (await page.evaluate(() => window.__garden?.factKeys())) ?? [];
   expect(factKeys).toHaveLength(ROUNDS);
   expect(new Set(factKeys).size).toBe(ROUNDS);
-  for (const key of factKeys) expect(STAGE3_SKILLS).toContain(key);
+  for (const key of factKeys) expect([...STAGE3_SKILLS, 'sk:add-sub-bug-choice']).toContain(key);
   expect(factKeys).toContain('sk:expr-brackets');
   expect(factKeys).toContain('sk:expr-from-story');
 

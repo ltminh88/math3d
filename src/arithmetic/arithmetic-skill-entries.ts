@@ -59,4 +59,9 @@ export const ARITHMETIC_ENTRIES: readonly SkillEntry[] = Object.freeze([
   entry('add-sub-bar-model-wp', 'arithmetic', [t1(2)]),
   // Boost Phase 2A: the column-calc scene skill, B2.
   entry('add-sub-column', 'arithmetic', [t1(2)]),
+  // Boost Phase 3A: the match format, B2; the bug-choice variants at the
+  // numberfort stage ranges, B54 (10 000) and B63 (100 000).
+  entry('add-sub-match', 'arithmetic', [t1(2)]),
+  entry('add-sub-10000-bug-choice', 'arithmetic', [t2(54)]),
+  entry('add-sub-100000-bug-choice', 'arithmetic', [t2(63)]),
 ]);

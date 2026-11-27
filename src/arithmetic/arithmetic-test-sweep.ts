@@ -31,6 +31,21 @@ function checkStep(step: ReasoningStep, where: string): void {
     }
     return;
   }
+  if (step.kind === 'match') {
+    // A match step pairs each left with exactly one right: equal lengths
+    // (2–4 pairs), pairs a permutation, distinct right labels.
+    expect(step.left.length, `${where} lefts`).toBeGreaterThanOrEqual(2);
+    expect(step.left.length, `${where} lefts`).toBeLessThanOrEqual(4);
+    expect(step.right.length, `${where} equal sides`).toBe(step.left.length);
+    expect(step.pairs.length, `${where} pairs`).toBe(step.left.length);
+    expect(
+      [...step.pairs].sort((a, b) => a - b),
+      `${where} pairs permutation`,
+    ).toEqual(step.left.map((_, i) => i));
+    const labels = step.right.map((o) => JSON.stringify(o.label));
+    expect(new Set(labels).size, `${where} distinct right labels`).toBe(labels.length);
+    return;
+  }
   throw new Error(`${where}: arithmetic has no ${step.kind} steps`);
 }
 

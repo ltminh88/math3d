@@ -16,6 +16,7 @@ import { skillTierOf } from '../../learning/skill-tiers';
 import { itemForSkill } from '../../practice/item-for-skill';
 import type { LevelDefinition, LevelLearning } from '../shared/level-types';
 import type { ReasoningRoundPlan } from '../shared/reasoning-round-slot';
+import { withBugChoiceRound } from './numberfort-bug-choice-slots';
 
 /** Rounds per numberfort run (a lesson run is six items, as in "Ôn theo bài"). */
 export const NUMBERFORT_ROUNDS = 6;
@@ -56,6 +57,8 @@ export const NUMBERFORT_TEN_THOUSAND_ARITHMETIC_SKILLS: readonly string[] = [
   'div-4d-1d',
   'div-4d-1d-remainder',
   'div-thousands-mental',
+  // Boost Phase 3A: one bug-choice round per stage-3 run, at the 10 000 range.
+  'add-sub-10000-bug-choice',
 ] as const;
 
 /** Numbers to 100 000 (B59, B60). */
@@ -76,6 +79,8 @@ export const NUMBERFORT_HUNDRED_THOUSAND_ARITHMETIC_SKILLS: readonly string[] = 
   'div-5d-1d-remainder',
   'mul-div-large-wp',
   'mul-chain-operators',
+  // Boost Phase 3A: one bug-choice round per stage-5 run, at the 100 000 range.
+  'add-sub-100000-bug-choice',
 ] as const;
 
 /** The stage's family, in catalog order (stage 5 is the mix of the two 100 000 groups). */
@@ -168,7 +173,7 @@ export function planNumberfortRun(
   const stats = learning.stats();
   const { rng } = learning;
   const rounds = Math.min(definition.rounds, NUMBERFORT_ROUNDS);
-  const ids = planNumberfortStageSkills(stats, rounds, stage);
+  const ids = withBugChoiceRound(planNumberfortStageSkills(stats, rounds, stage), stage);
   const plans: ReasoningRoundPlan[] = ids.map((skillId) => {
     const tier = skillTierOf(stats[skillKey(skillId)]);
     return { skillId, tier, factKey: skillKey(skillId), item: itemForSkill(skillId, rng, tier) };
