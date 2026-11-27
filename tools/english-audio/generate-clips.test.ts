@@ -112,7 +112,7 @@ describe('emitAudioMap', () => {
       { text: 'This is a cat', id: 'this-is-a-cat' },
     ]);
     expect(src).toContain('ENGLISH_AUDIO_CLIPS');
-    expect(src).toContain(`'cat': '/english-audio/cat.mp3'`);
+    expect(src).toContain(`cat: '/english-audio/cat.mp3'`);
     expect(src).toContain(`'This is a cat': '/english-audio/this-is-a-cat.mp3'`);
     expect(src).toContain('export function englishClipUrl(text: string): string | null');
   });
