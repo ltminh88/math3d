@@ -217,6 +217,10 @@ function tierCheck(skillId: string, item: PracticeItem, tier: SkillTier): void {
       expect(a / 10, where).toBeLessThanOrEqual(9);
       expect(b, where).toBeLessThanOrEqual(9);
       expect((a / 10) * b, where).toBeLessThanOrEqual(9);
+      if (tier === 1) {
+        expect(a / 10, where).toBeLessThanOrEqual(5);
+        expect(b, where).toBeLessThanOrEqual(5);
+      }
       return;
     }
     const nums = exprNums(item);
@@ -248,6 +252,10 @@ function tierCheck(skillId: string, item: PracticeItem, tier: SkillTier): void {
       expect(a / 100, where).toBeLessThanOrEqual(9);
       expect(b, where).toBeLessThanOrEqual(9);
       expect((a / 100) * b, where).toBeLessThanOrEqual(9);
+      if (tier === 1) {
+        expect(a / 100, where).toBeLessThanOrEqual(4);
+        expect(b, where).toBeLessThanOrEqual(4);
+      }
       return;
     }
     const nums = exprNums(item);

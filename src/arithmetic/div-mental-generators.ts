@@ -9,8 +9,8 @@ import { mentalVerdictItem, missingDigitItem, missingNumberItem } from './mul-di
 
 const hasZero = (q: number): boolean => String(q).includes('0');
 
-/** Round tens : a digit (exact, round-tens quotient): T1 quotient 10–40, T2 the
- *  same range plus a missing-number form, T3 a two-step chain or a Đúng/Sai verdict. */
+/** Round tens : a digit (exact, round-tens quotient): T1 quotient 10–40, T1–T2
+ *  a missing-number form (R117), T3 a two-step chain or a Đúng/Sai verdict. */
 export const divTensMental: ReasoningGenerator = (rng, tier) => {
   if (tier === 3) {
     if (rng() < 0.5) {
@@ -50,13 +50,10 @@ export const divTensMental: ReasoningGenerator = (rng, tier) => {
     const q = (tens / b) * 10;
     if (q > 40) continue;
     const a = tens * 10;
-    if (tier === 2) {
-      const form = pick(rng, ['plain', 'divisor', 'dividend'] as const);
-      if (form === 'divisor')
-        return missingDigitItem('div-tens-mental', tier, `${a} : □ = ${q}`, b);
-      if (form === 'dividend')
-        return missingNumberItem('div-tens-mental', tier, `□ : ${b} = ${q}`, a);
-    }
+    const form = pick(rng, ['plain', 'divisor', 'dividend'] as const);
+    if (form === 'divisor') return missingDigitItem('div-tens-mental', tier, `${a} : □ = ${q}`, b);
+    if (form === 'dividend')
+      return missingNumberItem('div-tens-mental', tier, `□ : ${b} = ${q}`, a);
     return arithmeticItem('div-tens-mental', tier, ref('mentalCalc', { expr: `${a} : ${b}` }), [
       numberStep(ref('askResult'), q),
     ]);
@@ -70,7 +67,7 @@ export const divTensMental: ReasoningGenerator = (rng, tier) => {
 };
 
 /** Round hundreds : a digit (exact, round-hundreds quotient): T1 quotient 100–400,
- *  T2 the same range plus a missing-number form, T3 a two-step chain or a Đúng/Sai
+ *  T1–T2 a missing-number form (R117), T3 a two-step chain or a Đúng/Sai
  *  verdict. */
 export const divHundredsMental: ReasoningGenerator = (rng, tier) => {
   if (tier === 3) {
@@ -114,13 +111,11 @@ export const divHundredsMental: ReasoningGenerator = (rng, tier) => {
     const q = (h / b) * 100;
     if (q > 400) continue;
     const a = h * 100;
-    if (tier === 2) {
-      const form = pick(rng, ['plain', 'divisor', 'dividend'] as const);
-      if (form === 'divisor')
-        return missingDigitItem('div-hundreds-mental', tier, `${a} : □ = ${q}`, b);
-      if (form === 'dividend')
-        return missingNumberItem('div-hundreds-mental', tier, `□ : ${b} = ${q}`, a);
-    }
+    const form = pick(rng, ['plain', 'divisor', 'dividend'] as const);
+    if (form === 'divisor')
+      return missingDigitItem('div-hundreds-mental', tier, `${a} : □ = ${q}`, b);
+    if (form === 'dividend')
+      return missingNumberItem('div-hundreds-mental', tier, `□ : ${b} = ${q}`, a);
     return arithmeticItem('div-hundreds-mental', tier, ref('mentalCalc', { expr: `${a} : ${b}` }), [
       numberStep(ref('askResult'), q),
     ]);

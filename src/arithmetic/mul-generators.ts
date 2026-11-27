@@ -59,7 +59,7 @@ const plainMul =
   };
 
 /** Round tens × a digit (product ≤ 99): T1 tens 1–5 × digit 2–5, T2 the wider
- *  range plus a missing-number form, T3 a two-step chain or a Đúng/Sai verdict. */
+ *  range, T1–T2 a missing-number form (R117), T3 a two-step chain or a Đúng/Sai verdict. */
 export const mulTensMental: ReasoningGenerator = (rng, tier) => {
   if (tier === 3) {
     if (rng() < 0.5) {
@@ -96,13 +96,11 @@ export const mulTensMental: ReasoningGenerator = (rng, tier) => {
     const d = tier === 1 ? randInt(rng, 2, 5) : randInt(rng, 2, 9);
     if (tens * d > 9) continue;
     const a = tens * 10;
-    if (tier === 2) {
-      const form = pick(rng, ['plain', 'digit', 'tens'] as const);
-      if (form === 'digit')
-        return missingDigitItem('mul-tens-mental', tier, `${a} × □ = ${a * d}`, d);
-      if (form === 'tens')
-        return missingNumberItem('mul-tens-mental', tier, `□ × ${d} = ${a * d}`, a);
-    }
+    const form = pick(rng, ['plain', 'digit', 'tens'] as const);
+    if (form === 'digit')
+      return missingDigitItem('mul-tens-mental', tier, `${a} × □ = ${a * d}`, d);
+    if (form === 'tens')
+      return missingNumberItem('mul-tens-mental', tier, `□ × ${d} = ${a * d}`, a);
     return arithmeticItem('mul-tens-mental', tier, ref('mentalCalc', { expr: `${a} × ${d}` }), [
       numberStep(ref('askResult'), a * d),
     ]);
@@ -116,7 +114,7 @@ export const mulTensMental: ReasoningGenerator = (rng, tier) => {
 };
 
 /** Round hundreds × a digit (product ≤ 999): T1 hundreds 1–4 × digit 2–4, T2 the
- *  wider range plus a missing-number form, T3 a two-step chain or a Đúng/Sai verdict. */
+ *  wider range, T1–T2 a missing-number form (R117), T3 a two-step chain or a Đúng/Sai verdict. */
 export const mulHundredsMental: ReasoningGenerator = (rng, tier) => {
   if (tier === 3) {
     if (rng() < 0.5) {
@@ -156,13 +154,11 @@ export const mulHundredsMental: ReasoningGenerator = (rng, tier) => {
     const d = tier === 1 ? randInt(rng, 2, 4) : randInt(rng, 2, 9);
     if (h * d > 9) continue;
     const a = h * 100;
-    if (tier === 2) {
-      const form = pick(rng, ['plain', 'digit', 'hundreds'] as const);
-      if (form === 'digit')
-        return missingDigitItem('mul-hundreds-mental', tier, `${a} × □ = ${a * d}`, d);
-      if (form === 'hundreds')
-        return missingNumberItem('mul-hundreds-mental', tier, `□ × ${d} = ${a * d}`, a);
-    }
+    const form = pick(rng, ['plain', 'digit', 'hundreds'] as const);
+    if (form === 'digit')
+      return missingDigitItem('mul-hundreds-mental', tier, `${a} × □ = ${a * d}`, d);
+    if (form === 'hundreds')
+      return missingNumberItem('mul-hundreds-mental', tier, `□ × ${d} = ${a * d}`, a);
     return arithmeticItem('mul-hundreds-mental', tier, ref('mentalCalc', { expr: `${a} × ${d}` }), [
       numberStep(ref('askResult'), a * d),
     ]);
@@ -175,15 +171,13 @@ export const mulHundredsMental: ReasoningGenerator = (rng, tier) => {
   );
 };
 
-/** 2-digit × 1-digit (product ≤ 99): T1 plain only (no carry), T2/T3 add the
- *  missing-number form — the pair still follows the tier's carry rule. */
+/** 2-digit × 1-digit (product ≤ 99): the missing-number form at every tier
+ *  (R117) — the pair still follows the tier's carry rule (T1 no carry). */
 const mul2d1d: ReasoningGenerator = (rng, tier) => {
   const [a, b] = pickMulPair(rng, RANGE_99, tier);
-  if (tier !== 1) {
-    const form = pick(rng, ['plain', 'digit', 'a'] as const);
-    if (form === 'digit') return missingDigitItem('mul-2d-1d', tier, `${a} × □ = ${a * b}`, b);
-    if (form === 'a') return missingNumberItem('mul-2d-1d', tier, `□ × ${b} = ${a * b}`, a);
-  }
+  const form = pick(rng, ['plain', 'digit', 'a'] as const);
+  if (form === 'digit') return missingDigitItem('mul-2d-1d', tier, `${a} × □ = ${a * b}`, b);
+  if (form === 'a') return missingNumberItem('mul-2d-1d', tier, `□ × ${b} = ${a * b}`, a);
   return arithmeticItem('mul-2d-1d', tier, ref('mulCalc', { a, b }), [
     numberStep(ref('askProduct'), a * b),
   ]);

@@ -101,17 +101,15 @@ export const remainderDiv =
     ]);
   };
 
-/** Exact 2-digit : 1-digit (dividend ≤ 99): T1 plain only, T2/T3 add the
- *  missing-number form — the pair still follows the tier's rule (tens divides /
+/** Exact 2-digit : 1-digit (dividend ≤ 99): the missing-number form at every
+ *  tier (R117) — the pair still follows the tier's rule (tens divides /
  *  does not / divisor 7–9). */
 const div2d1d: ReasoningGenerator = (rng, tier) => {
   const [a, b] = pickDivExact2d(rng, tier);
   const q = a / b;
-  if (tier !== 1) {
-    const form = pick(rng, ['plain', 'divisor', 'dividend'] as const);
-    if (form === 'divisor') return missingDigitItem('div-2d-1d', tier, `${a} : □ = ${q}`, b);
-    if (form === 'dividend') return missingNumberItem('div-2d-1d', tier, `□ : ${b} = ${q}`, a);
-  }
+  const form = pick(rng, ['plain', 'divisor', 'dividend'] as const);
+  if (form === 'divisor') return missingDigitItem('div-2d-1d', tier, `${a} : □ = ${q}`, b);
+  if (form === 'dividend') return missingNumberItem('div-2d-1d', tier, `□ : ${b} = ${q}`, a);
   return arithmeticItem('div-2d-1d', tier, ref('divCalc', { a, b }), [
     numberStep(ref('askQuotient'), q),
   ]);

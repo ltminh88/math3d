@@ -77,3 +77,12 @@ Same ids, same dispatcher; generators pick a form by tier, then numbers inside t
 
 ## Next steps
 - Phase 9 after-report.
+
+## Decisions (reviewer R117, 2026-11-27, ANSWER to M110)
+- T1 stays below the ≥30-distinct bar (10/9/14/14) because the lesson caps bound
+  the pair count — so the missing-number form goes to T1 too (option (b)): same
+  T1 number ranges, no widening, no cap breach (99/999). After: T1 distinct
+  30/27/42/42, shapes 2 (mul-2d-1d/div-2d-1d: 120/111, shapes 3).
+- `mul-hundreds-mental` T1 = 27 distinct (9 pairs × 3 forms) goes into the
+  Phase 9 allow-list with the reason: lesson cap B36/B37 ≤ 1000 → 9 pairs max.
+- Option (c) (widen T1 ranges) is NOT done.
