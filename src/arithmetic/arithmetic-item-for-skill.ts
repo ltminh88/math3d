@@ -4,6 +4,7 @@ import type { Rng } from '../learning/seeded-rng';
 import type { SkillTier } from '../learning/skill-tiers';
 import type { PracticeItem } from '../practice/practice-scene';
 import { ADD_SUB_GENERATORS } from './add-sub-generators';
+import { ADD_SUB_COLUMN_GENERATORS } from './add-sub-column-generator';
 import { WORD_PROBLEM_GENERATORS } from './add-sub-word-problems';
 import { ARITHMETIC_ENTRIES } from './arithmetic-skill-entries';
 import { DIV_GENERATORS } from './div-generators';
@@ -17,6 +18,7 @@ export type ArithmeticGenerator = (rng: Rng, tier: SkillTier) => PracticeItem;
 
 const GENERATORS: Readonly<Record<string, ArithmeticGenerator>> = {
   ...ADD_SUB_GENERATORS,
+  ...ADD_SUB_COLUMN_GENERATORS,
   ...WORD_PROBLEM_GENERATORS,
   ...MUL_GENERATORS,
   ...DIV_GENERATORS,

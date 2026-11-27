@@ -27,7 +27,6 @@
 // a question for the reviewer instead of guessed here.
 import { type Rng } from '../learning/seeded-rng';
 import type { SkillTier } from '../learning/skill-tiers';
-import type { PracticeItem } from '../practice/practice-scene';
 import type { ReasoningGenerator, ReasoningStep } from '../reasoning/reasoning-types';
 import { type AddSubBug, type AddSubOp, bugsFor } from './add-sub-bug-catalogue';
 import { arithmeticItem, ref } from './arithmetic-distractors';

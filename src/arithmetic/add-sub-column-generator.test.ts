@@ -238,14 +238,14 @@ describe('bugForDigit', () => {
 describe('find-error shows the buggy row in the column scene from T2', () => {
   it('T1 stays scene-free', () => {
     for (let seed = 0; seed < 20; seed++) {
-      expect(findError(mulberry32(seed), 1).scene).toBeUndefined();
+      expect((findError(mulberry32(seed), 1) as PracticeItem).scene).toBeUndefined();
     }
   });
 
   it('T2/T3 carry a column-calc scene with the shown row', () => {
     for (const tier of [2, 3] as const) {
       for (let seed = 0; seed < 20; seed++) {
-        const item = findError(mulberry32(seed), tier);
+        const item = findError(mulberry32(seed), tier) as PracticeItem;
         const scene = item.scene as unknown as Record<string, unknown> | undefined;
         expect(scene?.kind).toBe('column-calc');
         expect(scene?.focusCol).toBe(0);

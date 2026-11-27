@@ -57,4 +57,6 @@ export const ARITHMETIC_ENTRIES: readonly SkillEntry[] = Object.freeze([
   entry('add-sub-compare-estimate', 'arithmetic', [t1(2)]),
   entry('add-sub-number-line', 'arithmetic', [t1(2)]),
   entry('add-sub-bar-model-wp', 'arithmetic', [t1(2)]),
+  // Boost Phase 2A: the column-calc scene skill, B2.
+  entry('add-sub-column', 'arithmetic', [t1(2)]),
 ]);

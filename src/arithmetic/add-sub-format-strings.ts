@@ -24,6 +24,13 @@ export const addSubFormatStrings = {
     askBarOpPart: 'Muốn tìm phần chưa biết, làm phép nào?',
     askBarOpTotal: 'Muốn tìm tất cả, làm phép nào?',
     askUnknownPart: 'Phần chưa biết là bao nhiêu?',
+    // Boost Phase 2A column-calc: one digit step per column, units first.
+    columnCalc: 'Đặt tính rồi tính: {a} {op} {b}.',
+    columnDigitOnes: 'Hàng đơn vị: {a} {op} {b} = ?',
+    columnDigitTens: 'Hàng chục: {a} {op} {b} = ?',
+    columnDigitHundreds: 'Hàng trăm: {a} {op} {b} = ?',
+    askCarry: 'Có nhớ 1 không?',
+    askBorrow: 'Có phải vay 1 không?',
   },
   en: {
     askChooseResult: 'Which number is the right answer?',
@@ -45,5 +52,12 @@ export const addSubFormatStrings = {
     askBarOpPart: 'Which operation finds the unknown part?',
     askBarOpTotal: 'Which operation finds the total?',
     askUnknownPart: 'How many are in the unknown part?',
+    // Boost Phase 2A column-calc: one digit step per column, units first.
+    columnCalc: 'Work it out in columns: {a} {op} {b}.',
+    columnDigitOnes: 'Ones: {a} {op} {b} = ?',
+    columnDigitTens: 'Tens: {a} {op} {b} = ?',
+    columnDigitHundreds: 'Hundreds: {a} {op} {b} = ?',
+    askCarry: 'Do you carry 1?',
+    askBorrow: 'Do you borrow 1?',
   },
 } as const;
