@@ -9,4 +9,4 @@ speed 0.9), engine version `0.9.4`.
 - Fallback engine (only if Kokoro output is unusable for a clip):
   Piper `en_US-ljspeech-high`, public domain dataset.
 - Generator: `tools/english-audio/generate-clips.mjs` (deterministic;
-  re-running it regenerates only clips whose text changed).
+  re-running it regenerates only clips whose text, voice or speed changed).
