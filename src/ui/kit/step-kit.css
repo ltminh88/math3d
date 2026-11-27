@@ -85,6 +85,7 @@
 
 .kit-order__slots {
   display: flex;
+  flex-wrap: wrap;
   gap: 8px;
 }
 
@@ -145,6 +146,44 @@
   outline: 3px solid currentColor;
   outline-offset: -3px;
   font-weight: 700;
+}
+
+/* Paired tiles share a tint and a pair number, so the child can see which
+ * left goes with which right (boost 2B, R90.4). */
+.kit-match__left.paired::after,
+.kit-match__right.paired::after {
+  content: attr(data-pair);
+  display: inline-block;
+  margin-left: 8px;
+  min-width: 22px;
+  height: 22px;
+  line-height: 22px;
+  text-align: center;
+  border-radius: 50%;
+  background: #2f7cf6;
+  color: #fff;
+  font-size: 13px;
+  font-weight: 700;
+}
+
+.kit-match__left[data-pair="1"],
+.kit-match__right[data-pair="1"] {
+  background: #e3f0ff;
+}
+
+.kit-match__left[data-pair="2"],
+.kit-match__right[data-pair="2"] {
+  background: #e2f4e2;
+}
+
+.kit-match__left[data-pair="3"],
+.kit-match__right[data-pair="3"] {
+  background: #fff3d6;
+}
+
+.kit-match__left[data-pair="4"],
+.kit-match__right[data-pair="4"] {
+  background: #fbe3ee;
 }
 
 .kit-match__left.selected,

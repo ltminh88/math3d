@@ -3,6 +3,7 @@ import {
   firstMisplacedTile,
   firstWrongPair,
   isStepAnswerCorrect,
+  orderBug,
   playableSteps,
   toggleSelection,
 } from './reasoning-step-answers';
@@ -71,6 +72,34 @@ describe('reasoning step answers', () => {
     expect(firstMisplacedTile(order, [2, 1, 0])).toBe(1);
     expect(firstMisplacedTile(order, [0, 2, 1])).toBe(0);
     expect(firstMisplacedTile(order, [2, 0])).toBe(2);
+  });
+
+  it('names the bug a wrong order stands for (R90.2)', () => {
+    // Tiles as meas-len-order emits them (lenQty {n, unit}); display order
+    // 1 m, 20 cm, 300 mm — correct smallest-first is [1, 2, 0].
+    const tiles = [
+      { key: 'lenQty', params: { n: 1, unit: 'm' } },
+      { key: 'lenQty', params: { n: 20, unit: 'cm' } },
+      { key: 'lenQty', params: { n: 300, unit: 'mm' } },
+    ];
+    const order: ReasoningStep = { kind: 'order', prompt: p, tiles, answer: [1, 2, 0] };
+    expect(orderBug(order, [1, 2, 0])).toBeUndefined();
+    // Exact reverse of the correct order: largest first — direction error.
+    expect(orderBug(order, [0, 2, 1])).toBe('unit-direction');
+    // Sorted by the bare numbers (1, 20, 300) while ignoring the units.
+    expect(orderBug(order, [0, 1, 2])).toBe('ignore-unit');
+    // Wrong but neither known order: no bug.
+    expect(orderBug(order, [2, 1, 0])).toBeUndefined();
+    expect(orderBug(order, '120')).toBeUndefined();
+    // Tiles without a numeric param: the bare-number check cannot apply.
+    const plain: ReasoningStep = {
+      kind: 'order',
+      prompt: p,
+      tiles: [{ key: 't0' }, { key: 't1' }, { key: 't2' }],
+      answer: [2, 0, 1],
+    };
+    expect(orderBug(plain, [0, 2, 1])).toBeUndefined();
+    expect(orderBug(plain, [1, 0, 2])).toBe('unit-direction');
   });
 
   it('checks match answers and names the first wrong pair with its bug', () => {

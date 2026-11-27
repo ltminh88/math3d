@@ -229,6 +229,14 @@ describe('createTapMatchStep', () => {
     byText(widget.element, '2 dm').click();
     byText(widget.element, '20 cm').click();
     expect(doneButton.disabled).toBe(false);
+    // Partners share a pair number (R90.4): pair 1 is 1 m + 100 cm, pair 2
+    // is 2 dm + 20 cm.
+    const pair = (label: string) =>
+      (byText(widget.element, label) as unknown as { dataset: { pair?: string } }).dataset.pair;
+    expect(pair('1 m')).toBe('1');
+    expect(pair('100 cm')).toBe('1');
+    expect(pair('2 dm')).toBe('2');
+    expect(pair('20 cm')).toBe('2');
     doneButton.click();
     expect(done).toEqual([[0, 1]]);
     widget.destroy();

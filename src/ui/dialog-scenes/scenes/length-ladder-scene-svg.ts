@@ -37,12 +37,19 @@ function renderLengthLadder(scene: LengthScene): SVGElement {
     if (!last) {
       const ax = x + STEP_W - 8;
       const ay = y + STEP_H;
+      const up = (scene.arrows ?? '×10') === ':10';
       // A short diagonal from this step's bottom edge into the next step's
       // top-left corner; the factor sits in the empty gap above the next step.
+      // Going down (×10) the head points down-right at the line's end; going
+      // up (:10) it points up-left at the line's start, so ':10' never reads
+      // as 'm :10 = dm' (R90.3). The up head mirrors the down head through
+      // the line's midpoint.
       svg.append(svgEl('line', { x1: ax, y1: ay, x2: ax + 16, y2: ay + 10, class: 'ds-line' }));
       svg.append(
         svgEl('polygon', {
-          points: `${ax + 16},${ay + 10} ${ax + 8},${ay + 4} ${ax + 10},${ay + 16}`,
+          points: up
+            ? `${ax},${ay} ${ax + 8},${ay + 6} ${ax + 6},${ay - 6}`
+            : `${ax + 16},${ay + 10} ${ax + 8},${ay + 4} ${ax + 10},${ay + 16}`,
           class: 'ds-point',
         }),
       );

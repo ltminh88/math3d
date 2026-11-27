@@ -61,4 +61,14 @@ describe('length-ladder scene', () => {
     const highlights = (svg.match(/ds-highlight/g) ?? []).length;
     expect(highlights).toBe(2);
   });
+
+  it('points the arrows down for x10 and up for :10 (R90.3)', () => {
+    // First gap: ax = 14 + 92 - 8 = 98, ay = 12 + 34 = 46.
+    const down = render({ kind: 'length-ladder', arrows: '×10' });
+    expect(down).toContain('114,56 106,50 108,62');
+    expect(down).not.toContain('98,46 106,52 104,40');
+    const up = render({ kind: 'length-ladder', arrows: ':10' });
+    expect(up).toContain('98,46 106,52 104,40');
+    expect(up).not.toContain('114,56 106,50 108,62');
+  });
 });

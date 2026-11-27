@@ -160,7 +160,9 @@ export type ReasoningStep =
     }
   /** Tap left, then right, to pair them; "Xong" checks all pairs. `pairs[i]` is
    * the index into `right` matched with `left[i]`. A wrong pair records the
-   * right option's `misconception` when it is tagged. */
+   * right option's `misconception` when it is tagged. `left` and `right`
+   * have equal lengths (2–4 pairs); the kit widget throws otherwise, so a
+   * generator (3A's add-sub-match) must emit equal sides. */
   | {
       readonly kind: 'match';
       readonly prompt: PromptRef;

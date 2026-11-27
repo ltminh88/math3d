@@ -5,7 +5,6 @@
 // Lanes 1–3 cover groups 1–10; the hint ladder is untouched (golden).
 import type { SkillTier } from '../learning/skill-tiers';
 import {
-  firstMisplacedTile,
   firstWrongPair,
   isStepAnswerCorrect,
   playableSteps,
@@ -59,8 +58,6 @@ export interface WrongAnswerContext {
   readonly wrongNumber?: number;
   /** The chosen option ids for multi steps (money-pick-notes). */
   readonly chosenIds?: readonly string[];
-  /** The first misplaced slot for order steps (no bug tag rides on a tile). */
-  readonly firstMisplaced?: number;
   readonly missNumber: number;
 }
 
@@ -101,7 +98,6 @@ function resolveAnswer(
   option?: ChoiceOption;
   wrongNumber?: number;
   chosenIds?: readonly string[];
-  firstMisplaced?: number;
 } {
   if (step.kind === 'choice' && typeof answer === 'string') {
     const option = step.options.find((o) => o.id === answer);
@@ -110,10 +106,7 @@ function resolveAnswer(
   }
   if (step.kind === 'multi' && Array.isArray(answer)) return { chosenIds: answer };
   if (step.kind === 'number' && typeof answer === 'number') return { wrongNumber: answer };
-  if (step.kind === 'order') {
-    const misplaced = firstMisplacedTile(step, answer);
-    return misplaced === null ? {} : { firstMisplaced: misplaced };
-  }
+  if (step.kind === 'order') return {};
   if (step.kind === 'match') {
     // A wrong pair whose right option carries a bug becomes the "chosen
     // option", so the Phase 0 bug registry explains it like a choice pick.

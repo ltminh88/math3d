@@ -52,6 +52,29 @@ export function wrongPairs(
   return out;
 }
 
+/** The bug a wrong order stands for, if it matches a known wrong order
+ * (boost 2B, R90.2): the exact reverse of the correct order is a direction
+ * error; ordering by the tiles' bare numbers while ignoring their units is
+ * an ignore-unit error. Tiles without a numeric param make the bare-number
+ * check inapplicable. A correct order is no bug. */
+export function orderBug(
+  step: Extract<ReasoningStep, { kind: 'order' }>,
+  answer: StepAnswer,
+): Misconception | undefined {
+  if (!isNumberList(answer) || isStepAnswerCorrect(step, answer)) return undefined;
+  const correct = [...step.answer];
+  const reversed = [...correct].reverse();
+  if (answer.length === reversed.length && answer.every((n, i) => n === reversed[i]))
+    return 'unit-direction';
+  const bareNumbers = step.tiles.map((t) => Number(t.params?.n));
+  if (bareNumbers.some((n) => !Number.isFinite(n))) return undefined;
+  const bare = bareNumbers
+    .map((_, i) => i)
+    .sort((a, b) => (bareNumbers[a] as number) - (bareNumbers[b] as number));
+  if (answer.length === bare.length && answer.every((n, i) => n === bare[i])) return 'ignore-unit';
+  return undefined;
+}
+
 /** The steps as played: a false verdict that carries a fix is followed by a number step for it. */
 export function playableSteps(item: ReasoningItem): ReasoningStep[] {
   return item.steps.flatMap((step): ReasoningStep[] =>

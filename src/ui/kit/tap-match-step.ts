@@ -15,7 +15,9 @@ export interface TapMatchStep {
   destroy(): void;
 }
 
-/** 2–4 pairs (narrow phones wrap the columns; more would overflow). */
+/** 2–4 pairs (narrow phones wrap the columns; more would overflow). `left`
+ * and `right` must have equal lengths — the widget throws otherwise, so a
+ * generator (3A's add-sub-match) must emit equal sides. */
 export function createTapMatchStep(
   left: readonly string[],
   right: readonly string[],
@@ -70,13 +72,22 @@ export function createTapMatchStep(
   };
 
   const renderPairs = () => {
+    // Paired tiles share a tint and a pair number (data-pair), so the child
+    // can see which left goes with which right (R90.4).
     for (const [i, b] of leftButtons.entries()) {
-      b.classList.toggle('paired', pairs[i] !== null);
-      b.setAttribute('aria-pressed', String(pairs[i] !== null));
+      const paired = pairs[i] !== null;
+      b.classList.toggle('paired', paired);
+      b.setAttribute('aria-pressed', String(paired));
+      if (paired) b.dataset.pair = String(i + 1);
+      else delete b.dataset.pair;
     }
     for (const [j, b] of rightButtons.entries()) {
-      b.classList.toggle('paired', pairs.includes(j));
-      b.setAttribute('aria-pressed', String(pairs.includes(j)));
+      const leftIndex = pairs.indexOf(j);
+      const paired = leftIndex >= 0;
+      b.classList.toggle('paired', paired);
+      b.setAttribute('aria-pressed', String(paired));
+      if (paired) b.dataset.pair = String(leftIndex + 1);
+      else delete b.dataset.pair;
     }
   };
 
