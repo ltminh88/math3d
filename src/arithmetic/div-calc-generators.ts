@@ -2,11 +2,12 @@
 // 1 digit. Exact divisions use (quotient, divisor) construction; remainder items
 // answer in two steps — "Thương?" then "Số dư?" — with dư < số chia enforced by
 // construction. Zero in the quotient is the T3 trap.
-import { type Rng, randInt } from '../learning/seeded-rng';
+import { pick, type Rng, randInt } from '../learning/seeded-rng';
 import type { SkillTier } from '../learning/skill-tiers';
 import type { ReasoningGenerator } from '../reasoning/reasoning-types';
 import { arithmeticItem, numberStep, ref } from './arithmetic-distractors';
 import { RANGE_99, RANGE_999 } from './arithmetic-ranges';
+import { missingDigitItem, missingNumberItem } from './mul-div-missing-factor';
 
 const hasZero = (q: number): boolean => String(q).includes('0');
 
@@ -100,8 +101,24 @@ export const remainderDiv =
     ]);
   };
 
+/** Exact 2-digit : 1-digit (dividend ≤ 99): T1 plain only, T2/T3 add the
+ *  missing-number form — the pair still follows the tier's rule (tens divides /
+ *  does not / divisor 7–9). */
+const div2d1d: ReasoningGenerator = (rng, tier) => {
+  const [a, b] = pickDivExact2d(rng, tier);
+  const q = a / b;
+  if (tier !== 1) {
+    const form = pick(rng, ['plain', 'divisor', 'dividend'] as const);
+    if (form === 'divisor') return missingDigitItem('div-2d-1d', tier, `${a} : □ = ${q}`, b);
+    if (form === 'dividend') return missingNumberItem('div-2d-1d', tier, `□ : ${b} = ${q}`, a);
+  }
+  return arithmeticItem('div-2d-1d', tier, ref('divCalc', { a, b }), [
+    numberStep(ref('askQuotient'), q),
+  ]);
+};
+
 export const DIV_CALC_GENERATORS: Record<string, ReasoningGenerator> = {
-  'div-2d-1d': plainDiv('div-2d-1d', pickDivExact2d),
+  'div-2d-1d': div2d1d,
   'div-2d-1d-remainder': remainderDiv('div-2d-1d-remainder', pickDivRemainder2d),
   'div-3d-1d': plainDiv('div-3d-1d', pickDivExact3d),
   'div-3d-1d-remainder': remainderDiv('div-3d-1d-remainder', pickDivRemainder3d),

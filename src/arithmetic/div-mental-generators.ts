@@ -5,13 +5,23 @@ import { pick, randInt } from '../learning/seeded-rng';
 import type { ReasoningGenerator } from '../reasoning/reasoning-types';
 import { arithmeticItem, numberStep, ref } from './arithmetic-distractors';
 import { RANGE_99, RANGE_999 } from './arithmetic-ranges';
+import { mentalVerdictItem, missingDigitItem, missingNumberItem } from './mul-div-missing-factor';
 
 const hasZero = (q: number): boolean => String(q).includes('0');
 
-/** Round tens : a digit (exact, round-tens quotient): T1 quotient 10–20, T2 30–40,
- *  T3 a two-step chain of round tens. */
+/** Round tens : a digit (exact, round-tens quotient): T1 quotient 10–40, T2 the
+ *  same range plus a missing-number form, T3 a two-step chain or a Đúng/Sai verdict. */
 export const divTensMental: ReasoningGenerator = (rng, tier) => {
   if (tier === 3) {
+    if (rng() < 0.5) {
+      for (let t = 0; t < 500; t++) {
+        const tens = randInt(rng, 1, 9);
+        const b = randInt(rng, 2, 9);
+        if (tens % b !== 0) continue;
+        return mentalVerdictItem('div-tens-mental', tier, false, tens * 10, b, rng);
+      }
+      return mentalVerdictItem('div-tens-mental', tier, false, 60, 3, rng);
+    }
     for (let t = 0; t < 500; t++) {
       const tens = randInt(rng, 1, 9);
       const b = randInt(rng, 2, 9);
@@ -38,9 +48,15 @@ export const divTensMental: ReasoningGenerator = (rng, tier) => {
     const b = randInt(rng, 2, 9);
     if (tens % b !== 0) continue;
     const q = (tens / b) * 10;
-    if (tier === 1 && q > 20) continue;
-    if (tier === 2 && q < 30) continue;
+    if (q > 40) continue;
     const a = tens * 10;
+    if (tier === 2) {
+      const form = pick(rng, ['plain', 'divisor', 'dividend'] as const);
+      if (form === 'divisor')
+        return missingDigitItem('div-tens-mental', tier, `${a} : □ = ${q}`, b);
+      if (form === 'dividend')
+        return missingNumberItem('div-tens-mental', tier, `□ : ${b} = ${q}`, a);
+    }
     return arithmeticItem('div-tens-mental', tier, ref('mentalCalc', { expr: `${a} : ${b}` }), [
       numberStep(ref('askResult'), q),
     ]);
@@ -53,10 +69,20 @@ export const divTensMental: ReasoningGenerator = (rng, tier) => {
   );
 };
 
-/** Round hundreds : a digit (exact, round-hundreds quotient): T1 quotient 100, T2
- *  200–400, T3 a two-step chain of round hundreds. */
+/** Round hundreds : a digit (exact, round-hundreds quotient): T1 quotient 100–400,
+ *  T2 the same range plus a missing-number form, T3 a two-step chain or a Đúng/Sai
+ *  verdict. */
 export const divHundredsMental: ReasoningGenerator = (rng, tier) => {
   if (tier === 3) {
+    if (rng() < 0.5) {
+      for (let t = 0; t < 500; t++) {
+        const h = randInt(rng, 1, 9);
+        const b = randInt(rng, 2, 9);
+        if (h % b !== 0) continue;
+        return mentalVerdictItem('div-hundreds-mental', tier, false, h * 100, b, rng);
+      }
+      return mentalVerdictItem('div-hundreds-mental', tier, false, 600, 3, rng);
+    }
     for (let t = 0; t < 500; t++) {
       const h = randInt(rng, 1, 9);
       const b = randInt(rng, 2, 9);
@@ -86,9 +112,15 @@ export const divHundredsMental: ReasoningGenerator = (rng, tier) => {
     const b = randInt(rng, 2, 9);
     if (h % b !== 0) continue;
     const q = (h / b) * 100;
-    if (tier === 1 && q !== 100) continue;
-    if (tier === 2 && ![200, 300, 400].includes(q)) continue;
+    if (q > 400) continue;
     const a = h * 100;
+    if (tier === 2) {
+      const form = pick(rng, ['plain', 'divisor', 'dividend'] as const);
+      if (form === 'divisor')
+        return missingDigitItem('div-hundreds-mental', tier, `${a} : □ = ${q}`, b);
+      if (form === 'dividend')
+        return missingNumberItem('div-hundreds-mental', tier, `□ : ${b} = ${q}`, a);
+    }
     return arithmeticItem('div-hundreds-mental', tier, ref('mentalCalc', { expr: `${a} : ${b}` }), [
       numberStep(ref('askResult'), q),
     ]);
