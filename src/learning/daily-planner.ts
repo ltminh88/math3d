@@ -2,6 +2,7 @@
 // Pool = attempted facts/skills only — never an untaught fact, never a repeat within one day,
 // and fewer items when the pool is under 10 (no top-up). Due uses calendar days
 // (daily-intervals.ts), not sessions: a box-1 fact seen yesterday is due today.
+import { LOOK_SKILL_IDS } from '../english/look-skill-ids';
 import { FLUENCY_ORDER } from './curriculum-tables';
 import { dailyIntervalDays, dayNumber } from './daily-intervals';
 import type { FactKey } from './fact-key';
@@ -36,6 +37,11 @@ export interface PlanDailyInput {
   /** English Island (Phase 6): the island gate is open (bridge done). Defaults to */
   /** locked — no English items unless the caller says the island is open. */
   islandUnlocked?: boolean;
+  /** Look 1 (two-modes Phase 4): the Look gate is open (bridge done, same as */
+  /** the island gate — Phase 3's Look gate also requires the bridge). Defaults */
+  /** to locked: Look items stay out of daily practice until the Look gate opens, */
+  /** even when the island is already open. */
+  lookUnlocked?: boolean;
 }
 
 export interface LevelStarsView {
@@ -64,6 +70,19 @@ const isEnglishKey = (key: FactKey): boolean => {
   return parsed?.op === 'skill' && skillEntry(parsed.id)?.family === 'english';
 };
 
+/** True when the key is a Look 1 skill (the Look book's id list). */
+const isLookKey = (key: FactKey): boolean => {
+  const parsed = parseKey(key);
+  return parsed?.op === 'skill' && (LOOK_SKILL_IDS as readonly string[]).includes(parsed.id);
+};
+
+/** True when the key's book gate is open: CEC keys need the island, Look keys need Look. */
+const bookGateOpen = (key: FactKey, islandUnlocked: boolean, lookUnlocked: boolean): boolean => {
+  if (isLookKey(key)) return lookUnlocked;
+  if (isEnglishKey(key)) return islandUnlocked;
+  return true;
+};
+
 /** Due: box < 5 and enough calendar days since it was last seen. */
 const isDue = (stat: FactStat, today: number): boolean =>
   stat.box < 5 && today - dayNumber(stat.lastSeenAt) >= dailyIntervalDays(stat.box);
@@ -82,16 +101,19 @@ export function pickDailyItems({
   today,
   seed,
   islandUnlocked = false,
+  lookUnlocked = false,
 }: PlanDailyInput): FactKey[] {
   const rng = mulberry32(seed);
-  // English Island (Phase 6): a locked island contributes no English items at all.
-  // Filtered BEFORE the shuffle (R114): a locked island with English stats must
-  // plan the same deck as the same profile without them — filtering after the
-  // shuffle consumed the rng differently and drifted 158/2000 decks from main.
-  // Shuffled so the stable sorts below break ties deterministically by seed.
+  // English books (Phase 6 + two-modes Phase 4): a locked book contributes no
+  // items at all — the island gate drops CEC keys, the Look gate drops Look
+  // keys, each on its own flag. Filtered BEFORE the shuffle (R114): a locked
+  // book with stats must plan the same deck as the same profile without them —
+  // filtering after the shuffle consumed the rng differently and drifted
+  // 158/2000 decks from main. Shuffled so the stable sorts below break ties
+  // deterministically by seed.
   const pool = shuffle(
     rng,
-    learnedPool(stats).filter((k) => islandUnlocked || !isEnglishKey(k)),
+    learnedPool(stats).filter((k) => bookGateOpen(k, islandUnlocked, lookUnlocked)),
   );
   const due = pool
     .filter((k) => {

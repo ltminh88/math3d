@@ -5,6 +5,7 @@
 // Dynamically imported from practice-run.ts, so the widgets, the speaker and
 // their CSS stay out of the daily dialog's chunk until the first English item.
 import './english-widgets.css';
+import { lookUnitForSkill } from '../../english/content/look/look-units';
 import { unitForSkill } from '../../english/content/units';
 import type { EnglishAttempt } from '../../english/engine/answer-check';
 import { checkAnswer } from '../../english/engine/answer-check';
@@ -58,7 +59,8 @@ export function mountEnglishDailyItem(opts: {
   cb: EnglishDailyItemCallbacks;
 }): { destroy(): void } {
   const { skillId, box, isLast, rng, signal, cb } = opts;
-  const unit = unitForSkill(skillId);
+  // Look skills build from their Look home unit; CEC skills from the CEC one.
+  const unit = skillId.startsWith('en-look-') ? lookUnitForSkill(skillId) : unitForSkill(skillId);
   const kinds = kindsForSkill(skillId);
   const kind = kinds[Math.floor(rng() * kinds.length)] as EnglishItemKind;
   const item = generateItem(skillId, kind, skillTierOf({ box }), unit, rng);

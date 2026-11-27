@@ -193,3 +193,72 @@ describe('English in daily practice (Phase 6)', () => {
     expect(planDailySet(input)).toEqual(planDailySet(input));
   });
 });
+
+describe('Look 1 in daily practice (two-modes Phase 4)', () => {
+  const lookDue = statsOf({
+    'sk:en-look-u1-words': stat(1, [2026, 10, 20]),
+    'sk:en-look-u1-pattern': stat(1, [2026, 10, 20]),
+    'sk:en-look-phonics-initial': stat(1, [2026, 10, 20]),
+  });
+  const mathDue = statsOf({
+    'mul:3x4': stat(1, [2026, 10, 20]),
+    'mul:3x5': stat(1, [2026, 10, 20]),
+    'mul:3x6': stat(1, [2026, 10, 20]),
+    'mul:3x7': stat(1, [2026, 10, 20]),
+    'mul:4x4': stat(1, [2026, 10, 20]),
+    'mul:4x5': stat(1, [2026, 10, 20]),
+    'mul:4x6': stat(1, [2026, 10, 20]),
+    'mul:4x7': stat(1, [2026, 10, 20]),
+    'div:12/3': stat(1, [2026, 10, 20]),
+    'div:20/4': stat(1, [2026, 10, 20]),
+  });
+  const cecDue = statsOf({
+    'sk:en-letters-a-d': stat(1, [2026, 10, 20]),
+    'sk:en-words-a-d': stat(1, [2026, 10, 20]),
+  });
+
+  it('island open but Look locked: Look items stay out, CEC items stay in', () => {
+    const stats = statsOf({ ...lookDue, ...cecDue, ...mathDue });
+    const set = planDailySet({ stats, today: TODAY, seed: 7, islandUnlocked: true });
+    expect(set).not.toContain('sk:en-look-u1-words');
+    expect(set).not.toContain('sk:en-look-u1-pattern');
+    expect(set).not.toContain('sk:en-look-phonics-initial');
+    expect(set.filter((k) => k.startsWith('sk:en-look-'))).toHaveLength(0);
+    // The two CEC skills are the only English keys the open island may serve;
+    // the seed-7 draw picks one of them into the day (the cap is 2).
+    const cec = set.filter((k) => k.startsWith('sk:en-') && !k.startsWith('sk:en-look-'));
+    expect(cec.length).toBeGreaterThan(0);
+    expect(cec.length).toBeLessThanOrEqual(2);
+  });
+
+  it('Look open but island locked: CEC items stay out, Look items stay in', () => {
+    const stats = statsOf({ ...lookDue, ...cecDue, ...mathDue });
+    const set = planDailySet({ stats, today: TODAY, seed: 7, lookUnlocked: true });
+    expect(set).not.toContain('sk:en-letters-a-d');
+    expect(set).not.toContain('sk:en-words-a-d');
+    expect(set.filter((k) => k.startsWith('sk:en-look-')).length).toBeGreaterThan(0);
+  });
+
+  it('both gates open: English items (CEC + Look together) cap at 2', () => {
+    const stats = statsOf({ ...lookDue, ...cecDue, ...mathDue });
+    const set = planDailySet({
+      stats,
+      today: TODAY,
+      seed: 7,
+      islandUnlocked: true,
+      lookUnlocked: true,
+    });
+    expect(set).toHaveLength(DAILY_LENGTH);
+    expect(set.filter((k) => k.startsWith('sk:en-'))).toHaveLength(2);
+  });
+
+  it('both gates locked: the deck equals the math-only deck', () => {
+    const stats = statsOf({ ...lookDue, ...cecDue, ...mathDue });
+    const mathOnly = statsOf({ ...mathDue });
+    for (const seed of [7, 11, 23]) {
+      expect(planDailySet({ stats, today: TODAY, seed })).toEqual(
+        planDailySet({ stats: mathOnly, today: TODAY, seed }),
+      );
+    }
+  });
+});

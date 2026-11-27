@@ -65,14 +65,17 @@ export function openDailyPractice(): void {
     return;
   }
   const seed = dailySeed(today, snapshot.profile.id);
-  // English Island (Phase 6): the island opens when the bridge quest is done
-  // (gameState.progress.questComplete); until then the planner drops every
-  // English key, and afterwards it caps them at 2 per day.
+  // English books (Phase 6 + two-modes Phase 4): the island opens when the
+  // bridge quest is done (gameState.progress.questComplete), and the Look
+  // gate opens on the same bridge (Phase 3's Look gate also requires it).
+  // Until a book's gate is open the planner drops every key of that book,
+  // and afterwards it caps English items at 2 per day.
   const keys = planDailySet({
     stats: renderableStats(snapshot.factStats),
     today,
     seed,
     islandUnlocked: gameState.progress.questComplete,
+    lookUnlocked: gameState.progress.questComplete,
   });
   if (keys.length === 0) {
     openDialog(td('title'), `<p class="dialog-copy">${td('locked')}</p>`, 'daily');

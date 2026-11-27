@@ -6,10 +6,12 @@
 // chunk hash the new deploy deleted). The previous item's Next button is
 // locked while the chunk loads, so a second tap cannot advance twice and
 // silently skip this item.
+
 import { unitForSkill } from '../english/content/units';
 import { generateItem } from '../english/engine/item-generators';
 import { kindsForSkill } from '../english/engine/item-planner';
 import type { EnglishItemKind, EnglishSkillId } from '../english/english-types';
+import { LOOK_SKILL_IDS } from '../english/look-skill-ids';
 import type { FactKey } from '../learning/fact-key';
 import { mulberry32 } from '../learning/seeded-rng';
 import type { QuestionOutcome } from '../learning/session-recorder';
@@ -33,8 +35,13 @@ export interface EnglishStepCallbacks {
  * content exists.
  */
 export function isEnglishKeyRenderable(id: string, box: number): boolean {
+  const skillId = id as EnglishSkillId;
+  // Look skills: the Look schema test proves the generator builds an item for
+  // every Look skill from its home unit, so a Look skill is renderable. The
+  // content itself stays in the Look chunk — the daily item loads it with its
+  // dynamic import, never here (this module rides the practice-run chunk).
+  if ((LOOK_SKILL_IDS as readonly string[]).includes(skillId)) return true;
   try {
-    const skillId = id as EnglishSkillId;
     const kinds = kindsForSkill(skillId);
     generateItem(
       skillId,
