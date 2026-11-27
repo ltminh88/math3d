@@ -37,6 +37,12 @@ export const barModelWp: ReasoningGenerator = (rng, tier) => {
       [total, a] = pickLadderPair(rng, '−', ladder);
       if (total > a) break;
     }
+    if (total <= a) {
+      // Fallback (R108): the loop can exhaust with total === a, which would
+      // make the unknown part 0. Force a positive unknown, staying ≤ 1 000.
+      a = Math.min(a, 999);
+      total = a + 1;
+    }
     const unknown = total - a;
     return arithmeticItem(
       'add-sub-bar-model-wp',
@@ -63,6 +69,13 @@ export const barModelWp: ReasoningGenerator = (rng, tier) => {
   for (let t = 0; t < 20; t++) {
     [a, b] = pickLadderPair(rng, '+', ladder);
     if (a !== b) break;
+  }
+  if (a === b) {
+    // Fallback (R108): the loop can exhaust with a === b, which would make
+    // the two known bars indistinguishable. Force the parts apart, staying
+    // inside the 1 000 range.
+    b = a + 1;
+    if (a + b > 1000) b = a - 1;
   }
   return arithmeticItem('add-sub-bar-model-wp', tier, ref('barModelTotal', { name, item, a, b }), [
     barOptions(rng, [
