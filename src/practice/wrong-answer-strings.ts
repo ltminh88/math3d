@@ -286,7 +286,7 @@ export const twa = defineStrings('wrongAnswer', {
     bugBorrowNoDecrement:
       'Bạn mượn 1 rồi nhưng quên bớt 1 ở số cho mượn. Mình bớt 1 ở hàng cho mượn rồi tính lại nhé.',
     bugZeroBorrowSkip:
-      'Bạn gặp số 0 thì dừng mượn. Số 0 mượn 1 thành 9 rồi mượn tiếp sang hàng bên trái nhé.',
+      'Bạn gặp số 0 thì viết luôn số ở dưới rồi không mượn nữa. Số 0 phải mượn 1 ở hàng bên trái thành 10, bớt 1 cho hàng bên phải thì còn 9, rồi tính lại nhé.',
     bugZeroMinusNZero: 'Bạn thấy 0 trừ một số thì viết 0. Mình mượn 1 cho số 0 rồi tính lại nhé.',
     bugMisalignedColumns:
       'Bạn đặt các chữ số chưa thẳng hàng. Mình viết số dưới sao cho hàng đơn vị thẳng hàng đơn vị nhé.',
@@ -576,7 +576,7 @@ export const twa = defineStrings('wrongAnswer', {
     bugBorrowNoDecrement:
       'You borrowed 1 but forgot to take 1 away from the digit you borrowed from. Take 1 away there and work it out again.',
     bugZeroBorrowSkip:
-      'You stopped borrowing when you met a 0. A 0 that borrows 1 becomes 9 — borrow on to the next column.',
+      'When you met a 0 you just wrote the digit below it and stopped borrowing. A 0 has to borrow 1 from the column on the left to make 10, lend 1 to the column on the right so it is 9, then work it out again.',
     bugZeroMinusNZero:
       'You saw 0 minus a number and wrote 0. Borrow 1 for the 0 and work it out again.',
     bugMisalignedColumns:
