@@ -296,6 +296,32 @@ describe('add-sub-number-line', () => {
 });
 
 describe('add-sub-bar-model-wp', () => {
+  it('the unknown-bar step names the bars, never their numbers (R103.3)', () => {
+    for (const tier of [1, 2, 3] as const) {
+      for (let seed = 0; seed < 300; seed++) {
+        const item = generate('add-sub-bar-model-wp', tier, seed);
+        const barStep = choiceStep(item, 0);
+        expect(barStep.options.length).toBe(3);
+        const keys = barStep.options.map((o) => o.label.key);
+        expect(new Set(keys).size).toBe(3);
+        for (const o of barStep.options) {
+          expect(['barPartHave', 'barPartAdded', 'barBoth']).toContain(o.label.key);
+          for (const v of Object.values(o.label.params ?? {})) {
+            expect(typeof v).not.toBe('number');
+            expect(String(v)).not.toContain('?');
+          }
+        }
+        // No degenerate pair: the two parts differ, the unknown part is > 0.
+        const p = params(item);
+        if (item.story.key === 'barModelPart') {
+          expect((p.total as number) - (p.a as number)).toBeGreaterThan(0);
+        } else {
+          expect(p.a).not.toBe(p.b);
+        }
+      }
+    }
+  });
+
   it('three steps: unknown bar, then the operation, then the number pad', () => {
     for (const tier of [1, 2, 3] as const) {
       for (let seed = 0; seed < 40; seed++) {
@@ -314,7 +340,7 @@ describe('add-sub-bar-model-wp', () => {
         if (isPart) {
           const a = p.a as number;
           const total = p.total as number;
-          expect(rightBar.label.key).toBe('barUnknown');
+          expect(rightBar.label.key).toBe('barPartAdded');
           expect((rightOp.label.params as Record<string, string>).text).toBe('−');
           expect((wrongOp.label.params as Record<string, string>).text).toBe('+');
           expect(wrongOp.misconception).toBe('wrong-inverse');
@@ -323,7 +349,7 @@ describe('add-sub-bar-model-wp', () => {
         } else {
           const a = p.a as number;
           const b = p.b as number;
-          expect(rightBar.label.key).toBe('barWhole');
+          expect(rightBar.label.key).toBe('barBoth');
           expect((rightOp.label.params as Record<string, string>).text).toBe('+');
           expect((wrongOp.label.params as Record<string, string>).text).toBe('−');
           expect(wrongOp.misconception).toBe('wrong-inverse');

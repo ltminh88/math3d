@@ -29,8 +29,14 @@ export const barModelWp: ReasoningGenerator = (rng, tier) => {
   const name = pickName(rng);
   const item = pickNoun(rng);
   if (rng() < 0.5) {
-    // Unknown part: {name} has {a}, ends with {total} — find the part.
-    const [total, a] = pickLadderPair(rng, '−', ladder);
+    // Unknown part: {name} has {a}, ends with {total} — find the part. The
+    // unknown part must be positive: total === a would mean buying 0 (R103.3).
+    let total = 0;
+    let a = 0;
+    for (let t = 0; t < 20; t++) {
+      [total, a] = pickLadderPair(rng, '−', ladder);
+      if (total > a) break;
+    }
     const unknown = total - a;
     return arithmeticItem(
       'add-sub-bar-model-wp',
@@ -38,26 +44,33 @@ export const barModelWp: ReasoningGenerator = (rng, tier) => {
       ref('barModelPart', { name, item, a, total }),
       [
         barOptions(rng, [
-          { label: ref('barWhole', { n: total }), correct: false },
-          { label: ref('barKnown', { n: a }), correct: false },
-          { label: ref('barUnknown'), correct: true },
+          { label: ref('barPartHave', { name }), correct: false },
+          { label: ref('barPartAdded'), correct: true },
+          { label: ref('barBoth'), correct: false },
         ]),
-        expressionChoiceStep(rng, ref('askBarOp'), '−', [
+        expressionChoiceStep(rng, ref('askBarOpPart'), '−', [
           { value: '+', misconception: 'wrong-inverse' },
         ]),
         numberStep(ref('askUnknownPart'), unknown),
       ],
     );
   }
-  // Unknown total: {name} has {a}, buys {b} more — find the total.
-  const [a, b] = pickLadderPair(rng, '+', ladder);
+  // Unknown total: {name} has {a}, buys {b} more — find the total. The two
+  // parts must differ (R103.3): with a === b the two known bars would be
+  // indistinguishable.
+  let a = 0;
+  let b = 0;
+  for (let t = 0; t < 20; t++) {
+    [a, b] = pickLadderPair(rng, '+', ladder);
+    if (a !== b) break;
+  }
   return arithmeticItem('add-sub-bar-model-wp', tier, ref('barModelTotal', { name, item, a, b }), [
     barOptions(rng, [
-      { label: ref('barKnown', { n: a }), correct: false },
-      { label: ref('barKnown', { n: b }), correct: false },
-      { label: ref('barWhole', { n: '?' }), correct: true },
+      { label: ref('barPartHave', { name }), correct: false },
+      { label: ref('barPartAdded'), correct: false },
+      { label: ref('barBoth'), correct: true },
     ]),
-    expressionChoiceStep(rng, ref('askBarOp'), '+', [
+    expressionChoiceStep(rng, ref('askBarOpTotal'), '+', [
       { value: '−', misconception: 'wrong-inverse' },
     ]),
     numberStep(ref('askTotal', { name, item }), a + b),

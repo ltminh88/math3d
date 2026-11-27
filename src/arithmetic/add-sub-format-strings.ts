@@ -16,10 +16,13 @@ export const addSubFormatStrings = {
     barModelPart: '{name} có {a} {item}. Sau khi mua thêm, {name} có tất cả {total} {item}.',
     barModelTotal: '{name} có {a} {item}. {name} mua thêm {b} {item}.',
     askUnknownBar: 'Thanh nào chưa biết?',
-    barWhole: 'Thanh tổng: {n}',
-    barKnown: 'Thanh đã biết: {n}',
-    barUnknown: 'Thanh chưa biết: ?',
-    askBarOp: 'Muốn tìm phần chưa biết, làm phép nào?',
+    // The bars are named by role, never by number: a number (or '?') on the
+    // label would give the answer away (R103.3).
+    barPartHave: 'Phần {name} có',
+    barPartAdded: 'Phần mua thêm',
+    barBoth: 'Cả hai',
+    askBarOpPart: 'Muốn tìm phần chưa biết, làm phép nào?',
+    askBarOpTotal: 'Muốn tìm tất cả, làm phép nào?',
     askUnknownPart: 'Phần chưa biết là bao nhiêu?',
   },
   en: {
@@ -36,10 +39,11 @@ export const addSubFormatStrings = {
     barModelPart: '{name} has {a} {item}. After buying more, {name} has {total} {item} in all.',
     barModelTotal: '{name} has {a} {item}. {name} buys {b} more {item}.',
     askUnknownBar: 'Which bar is unknown?',
-    barWhole: 'Whole bar: {n}',
-    barKnown: 'Known bar: {n}',
-    barUnknown: 'Unknown bar: ?',
-    askBarOp: 'Which operation finds the unknown part?',
+    barPartHave: 'The part {name} has',
+    barPartAdded: 'The part bought more',
+    barBoth: 'Both parts',
+    askBarOpPart: 'Which operation finds the unknown part?',
+    askBarOpTotal: 'Which operation finds the total?',
     askUnknownPart: 'How many are in the unknown part?',
   },
 } as const;
