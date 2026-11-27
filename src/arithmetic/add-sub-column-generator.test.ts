@@ -81,9 +81,7 @@ describe('column-calc sweep', () => {
       for (let seed = 0; seed < 40; seed++) {
         const item = generate(tier, seed);
         const p = params(item);
-        expect(ladderMatchesTier(p.a as number, p.b as number, p.op as '+' | '−', tier)).toBe(
-          true,
-        );
+        expect(ladderMatchesTier(p.a as number, p.b as number, p.op as '+' | '−', tier)).toBe(true);
       }
     }
   });

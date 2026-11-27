@@ -25,12 +25,12 @@
 // It is pure and tested here; wiring it into the round flow's bug bank needs a
 // hook in reasoning-round-flow.ts, outside this phase's ownership — recorded as
 // a question for the reviewer instead of guessed here.
-import { type Rng } from '../learning/seeded-rng';
+import type { Rng } from '../learning/seeded-rng';
 import type { SkillTier } from '../learning/skill-tiers';
 import type { ReasoningGenerator, ReasoningStep } from '../reasoning/reasoning-types';
 import { type AddSubBug, type AddSubOp, bugsFor } from './add-sub-bug-catalogue';
-import { arithmeticItem, ref } from './arithmetic-distractors';
 import { ladderOfSkillTier, pickLadderPair } from './add-sub-pair-pickers';
+import { arithmeticItem, ref } from './arithmetic-distractors';
 import { RANGE_1000 } from './arithmetic-ranges';
 import type { ColumnCalcScene } from './column-calc-scene-types';
 

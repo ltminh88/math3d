@@ -7,6 +7,8 @@
 // `DialogScene` union (geometry + time + money + data); phase 16 extends the union
 // with the numbers/fraction scenes. A renderer's `render` narrows on `kind`, so no
 // casts are needed inside the scene files.
+
+import type { ColumnCalcScene } from '../../arithmetic/column-calc-scene-types';
 import type { DataScene } from '../../data/data-scene-types';
 import type { FractionScene } from '../../fractions/fraction-scene-types';
 import type { SceneBody } from '../../geometry/geo-scene-types';
@@ -24,7 +26,8 @@ export type DialogScene =
   | DataScene
   | NumberScene
   | FractionScene
-  | LengthScene;
+  | LengthScene
+  | ColumnCalcScene;
 
 export type DialogSceneKind = DialogScene['kind'];
 

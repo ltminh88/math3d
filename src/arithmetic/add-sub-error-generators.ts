@@ -6,7 +6,6 @@ import { pickName } from '../reasoning/reasoning-distractors';
 import type { ReasoningGenerator, ReasoningStep } from '../reasoning/reasoning-types';
 import { bugsFor } from './add-sub-bug-catalogue';
 import { pickAddPair, pickSubPair } from './add-sub-pair-pickers';
-import type { ColumnCalcScene } from './column-calc-scene-types';
 import {
   arithmeticItem,
   numberStep,
@@ -16,6 +15,7 @@ import {
   wrongSubByNoBorrow,
 } from './arithmetic-distractors';
 import { tierRangeCap } from './arithmetic-ranges';
+import type { ColumnCalcScene } from './column-calc-scene-types';
 
 /** Đúng/Sai on a worked result: half the time the shown result is right, half the time it
  *  is built from the bug catalogue (Phase 1A) when a bug applies, otherwise from the
