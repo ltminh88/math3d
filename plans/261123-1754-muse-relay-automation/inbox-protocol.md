@@ -54,7 +54,7 @@ Hạn mức: 41%
 3. `REPORT` giữ đủ những gì trước đây gửi cho anh chủ dự án: PR, **head sha đầy đủ**, CI run id + kết quả, gates đã chạy, hạn mức %.
 4. Quy tắc hạn mức như cũ: từ 90% push sau mỗi commit; tới 99% commit + push WIP, ghi "Bàn giao" trên #11, gửi `HANDOFF` ở đây rồi dừng.
    **Mỗi `REPORT` ghi hạn mức ĐỌC LẠI THẬT ngay lúc gửi, kèm giờ đọc** (vd `Hạn mức: 93% (đọc 16:20)`) — không chép số của báo cáo trước. Từ 90% không nhận việc song song (rule 11), chỉ làm nốt việc đang dở. Nếu hạn mức hết trước giờ reset: push WIP, rồi chạy **một** lệnh `sleep` nền tới vài phút sau giờ reset (không làm gì khác) để tự chạy lại.
-5. **Vòng lặp không bao giờ tự tắt**: mọi lượt — kể cả ngay sau khi gửi `REPORT` hay khi việc đã xong — đều kết thúc bằng một lệnh `sleep` chạy nền (300 s khi chờ CI, 600 s khi rảnh). Không có lệnh ngủ nền thì không gì đánh thức Muse được nữa. **Chờ reviewer gộp PR hay trả lời KHÔNG phải là xong việc** — vẫn phải ngủ nền rồi đọc hộp thư. Chỉ dừng khi nhận `STOP` hoặc hạn mức ≥ 99%.
+5. **Vòng lặp không bao giờ tự tắt**: mọi lượt — kể cả ngay sau khi gửi `REPORT`, khi việc đã xong, **hay khi vừa trả lời anh chủ dự án trực tiếp trong tab** — đều kết thúc bằng một lệnh `sleep` chạy nền (300 s khi chờ CI, 600 s khi rảnh). Không có lệnh ngủ nền thì không gì đánh thức Muse được nữa. **Chờ reviewer gộp PR hay trả lời KHÔNG phải là xong việc** — vẫn phải ngủ nền rồi đọc hộp thư. Chỉ dừng khi nhận `STOP` hoặc hạn mức ≥ 99%.
 6. Kẹt sau 2 lần thử → gửi `BLOCKED` (đã thử gì, lỗi gì), không thử lần 3 theo cùng cách.
 7. Không deploy `--prod`. Chỉ deploy preview.
 8. Không sửa `.github/workflows`, không chụp lại parity: việc của reviewer.
