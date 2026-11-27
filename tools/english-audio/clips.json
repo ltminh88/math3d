@@ -1,0 +1,91 @@
+{
+  "version": 1,
+  "voice": "af_heart",
+  "speed": 0.9,
+  "clips": {
+    "astronaut": {
+      "text": "astronaut",
+      "hash": "d4c8dea0b232"
+    },
+    "bread": {
+      "text": "bread",
+      "hash": "3b17e9bc1608"
+    },
+    "brother": {
+      "text": "brother",
+      "hash": "f0c0dab3ed5f"
+    },
+    "elephant": {
+      "text": "elephant",
+      "hash": "a0a585828a26"
+    },
+    "island": {
+      "text": "island",
+      "hash": "b259ac018ae6"
+    },
+    "snow": {
+      "text": "snow",
+      "hash": "a596ad5b6a84"
+    },
+    "star": {
+      "text": "star",
+      "hash": "99941e98f252"
+    },
+    "teacher": {
+      "text": "teacher",
+      "hash": "b246a7d2f9cf"
+    },
+    "tiger": {
+      "text": "tiger",
+      "hash": "656ef1e17b97"
+    },
+    "umbrella": {
+      "text": "umbrella",
+      "hash": "1fb7455d6754"
+    },
+    "unicorn": {
+      "text": "unicorn",
+      "hash": "57f0c939ecc4"
+    },
+    "yellow": {
+      "text": "yellow",
+      "hash": "0a87781ec14a"
+    },
+    "letter-a": {
+      "text": "a",
+      "hash": "07b809aa0f35"
+    },
+    "letter-b": {
+      "text": "b",
+      "hash": "aba969a3a030"
+    },
+    "letter-e": {
+      "text": "e",
+      "hash": "7237c23bb5c9"
+    },
+    "letter-h": {
+      "text": "h",
+      "hash": "c7fd41b20f70"
+    },
+    "letter-z": {
+      "text": "z",
+      "hash": "f1843fa75fa7"
+    },
+    "this-is-a-cat": {
+      "text": "This is a cat",
+      "hash": "5c8a08ae0d9a"
+    },
+    "i-like-fish": {
+      "text": "I like fish",
+      "hash": "72c1c138e6ea"
+    },
+    "my-favourite-colour-is-red": {
+      "text": "My favourite colour is red",
+      "hash": "007d5539ae53"
+    },
+    "what-is-this-it-is-a-cat": {
+      "text": "What is this? It is a cat",
+      "hash": "91e79d3e2943"
+    }
+  }
+}
