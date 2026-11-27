@@ -163,10 +163,13 @@ export interface EnglishUnit {
 /**
  * A book pack (or a synthetic fixture): version 1, optional stage, the items,
  * and optional image data by id (the `'images'` part of the pack contract).
+ * `book` names the book the pack belongs to (absent = `cec`, the island);
+ * the validator checks the items against that book's skill ids.
  */
 export interface EnglishPack {
   readonly version: 1;
   readonly stage?: number;
+  readonly book?: EnglishBookId;
   readonly items: readonly EnglishItem[];
   readonly images?: Readonly<Record<string, string>>;
 }

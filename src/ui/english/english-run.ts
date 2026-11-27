@@ -1,17 +1,14 @@
-// English run (Phase 1B + 3B + 2A, split in two-modes Phase 1): the run the
-// island level shell (1A) calls. Eight rounds: the planner picks the weakest
-// skill, the round builds the item (or a stored pack item joins when skill +
-// kind match), a tap-only widget renders it, the miss budget reveals after
-// 3 misses, hints narrow the choices, and every round records under
-// `sk:en-*`. 2A: each stage drills its own unit — the engine reads its pool
-// from the unit, not from the stage. R64: the run draws no finish screen
-// and resolves right after round 8 — the level shell owns the ending screen.
-// 3B: "🔊 Nghe" speaks the item, the "Phụ huynh" button unlocks the book
-// pack, and `signal` lets the shell abort mid-run. The round body lives in
-// `english-run-round.ts`, the shell DOM in `english-run-widgets.ts`, the
-// speech behaviour in `english-run-speech.ts`.
-import { unitForStage } from '../../english/content/units';
+// English run (Phase 1B + 3B + 2A, split in two-modes Phase 1): the run
+// the island level shell (1A) calls. Eight rounds: the planner picks the
+// weakest skill, the round builds the item (or a stored pack item joins),
+// a tap-only widget renders it, the miss budget reveals after 3 misses,
+// hints narrow the choices, and every round records under `sk:en-*`.
+// 2A: each stage drills its own unit. R64: no finish screen — the run
+// resolves after round 8; the level shell owns the ending screen. 3B:
+// "🔊 Nghe" speaks the item, "Phụ huynh" unlocks the book pack, `signal`
+// aborts mid-run. Round: `english-run-round.ts`; shell: `english-run-widgets.ts`; speech: `english-run-speech.ts`.
 import { createItemPlanner, type PlannedRound } from '../../english/engine/item-planner';
+import type { EnglishBook } from '../../english/english-books';
 import type { EnglishItem, EnglishPack } from '../../english/english-types';
 import { fetchEnglishPack } from '../../english/pack/pack-client';
 import { openPackStore } from '../../english/pack/pack-storage';
@@ -24,8 +21,10 @@ import { createBrowserEnglishSpeaker } from './english-speaker';
 import { tei } from './english-strings';
 import { openPackUnlockDialog } from './pack-unlock-dialog';
 
-/** What the island level shell hands the run: its stage, DOM root and learning services. */
+/** What the island level shell hands the run: its book, stage, DOM root and learning services. */
 export interface EnglishRunPort {
+  /** The book this run drills (units, skills and pack key come from it). */
+  readonly book: EnglishBook;
   /** Stage of this run (1-based, 1–8). */
   readonly stage: number;
   /** Overlay root for the run's DOM; removed on exit. */
@@ -73,17 +72,14 @@ export function getEnglishRunLive(): EnglishRunLive {
   return live;
 }
 
-/**
- * Daily practice (Phase 6) plays one English item outside the island run:
- * it reports the item here so the same test hook (`window.__game.island`)
- * answers it. The two runs never play at once, so they share this state.
- */
+/** Daily practice (Phase 6) plays one English item outside the island run
+ * and reports it here for the same test hook. The runs never play at once. */
 export function setEnglishRunLive(next: EnglishRunLive): void {
   live = next;
 }
 
 export async function startEnglishRun(port: EnglishRunPort): Promise<EnglishRunResult> {
-  const unit = unitForStage(port.stage);
+  const unit = port.book.unitForStage(port.stage);
   const learning = port.learning;
   const planner = createItemPlanner({
     skills: unit.skillIds,
@@ -92,9 +88,9 @@ export async function startEnglishRun(port: EnglishRunPort): Promise<EnglishRunR
   });
   const doc = port.ui.ownerDocument ?? document;
   // 3B: the speaker reads the game's sound setting; the pack loads in the
-  // background so the first item mounts at once (a stored pack joins later).
+  // background so the first item mounts at once.
   const speaker = createBrowserEnglishSpeaker(() => !appSettings.get().sound);
-  const packStorePromise = openPackStore();
+  const packStorePromise = openPackStore(port.book.packKey);
   let packItems: EnglishItem[] = [];
   const usedPack = new Set<number>();
 
@@ -105,7 +101,10 @@ export async function startEnglishRun(port: EnglishRunPort): Promise<EnglishRunR
         doc,
         unlock: async (passphrase) => {
           const store = await packStorePromise;
-          const result = await fetchEnglishPack(passphrase, { stage: port.stage });
+          const result = await fetchEnglishPack(passphrase, {
+            stage: port.stage,
+            book: port.book.id,
+          });
           if (!result.ok) {
             if (result.error === 'bad-passphrase') await store.clearPassphrase();
             return { ok: false, error: result.error };
@@ -190,8 +189,7 @@ export async function startEnglishRun(port: EnglishRunPort): Promise<EnglishRunR
     item: null,
     hintRung: 0,
   };
-  // R64: no finish screen — resolve at once so the level shell can show its
-  // own ending card. Clear the controls so nothing stale stays tappable.
+  // R64: no finish screen — resolve at once; clear the controls so nothing stale stays tappable.
   shell.root.textContent = '';
   port.signal?.removeEventListener('abort', onAbort);
   speaker.dispose();

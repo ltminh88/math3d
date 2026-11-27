@@ -3,7 +3,8 @@
 // this file only pins the shapes both sides agree on, so 1B/2A/3B can build
 // against them now. No passphrase or secret lives here — only the env var name.
 import { ENGLISH_SKILL_IDS } from './english-skill-entries';
-import type { EnglishItem, EnglishPack } from './english-types';
+import type { EnglishBookId, EnglishItem, EnglishPack } from './english-types';
+import { LOOK_SKILL_IDS } from './look-skill-ids';
 
 /** The pack endpoint (Vercel function, Phase 4). */
 export const ENGLISH_PACK_ENDPOINT = '/api/english-pack';
@@ -20,6 +21,8 @@ export interface EnglishPackRequest {
   readonly passphrase: string;
   readonly part: EnglishPackPart;
   readonly stage?: number;
+  /** The book the pack is asked for (absent = `cec`). */
+  readonly book?: EnglishBookId;
 }
 
 export type EnglishPackErrorCode = 'bad-passphrase' | 'pack-unavailable';
@@ -38,13 +41,9 @@ function isPictureChoice(v: unknown): boolean {
   return isRecord(v) && isNonEmptyString(v.word) && isNonEmptyString(v.picture);
 }
 
-function isEnglishItem(v: unknown): v is EnglishItem {
+function isEnglishItem(v: unknown, skillIds: readonly string[]): v is EnglishItem {
   if (!isRecord(v)) return false;
-  if (
-    typeof v.skillId !== 'string' ||
-    !(ENGLISH_SKILL_IDS as readonly string[]).includes(v.skillId)
-  )
-    return false;
+  if (typeof v.skillId !== 'string' || !skillIds.includes(v.skillId)) return false;
   if (v.source !== 'own' && v.source !== 'pack') return false;
   switch (v.kind) {
     case 'listen-pick-picture': {
@@ -92,13 +91,18 @@ function isEnglishItem(v: unknown): v is EnglishItem {
 
 /**
  * Pure pack validator: version 1, an items array of well-formed items whose
- * skill ids exist, an optional stage 1–8, and optional image data (string map).
- * It checks shape only — never the passphrase, never the content's origin.
+ * skill ids exist in the pack's book (`cec` when absent), an optional stage
+ * 1–8, and optional image data (string map). It checks shape only — never
+ * the passphrase, never the content's origin.
  */
 export function isEnglishPack(value: unknown): value is EnglishPack {
   if (!isRecord(value)) return false;
   if (value.version !== 1) return false;
-  if (!Array.isArray(value.items) || !value.items.every(isEnglishItem)) return false;
+  const book: EnglishBookId = value.book === undefined ? 'cec' : (value.book as EnglishBookId);
+  if (book !== 'cec' && book !== 'look') return false;
+  const skillIds: readonly string[] = book === 'look' ? LOOK_SKILL_IDS : ENGLISH_SKILL_IDS;
+  if (!Array.isArray(value.items) || !value.items.every((i) => isEnglishItem(i, skillIds)))
+    return false;
   if (value.stage !== undefined) {
     if (typeof value.stage !== 'number' || !Number.isInteger(value.stage)) return false;
     if (value.stage < 1 || value.stage > 8) return false;

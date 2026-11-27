@@ -3,6 +3,7 @@
 // the run's widgets mount inside it, and the done card replaces them when the run
 // resolves. Leaving through the host's "Về thế giới" button exits uncompleted.
 import { Scene } from 'three';
+import { ENGLISH_BOOKS } from '../../english/english-books';
 import { type EnglishRunResult, startEnglishRun } from '../../ui/english/english-run';
 import { LEVEL_COMPLETE_BONUS } from '../shared/level-run-result';
 import type { LevelContext, LevelModule, LevelSession } from '../shared/level-types';
@@ -82,6 +83,7 @@ function start(ctx: LevelContext): LevelSession {
   // below still returns early on `disposed`, so no done card shows.
   const runAbort = new AbortController();
   void startEnglishRun({
+    book: ENGLISH_BOOKS.cec,
     stage: ctx.stage,
     ui: panel.runRoot,
     learning: ctx.learning,

@@ -37,4 +37,10 @@ describe('openPackStore', () => {
     await store.save('gia-dinh', SYNTHETIC_PACK);
     expect(await store.load()).toEqual({ passphrase: 'gia-dinh', pack: SYNTHETIC_PACK });
   });
+
+  it('accepts an explicit key (cec keeps the default current key)', async () => {
+    const store = await openPackStore('current');
+    await store.save('gia-dinh', SYNTHETIC_PACK);
+    expect((await store.load())?.pack).toBe(SYNTHETIC_PACK);
+  });
 });

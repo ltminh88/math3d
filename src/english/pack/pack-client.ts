@@ -7,6 +7,7 @@ import {
   type EnglishPackPart,
   isEnglishPack,
 } from '../english-pack-contract';
+import type { EnglishBookId } from '../english-types';
 import type { EnglishPack } from '../english-types';
 
 export type EnglishPackFetchError = 'bad-passphrase' | 'pack-unavailable' | 'offline' | 'malformed';
@@ -18,6 +19,8 @@ export type EnglishPackFetchResult =
 export interface FetchEnglishPackOptions {
   readonly part?: EnglishPackPart;
   readonly stage?: number;
+  /** The book the pack is asked for (absent = `cec`). */
+  readonly book?: EnglishBookId;
 }
 
 type FetchFn = (
@@ -40,6 +43,7 @@ export async function fetchEnglishPack(
         passphrase,
         part: options.part ?? 'items',
         ...(options.stage !== undefined ? { stage: options.stage } : {}),
+        ...(options.book !== undefined ? { book: options.book } : {}),
       }),
       cache: 'no-store',
     });
