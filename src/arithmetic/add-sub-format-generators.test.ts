@@ -26,7 +26,11 @@ const SKILLS = [
 
 const CAP = 1000;
 
-const generate = (skillId: (typeof SKILLS)[number], tier: SkillTier, seed: number): PracticeItem => {
+const generate = (
+  skillId: (typeof SKILLS)[number],
+  tier: SkillTier,
+  seed: number,
+): PracticeItem => {
   const gen = ADD_SUB_FORMAT_GENERATORS[skillId];
   if (!gen) throw new Error(`no generator for ${skillId}`);
   return gen(mulberry32(seed), tier) as PracticeItem;
