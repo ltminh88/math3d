@@ -166,13 +166,37 @@ async function playLessonRun(
 // on #52's tablet-landscape shard).
 const PINNED_PROFILE_UUID = '00000000-0000-4000-8000-000000000005';
 
+/** Crypto.prototype with the pinned-UUID override state (see pinProfileUuid). */
+type PinnedCryptoPrototype = Crypto & {
+  __pinnedUuid?: string;
+};
+
 async function pinProfileUuid(page: Page): Promise<void> {
   await page.addInitScript((uuid: string) => {
+    const proto = Crypto.prototype as unknown as PinnedCryptoPrototype;
+    // Keep the real generator: the pinned value is only for the profile id
+    // created at boot. Session batches use newId() too, and the store dedupes
+    // by batchId — a pinned generator would give every replay the same
+    // batchId, so its attempts would be dropped as an "already committed"
+    // retry and the run seed would never advance past the first replay.
+    const orig = Crypto.prototype.randomUUID as (this: Crypto) => string;
+    proto.__pinnedUuid = uuid;
     Object.defineProperty(Crypto.prototype, 'randomUUID', {
-      value: () => uuid,
+      value: function (this: Crypto) {
+        const p = Crypto.prototype as unknown as PinnedCryptoPrototype;
+        return p.__pinnedUuid ?? orig.call(this);
+      },
       configurable: true,
     });
   }, PINNED_PROFILE_UUID);
+}
+
+/** Restores real randomUUIDs once boot has created the pinned profile. */
+async function unpinProfileUuid(page: Page): Promise<void> {
+  await page.evaluate(() => {
+    const proto = Crypto.prototype as unknown as PinnedCryptoPrototype;
+    delete proto.__pinnedUuid;
+  });
 }
 
 /** Like playLessonRun, but also reports whether a number step with a ≥ 1000 answer was solved. */
@@ -320,32 +344,57 @@ test('VLM entry: the Milo dialog opens the picker by tap', async ({ page }, info
   await expect(page.locator('#dialog')).not.toHaveAttribute('open', '');
 });
 
-test('run B2: answer all 6, stars before/after show, coins in store, picker stars update', async ({
+test('run B2: replays cover all 11 skills, stars show once covered, coins in store, picker stars update', async ({
   page,
 }, info) => {
   const touch = isTouch(info);
+  // 30 items × 2 taps: under SwiftShader the dialog's backdrop blur holds the world near
+  // 1 frame/s, so Playwright's stability check alone costs seconds per click (same
+  // reason daily-practice sets SLOW_TEST_MS * 7 for its 40-item test). Desktop needs
+  // ~4.3 min; tablets run ~3× slower here and the 12-min default cuts the test off
+  // mid-run-4, so the budget is 20 minutes.
+  test.setTimeout(SLOW_TEST_MS * 5);
+  // The pinned profile makes the replay sequence deterministic: B2 is a
+  // 'skills' lesson (not 'mix'), so each run shuffles the 11 skills and plays
+  // 6 — a replay does NOT prefer the unseen ones. The seed chain (profile +
+  // total attempts) covers all 11 after 5 replays (find-error last); the
+  // assert is ≤ so a planner change that covers faster does not break it
+  // (R105) — the loop's own cap of 8 is the hard bound.
+  await pinProfileUuid(page);
   await boot(page);
+  await unpinProfileUuid(page);
   await openPicker(page, touch);
   await pickLesson(page, 2, touch);
   await expect(page.locator('#dialog-content')).toContainText(
     'Bài 2 · Cộng, trừ trong phạm vi 1 000 · Câu 1/6',
   );
-  expect(await playLessonRun(page, touch)).toBe(6);
+  const played: (string | undefined)[] = [];
+  // B2 has eleven skills since boost 1A (six legacy + five new formats),
+  // so one 6-item run cannot earn the first star: it needs every skill
+  // attempted. Replay until all 11 have been played, then the star lands.
+  let runs = 0;
+  for (;;) {
+    expect(await playLessonRun(page, touch, (id) => played.push(id))).toBe(6);
+    runs++;
+    if (new Set(played).size >= 11) break;
+    if (runs >= 8) throw new Error('B2 did not cover all 11 skills in 8 runs');
+    const replay = page.locator('#lesson-replay');
+    if (touch) await replay.tap();
+    else await replay.click();
+    await expect(page.locator('#dialog-content')).toContainText(
+      'Bài 2 · Cộng, trừ trong phạm vi 1 000 · Câu 1/6',
+    );
+  }
+  expect(runs, 'pinned profile covers B2 in at most 5 replays').toBeLessThanOrEqual(5);
   const content = page.locator('#dialog-content');
   await expect(content).toContainText('Xong bài 2!');
   await expect(content).toContainText('☆☆☆ → ★☆☆');
   await expect(content).toContainText('+30 xu');
-  await expect(coins(page)).toHaveText('30');
+  await expect(coins(page)).toHaveText('150');
   const snap = await page.evaluate(() => window.__game?.snapshot());
-  for (const id of [
-    'add-sub-mental-round',
-    'add-sub-1000',
-    'add-sub-1000-wp',
-    'add-sub-1000-chain',
-    'add-sub-find-error',
-    'add-missing-digit',
-  ])
-    expect(snap?.factStats[`sk:${id}`]?.attempts ?? 0).toBeGreaterThanOrEqual(1);
+  for (const key of skillsOfLesson(2))
+    expect(snap?.factStats[key]?.attempts ?? 0, key).toBeGreaterThanOrEqual(1);
+  expect(new Set(played).size, 'all runs together play all 11 skills').toBe(11);
   // Back to the picker: B2 now shows 1 star.
   const back = page.locator('#lesson-back');
   if (touch) await back.tap();
@@ -407,23 +456,44 @@ test('run B7: two runs cover all 12 skills, stars show after the second, coins i
   await expect(page.locator('#dialog')).not.toHaveAttribute('open', '');
 });
 
-test('B2 four-digit answer: 700 + 300 types 1000 and completes the step', async ({
+test('B2 four-digit answer: a replay contains a 1000 answer and typing it completes the step', async ({
   page,
 }, info) => {
   const touch = isTouch(info);
   await pinProfileUuid(page);
   await boot(page);
+  await unpinProfileUuid(page);
   await openPicker(page, touch);
   await pickLesson(page, 2, touch);
   await expect(page.locator('#dialog-content')).toContainText(
     'Bài 2 · Cộng, trừ trong phạm vi 1 000 · Câu 1/6',
   );
-  const { items, sawThousand } = await playLessonRunTracked(page, touch);
-  expect(items).toBe(6);
-  expect(sawThousand, 'the run contains a 4-digit answer step').toBe(true);
+  // The pinned profile's run 1 has no >= 1000 answer (the 11-skill shuffle
+  // plays wp, compare-estimate, bar-model, chain, number-line, missing-digit);
+  // the 1000 answer (mental-round, round hundreds) lands in run 2. One run
+  // cannot earn the star with 11 skills, so no star assertion here — the
+  // run-B2 coverage test owns that. The run assert is ≤ so a planner change
+  // that surfaces the 1000 answer earlier does not break it (R105).
+  let sawThousand = false;
+  let runs = 0;
+  for (let r = 0; r < 4 && !sawThousand; r++) {
+    const { items, sawThousand: saw } = await playLessonRunTracked(page, touch);
+    expect(items).toBe(6);
+    sawThousand = saw;
+    runs++;
+    if (!sawThousand) {
+      const replay = page.locator('#lesson-replay');
+      if (touch) await replay.tap();
+      else await replay.click();
+      await expect(page.locator('#dialog-content')).toContainText(
+        'Bài 2 · Cộng, trừ trong phạm vi 1 000 · Câu 1/6',
+      );
+    }
+  }
+  expect(sawThousand, 'a B2 run contains a 4-digit answer step').toBe(true);
+  expect(runs, 'pinned profile finds the 1000 answer by run 2').toBeLessThanOrEqual(2);
   const content = page.locator('#dialog-content');
   await expect(content).toContainText('Xong bài 2!');
-  await expect(content).toContainText('☆☆☆ → ★☆☆');
   await waitDialogSettled(page);
   await page.locator('#close-dialog').click();
   await expect(page.locator('#dialog')).not.toHaveAttribute('open', '');
@@ -435,13 +505,27 @@ test('B2 pad fits six digits: typing 100000 shows all six, keys stay ≥ 44 px, 
   const touch = isTouch(info);
   await pinProfileUuid(page);
   await boot(page);
+  await unpinProfileUuid(page);
   await openPicker(page, touch);
   await pickLesson(page, 2, touch);
   // Play until the item whose number step answers 1000, then check the pad there.
+  // The pinned profile's run 1 has no >= 1000 number step; the 1000 answer
+  // (mental-round) lands in run 2 — replay until it appears.
+  let runs = 0;
   for (;;) {
     const state = await page.evaluate(() => window.__lesson?.state() ?? null);
     if (!state) throw new Error('lesson hook missing');
-    if (state.index >= state.total) throw new Error('1000-answer item not found in B2 run');
+    if (state.index >= state.total) {
+      runs++;
+      if (runs >= 3) throw new Error('1000-answer item not found in B2 run');
+      const replay = page.locator('#lesson-replay');
+      if (touch) await replay.tap();
+      else await replay.click();
+      await expect(page.locator('#dialog-content')).toContainText(
+        'Bài 2 · Cộng, trừ trong phạm vi 1 000 · Câu 1/6',
+      );
+      continue;
+    }
     if (state.kind === 'quiz') await solveQuizItem(page, touch);
     else {
       const steps = await page.evaluate(() => {

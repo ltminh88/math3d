@@ -12,6 +12,7 @@ import {
 } from '../reasoning/reasoning-step-answers';
 import type { ChoiceOption, Misconception, ReasoningStep } from '../reasoning/reasoning-types';
 import type { PracticeItem } from './practice-scene';
+import { ADD_SUB_BUG_EXPLAINERS } from './wrong-answer-add-sub-bug';
 import { explainArea } from './wrong-answer-area';
 import { explainCarry } from './wrong-answer-carry';
 import { explainClock } from './wrong-answer-clock';
@@ -77,6 +78,9 @@ const bugExplainables = new Map<Misconception, BugExplainer>();
 // data-only (wrong-answer-length imports no runtime value from this file), so
 // the merge cannot run into the Map's TDZ.
 for (const [bug, fn] of LENGTH_BUG_EXPLAINERS) bugExplainables.set(bug, fn);
+
+// Boost, Phase 1A: the add/sub lane's explainers, merged the same way.
+for (const [bug, fn] of ADD_SUB_BUG_EXPLAINERS) bugExplainables.set(bug, fn);
 
 export function registerBugExplainer(bug: Misconception, fn: BugExplainer): void {
   bugExplainables.set(bug, fn);

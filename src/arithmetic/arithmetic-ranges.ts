@@ -18,6 +18,12 @@ const FIXED_RANGES: Record<string, number> = {
   'add-sub-1000': RANGE_1000,
   'add-sub-1000-wp': RANGE_1000,
   'add-sub-1000-chain': RANGE_1000,
+  // Boost Phase 1A: the new formats practise to 1 000 at every tier.
+  'add-sub-bug-choice': RANGE_1000,
+  'add-sub-true-false': RANGE_1000,
+  'add-sub-compare-estimate': RANGE_1000,
+  'add-sub-number-line': RANGE_1000,
+  'add-sub-bar-model-wp': RANGE_1000,
   'add-4digit': RANGE_10000,
   'sub-4digit': RANGE_10000,
   'add-sub-10000-wp': RANGE_10000,

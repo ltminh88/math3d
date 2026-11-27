@@ -100,8 +100,9 @@ describe('skill catalog', () => {
 
   it('every new family has skills now (arithmetic landed in phase 09)', () => {
     // Arithmetic landed in phase 09 (B2, B54-55, B63-64), grew in phase 10
-    // (B23, B26, B36, B37) and in phase 11 (B56, B57, B70, B71): its
-    // thirty-seven skills are in the catalog, in entries order.
+    // (B23, B26, B36, B37) and in phase 11 (B56, B57, B70, B71), and gained
+    // five B2 formats in boost Phase 1A: its forty-two skills are in the
+    // catalog, in entries order.
     expect(skillsOfFamily('arithmetic')).toEqual([
       'add-sub-mental-round',
       'add-sub-1000',
@@ -140,6 +141,11 @@ describe('skill catalog', () => {
       'div-5d-1d-remainder',
       'mul-div-large-wp',
       'mul-chain-operators',
+      'add-sub-bug-choice',
+      'add-sub-true-false',
+      'add-sub-compare-estimate',
+      'add-sub-number-line',
+      'add-sub-bar-model-wp',
     ]);
     // Fraction landed in phase 12 (B14): its six skills are in the catalog.
     expect(skillsOfFamily('fraction')).toEqual([

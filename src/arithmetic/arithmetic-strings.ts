@@ -5,6 +5,7 @@ import { defineStrings } from '../i18n/i18n';
 import { formatDigitRuns, formatNumber } from '../numbers/numbers-format';
 import { renderPrompt as renderReasoningPrompt } from '../reasoning/reasoning-strings';
 import type { PromptRef } from '../reasoning/reasoning-types';
+import { addSubFormatStrings } from './add-sub-format-strings';
 
 const vi = {
   addCalc: 'Tính: {a} + {b}.',
@@ -92,6 +93,8 @@ const vi = {
   item_ml: 'ml',
   item_gram: 'g',
   item_riceKg: 'kg gạo',
+  // Boost Phase 1A formats (add-sub-format-strings.ts).
+  ...addSubFormatStrings.vi,
 };
 
 const en = {
@@ -185,6 +188,8 @@ const en = {
   item_ml: 'ml',
   item_gram: 'g',
   item_riceKg: 'kg of rice',
+  // Boost Phase 1A formats (add-sub-format-strings.ts).
+  ...addSubFormatStrings.en,
 };
 
 const ns = defineStrings('arithmetic', { vi, en });
