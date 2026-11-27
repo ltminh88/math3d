@@ -9,6 +9,7 @@
   `market-stage-plan.ts:132`, `numberfort-stage-plan.ts:174`, `cave-chamber-formats.ts:151`
 
 ## Overview
+- **Q3 decided (author): level fact rounds (field 17 facts, garden, numberfort) are in scope — vary order and presentation, never the same fact twice in a row; Leitner still picks which facts.**
 - Date: 2026-11-27
 - Description: every level that drops a skill item into a round (reasoning slot, market,
   numberfort, cave) draws it with `drawFreshItem` and the skill's `seen` list.

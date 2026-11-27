@@ -23,7 +23,7 @@
 ## Key Insights
 - Both run types share `practice-run.ts` → `skillPlan(id, box, run.rng)` → one change point.
 - `daily-planner.ts` is **not** touched (which skills = planner, which item = this phase).
-- Same-day daily replay keeps today's set (Q2): `seen` only holds items already answered,
+- **Q2 decided: same-day daily replay gives a NEW set** (mix a per-day replay counter into the daily seed; `seen` excludes earlier runs today). Old note, superseded: `seen` only holds items already answered,
   and a resumed run reuses the stored plan, so resume is unaffected.
 - Parity builds start from fixed saves with no `seen` → the first candidate is accepted →
   shots unchanged, unless a run repeats in itself (pool ≤ 6) — then the 2nd copy changes.

@@ -68,9 +68,13 @@ Lane B (muse-min, after English 6): 1 → 6 → 5 → 7 → 2 → 3. Lane A (mus
   `meas-len-*` (integers ≤ 1000, m↔mm from L2). Widening never crosses them; a sweep test guards.
 - **Strings:** every new noun/name/frame needs vi + en strings; reuse `i:` noun tables.
 
-## Unresolved questions (recommended answer in bold)
-1. Q1 Memory depth: **last 24 items per skill (≈ 4 lesson runs), device-only, not in save code.**
-2. Q2 Daily replay same day: keep the same set (today's rule)? **Yes, same set; avoid only items from earlier days.**
-3. Q3 Level fact rounds (field 17 facts…): leave as Leitner repetition? **Yes, out of scope.**
-4. Q4 Mental mul T1 range: allow tens 1–5 × 2–5 (product ≤ 100)? **Yes, keeps ≤100.**
-5. Q5 New story contexts: everyday Vietnamese school/home/market themes only? **Yes, own text.**
+## Decisions (author, 2026-11-27)
+1. Q1 Memory depth: last 24 items per skill (≈ 4 lesson runs), device-only, not in save code.
+2. Q2 Daily replay same day: **a replay must give a NEW set** (author: "phải thay đổi sau mỗi
+   lần vào chơi lại"). The daily seed mixes in a replay counter; `seen` also excludes items from
+   today's earlier runs. Phase 3 owns this.
+3. Q3 Level fact rounds (field 17 facts…): **in scope — make them more varied** (author: "cần đa
+   dạng hơn"). Keep Leitner choice of WHICH fact; vary order, presentation and avoid the same
+   fact twice in a row. Phase 4 owns this (field/garden/numberfort fact rounds).
+4. Q4 Mental mul T1: tens 1–5 × 2–5, product ≤ 100. Yes.
+5. Q5 New story contexts: everyday Vietnamese school/home/market themes, own text. Yes.
