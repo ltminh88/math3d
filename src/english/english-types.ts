@@ -38,7 +38,9 @@ export type EnglishPattern = (typeof ENGLISH_PATTERNS)[number];
 
 /**
  * The 41 `en-*` skill ids: 7 letter blocks × (letters + sounds + words),
- * alphabet order, 12 topics, 7 sentence patterns.
+ * alphabet order, 12 topics, 7 sentence patterns — plus the 29 `en-look-*`
+ * ids of the Look 1 book (two-modes Phase 1 pins them here; Phase 4 fills
+ * the content and registers the entries — they must not surface early).
  */
 export type EnglishSkillId =
   | `en-letters-${EnglishLetterBlock}`
@@ -46,7 +48,17 @@ export type EnglishSkillId =
   | `en-words-${EnglishLetterBlock}`
   | 'en-alphabet-order'
   | `en-topic-${EnglishTopic}`
-  | `en-pattern-${EnglishPattern}`;
+  | `en-pattern-${EnglishPattern}`
+  | 'en-look-starter-numbers'
+  | 'en-look-starter-colors'
+  | 'en-look-starter-greetings'
+  | `en-look-u${1 | 2 | 3 | 4 | 5 | 6 | 7 | 8 | 9 | 10 | 11 | 12}-words`
+  | `en-look-u${1 | 2 | 3 | 4 | 5 | 6 | 7 | 8 | 9 | 10 | 11 | 12}-pattern`
+  | 'en-look-phonics-initial'
+  | 'en-look-phonics-short-vowels';
+
+/** The English books: CEC (the island) and Look 1 (two-modes). */
+export type EnglishBookId = 'cec' | 'look';
 
 export type EnglishItemKind =
   | 'listen-pick-picture'
@@ -151,10 +163,13 @@ export interface EnglishUnit {
 /**
  * A book pack (or a synthetic fixture): version 1, optional stage, the items,
  * and optional image data by id (the `'images'` part of the pack contract).
+ * `book` names the book the pack belongs to (absent = `cec`, the island);
+ * the validator checks the items against that book's skill ids.
  */
 export interface EnglishPack {
   readonly version: 1;
   readonly stage?: number;
+  readonly book?: EnglishBookId;
   readonly items: readonly EnglishItem[];
   readonly images?: Readonly<Record<string, string>>;
 }

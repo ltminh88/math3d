@@ -3,6 +3,7 @@
 // and read the current item's answer. Installed from the test-debug hook;
 // the run commits through the same level path the host uses (levelId 'island').
 import { type EnglishExpected, expectedOf } from '../../english/engine/answer-check';
+import { ENGLISH_BOOKS } from '../../english/english-books';
 import { mulberry32 } from '../../learning/seeded-rng';
 import { planSession } from '../../learning/session-planner';
 import { createSessionRecorder } from '../../learning/session-recorder';
@@ -49,7 +50,7 @@ export function createIslandTestHook(): IslandTestHook {
       const rng = mulberry32(seed ?? sessionNo);
       const recorder = createSessionRecorder({
         profileId: store.getSnapshot().profile.id,
-        levelId: 'island',
+        levelId: ENGLISH_BOOKS.cec.levelId,
         sessionNo,
         stage,
         getStat: (key) => stats()[key],
@@ -64,18 +65,23 @@ export function createIslandTestHook(): IslandTestHook {
           planSession({ stats: stats(), pool, tables: [], sessionNo, rng, length }),
         record: (outcome) => recorder.recordQuestion(outcome),
       };
-      void startEnglishRun({ stage, ui: container, learning, signal: controller.signal }).then(
-        (result) => {
-          // R64: the run draws no finish screen (the level shell owns it), so the
-          // hook shows a minimal summary line itself for the spec to assert.
-          const summary = document.createElement('p');
-          summary.className = 'english-test-summary';
-          summary.textContent = `Bạn đúng ${result.correctCount}/${result.roundsPlayed} câu.`;
-          container.appendChild(summary);
-          const commit = levelRunToCommit(recorder, result);
-          if (commit) void commitLevelRun(commit, firstCompletionBonus('island', commit));
-        },
-      );
+      void startEnglishRun({
+        book: ENGLISH_BOOKS.cec,
+        stage,
+        ui: container,
+        learning,
+        signal: controller.signal,
+      }).then((result) => {
+        // R64: the run draws no finish screen (the level shell owns it), so the
+        // hook shows a minimal summary line itself for the spec to assert.
+        const summary = document.createElement('p');
+        summary.className = 'english-test-summary';
+        summary.textContent = `Bạn đúng ${result.correctCount}/${result.roundsPlayed} câu.`;
+        container.appendChild(summary);
+        const commit = levelRunToCommit(recorder, result);
+        if (commit)
+          void commitLevelRun(commit, firstCompletionBonus(ENGLISH_BOOKS.cec.levelId, commit));
+      });
     },
     abort() {
       controller?.abort();

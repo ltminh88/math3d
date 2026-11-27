@@ -3,6 +3,8 @@
 // (so it works offline). When IndexedDB is blocked (private mode), the pack
 // lives in memory for the session instead. A 401 clears the stored passphrase
 // (the caller does that); the pack itself stays for offline play.
+// Two-modes Phase 1: one record per book, keyed by the book's pack key —
+// CEC keeps `'current'` (an old record under it still loads as CEC).
 import type { EnglishPack } from '../english-types';
 
 export interface StoredEnglishPack {
@@ -39,7 +41,8 @@ export function createMemoryPackStore(): PackStore {
 
 const DB_NAME = 'english-pack-db';
 const STORE_NAME = 'pack';
-const KEY = 'current';
+/** The default IndexedDB key: CEC's `'current'` (back-compat). */
+const DEFAULT_PACK_KEY = 'current';
 
 function openDb(): Promise<IDBDatabase> {
   return new Promise((resolve, reject) => {
@@ -68,12 +71,12 @@ function txDone(tx: IDBTransaction): Promise<void> {
 }
 
 /** IndexedDB store (browser only; throws when IndexedDB is unavailable). */
-export function createIndexedDbPackStore(): PackStore {
+export function createIndexedDbPackStore(packKey = DEFAULT_PACK_KEY): PackStore {
   const loadStored = async (): Promise<StoredEnglishPack | null> => {
     const db = await openDb();
     try {
       const tx = db.transaction(STORE_NAME, 'readonly');
-      const request = tx.objectStore(STORE_NAME).get(KEY);
+      const request = tx.objectStore(STORE_NAME).get(packKey);
       const value = await idbRequest(request);
       await txDone(tx);
       return (value ?? null) as StoredEnglishPack | null;
@@ -85,7 +88,7 @@ export function createIndexedDbPackStore(): PackStore {
     const db = await openDb();
     try {
       const tx = db.transaction(STORE_NAME, 'readwrite');
-      tx.objectStore(STORE_NAME).put(value, KEY);
+      tx.objectStore(STORE_NAME).put(value, packKey);
       await txDone(tx);
     } finally {
       db.close();
@@ -95,7 +98,7 @@ export function createIndexedDbPackStore(): PackStore {
     const db = await openDb();
     try {
       const tx = db.transaction(STORE_NAME, 'readwrite');
-      tx.objectStore(STORE_NAME).delete(KEY);
+      tx.objectStore(STORE_NAME).delete(packKey);
       await txDone(tx);
     } finally {
       db.close();
@@ -116,10 +119,10 @@ export function createIndexedDbPackStore(): PackStore {
  * Open the real store, falling back to memory when IndexedDB is blocked or
  * missing (private mode, old browsers, unit tests under node).
  */
-export async function openPackStore(): Promise<PackStore> {
+export async function openPackStore(packKey = DEFAULT_PACK_KEY): Promise<PackStore> {
   if (typeof indexedDB === 'undefined') return createMemoryPackStore();
   try {
-    const store = createIndexedDbPackStore();
+    const store = createIndexedDbPackStore(packKey);
     await store.load();
     return store;
   } catch {

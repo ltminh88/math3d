@@ -91,4 +91,28 @@ describe('isEnglishPack', () => {
     expect(isEnglishPack({ version: 1, items: [fill] })).toBe(true);
     expect(isEnglishPack({ version: 1, items: [{ ...fill, question: null }] })).toBe(false);
   });
+
+  it('validates items against the pack book (absent = cec)', () => {
+    const lookItem = {
+      kind: 'letter-pick',
+      skillId: 'en-look-starter-numbers',
+      source: 'own',
+      prompt: 'one',
+      choices: ['1', '2'],
+      answer: '1',
+    };
+    const cecItem = {
+      kind: 'letter-pick',
+      skillId: 'en-letters-a-d',
+      source: 'own',
+      prompt: 'apple',
+      choices: ['a', 'b'],
+      answer: 'a',
+    };
+    expect(isEnglishPack({ version: 1, book: 'look', items: [lookItem] })).toBe(true);
+    expect(isEnglishPack({ version: 1, book: 'look', items: [cecItem] })).toBe(false);
+    expect(isEnglishPack({ version: 1, items: [lookItem] })).toBe(false);
+    expect(isEnglishPack({ version: 1, book: 'cec', items: [cecItem] })).toBe(true);
+    expect(isEnglishPack({ version: 1, book: 'nope', items: [cecItem] })).toBe(false);
+  });
 });

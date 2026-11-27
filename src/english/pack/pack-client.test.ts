@@ -72,4 +72,10 @@ describe('fetchEnglishPack', () => {
     await fetchEnglishPack('x', { stage: 3 }, fetchFn);
     expect(fetchFn.mock.calls[0]?.[1].body as string).toContain('"stage":3');
   });
+
+  it('sends the book when asked', async () => {
+    const fetchFn = vi.fn().mockResolvedValue(respond(200, { ok: true, pack: SYNTHETIC_PACK }));
+    await fetchEnglishPack('x', { book: 'look' }, fetchFn);
+    expect(fetchFn.mock.calls[0]?.[1].body as string).toContain('"book":"look"');
+  });
 });
