@@ -164,6 +164,9 @@
   color: #fff;
   font-size: 13px;
   font-weight: 700;
+  /* Decorative and aria-hidden: never intercept a tap or a hit test, so the
+   * button's centre still resolves to the button itself. */
+  pointer-events: none;
 }
 
 .kit-match__left[data-pair="1"],
