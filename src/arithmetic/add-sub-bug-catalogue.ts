@@ -12,9 +12,15 @@
 // (smaller-from-larger, borrow-no-decrement, zero-borrow-skip); bugsFor keeps
 // the first in catalogue order. Per-bug function tests assert each rule on its
 // own research example, independently of tagging order.
+//
+// The bug values live in two files (R103.2, the 200-line limit): the add-only
+// bugs and the shared helpers in add-sub-bug-catalogue-add.ts, the sub-only
+// bugs in add-sub-bug-catalogue-sub.ts. This file is the public API: the
+// types, the order, and the dispatch.
 
 import type { Misconception } from '../reasoning/reasoning-types';
-import { wrongAddByForgotCarry, wrongSubByNoBorrow } from './arithmetic-distractors';
+import { addBugValue } from './add-sub-bug-catalogue-add';
+import { subBugValue } from './add-sub-bug-catalogue-sub';
 
 export type AddSubBug = Extract<
   Misconception,
@@ -41,168 +47,12 @@ export const ADD_SUB_BUG_ORDER: readonly AddSubBug[] = [
 
 export type AddSubOp = '+' | '−';
 
-/** Least-significant-first digits of a non-negative integer. */
-const digitsOf = (n: number): readonly number[] => {
-  if (n === 0) return [0];
-  const out: number[] = [];
-  for (let rest = Math.floor(n); rest > 0; rest = Math.floor(rest / 10)) {
-    out.push(rest % 10);
-  }
-  return out;
-};
-
-const fromDigits = (digits: readonly number[]): number => {
-  let value = 0;
-  for (let i = digits.length - 1; i >= 0; i--) value = value * 10 + (digits[i] ?? 0);
-  return value;
-};
-
-/** Add, but the carry out of the units column is dropped (forced to 0). */
-const carryNotAdded = (a: number, b: number): number => {
-  const da = digitsOf(a);
-  const db = digitsOf(b);
-  const n = Math.max(da.length, db.length);
-  const out: number[] = [];
-  let carry = 0;
-  for (let i = 0; i < n; i++) {
-    const sum = (da[i] ?? 0) + (db[i] ?? 0) + carry;
-    out.push(sum % 10);
-    carry = i === 0 ? 0 : Math.floor(sum / 10);
-  }
-  if (carry > 0) out.push(carry);
-  return fromDigits(out);
-};
-
-/** Subtract, but the borrow-in is never subtracted from the lending digit. */
-const borrowNoDecrement = (a: number, b: number): number => {
-  const da = digitsOf(a);
-  const db = digitsOf(b);
-  const n = Math.max(da.length, db.length);
-  const out: number[] = [];
-  let borrowIn = false;
-  for (let i = 0; i < n; i++) {
-    const daDigit = da[i] ?? 0;
-    const dbDigit = db[i] ?? 0;
-    out.push((((daDigit - dbDigit + (borrowIn ? 10 : 0)) % 10) + 10) % 10);
-    borrowIn = daDigit - dbDigit < 0;
-  }
-  return fromDigits(out);
-};
-
-/**
- * Subtract, but when a borrow-in hits a zero digit of the minuend the digit is
- * written as the subtrahend digit and the borrow is absorbed (no borrow out).
- */
-const zeroBorrowSkip = (a: number, b: number): number => {
-  const da = digitsOf(a);
-  const db = digitsOf(b);
-  const n = Math.max(da.length, db.length);
-  const out: number[] = [];
-  let borrowIn = false;
-  for (let i = 0; i < n; i++) {
-    const daDigit = da[i] ?? 0;
-    const dbDigit = db[i] ?? 0;
-    if (borrowIn && daDigit === 0) {
-      out.push(dbDigit);
-      borrowIn = false;
-      continue;
-    }
-    const raw: number = daDigit - dbDigit - (borrowIn ? 1 : 0);
-    out.push(((raw % 10) + 10) % 10);
-    borrowIn = raw < 0;
-  }
-  return fromDigits(out);
-};
-
-/** Subtract digit by digit; a zero minuend digit stays zero. */
-const zeroMinusNZero = (a: number, b: number): number => {
-  const da = digitsOf(a);
-  const db = digitsOf(b);
-  const n = Math.max(da.length, db.length);
-  const out: number[] = [];
-  for (let i = 0; i < n; i++) {
-    const daDigit = da[i] ?? 0;
-    out.push(daDigit === 0 ? 0 : Math.abs(daDigit - (db[i] ?? 0)));
-  }
-  return fromDigits(out);
-};
-
-/**
- * The shorter operand is shifted left by the length difference (×10^d), i.e.
- * its units are lined up under the longer operand's tens/hundreds. Only
- * applies when the operand lengths differ; for subtraction only when the
- * result is >= 0 (otherwise the value is the correct answer and bugsFor
- * filters it out).
- */
-const misalignedColumns = (a: number, b: number, op: AddSubOp): number => {
-  const lenA = String(a).length;
-  const lenB = String(b).length;
-  const d = Math.abs(lenA - lenB);
-  if (d === 0) return op === '+' ? a + b : a - b;
-  const factor = 10 ** d;
-  const value =
-    lenA > lenB
-      ? op === '+'
-        ? a + b * factor
-        : a - b * factor
-      : op === '+'
-        ? a * factor + b
-        : a * factor - b;
-  return value < 0 ? (op === '+' ? a + b : a - b) : value;
-};
-
-/**
- * Correct computation except the carry/borrow out of column 1 is forced to 0
- * (the second regroup is dropped). With fewer than two regroups this is the
- * correct value.
- */
-const secondRegroupDropped = (a: number, b: number, op: AddSubOp): number => {
-  const da = digitsOf(a);
-  const db = digitsOf(b);
-  const n = Math.max(da.length, db.length);
-  const out: number[] = [];
-  let carry = 0;
-  for (let i = 0; i < n; i++) {
-    const daDigit = da[i] ?? 0;
-    const dbDigit = db[i] ?? 0;
-    if (op === '+') {
-      const sum = daDigit + dbDigit + carry;
-      out.push(sum % 10);
-      carry = i === 1 ? 0 : Math.floor(sum / 10);
-    } else {
-      const raw = daDigit - dbDigit - carry;
-      out.push(((raw % 10) + 10) % 10);
-      carry = i === 1 ? 0 : raw < 0 ? 1 : 0;
-    }
-  }
-  if (op === '+' && carry > 0) out.push(carry);
-  return fromDigits(out);
-};
-
 /**
  * The wrong value a child with this bug produces for `a op b`. A bug from the
  * other operation returns the correct value (so bugsFor filters it out).
  */
-export const bugValue = (bug: AddSubBug, a: number, b: number, op: AddSubOp): number => {
-  switch (bug) {
-    case 'forgot-carry':
-      return op === '+' ? wrongAddByForgotCarry(a, b) : a - b;
-    case 'carry-not-added':
-      return op === '+' ? carryNotAdded(a, b) : a - b;
-    case 'smaller-from-larger':
-      return op === '−' ? wrongSubByNoBorrow(a, b) : a + b;
-    case 'borrow-no-decrement':
-      return op === '−' ? borrowNoDecrement(a, b) : a + b;
-    case 'zero-borrow-skip':
-      return op === '−' ? zeroBorrowSkip(a, b) : a + b;
-    case 'zero-minus-n-zero':
-      return op === '−' ? zeroMinusNZero(a, b) : a + b;
-    case 'misaligned-columns':
-      return misalignedColumns(a, b, op);
-    case 'second-regroup-dropped':
-      return secondRegroupDropped(a, b, op);
-  }
-};
+export const bugValue = (bug: AddSubBug, a: number, b: number, op: AddSubOp): number =>
+  op === '+' ? addBugValue(bug, a, b) : subBugValue(bug, a, b);
 
 export interface BugHit {
   readonly bug: AddSubBug;
