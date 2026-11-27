@@ -1,11 +1,12 @@
-// Compare / order / choose-the-unit generators (boost, Phase 1B). Order items use
-// a choice step until 2B lands the `order` step kind — the options are full
-// orderings, so the item is playable today and the scene can arrive later.
+// Compare / order / choose-the-unit generators (boost, Phase 1B). Order items
+// use the `order` step kind (2B) — the child taps the tiles smallest first.
+// Every item carries its `length-ladder` scene (2B).
 import { pick, type Rng, randInt, shuffle } from '../learning/seeded-rng';
 import type { SkillTier } from '../learning/skill-tiers';
 import { type Candidate, reasoningItem, ref } from '../reasoning/reasoning-distractors';
-import type { Misconception, ReasoningItem } from '../reasoning/reasoning-types';
+import type { Misconception } from '../reasoning/reasoning-types';
 import { lenTextChoiceStep } from './length-bug-catalogue';
+import { type LengthItem, lengthItem, plainLadderScene } from './length-scene-types';
 import { formatQty, LENGTH_LADDER, type LengthUnit, MM_PER_UNIT } from './length-units';
 
 type Qty = { readonly n: number; readonly unit: LengthUnit; readonly mm: number };
@@ -23,7 +24,7 @@ function twoUnits(rng: Rng, ladder: number): readonly [LengthUnit, LengthUnit] {
 }
 
 /** meas-len-compare: < = > across units. */
-export const measLenCompare = (rng: Rng, tier: SkillTier, ladder: number): ReasoningItem => {
+export const measLenCompare = (rng: Rng, tier: SkillTier, ladder: number): LengthItem => {
   const [ua, ub] = twoUnits(rng, ladder);
   const stepA = MM_PER_UNIT[ua];
   const aMm = randInt(rng, Math.ceil(20 / stepA), Math.floor(1000 / stepA)) * stepA;
@@ -57,13 +58,16 @@ export const measLenCompare = (rng: Rng, tier: SkillTier, ladder: number): Reaso
         ? 'ignore-unit'
         : 'unit-direction') as Misconception,
   }));
-  return reasoningItem('meas-len-compare', tier, ref('lenCompare', { a: a.n, ua, b: b.n, ub }), [
-    lenTextChoiceStep(rng, ref('lenPickSign'), sign, candidates, (s) => ref('lenSign', { s })),
-  ]);
+  return lengthItem(
+    reasoningItem('meas-len-compare', tier, ref('lenCompare', { a: a.n, ua, b: b.n, ub }), [
+      lenTextChoiceStep(rng, ref('lenPickSign'), sign, candidates, (s) => ref('lenSign', { s })),
+    ]),
+    plainLadderScene(),
+  );
 };
 
-/** Three quantities, smallest first; the wrong orders name the bug. */
-export const measLenOrder = (rng: Rng, tier: SkillTier, ladder: number): ReasoningItem => {
+/** Three quantities, smallest first; the child taps the tiles in order. */
+export const measLenOrder = (rng: Rng, tier: SkillTier, ladder: number): LengthItem => {
   const pool: readonly LengthUnit[] = ladder < 2 ? ['dm', 'cm', 'mm'] : ['m', 'dm', 'cm', 'mm'];
   const mms = new Set<number>();
   while (mms.size < 3) mms.add(randInt(rng, 1, 100) * 10);
@@ -76,37 +80,21 @@ export const measLenOrder = (rng: Rng, tier: SkillTier, ladder: number): Reasoni
     return qty(mm / MM_PER_UNIT[unit], unit);
   });
   const shown = shuffle(rng, quantities);
-  const seqOf = (qs: readonly Qty[]): string => qs.map((q) => formatQty(q.n, q.unit)).join(', ');
   const labelFor = (qs: readonly Qty[]): { a: string; b: string; c: string } => ({
     a: formatQty(qs[0]?.n ?? 0, qs[0]?.unit ?? 'cm'),
     b: formatQty(qs[1]?.n ?? 0, qs[1]?.unit ?? 'cm'),
     c: formatQty(qs[2]?.n ?? 0, qs[2]?.unit ?? 'cm'),
   });
   const correct = [...quantities].sort((x, y) => x.mm - y.mm);
-  const reversed = [...correct].reverse();
-  const bare = [...quantities].sort((x, y) => x.n - y.n);
-  const wrongs: { qs: readonly Qty[]; bug: Misconception }[] = [];
-  const addWrong = (qs: readonly Qty[], bug: Misconception): void => {
-    if (seqOf(qs) !== seqOf(correct) && !wrongs.some((w) => seqOf(w.qs) === seqOf(qs)))
-      wrongs.push({ qs, bug });
-  };
-  addWrong(reversed, 'unit-direction');
-  addWrong(bare, 'ignore-unit');
-  if (wrongs.length < 2) {
-    // Bare order agreed with the true order: swap the first two as a near miss.
-    const swapped = [correct[1], correct[0], correct[2]] as [Qty, Qty, Qty];
-    addWrong(swapped, 'near-miss');
-  }
-  const options = wrongs.slice(0, 2).map((w) => ({
-    value: seqOf(w.qs),
-    misconception: w.bug,
-  }));
-  return reasoningItem('meas-len-order', tier, ref('lenOrder', labelFor(shown)), [
-    lenTextChoiceStep(rng, ref('lenPickOrder'), seqOf(correct), options, (s) => {
-      const qs = [correct, ...wrongs.map((w) => w.qs)].find((o) => seqOf(o) === s) ?? correct;
-      return ref('lenSeq3', labelFor(qs));
-    }),
-  ]);
+  // Tiles in display order; the answer lists tile indices smallest first.
+  const tiles = shown.map((q) => ref('lenQty', { n: q.n, unit: q.unit }));
+  const answer = correct.map((q) => shown.indexOf(q));
+  return lengthItem(
+    reasoningItem('meas-len-order', tier, ref('lenOrder', labelFor(shown)), [
+      { kind: 'order', prompt: ref('lenPickOrder'), tiles, answer },
+    ]),
+    plainLadderScene(),
+  );
 };
 
 interface LenObject {
@@ -136,15 +124,12 @@ export const OBJECTS: readonly LenObject[] = [
 ];
 
 /** meas-len-choose-unit: an everyday object, pick its unit (mm objects at L2+). */
-export const measLenChooseUnit = (rng: Rng, tier: SkillTier, ladder: number): ReasoningItem => {
+export const measLenChooseUnit = (rng: Rng, tier: SkillTier, ladder: number): LengthItem => {
   const pool = ladder >= 2 ? OBJECTS : OBJECTS.filter((o) => o.unit !== 'mm');
   const obj = pick(rng, pool);
   const wrong = (['m', 'dm', 'cm', 'mm'] as const).filter((u) => u !== obj.unit);
-  return reasoningItem(
-    'meas-len-choose-unit',
-    tier,
-    ref('lenChooseObj', { item: obj.item, n: obj.n }),
-    [
+  return lengthItem(
+    reasoningItem('meas-len-choose-unit', tier, ref('lenChooseObj', { item: obj.item, n: obj.n }), [
       lenTextChoiceStep(
         rng,
         ref('lenPickUnit'),
@@ -152,6 +137,7 @@ export const measLenChooseUnit = (rng: Rng, tier: SkillTier, ladder: number): Re
         wrong.map((u) => ({ value: u, misconception: 'wrong-unit' as const })),
         (u) => ref('lenUnit', { unit: u }),
       ),
-    ],
+    ]),
+    plainLadderScene(),
   );
 };

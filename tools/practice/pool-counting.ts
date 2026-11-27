@@ -28,6 +28,12 @@ const stepSig = (step: ReasoningStep): string => {
       step.fix ? `|fix=${step.fix.answer}` : ''
     }`;
   if (step.kind === 'set-clock') return `c:${refSig(step.prompt)}=${step.h}:${step.m}`;
+  if (step.kind === 'order')
+    return `o:${refSig(step.prompt)}|${step.tiles.map(refSig).join('+')}=${step.answer.join(',')}`;
+  if (step.kind === 'match')
+    return `m:${refSig(step.prompt)}|${step.left.map(refSig).join('+')}|${step.right
+      .map((o) => refSig(o.label))
+      .join('+')}=${step.pairs.join(',')}`;
   const correct = step.options
     .filter((o) => o.correct)
     .map((o) => refSig(o.label))

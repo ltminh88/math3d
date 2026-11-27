@@ -4,7 +4,12 @@
 // operation (no rung 4).
 import type { HintState } from '../../learning/hint-ladder';
 import type { QuestionOutcome, WrongAttempt } from '../../learning/session-recorder';
-import { playableSteps, type StepAnswer } from '../../reasoning/reasoning-step-answers';
+import {
+  firstWrongPair,
+  orderBug,
+  playableSteps,
+  type StepAnswer,
+} from '../../reasoning/reasoning-step-answers';
 import type { Misconception } from '../../reasoning/reasoning-types';
 import { reasoningHint } from './reasoning-round-hints';
 import type { ReasoningRoundPlan } from './reasoning-round-slot';
@@ -66,6 +71,12 @@ export class ReasoningRoundFlow {
       // A wrong choice pick that stands for a bug fills only the bug bank.
       const bug = this.chosenBug(stepIndex, answer);
       if (bug !== undefined) this.questionBugs.add(bug);
+    } else if (Array.isArray(answer)) {
+      // A wrong match pairing or order that stands for a bug fills only the
+      // bug bank (boost 2B, R90.1/R90.2) — the same rule as a wrong choice
+      // pick (R79): no attempt, no box move.
+      const bug = this.listBug(stepIndex, answer);
+      if (bug !== undefined) this.questionBugs.add(bug);
     }
     if (!this.budget.miss()) return { verdict: 'wrong' };
     return this.advance('revealed');
@@ -76,6 +87,15 @@ export class ReasoningRoundFlow {
     const step = playableSteps(this.plan.item)[stepIndex];
     if (step?.kind !== 'choice') return undefined;
     return step.options.find((o) => o.id === optionId)?.misconception;
+  }
+
+  /** The misconception of a wrong match pairing or order, if it stands for one. */
+  private listBug(stepIndex: number, answer: readonly unknown[]): Misconception | undefined {
+    const step = playableSteps(this.plan.item)[stepIndex];
+    if (!answer.every((n): n is number => typeof n === 'number')) return undefined;
+    if (step?.kind === 'match') return firstWrongPair(step, answer)?.misconception;
+    if (step?.kind === 'order') return orderBug(step, answer);
+    return undefined;
   }
 
   /** The live step is answered or shown: the next step, or the round's outcome after the last. */

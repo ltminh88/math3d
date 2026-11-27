@@ -3,7 +3,7 @@
 import { pick, type Rng, randInt } from '../learning/seeded-rng';
 import type { SkillTier } from '../learning/skill-tiers';
 import { type Candidate, numberStep, reasoningItem, ref } from '../reasoning/reasoning-distractors';
-import type { Misconception, ReasoningItem } from '../reasoning/reasoning-types';
+import type { Misconception } from '../reasoning/reasoning-types';
 import {
   bugMixedPair,
   bugMixedValue,
@@ -11,6 +11,7 @@ import {
   lenQtyChoiceStep,
   lenTextChoiceStep,
 } from './length-bug-catalogue';
+import { type LengthItem, ladderScene, lengthItem } from './length-scene-types';
 import { formatMixed, type LengthUnit, MM_PER_UNIT, mixedToMm } from './length-units';
 
 /** A mixed value: `big` bigUnit + `small` smallUnit (small < one bigUnit). */
@@ -48,10 +49,11 @@ function pickMixed(rng: Rng, ladder: number): Mixed {
 }
 
 /** meas-len-mixed: 1 m 5 cm <-> 105 cm, both ways. */
-export const measLenMixed = (rng: Rng, tier: SkillTier, ladder: number): ReasoningItem => {
+export const measLenMixed = (rng: Rng, tier: SkillTier, ladder: number): LengthItem => {
   const m = pickMixed(rng, ladder);
   const to: LengthUnit = m.smallUnit;
   const total = mixedMm(m) / MM_PER_UNIT[to];
+  const scene = ladderScene(m.bigUnit, m.smallUnit);
   const storyToSingle = ref('lenMixedToSingle', {
     a: m.big,
     ua: m.bigUnit,
@@ -62,9 +64,10 @@ export const measLenMixed = (rng: Rng, tier: SkillTier, ladder: number): Reasoni
   // Direction A: mixed -> single. Number step at tier 1, bug choices above.
   if (tier === 1 || rng() < 0.5) {
     if (tier === 1)
-      return reasoningItem('meas-len-mixed', tier, storyToSingle, [
-        numberStep(ref('askNumber'), total),
-      ]);
+      return lengthItem(
+        reasoningItem('meas-len-mixed', tier, storyToSingle, [numberStep(ref('askNumber'), total)]),
+        scene,
+      );
     const candidates = dedupeCandidates(
       (['mixed-concat', 'mixed-drop-big', 'unit-factor'] as const).flatMap((bug) => {
         const v = bugMixedValue(bug, m.big, m.bigUnit, m.small, m.smallUnit, to);
@@ -72,9 +75,12 @@ export const measLenMixed = (rng: Rng, tier: SkillTier, ladder: number): Reasoni
       }),
       total,
     );
-    return reasoningItem('meas-len-mixed', tier, storyToSingle, [
-      lenQtyChoiceStep(rng, ref('askNumber'), total, to, candidates),
-    ]);
+    return lengthItem(
+      reasoningItem('meas-len-mixed', tier, storyToSingle, [
+        lenQtyChoiceStep(rng, ref('askNumber'), total, to, candidates),
+      ]),
+      scene,
+    );
   }
   // Direction B: single -> mixed. Options are mixed pairs, as text.
   const story = ref('lenMixedFromSingle', { n: total, from: to, to: m.bigUnit, to2: m.smallUnit });
@@ -97,9 +103,12 @@ export const measLenMixed = (rng: Rng, tier: SkillTier, ladder: number): Reasoni
     seen.add(label);
     candidates.push({ value: w.pair, misconception: w.bug });
   }
-  return reasoningItem('meas-len-mixed', tier, story, [
-    lenTextChoiceStep(rng, ref('lenPickMixed'), correctPair, candidates.slice(0, 3), (p) =>
-      ref('lenMixed', { a: p.big, ua: m.bigUnit, b: p.small, ub: m.smallUnit }),
-    ),
-  ]);
+  return lengthItem(
+    reasoningItem('meas-len-mixed', tier, story, [
+      lenTextChoiceStep(rng, ref('lenPickMixed'), correctPair, candidates.slice(0, 3), (p) =>
+        ref('lenMixed', { a: p.big, ua: m.bigUnit, b: p.small, ub: m.smallUnit }),
+      ),
+    ]),
+    scene,
+  );
 };

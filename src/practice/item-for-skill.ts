@@ -20,6 +20,7 @@ import {
 import { isMoneySkill, moneyItemForSkill } from '../money/money-item-for-skill';
 import { isNumberSkill, numberItemForSkill } from '../numbers/number-item-for-skill';
 import { isReasoningSkill, reasoningItemForSkill } from '../reasoning/reasoning-item-for-skill';
+import { STEP_KIT_FIXTURE_ID, stepKitFixtureItem } from '../reasoning/step-kit-fixture';
 import { isTimeSkill, timeItemForSkill } from '../time/time-item-for-skill';
 import { hasSceneRenderer } from '../ui/dialog-scenes/dialog-scene-registry';
 import type { PracticeItem } from './practice-scene';
@@ -31,6 +32,9 @@ export function familyOfSkill(id: string): SkillFamily | undefined {
 
 /** Pure and deterministic for a seeded `rng`; throws only for unknown ids. */
 export function itemForSkill(id: string, rng: Rng, tier: SkillTier): PracticeItem {
+  // Dev-only fixture (boost 2B): the step-kit e2e spec mounts it to drive the
+  // order + match kinds. Never in production builds, never in the catalog.
+  if (id === STEP_KIT_FIXTURE_ID && import.meta.env.MODE === 'test') return stepKitFixtureItem();
   if (isReasoningSkill(id)) return reasoningItemForSkill(id, rng, tier);
   if (isGeometrySkill(id)) return geometryItemForSkill(id, rng, tier);
   if (isLengthSkill(id)) return lengthItemForSkill(id, rng, tier);

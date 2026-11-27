@@ -13,7 +13,9 @@ export type WorkshopPlannedStep =
   | { kind: 'choice'; index: number; label: string; wrongIndex: number }
   | { kind: 'multi'; indexes: number[] }
   | { kind: 'verdict'; answer: boolean }
-  | { kind: 'set-clock'; h: number; m: number };
+  | { kind: 'set-clock'; h: number; m: number }
+  | { kind: 'order'; tiles: string[]; answer: number[] }
+  | { kind: 'match'; left: string[]; right: string[]; pairs: number[] };
 
 export interface WorkshopTestHook {
   state(): {
@@ -60,6 +62,19 @@ export function installWorkshopTestHook(c: WorkshopRoundController): () => void 
           if (step.kind === 'number') return { kind: 'number', answer: step.answer };
           if (step.kind === 'verdict') return { kind: 'verdict', answer: step.answer };
           if (step.kind === 'set-clock') return { kind: 'set-clock', h: step.h, m: step.m };
+          if (step.kind === 'order')
+            return {
+              kind: 'order',
+              tiles: step.tiles.map((t) => renderMeasurementPrompt(t)),
+              answer: [...step.answer],
+            };
+          if (step.kind === 'match')
+            return {
+              kind: 'match',
+              left: step.left.map((t) => renderMeasurementPrompt(t)),
+              right: step.right.map((o) => renderMeasurementPrompt(o.label)),
+              pairs: [...step.pairs],
+            };
           const right = step.options.flatMap((o, i) => (o.correct ? [i] : []));
           if (step.kind === 'multi') return { kind: 'multi', indexes: right };
           const index = right[0] ?? 0;

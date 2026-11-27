@@ -4,7 +4,7 @@
 import { pick, type Rng, randInt } from '../learning/seeded-rng';
 import type { SkillTier } from '../learning/skill-tiers';
 import { type Candidate, numberStep, reasoningItem, ref } from '../reasoning/reasoning-distractors';
-import type { Misconception, ReasoningItem } from '../reasoning/reasoning-types';
+import type { Misconception } from '../reasoning/reasoning-types';
 import {
   bugConvertValue,
   bugMixedValue,
@@ -13,6 +13,7 @@ import {
 } from './length-bug-catalogue';
 import type { Mixed } from './length-mixed-unit-generators';
 import { mixedMm } from './length-mixed-unit-generators';
+import { type LengthItem, ladderScene, lengthItem, plainLadderScene } from './length-scene-types';
 import { convertLength, formatMixed, type LengthUnit, MM_PER_UNIT } from './length-units';
 import { LENGTH_LADDER_MAX } from './measurement-ranges';
 
@@ -31,7 +32,7 @@ function mixedWithBug(bug: Misconception, m: Mixed, to: LengthUnit): number {
 const LEN_OBJECTS = ['i:rope', 'i:ribbon', 'i:cloth', 'i:road'] as const;
 
 /** meas-len-add-sub: word problems that add or subtract lengths. */
-export const measLenAddSub = (rng: Rng, tier: SkillTier, _ladder: number): ReasoningItem => {
+export const measLenAddSub = (rng: Rng, tier: SkillTier, _ladder: number): LengthItem => {
   const item = pick(rng, LEN_OBJECTS);
   const add = rng() < 0.5;
   if (tier === 1) {
@@ -48,9 +49,12 @@ export const measLenAddSub = (rng: Rng, tier: SkillTier, _ladder: number): Reaso
       b,
       ub: unit,
     });
-    return reasoningItem('meas-len-add-sub', tier, story, [
-      numberStep(ref(add ? 'lenAskTotal' : 'lenAskLeft', { to: unit }), answer),
-    ]);
+    return lengthItem(
+      reasoningItem('meas-len-add-sub', tier, story, [
+        numberStep(ref(add ? 'lenAskTotal' : 'lenAskLeft', { to: unit }), answer),
+      ]),
+      plainLadderScene(),
+    );
   }
   if (tier === 2) {
     // Two different units, one conversion: bug values per part, then combine.
@@ -93,9 +97,18 @@ export const measLenAddSub = (rng: Rng, tier: SkillTier, _ladder: number): Reaso
       }),
       total,
     );
-    return reasoningItem('meas-len-add-sub', tier, story, [
-      lenQtyChoiceStep(rng, ref(add ? 'lenAskTotal' : 'lenAskLeft', { to }), total, to, candidates),
-    ]);
+    return lengthItem(
+      reasoningItem('meas-len-add-sub', tier, story, [
+        lenQtyChoiceStep(
+          rng,
+          ref(add ? 'lenAskTotal' : 'lenAskLeft', { to }),
+          total,
+          to,
+          candidates,
+        ),
+      ]),
+      ladderScene(bigUnit, smallUnit),
+    );
   }
   // Tier 3: two mixed values, one operation (the bigger one is cut for sub).
   const pair = pick(rng, [
@@ -129,7 +142,10 @@ export const measLenAddSub = (rng: Rng, tier: SkillTier, _ladder: number): Reaso
     }),
     total,
   );
-  return reasoningItem('meas-len-add-sub', tier, story, [
-    lenQtyChoiceStep(rng, ref(add ? 'lenAskTotal' : 'lenAskLeft', { to }), total, to, candidates),
-  ]);
+  return lengthItem(
+    reasoningItem('meas-len-add-sub', tier, story, [
+      lenQtyChoiceStep(rng, ref(add ? 'lenAskTotal' : 'lenAskLeft', { to }), total, to, candidates),
+    ]),
+    ladderScene(bigUnit, smallUnit),
+  );
 };

@@ -148,7 +148,34 @@ export type ReasoningStep =
       readonly h: number;
       readonly m: number;
       readonly snapMinutes: 5 | 1;
+    }
+  /** Tap the tiles into the slots in order, then "Xong". `tiles` is the display
+   * order (already shuffled by the generator); `answer` lists tile indices in
+   * the correct order. A wrong order records the first misplaced tile. */
+  | {
+      readonly kind: 'order';
+      readonly prompt: PromptRef;
+      readonly tiles: readonly PromptRef[];
+      readonly answer: readonly number[];
+    }
+  /** Tap left, then right, to pair them; "Xong" checks all pairs. `pairs[i]` is
+   * the index into `right` matched with `left[i]`. A wrong pair records the
+   * right option's `misconception` when it is tagged. `left` and `right`
+   * have equal lengths (2–4 pairs); the kit widget throws otherwise, so a
+   * generator (3A's add-sub-match) must emit equal sides. */
+  | {
+      readonly kind: 'match';
+      readonly prompt: PromptRef;
+      readonly left: readonly PromptRef[];
+      readonly right: readonly MatchOption[];
+      readonly pairs: readonly number[];
     };
+
+/** One side of a `match` step: the label plus the bug it names when picked wrong. */
+export interface MatchOption {
+  readonly label: PromptRef;
+  readonly misconception?: Misconception;
+}
 
 export interface ReasoningItem {
   readonly skillId: string;

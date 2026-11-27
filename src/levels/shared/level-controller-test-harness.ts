@@ -149,6 +149,20 @@ export function wrongAnswerFor(step: ReasoningStep): StepAnswer {
     }
     case 'verdict':
       return !step.answer;
+    case 'order': {
+      // Swap the first two tiles of the right order (a one-tile order has no
+      // wrong order, so an empty tap list stands in).
+      const wrong = [...step.answer];
+      if (wrong.length > 1) [wrong[0], wrong[1]] = [wrong[1] as number, wrong[0] as number];
+      else return [];
+      return wrong;
+    }
+    case 'match': {
+      const wrong = [...step.pairs];
+      if (wrong.length > 1) [wrong[0], wrong[1]] = [wrong[1] as number, wrong[0] as number];
+      else return [];
+      return wrong;
+    }
     case 'set-clock':
       return { h: (step.h + 1) % 12, m: step.m };
   }
@@ -168,6 +182,10 @@ export function correctAnswerFor(step: ReasoningStep): StepAnswer {
       return step.options.filter((o) => o.correct).map((o) => o.id);
     case 'verdict':
       return step.answer;
+    case 'order':
+      return [...step.answer];
+    case 'match':
+      return [...step.pairs];
     case 'set-clock':
       return { h: step.h, m: step.m };
   }

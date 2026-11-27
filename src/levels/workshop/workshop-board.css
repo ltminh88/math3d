@@ -19,6 +19,9 @@
 .ws-label--small {
   font-size: 11px;
 }
+.ws-label--mm {
+  font-size: 10px;
+}
 .ws-label--ruler {
   font-size: 12px;
 }

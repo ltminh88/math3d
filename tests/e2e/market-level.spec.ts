@@ -123,6 +123,8 @@ async function give(page: Page, e: Expected, right: boolean, tap: boolean): Prom
   // Choose-all: the right set, or a wrong one (everything, or one sentence when all are true).
   if (e.kind === 'set-clock')
     throw new Error('market spec: set-clock steps are not played (only stages 1–2 are)');
+  if (e.kind !== 'multi')
+    throw new Error(`market spec: ${e.kind} steps are not played (market skills only)`);
   const ids = right ? e.ids : e.ids.length < e.all.length ? e.all : e.all.slice(0, 1);
   if (tap) {
     for (const id of ids) await card.locator(`[data-choice="${id}"]`).tap();

@@ -23,7 +23,9 @@ type PlannedStep =
   | { kind: 'choice'; label: string }
   | { kind: 'multi'; ids: string[] }
   | { kind: 'verdict'; answer: boolean }
-  | { kind: 'set-clock'; h: number; m: number };
+  | { kind: 'set-clock'; h: number; m: number }
+  | { kind: 'order'; tiles: string[]; answer: number[] }
+  | { kind: 'match'; left: string[]; right: string[]; pairs: number[] };
 
 declare global {
   interface Window {

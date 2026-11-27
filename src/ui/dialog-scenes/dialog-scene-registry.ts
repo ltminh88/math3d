@@ -10,6 +10,7 @@
 import type { DataScene } from '../../data/data-scene-types';
 import type { FractionScene } from '../../fractions/fraction-scene-types';
 import type { SceneBody } from '../../geometry/geo-scene-types';
+import type { LengthScene } from '../../measurement/length-scene-types';
 import type { MoneyScene } from '../../money/money-scene-types';
 import type { NumberScene } from '../../numbers/numbers-scene-types';
 import type { PracticeScene } from '../../practice/practice-scene';
@@ -22,7 +23,8 @@ export type DialogScene =
   | MoneyScene
   | DataScene
   | NumberScene
-  | FractionScene;
+  | FractionScene
+  | LengthScene;
 
 export type DialogSceneKind = DialogScene['kind'];
 

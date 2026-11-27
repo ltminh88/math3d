@@ -83,7 +83,19 @@ async function solveSkillItem(page: Page, touch: boolean): Promise<void> {
         row.locator('.kit-choices').getByRole('button', { name: step.label, exact: true }),
         touch,
       );
-    else throw new Error(`unexpected step kind in a length item`);
+    else if (step.kind === 'order') {
+      // Tap the bank tiles in the answer's order, then "Xong".
+      for (const tileIndex of step.answer) {
+        const label = step.tiles[tileIndex];
+        if (label === undefined) throw new Error('order step answer index out of range');
+        await press(
+          page,
+          row.locator('.kit-order__bank').getByRole('button', { name: label, exact: true }),
+          touch,
+        );
+      }
+      await press(page, row.locator('.kit-order__done'), touch);
+    } else throw new Error(`unexpected step kind in a length item`);
     await expect(row).toHaveClass(/kit-step--done/);
   }
   await expect(panel.locator('.feedback')).toHaveClass(/success/);

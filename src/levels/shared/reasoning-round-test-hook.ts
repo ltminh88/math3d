@@ -11,7 +11,9 @@ export type ReasoningPlannedStep =
   | { kind: 'choice'; label: string }
   | { kind: 'multi'; ids: string[] }
   | { kind: 'verdict'; answer: boolean }
-  | { kind: 'set-clock'; h: number; m: number };
+  | { kind: 'set-clock'; h: number; m: number }
+  | { kind: 'order'; tiles: string[]; answer: number[] }
+  | { kind: 'match'; left: string[]; right: string[]; pairs: number[] };
 
 export interface ReasoningRoundTestHook {
   skillId: string;
@@ -36,6 +38,19 @@ export function installReasoningTestHook(
     if (step.kind === 'number') return { kind: 'number', answer: step.answer };
     if (step.kind === 'verdict') return { kind: 'verdict', answer: step.answer };
     if (step.kind === 'set-clock') return { kind: 'set-clock', h: step.h, m: step.m };
+    if (step.kind === 'order')
+      return {
+        kind: 'order',
+        tiles: step.tiles.map((t) => renderPrompt(t)),
+        answer: [...step.answer],
+      };
+    if (step.kind === 'match')
+      return {
+        kind: 'match',
+        left: step.left.map((t) => renderPrompt(t)),
+        right: step.right.map((o) => renderPrompt(o.label)),
+        pairs: [...step.pairs],
+      };
     const right = step.options.filter((o) => o.correct);
     if (step.kind === 'multi') return { kind: 'multi', ids: right.map((o) => o.id) };
     return { kind: 'choice', label: right.map((o) => renderPrompt(o.label)).join(', ') };

@@ -40,6 +40,18 @@ function wrongAnswerFor(step: ReasoningStep): StepAnswer {
     }
     case 'verdict':
       return !step.answer;
+    case 'order': {
+      const wrong = [...step.answer];
+      if (wrong.length > 1) [wrong[0], wrong[1]] = [wrong[1] as number, wrong[0] as number];
+      else return [];
+      return wrong;
+    }
+    case 'match': {
+      const wrong = [...step.pairs];
+      if (wrong.length > 1) [wrong[0], wrong[1]] = [wrong[1] as number, wrong[0] as number];
+      else return [];
+      return wrong;
+    }
     case 'set-clock':
       return { h: (step.h + 1) % 12, m: step.m };
   }

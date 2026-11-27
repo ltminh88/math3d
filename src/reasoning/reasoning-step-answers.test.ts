@@ -1,5 +1,12 @@
 import { describe, expect, it } from 'vitest';
-import { isStepAnswerCorrect, playableSteps, toggleSelection } from './reasoning-step-answers';
+import {
+  firstMisplacedTile,
+  firstWrongPair,
+  isStepAnswerCorrect,
+  orderBug,
+  playableSteps,
+  toggleSelection,
+} from './reasoning-step-answers';
 import type { ReasoningItem, ReasoningStep } from './reasoning-types';
 
 const opt = (id: string, correct: boolean) => ({
@@ -50,6 +57,76 @@ describe('reasoning step answers', () => {
     expect(isStepAnswerCorrect(setClock, { h: 3, m: 30 })).toBe(false);
     expect(isStepAnswerCorrect(setClock, 325)).toBe(false);
     expect(isStepAnswerCorrect(setClock, '3:25')).toBe(false);
+  });
+
+  it('checks order answers and names the first misplaced tile', () => {
+    const tiles = [{ key: 't0' }, { key: 't1' }, { key: 't2' }];
+    const order: ReasoningStep = { kind: 'order', prompt: p, tiles, answer: [2, 0, 1] };
+    expect(isStepAnswerCorrect(order, [2, 0, 1])).toBe(true);
+    expect(isStepAnswerCorrect(order, [2, 1, 0])).toBe(false);
+    expect(isStepAnswerCorrect(order, [0, 2, 1])).toBe(false);
+    expect(isStepAnswerCorrect(order, [2, 0])).toBe(false);
+    expect(isStepAnswerCorrect(order, [2, 0, 1, 2])).toBe(false);
+    expect(isStepAnswerCorrect(order, '201')).toBe(false);
+    expect(firstMisplacedTile(order, [2, 0, 1])).toBeNull();
+    expect(firstMisplacedTile(order, [2, 1, 0])).toBe(1);
+    expect(firstMisplacedTile(order, [0, 2, 1])).toBe(0);
+    expect(firstMisplacedTile(order, [2, 0])).toBe(2);
+  });
+
+  it('names the bug a wrong order stands for (R90.2)', () => {
+    // Tiles as meas-len-order emits them (lenQty {n, unit}); display order
+    // 1 m, 20 cm, 300 mm — correct smallest-first is [1, 2, 0].
+    const tiles = [
+      { key: 'lenQty', params: { n: 1, unit: 'm' } },
+      { key: 'lenQty', params: { n: 20, unit: 'cm' } },
+      { key: 'lenQty', params: { n: 300, unit: 'mm' } },
+    ];
+    const order: ReasoningStep = { kind: 'order', prompt: p, tiles, answer: [1, 2, 0] };
+    expect(orderBug(order, [1, 2, 0])).toBeUndefined();
+    // Exact reverse of the correct order: largest first — direction error.
+    expect(orderBug(order, [0, 2, 1])).toBe('unit-direction');
+    // Sorted by the bare numbers (1, 20, 300) while ignoring the units.
+    expect(orderBug(order, [0, 1, 2])).toBe('ignore-unit');
+    // Wrong but neither known order: no bug.
+    expect(orderBug(order, [2, 1, 0])).toBeUndefined();
+    expect(orderBug(order, '120')).toBeUndefined();
+    // Tiles without a numeric param: the bare-number check cannot apply.
+    const plain: ReasoningStep = {
+      kind: 'order',
+      prompt: p,
+      tiles: [{ key: 't0' }, { key: 't1' }, { key: 't2' }],
+      answer: [2, 0, 1],
+    };
+    expect(orderBug(plain, [0, 2, 1])).toBeUndefined();
+    expect(orderBug(plain, [1, 0, 2])).toBe('unit-direction');
+  });
+
+  it('checks match answers and names the first wrong pair with its bug', () => {
+    const left = [{ key: 'l0' }, { key: 'l1' }, { key: 'l2' }];
+    const right = [
+      { label: { key: 'r0' } },
+      { label: { key: 'r1' }, misconception: 'unit-direction' as const },
+      { label: { key: 'r2' } },
+    ];
+    const match: ReasoningStep = { kind: 'match', prompt: p, left, right, pairs: [2, 0, 1] };
+    expect(isStepAnswerCorrect(match, [2, 0, 1])).toBe(true);
+    expect(isStepAnswerCorrect(match, [2, 1, 0])).toBe(false);
+    expect(isStepAnswerCorrect(match, [0, 2, 1])).toBe(false);
+    expect(isStepAnswerCorrect(match, [2, 0])).toBe(false);
+    expect(firstWrongPair(match, [2, 0, 1])).toBeNull();
+    // left 1 paired with right 1 (the tagged option): the bug rides along.
+    expect(firstWrongPair(match, [2, 1, 0])).toEqual({
+      left: 1,
+      right: 1,
+      misconception: 'unit-direction',
+    });
+    // left 0 paired with right 0 (untagged): no bug to record.
+    expect(firstWrongPair(match, [0, 2, 1])).toEqual({
+      left: 0,
+      right: 0,
+      misconception: undefined,
+    });
   });
 
   it('plays a false verdict with a fix as verdict, then a number step', () => {

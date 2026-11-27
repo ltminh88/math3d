@@ -14,7 +14,6 @@ import { OBJECTS } from './length-compare-order-generators';
 import { LENGTH_SKILLS, lengthItemForSkill } from './length-item-for-skill';
 import {
   convertLength,
-  formatQty,
   LENGTH_LADDER,
   type LengthUnit,
   MM_PER_UNIT,
@@ -170,25 +169,24 @@ const ORACLE: Record<string, (item: ReasoningItem, tier: SkillTier, seed: number
         mm: Number(n) * MM_PER_UNIT[unit as LengthUnit],
       };
     });
-    const seqOf = (qs: readonly { n: number; unit: LengthUnit }[]) =>
-      qs.map((q) => formatQty(q.n, q.unit)).join(', ');
-    const correct = [...shown].sort((x, y) => x.mm - y.mm);
-    const params = correctParams(item);
-    expect(seqOf(correct), where).toBe(`${params.a}, ${params.b}, ${params.c}`);
-    const reversed = seqOf([...correct].reverse());
-    const bare = seqOf([...shown].sort((x, y) => x.n - y.n));
-    const swapped = seqOf([
-      correct[1] as { n: number; unit: LengthUnit },
-      correct[0] as { n: number; unit: LengthUnit },
-      correct[2] as { n: number; unit: LengthUnit },
-    ]);
-    for (const o of (choiceSteps(item)[0] as Extract<ReasoningStep, { kind: 'choice' }>).options) {
-      if (o.correct) continue;
-      const seq = `${o.label.params?.a}, ${o.label.params?.b}, ${o.label.params?.c}`;
-      if (o.misconception === 'unit-direction') expect(seq, where).toBe(reversed);
-      if (o.misconception === 'ignore-unit') expect(seq, where).toBe(bare);
-      if (o.misconception === 'near-miss') expect(seq, where).toBe(swapped);
-    }
+    const step = item.steps[0];
+    expect(step?.kind, where).toBe('order');
+    if (step?.kind !== 'order') return;
+    // Three distinct tiles, the story's shown quantities in display order.
+    expect(step.tiles, where).toHaveLength(3);
+    const tileMms = step.tiles.map((t) => {
+      const n = Number(t.params?.n);
+      const unit = String(t.params?.unit) as LengthUnit;
+      return n * MM_PER_UNIT[unit];
+    });
+    expect(
+      [...tileMms].sort((a, b) => a - b),
+      where,
+    ).toEqual([...shown].map((q) => q.mm).sort((a, b) => a - b));
+    // The answer is a permutation of the tile indices, smallest first.
+    expect([...step.answer].sort(), where).toEqual([0, 1, 2]);
+    const ordered = step.answer.map((i) => tileMms[i] as number);
+    expect(ordered, where).toEqual([...ordered].sort((a, b) => a - b));
   },
   lenChooseObj: (item, _tier, seed) => {
     const where = `meas-len-choose-unit #${seed}`;

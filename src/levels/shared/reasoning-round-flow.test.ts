@@ -154,4 +154,77 @@ describe('ReasoningRoundFlow', () => {
       bugs: ['forgot-carry'],
     });
   });
+
+  it('a wrong match pairing that stands for a bug only fills the bug bank (R90.1)', () => {
+    const item: PracticeItem = {
+      skillId: 'test-step-kit-fixture',
+      tier: 1,
+      story: { key: 'expr', params: { text: 'Nối' } },
+      steps: [
+        {
+          kind: 'match',
+          prompt: { key: 'expr', params: { text: 'Nối' } },
+          left: [
+            { key: 'expr', params: { text: '1 m' } },
+            { key: 'expr', params: { text: '2 dm' } },
+          ],
+          right: [
+            { label: { key: 'expr', params: { text: '100 cm' } } },
+            { label: { key: 'expr', params: { text: '20 cm' } }, misconception: 'unit-direction' },
+          ],
+          pairs: [0, 1],
+        },
+      ],
+      work: [],
+    };
+    const flow = new ReasoningRoundFlow(
+      { skillId: 'test-step-kit-fixture', tier: 1, factKey: 'sk:test-step-kit-fixture', item },
+      () => 0,
+    );
+    // Both pairs wrong; the first wrong pair's right option is tagged.
+    expect(flow.answer({ stepIndex: 0, correct: false, answer: [1, 0] }).verdict).toBe('wrong');
+    const done = flow.answer({ stepIndex: 0, correct: true, answer: [0, 1] });
+    expect(done.outcome).toMatchObject({
+      correct: true,
+      firstTry: false,
+      wrongAnswers: [],
+      wrongAttempts: [],
+      bugs: ['unit-direction'],
+    });
+  });
+
+  it('a wrong order that stands for a bug only fills the bug bank (R90.2)', () => {
+    const item: PracticeItem = {
+      skillId: 'meas-len-order',
+      tier: 1,
+      story: { key: 'lenOrder', params: { a: '1 m', b: '20 cm', c: '300 mm' } },
+      steps: [
+        {
+          kind: 'order',
+          prompt: { key: 'lenPickOrder' },
+          tiles: [
+            { key: 'lenQty', params: { n: 1, unit: 'm' } },
+            { key: 'lenQty', params: { n: 20, unit: 'cm' } },
+            { key: 'lenQty', params: { n: 300, unit: 'mm' } },
+          ],
+          answer: [1, 2, 0],
+        },
+      ],
+      work: [],
+    };
+    const flow = new ReasoningRoundFlow(
+      { skillId: 'meas-len-order', tier: 1, factKey: 'sk:meas-len-order', item },
+      () => 0,
+    );
+    // Exact reverse of the correct order: a direction error.
+    expect(flow.answer({ stepIndex: 0, correct: false, answer: [0, 2, 1] }).verdict).toBe('wrong');
+    const done = flow.answer({ stepIndex: 0, correct: true, answer: [1, 2, 0] });
+    expect(done.outcome).toMatchObject({
+      correct: true,
+      firstTry: false,
+      wrongAnswers: [],
+      wrongAttempts: [],
+      bugs: ['unit-direction'],
+    });
+  });
 });

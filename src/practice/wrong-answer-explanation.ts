@@ -5,6 +5,7 @@
 // Lanes 1–3 cover groups 1–10; the hint ladder is untouched (golden).
 import type { SkillTier } from '../learning/skill-tiers';
 import {
+  firstWrongPair,
   isStepAnswerCorrect,
   playableSteps,
   type StepAnswer,
@@ -93,7 +94,11 @@ export function numParam(
 function resolveAnswer(
   step: ReasoningStep,
   answer: StepAnswer,
-): { option?: ChoiceOption; wrongNumber?: number; chosenIds?: readonly string[] } {
+): {
+  option?: ChoiceOption;
+  wrongNumber?: number;
+  chosenIds?: readonly string[];
+} {
   if (step.kind === 'choice' && typeof answer === 'string') {
     const option = step.options.find((o) => o.id === answer);
     const n = option?.label.params?.n;
@@ -101,6 +106,23 @@ function resolveAnswer(
   }
   if (step.kind === 'multi' && Array.isArray(answer)) return { chosenIds: answer };
   if (step.kind === 'number' && typeof answer === 'number') return { wrongNumber: answer };
+  if (step.kind === 'order') return {};
+  if (step.kind === 'match') {
+    // A wrong pair whose right option carries a bug becomes the "chosen
+    // option", so the Phase 0 bug registry explains it like a choice pick.
+    const wrong = firstWrongPair(step, answer);
+    if (!wrong?.misconception) return {};
+    const label = step.right[wrong.right]?.label;
+    if (!label) return {};
+    return {
+      option: {
+        id: `match-${wrong.left}`,
+        label,
+        correct: false,
+        misconception: wrong.misconception,
+      },
+    };
+  }
   return {};
 }
 

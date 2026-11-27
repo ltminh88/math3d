@@ -5,7 +5,7 @@ import { defineStrings } from '../../i18n/i18n';
 import { mulberry32 } from '../../learning/seeded-rng';
 import type { SkillTier } from '../../learning/skill-tiers';
 import { playableSteps } from '../../reasoning/reasoning-step-answers';
-import type { ReasoningStep } from '../../reasoning/reasoning-types';
+import type { PromptRef, ReasoningStep } from '../../reasoning/reasoning-types';
 import { valleyHint } from './valley-hints';
 import { VALLEY_KIND } from './valley-round-plan';
 import { valleyStrings, valleyText } from './valley-strings';
@@ -18,6 +18,16 @@ const answersOf = (step: ReasoningStep): string[] => {
   if (step.kind === 'number') return [String(step.answer)];
   if (step.kind === 'verdict') return [];
   if (step.kind === 'set-clock') return [];
+  // An order step's answer is a sequence, not a label: its tiles are the
+  // candidates, so the tile labels (in the right order) are what a hint
+  // could leak. A match step's answer is a pairing, so no single label leaks.
+  if (step.kind === 'order')
+    return step.answer
+      .map((i) => step.tiles[i])
+      .filter((t): t is PromptRef => t !== undefined)
+      .map((t) => renderGeometryPrompt(t))
+      .filter((label) => /^\d+( \S+)?$|^[A-Z]{1,2}$/.test(label));
+  if (step.kind === 'match') return [];
   // Numbers ("6", "14 cm") and figure names ("B", "OA"); named terms ("Khối lập phương") are
   // what a definition is about, so they are not answers a hint could leak.
   return step.options

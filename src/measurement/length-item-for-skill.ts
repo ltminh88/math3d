@@ -1,19 +1,19 @@
 // One entry point for the length-ladder skills (boost, Phase 1B): a meas-len-*
-// skill id + rng + tier -> a plain ReasoningItem (no scene until 2B draws the
+// skill id + rng + tier -> a LengthItem (2B: every item carries its
 // `length-ladder` scene). The ladder level defaults to the tier's ladder
 // (tier 1 -> L0-1, tier 2 -> L2-3, tier 3 -> L4-5); 4A will feed the real
 // `ladderTierOf(stat)` here when weak-spot weighting lands.
 import type { Rng } from '../learning/seeded-rng';
 import type { SkillTier } from '../learning/skill-tiers';
-import type { ReasoningItem } from '../reasoning/reasoning-types';
 import { measLenAddSub } from './length-add-sub-generators';
 import { measLenChooseUnit, measLenCompare, measLenOrder } from './length-compare-order-generators';
 import { measLenConvert, measLenConvertFar, measLenLadder } from './length-ladder-generators';
 import { measLenMixed } from './length-mixed-unit-generators';
+import type { LengthItem } from './length-scene-types';
 import { ladderForTier } from './length-units';
 
 /** A length generator takes the ladder level too (L0-L5). */
-export type LengthGenerator = (rng: Rng, tier: SkillTier, ladder: number) => ReasoningItem;
+export type LengthGenerator = (rng: Rng, tier: SkillTier, ladder: number) => LengthItem;
 
 const GENERATORS: Readonly<Record<string, LengthGenerator>> = {
   'meas-len-ladder': measLenLadder,
@@ -37,7 +37,7 @@ export function lengthItemForSkill(
   rng: Rng,
   tier: SkillTier,
   ladder: number = ladderForTier(tier, rng),
-): ReasoningItem {
+): LengthItem {
   const generate = GENERATORS[id];
   if (!generate) throw new Error(`length: no generator for skill "${id}"`);
   return generate(rng, tier, ladder);

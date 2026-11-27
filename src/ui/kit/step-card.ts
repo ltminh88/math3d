@@ -1,8 +1,10 @@
 import './step-kit.css';
 import {
+  firstMisplacedTile,
   isStepAnswerCorrect,
   playableSteps,
   type StepAnswer,
+  wrongPairs,
 } from '../../reasoning/reasoning-step-answers';
 import { renderPrompt as renderReasoningPrompt } from '../../reasoning/reasoning-strings';
 import type { PromptRef, ReasoningItem, ReasoningStep } from '../../reasoning/reasoning-types';
@@ -12,6 +14,8 @@ import { createChoiceButtons } from './choice-buttons';
 import { createClockSetter } from './clock-setter';
 import { createMultiSelectButtons } from './multi-select-buttons';
 import { createNumberPad } from './number-pad';
+import { createTapMatchStep } from './tap-match-step';
+import { createTapOrderStep } from './tap-order-step';
 import { tk } from './ui-kit-strings';
 import { createVerdictButtons } from './verdict-buttons';
 
@@ -49,6 +53,15 @@ const answerText = (step: ReasoningStep, renderPrompt: (p: PromptRef) => string)
   if (step.kind === 'number') return String(step.answer);
   if (step.kind === 'verdict') return tk(step.answer ? 'yes' : 'no');
   if (step.kind === 'set-clock') return digitalText(step.h, step.m);
+  if (step.kind === 'order')
+    return step.answer.map((i) => renderPrompt(step.tiles[i] as PromptRef)).join(', ');
+  if (step.kind === 'match')
+    return step.pairs
+      .map(
+        (r, i) =>
+          `${renderPrompt(step.left[i] as PromptRef)} = ${renderPrompt(step.right[r]?.label as PromptRef)}`,
+      )
+      .join(', ');
   return step.options
     .filter((o) => o.correct)
     .map((o) => renderPrompt(o.label))
@@ -135,16 +148,48 @@ export function createStepCard(
         { snapMinutes: step.snapMinutes, onDone: (setting) => submit(setting) },
         doc,
       );
-    const multi = createMultiSelectButtons(
-      choices(step),
-      (ids) => {
-        const before = index;
-        submit(ids);
-        if (index === before) multi.reset();
-      },
-      doc,
-    );
-    return multi;
+    if (step.kind === 'order') {
+      const order = createTapOrderStep(
+        step.tiles.map((t) => renderPrompt(t)),
+        (sequence) => {
+          const before = index;
+          submit(sequence);
+          if (index === before) {
+            const misplaced = firstMisplacedTile(step, sequence);
+            if (misplaced !== null) order.markWrong(misplaced);
+          }
+        },
+        doc,
+      );
+      return order;
+    }
+    if (step.kind === 'match') {
+      const match = createTapMatchStep(
+        step.left.map((t) => renderPrompt(t)),
+        step.right.map((o) => renderPrompt(o.label)),
+        (pairs) => {
+          const before = index;
+          submit(pairs);
+          if (index === before) match.markWrong(wrongPairs(step, pairs));
+        },
+        doc,
+      );
+      return match;
+    }
+    if (step.kind === 'multi') {
+      const multi = createMultiSelectButtons(
+        choices(step),
+        (ids) => {
+          const before = index;
+          submit(ids);
+          if (index === before) multi.reset();
+        },
+        doc,
+      );
+      return multi;
+    }
+    const _exhaustive: never = step;
+    throw new Error(`step-card: unknown step kind ${(_exhaustive as { kind: string }).kind}`);
   }
 
   function showStep(): void {
