@@ -22,6 +22,7 @@ const vi = {
   h2AreaCount: 'Diện tích là đếm ô vuông phủ kín hình. Mỗi ô là 1 cm².',
   h2AreaRect: 'Diện tích hình chữ nhật: chiều dài nhân chiều rộng. Hình vuông: cạnh nhân cạnh.',
   h2Unit: 'Chu vi đo độ dài đường viền. Diện tích đo phần mặt được phủ kín bằng các ô vuông.',
+  h2Ladder: 'Mỗi bước xuống thang nhân 10: 1 m = 10 dm = 100 cm = 1 000 mm. Lên thang thì chia 10.',
   h3Look: 'Làm từng bước một: viết ra những số đã biết trước nhé.',
   h3RulerStart: 'Vật bắt đầu ở vạch {start} {u}. Đếm tiếp tới đầu kia nhé.',
   h3CmToMm: '{n} cm bằng {n} × 10 mm.',
@@ -81,6 +82,8 @@ const en: Record<keyof typeof vi, string> = {
   h2AreaCount: 'The area is counting the squares that cover the shape. Each square is 1 cm².',
   h2AreaRect: 'Rectangle area: length times width. Square: side times side.',
   h2Unit: 'Perimeter measures the edge. Area measures the surface covered by squares.',
+  h2Ladder:
+    'Each step down the ladder multiplies by 10: 1 m = 10 dm = 100 cm = 1,000 mm. Up the ladder, divide by 10.',
   h3Look: 'Go one step at a time: write down the numbers you know first.',
   h3RulerStart: 'The object starts at the {start} {u} mark. Count on to the other end.',
   h3CmToMm: '{n} cm is {n} times 10 mm.',

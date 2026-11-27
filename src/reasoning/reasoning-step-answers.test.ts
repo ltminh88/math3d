@@ -6,6 +6,7 @@ import {
   orderBug,
   playableSteps,
   toggleSelection,
+  wrongAnswerBug,
 } from './reasoning-step-answers';
 import type { ReasoningItem, ReasoningStep } from './reasoning-types';
 
@@ -100,6 +101,52 @@ describe('reasoning step answers', () => {
     };
     expect(orderBug(plain, [0, 2, 1])).toBeUndefined();
     expect(orderBug(plain, [1, 0, 2])).toBe('unit-direction');
+  });
+
+  it('names the bug a wrong answer stands for (3B)', () => {
+    // Choice / multi: the picked option's misconception, when tagged.
+    const choice: ReasoningStep = {
+      kind: 'choice',
+      prompt: p,
+      options: [opt('a', true), opt('b', false)],
+    };
+    expect(wrongAnswerBug(choice, 'b')).toBe('near-miss');
+    expect(wrongAnswerBug(choice, 'a')).toBeUndefined();
+    const untagged: ReasoningStep = {
+      kind: 'choice',
+      prompt: p,
+      options: [
+        { id: 'a', label: { key: 'num', params: { n: 1 } }, correct: true },
+        { id: 'b', label: { key: 'num', params: { n: 2 } }, correct: false },
+      ],
+    };
+    expect(wrongAnswerBug(untagged, 'b')).toBeUndefined();
+    // Order: the orderBug verdict (same fixture as the R90.2 test).
+    const tiles = [
+      { key: 'lenQty', params: { n: 1, unit: 'm' } },
+      { key: 'lenQty', params: { n: 20, unit: 'cm' } },
+      { key: 'lenQty', params: { n: 300, unit: 'mm' } },
+    ];
+    const order: ReasoningStep = { kind: 'order', prompt: p, tiles, answer: [1, 2, 0] };
+    expect(wrongAnswerBug(order, [0, 2, 1])).toBe('unit-direction');
+    expect(wrongAnswerBug(order, [0, 1, 2])).toBe('ignore-unit');
+    expect(wrongAnswerBug(order, [2, 1, 0])).toBeUndefined();
+    expect(wrongAnswerBug(order, [1, 2, 0])).toBeUndefined();
+    // Match: the first wrong pair's right option's bug.
+    const left = [{ key: 'l0' }, { key: 'l1' }, { key: 'l2' }];
+    const right = [
+      { label: { key: 'r0' } },
+      { label: { key: 'r1' }, misconception: 'unit-direction' as const },
+      { label: { key: 'r2' } },
+    ];
+    const match: ReasoningStep = { kind: 'match', prompt: p, left, right, pairs: [2, 0, 1] };
+    expect(wrongAnswerBug(match, [2, 1, 0])).toBe('unit-direction');
+    expect(wrongAnswerBug(match, [2, 0, 1])).toBeUndefined();
+    // A number, a verdict or a clock set never stands for a bug.
+    const num: ReasoningStep = { kind: 'number', prompt: p, answer: 12 };
+    expect(wrongAnswerBug(num, 21)).toBeUndefined();
+    expect(wrongAnswerBug(undefined, 'b')).toBeUndefined();
+    expect(wrongAnswerBug(choice, 5)).toBeUndefined();
   });
 
   it('checks match answers and names the first wrong pair with its bug', () => {

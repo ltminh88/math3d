@@ -7,6 +7,8 @@ import { type FactKey, skillKey } from '../../learning/fact-key';
 import type { FactStat } from '../../learning/learning-types';
 import type { Rng } from '../../learning/seeded-rng';
 import { type SkillTier, skillTierOf } from '../../learning/skill-tiers';
+import { isLengthSkill, lengthItemForSkill } from '../../measurement/length-item-for-skill';
+import type { LengthItem } from '../../measurement/length-scene-types';
 import { measurementItemForSkill } from '../../measurement/measurement-item-for-skill';
 import { STATION_OF, type WorkshopStation } from './workshop-stations';
 import { tileTargets } from './workshop-tile-grid';
@@ -16,7 +18,7 @@ export interface WorkshopRound {
   readonly factKey: FactKey;
   readonly tier: SkillTier;
   readonly station: WorkshopStation;
-  readonly item: GeoItem;
+  readonly item: GeoItem | LengthItem;
   /** The shape is covered tile by tile (else solved by the formula or by reading). */
   readonly tiling: boolean;
 }
@@ -24,7 +26,7 @@ export interface WorkshopRound {
 const MAX_DRAWS = 4000;
 
 /** [width, height] of a rectangle scene, else null. */
-export function rectOf(item: GeoItem | undefined): [number, number] | null {
+export function rectOf(item: GeoItem | LengthItem | undefined): [number, number] | null {
   const s = item?.scene;
   return s?.kind === 'rect' ? [s.width, s.height] : null;
 }
@@ -49,22 +51,28 @@ export function planWorkshopRounds(
   const same = rectOf(floor ?? undefined);
   return skills.map((skillId) => {
     const tier = tierOf(skillId);
-    let item: GeoItem;
+    let item: GeoItem | LengthItem;
     if (skillId === 'meas-area-rect' && floor) item = floor;
     else if (skillId === 'meas-perimeter-rect' && same) {
       item = draw(skillId, rng, tier, (it) => {
         const r = rectOf(it);
         return !!r && r[0] === same[0] && r[1] === same[1];
       });
+    } else if (isLengthSkill(skillId)) {
+      // Length items carry the ladder scene; the tier still comes from the
+      // child's Leitner box (the ladder), never from the workshop stage (3B).
+      item = lengthItemForSkill(skillId, rng, tier);
     } else item = measurementItemForSkill(skillId, rng, tier);
     const station = STATION_OF[skillId] as WorkshopStation;
+    const scene = item.scene;
     return {
       skillId,
       factKey: skillKey(skillId),
       tier,
       station,
       item,
-      tiling: station === 'tiles' && tileTargets(item.scene, tier) !== null,
+      tiling:
+        station === 'tiles' && scene.kind !== 'length-ladder' && tileTargets(scene, tier) !== null,
     };
   });
 }

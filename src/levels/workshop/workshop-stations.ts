@@ -12,12 +12,21 @@
 import { skillKey } from '../../learning/fact-key';
 import type { FactStat } from '../../learning/learning-types';
 import { type Rng, shuffle } from '../../learning/seeded-rng';
+import { excludeJustPlayedLength, rulerSlotForStage } from './workshop-length-slots';
 
 export type WorkshopStation = 'ruler' | 'fence' | 'tiles' | 'balance' | 'jug' | 'thermometer';
 
 export const STATION_OF: Readonly<Record<string, WorkshopStation>> = {
   'meas-ruler-read': 'ruler',
   'meas-mm-convert': 'ruler',
+  'meas-len-ladder': 'ruler',
+  'meas-len-convert': 'ruler',
+  'meas-len-convert-far': 'ruler',
+  'meas-len-compare': 'ruler',
+  'meas-len-order': 'ruler',
+  'meas-len-choose-unit': 'ruler',
+  'meas-len-mixed': 'ruler',
+  'meas-len-add-sub': 'ruler',
   'meas-gram': 'balance',
   'meas-gram-calc': 'balance',
   'meas-ml': 'jug',
@@ -50,7 +59,7 @@ const STATION_ORDER: readonly WorkshopStation[] = ['balance', 'jug', 'thermomete
 
 /** Candidates per round, in story order (the two instrument rounds take different skills). */
 const SLOTS: readonly (readonly string[])[] = [
-  ['meas-ruler-read', 'meas-mm-convert'],
+  rulerSlotForStage(1),
   ['meas-perimeter-rect'],
   ['meas-area-rect'],
   [
@@ -69,7 +78,7 @@ const SLOTS: readonly (readonly string[])[] = [
 const STAGE_SLOTS: Readonly<Record<number, readonly (readonly string[])[]>> = {
   1: SLOTS,
   2: [
-    ['meas-ruler-read', 'meas-mm-convert'],
+    rulerSlotForStage(2),
     ['meas-perimeter-rect', 'meas-perimeter-square'],
     ['meas-area-rect'],
     ['meas-perimeter-square', 'meas-perimeter-rect'],
@@ -77,7 +86,7 @@ const STAGE_SLOTS: Readonly<Record<number, readonly (readonly string[])[]>> = {
     INSTRUMENTS,
   ],
   3: [
-    ['meas-ruler-read', 'meas-mm-convert'],
+    rulerSlotForStage(3),
     ['meas-perimeter-rect'],
     ['meas-area-rect', 'meas-area-square', 'meas-area-count'],
     ['meas-area-square', 'meas-area-count'],
@@ -85,7 +94,7 @@ const STAGE_SLOTS: Readonly<Record<number, readonly (readonly string[])[]>> = {
     INSTRUMENTS,
   ],
   4: [
-    ['meas-mm-convert'],
+    rulerSlotForStage(4),
     ['meas-perimeter-rect'],
     ['meas-area-rect'],
     [
@@ -100,7 +109,7 @@ const STAGE_SLOTS: Readonly<Record<number, readonly (readonly string[])[]>> = {
     INSTRUMENTS,
   ],
   5: [
-    ['meas-ruler-read', 'meas-mm-convert'],
+    rulerSlotForStage(5),
     ['meas-perimeter-rect'],
     ['meas-area-rect'],
     ['meas-wp-fence'],
@@ -127,7 +136,9 @@ export function planWorkshopSkills(stats: Stats, rng: Rng, rounds: number, stage
   const chosen: string[] = [];
   for (let i = 0; i < slots.length; i++) {
     const slot = slots[i] as readonly string[];
-    let free = slot.filter((id) => !chosen.includes(id));
+    let free: readonly string[] = slot.filter((id) => !chosen.includes(id));
+    // The ruler slot never repeats the length round just played (3B).
+    if (i === 0) free = excludeJustPlayedLength(free, stats);
     // The two instrument rounds are two different instruments: the second one never
     // repeats the first one's station (six instrument skills, three stations — R8).
     if (i === 5 && chosen[4]) {

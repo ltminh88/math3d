@@ -75,6 +75,25 @@ export function orderBug(
   return undefined;
 }
 
+/** The bug a wrong answer stands for, if the picked option (or order, or
+ * pairing) is tagged with one (boost Phase 0, R79; 2B, R90): a wrong choice or
+ * multi pick carries its option's misconception; a wrong match carries the
+ * first wrong pair's right option's bug; a wrong order carries `orderBug`'s
+ * verdict. A correct answer, a number, a verdict or a clock set is no bug. */
+export function wrongAnswerBug(
+  step: ReasoningStep | undefined,
+  answer: StepAnswer,
+): Misconception | undefined {
+  if (typeof answer === 'string') {
+    if (step?.kind !== 'choice' && step?.kind !== 'multi') return undefined;
+    return step.options.find((o) => o.id === answer)?.misconception;
+  }
+  if (!isNumberList(answer)) return undefined;
+  if (step?.kind === 'match') return firstWrongPair(step, answer)?.misconception;
+  if (step?.kind === 'order') return orderBug(step, answer);
+  return undefined;
+}
+
 /** The steps as played: a false verdict that carries a fix is followed by a number step for it. */
 export function playableSteps(item: ReasoningItem): ReasoningStep[] {
   return item.steps.flatMap((step): ReasoningStep[] =>

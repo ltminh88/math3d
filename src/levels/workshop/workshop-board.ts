@@ -1,8 +1,8 @@
 // The measuring board of a round: picks the view for the item's scene (ruler, fence, tiles or the
 // formula floor, balance, jug, thermometers) and exposes the two board actions the keys and
 // buttons share: walk the next fence side, lay the next row of tiles.
-import type { GeoScene } from '../../geometry/geo-scene-types';
 import { renderMeasurementPrompt } from '../../measurement/measurement-strings';
+import { sceneRenderer as lengthLadderRenderer } from '../../ui/dialog-scenes/scenes/length-ladder-scene-svg';
 import { createAreaFormulaView } from './workshop-area-formula-view';
 import { createFenceView, type FenceView } from './workshop-fence-view';
 import {
@@ -32,11 +32,14 @@ function sceneView(
   round: WorkshopRound,
   ws: WorkshopStrings,
   onTiles: (grids: readonly WorkshopTileGrid[]) => void,
-): { element: HTMLElement; fence: FenceView | null; tiles: TileGridView | null } {
-  const scene: GeoScene = round.item.scene;
+): { element: Element; fence: FenceView | null; tiles: TileGridView | null } {
+  const scene = round.item.scene;
   const story = round.item.story.params ?? {};
   const none = { fence: null, tiles: null };
   switch (scene.kind) {
+    case 'length-ladder':
+      // A length item shows its ladder above the step card (3B).
+      return { element: lengthLadderRenderer.render(scene), ...none };
     case 'ruler':
       return {
         element: createRulerView(scene, round.tier, noun(story.item ?? story.y), ws),

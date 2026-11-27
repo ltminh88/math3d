@@ -3,6 +3,7 @@ import type { GeoItem, GeoScene } from '../../geometry/geo-scene-types';
 import { defineStrings } from '../../i18n/i18n';
 import { mulberry32 } from '../../learning/seeded-rng';
 import type { SkillTier } from '../../learning/skill-tiers';
+import { LENGTH_SKILLS, lengthItemForSkill } from '../../measurement/length-item-for-skill';
 import {
   MEASUREMENT_SKILLS,
   measurementItemForSkill,
@@ -69,6 +70,18 @@ describe('workshop hint ladder', () => {
     const area = measurementItemForSkill('meas-area-count', rng(), 1);
     expect(render(workshopHint(perim, 2, 0))).toContain('đi một vòng quanh viền');
     expect(render(workshopHint(area, 2, 0))).toContain('đếm ô vuông phủ kín');
+  });
+
+  it('length hints state the ladder rule on rung 2 (3B)', () => {
+    // Rung 2 states the general ladder chain, as h2Mm states 1 cm = 10 mm
+    // for the legacy ruler skills; rung 3 stays generic for length items.
+    for (const id of LENGTH_SKILLS) {
+      const item = lengthItemForSkill(id, mulberry32(7), 1);
+      expect(workshopHint(item, 1, 0).key).toBe('h1');
+      expect(workshopHint(item, 2, 0).key).toBe('h2Ladder');
+      expect(render(workshopHint(item, 2, 0))).toContain('10 dm');
+      expect(workshopHint(item, 3, 0).key).toBe('h3Look');
+    }
   });
 
   it('a chu vi / diện tích mix-up names the right concept', () => {
