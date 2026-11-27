@@ -34,6 +34,17 @@ const choiceStep = (step: ReasoningStep | undefined) => {
   return step as ReasoningStep & { kind: 'choice' };
 };
 
+/** Evaluates a digit prompt's expression ("5 + 7", "13 − 1 − 8") left to right. */
+const evalPromptText = (text: string): number => {
+  const tokens = text.split(' ');
+  let value = Number(tokens[0]);
+  for (let i = 1; i + 1 < tokens.length; i += 2) {
+    const rhs = Number(tokens[i + 1]);
+    value = tokens[i] === '+' ? value + rhs : value - rhs;
+  }
+  return value;
+};
+
 /** The tier's ladder rule, re-derived from the operands (oracle-local). */
 const ladderMatchesTier = (a: number, b: number, op: '+' | '−', tier: SkillTier): boolean => {
   if (op === '+') {
@@ -96,9 +107,12 @@ describe('columnsOf fixtures', () => {
     const cols = columnsOf(403, 158, '−');
     expect(cols.map((c) => c.digit)).toEqual([5, 4, 2]);
     expect(cols.map((c) => c.carryOut)).toEqual([true, true, false]);
-    expect(cols[0]?.sumText).toBe('3 − 8');
+    // R121: the digit prompt shows the calculation as the child performs it
+    // AFTER the borrow is decided — the borrowed top ("13 − 8"), never the
+    // raw column ("3 − 8" would ask for 5, a wrong calculation on screen).
+    expect(cols[0]?.sumText).toBe('13 − 8');
     expect(cols[0]?.sumValue).toBe(5);
-    expect(cols[1]?.sumText).toBe('0 − 1 − 5');
+    expect(cols[1]?.sumText).toBe('10 − 1 − 5');
     expect(cols[1]?.sumValue).toBe(4);
     expect(cols[2]?.sumText).toBe('4 − 1 − 1');
     expect(cols[2]?.sumValue).toBe(2);
@@ -131,19 +145,25 @@ describe('column item steps', () => {
     expect(numStep(steps[4]).prompt.key).toBe('columnDigitHundreds');
   });
 
-  it('403 − 158 plays digit, borrow choice, digit, borrow choice, digit', () => {
+  it('403 − 158 plays borrow choice, digit, borrow choice, digit, digit (R121)', () => {
+    // Subtraction asks the borrow BEFORE the digit: the child must decide
+    // the borrow first ("3 không trừ được 8, vay 1 → 13 − 8 = 5"). The
+    // borrow question names its column and shows the raw column.
     const steps = buildColumnSteps(403, 158, '−');
     expect(steps).toHaveLength(5);
-    expect(numStep(steps[0]).answer).toBe(5);
-    const c0 = choiceStep(steps[1]);
-    expect(c0.prompt.key).toBe('askBorrow');
+    const c0 = choiceStep(steps[0]);
+    expect(c0.prompt.key).toBe('askBorrowOnes');
+    expect(c0.prompt.params).toEqual({ text: '3 − 8' });
     expect(c0.options.map((o) => o.label.key)).toEqual(['borrowYes', 'borrowNo']);
     expect(c0.options.map((o) => o.correct)).toEqual([true, false]);
-    expect(numStep(steps[2]).answer).toBe(4);
-    const c1 = choiceStep(steps[3]);
-    expect(c1.prompt.key).toBe('askBorrow');
+    expect(numStep(steps[1]).answer).toBe(5);
+    expect(numStep(steps[1]).prompt.key).toBe('columnDigitOnes');
+    const c1 = choiceStep(steps[2]);
+    expect(c1.prompt.key).toBe('askBorrowTens');
+    expect(c1.prompt.params).toEqual({ text: '0 − 1 − 5' });
     expect(c1.options.map((o) => o.label.key)).toEqual(['borrowYes', 'borrowNo']);
     expect(c1.options.map((o) => o.correct)).toEqual([true, false]);
+    expect(numStep(steps[3]).answer).toBe(4);
     expect(numStep(steps[4]).answer).toBe(2);
   });
 
@@ -157,18 +177,46 @@ describe('column item steps', () => {
     expect(c1.options.map((o) => o.correct)).toEqual([false, true]);
   });
 
-  it('digit prompts show the column computation with original digits and the carry-in', () => {
-    // 403 − 158: the units prompt shows "3 − 8", never the borrowed "13 − 8";
-    // the tens prompt carries the borrow ("0 − 1 − 5").
+  it('digit prompts show the column computation after the regroup is decided', () => {
+    // 403 − 158: the borrow was asked first, so the units digit prompt shows
+    // the borrowed calculation "13 − 8" (never the raw "3 − 8" — that asks
+    // for 5, a wrong calculation); the tens prompt carries the borrow
+    // ("10 − 1 − 5"). The borrow QUESTION shows the raw column instead.
     const sub = buildColumnSteps(403, 158, '−');
-    expect(numStep(sub[0]).prompt.params).toEqual({ text: '3 − 8' });
-    expect(numStep(sub[2]).prompt.params).toEqual({ text: '0 − 1 − 5' });
+    expect(numStep(sub[1]).prompt.params).toEqual({ text: '13 − 8' });
+    expect(numStep(sub[3]).prompt.params).toEqual({ text: '10 − 1 − 5' });
     expect(numStep(sub[4]).prompt.params).toEqual({ text: '4 − 1 − 1' });
     // 385 + 247: the tens prompt adds the carry ("8 + 4 + 1").
     const add = buildColumnSteps(385, 247, '+');
     expect(numStep(add[0]).prompt.params).toEqual({ text: '5 + 7' });
     expect(numStep(add[2]).prompt.params).toEqual({ text: '8 + 4 + 1' });
     expect(numStep(add[4]).prompt.params).toEqual({ text: '3 + 2 + 1' });
+  });
+
+  it('every digit prompt is a correct calculation whose units digit is the answer (R121)', () => {
+    // Regression guard for the R121 bug: the R119.2 prompt "3 − 8" asked
+    // for 5, but 3 − 8 = −5 — a wrong calculation on screen. The sweep
+    // evaluates each digit prompt's expression (original digits plus
+    // carry-in, borrowed top for subtraction) and requires a non-negative
+    // value whose units digit is the step's answer. For subtraction the
+    // value is the digit itself; for addition it is the column sum
+    // ("9 + 1" asks for 0, the units digit of 10).
+    for (const tier of [1, 2, 3] as const) {
+      for (let seed = 0; seed < 40; seed++) {
+        const item = generate(tier, seed);
+        for (const step of item.steps) {
+          if (step.kind !== 'number') continue;
+          const text = step.prompt.params?.text;
+          expect(typeof text, `t${tier} #${seed} digit prompt has text`).toBe('string');
+          const value = evalPromptText(text as string);
+          expect(
+            value,
+            `t${tier} #${seed} "${text}" is a correct calculation`,
+          ).toBeGreaterThanOrEqual(0);
+          expect(value % 10, `t${tier} #${seed} "${text}"`).toBe(step.answer);
+        }
+      }
+    }
   });
 
   it('carry questions are choices, never verdicts, with the yes-option first', () => {

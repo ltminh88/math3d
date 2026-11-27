@@ -1,23 +1,25 @@
 // Column-calc generator (boost, Phase 2A): skill `add-sub-column`. The child
 // fills the result right→left one digit at a time (one `number` step per column,
-// 0–9 pad), with a two-option choice after every column but the last — "Có nhớ 1
-// không?" for addition, "Có phải vay 1 không?" for subtraction.
+// 0–9 pad), with a two-option regroup choice for every column but the last —
+// "Có nhớ 1 không?" for addition, "Có phải vay 1 không?" for subtraction.
 //
-// Two deliberate choices, both against leaking the answer through the item
-// itself:
-//   1. A choice follows EVERY column but the last, whether it regroups or
-//      not. A choice only after regrouping columns would teach the child that
-//      "choice ⟺ carry" and answer itself. No choice follows the most
-//      significant column: the capped result never regroups out of it, so the
-//      question would always be "Không".
-//   2. The digit prompt shows the column the child is computing with its
-//      ORIGINAL digits plus the carry/borrow from the previous column
-//      ("3 + 4 + 1", "0 − 1 − 5") — never the borrowed top digit ("13 − 8"
-//      would give the borrow away) and never the result. The scene likewise
-//      never pre-draws the true carry marks (see column-calc-
-//      scene-types.ts). The carry question is a choice, not a verdict: a
-//      verdict would ask the child to call a correct calculation "Sai"
-//      whenever the column does not regroup (R119.1).
+// The regroup question sits at a different point for each operation (R121):
+// addition asks it AFTER the digit ("5 + 7 = 12, viết 2 nhớ 1"), subtraction
+// asks it BEFORE ("3 không trừ được 8, vay 1 → 13 − 8 = 5"). Asking the
+// borrow after the digit would show the child "3 − 8 = ?" for an answer of 5,
+// a wrong calculation on screen. The borrow question names its column and
+// shows the raw column ("3 − 8", "0 − 1 − 5"); the digit prompt then shows
+// the calculation as the child performs it, borrowed top included ("13 − 8",
+// "10 − 1 − 5") — never the result. The scene likewise never pre-draws the
+// true carry marks (see column-calc-scene-types.ts). The regroup question is
+// a choice, not a verdict: a verdict would ask the child to call a correct
+// calculation "Sai" whenever the column does not regroup (R119.1).
+//
+// A choice follows EVERY column but the last, whether it regroups or not. A
+// choice only after regrouping columns would teach the child that
+// "choice ⟺ carry" and answer itself. No choice follows the most significant
+// column: the capped result never regroups out of it, so the question would
+// always be "Không".
 //
 // Pairs come from the Phase 1A ladder picker at the tier's ladder step, then
 // rejection-sampled to a result ≤ 999: column items stay within three columns
@@ -48,7 +50,7 @@ export interface ColumnStep {
   readonly digit: number;
   /** Whether this column regroups out (carry for +, borrow for −). */
   readonly carryOut: boolean;
-  /** The column's computation as the child performs it ("5 + 7", "3 − 8"). */
+  /** The column's computation as the child performs it ("5 + 7", "13 − 8"). */
   readonly sumText: string;
   /** The column's computed value (the sum for +, the borrowed difference for −). */
   readonly sumValue: number;
@@ -82,6 +84,7 @@ export function columnsOf(a: number, b: number, op: AddSubOp): readonly ColumnSt
     } else {
       const raw = topDigit - carryIn - bottomDigit;
       const borrow = raw < 0;
+      const top = borrow ? topDigit + 10 : topDigit;
       out.push({
         col,
         topDigit,
@@ -89,9 +92,11 @@ export function columnsOf(a: number, b: number, op: AddSubOp): readonly ColumnSt
         carryIn,
         digit: borrow ? raw + 10 : raw,
         carryOut: borrow,
-        // Original digits only: the borrowed top ("13 − 8") would give the
-        // borrow away (R119.2). The carry-in shows as "− 1" (R119.3).
-        sumText: carryIn ? `${topDigit} − 1 − ${bottomDigit}` : `${topDigit} − ${bottomDigit}`,
+        // The digit prompt shows the calculation as the child performs it,
+        // AFTER the borrow was decided (R121): the borrowed top ("13 − 8"),
+        // never the raw column ("3 − 8" would ask for 5, a wrong
+        // calculation). The carry-in shows as "− 1" (R119.3).
+        sumText: carryIn ? `${top} − 1 − ${bottomDigit}` : `${top} − ${bottomDigit}`,
         sumValue: borrow ? raw + 10 : raw,
       });
       carry = borrow ? 1 : 0;
@@ -101,6 +106,7 @@ export function columnsOf(a: number, b: number, op: AddSubOp): readonly ColumnSt
 }
 
 const PLACE_KEYS = ['columnDigitOnes', 'columnDigitTens', 'columnDigitHundreds'] as const;
+const PLACE_BORROW_KEYS = ['askBorrowOnes', 'askBorrowTens', 'askBorrowHundreds'] as const;
 
 /**
  * The carry/borrow question as a two-option choice, yes first, always in that
@@ -128,22 +134,37 @@ const carryOptions = (op: AddSubOp, carryOut: boolean): readonly ChoiceOption[] 
   return [yes, no];
 };
 
-/** The steps for `a op b`: one digit step per column, one carry/borrow choice
- *  after every column but the last. At most three columns (see columnPair's cap). */
+/** The steps for `a op b`: one digit step per column; a regroup choice after
+ *  every column but the last for addition, before every column but the last
+ *  for subtraction (R121 — the borrow must be decided before the digit is
+ *  computed). At most three columns (see columnPair's cap). */
 export function buildColumnSteps(a: number, b: number, op: AddSubOp): ReasoningStep[] {
   const cols = columnsOf(a, b, op);
   if (cols.length > 3) throw new Error(`column-calc: ${a} ${op} ${b} has ${cols.length} columns`);
   const steps: ReasoningStep[] = [];
   cols.forEach((c, i) => {
+    if (op === '−' && i < cols.length - 1) {
+      // The borrow question names its column and shows the raw column
+      // ("3 − 8", "0 − 1 − 5"): the child decides the borrow from this,
+      // before computing the digit.
+      const rawText = c.carryIn
+        ? `${c.topDigit} − 1 − ${c.bottomDigit}`
+        : `${c.topDigit} − ${c.bottomDigit}`;
+      steps.push({
+        kind: 'choice',
+        prompt: ref(PLACE_BORROW_KEYS[i] as string, { text: rawText }),
+        options: carryOptions(op, c.carryOut),
+      });
+    }
     steps.push({
       kind: 'number',
       prompt: ref(PLACE_KEYS[i] as string, { text: c.sumText }),
       answer: c.digit,
     });
-    if (i < cols.length - 1) {
+    if (op === '+' && i < cols.length - 1) {
       steps.push({
         kind: 'choice',
-        prompt: ref(op === '+' ? 'askCarry' : 'askBorrow'),
+        prompt: ref('askCarry'),
         options: carryOptions(op, c.carryOut),
       });
     }

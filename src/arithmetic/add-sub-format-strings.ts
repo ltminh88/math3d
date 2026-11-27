@@ -27,13 +27,18 @@ export const addSubFormatStrings = {
     // Boost Phase 2A column-calc: one digit step per column, units first.
     // The digit prompt shows the column's computation as one expression
     // ({text}): original digits plus the carry/borrow from the previous
-    // column — never the borrowed top digit, never the result (R119.2/3).
+    // column, borrowed top included for subtraction ("13 − 8") — the
+    // expression's value is always the digit asked for (R121). The borrow
+    // question (subtraction only, asked BEFORE the digit) names its column
+    // and shows the raw column instead.
     columnCalc: 'Đặt tính rồi tính: {a} {op} {b}.',
     columnDigitOnes: 'Hàng đơn vị: {text} = ?',
     columnDigitTens: 'Hàng chục: {text} = ?',
     columnDigitHundreds: 'Hàng trăm: {text} = ?',
     askCarry: 'Có nhớ 1 không?',
-    askBorrow: 'Có phải vay 1 không?',
+    askBorrowOnes: 'Hàng đơn vị: {text}. Có phải vay 1 không?',
+    askBorrowTens: 'Hàng chục: {text}. Có phải vay 1 không?',
+    askBorrowHundreds: 'Hàng trăm: {text}. Có phải vay 1 không?',
     carryYes: 'Có nhớ 1',
     carryNo: 'Không nhớ',
     borrowYes: 'Có vay 1',
@@ -65,7 +70,9 @@ export const addSubFormatStrings = {
     columnDigitTens: 'Tens: {text} = ?',
     columnDigitHundreds: 'Hundreds: {text} = ?',
     askCarry: 'Do you carry 1?',
-    askBorrow: 'Do you borrow 1?',
+    askBorrowOnes: 'Ones: {text}. Do you borrow 1?',
+    askBorrowTens: 'Tens: {text}. Do you borrow 1?',
+    askBorrowHundreds: 'Hundreds: {text}. Do you borrow 1?',
     carryYes: 'Carry 1',
     carryNo: 'No carry',
     borrowYes: 'Borrow 1',
