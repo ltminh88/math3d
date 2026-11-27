@@ -26,7 +26,7 @@ the AGENTS.md gates; UI PRs carry `parity-change`; `tap()` only, targets ≥ 44 
 | 3A | [Add/sub in play](phase-03a-add-sub-in-play.md) | Lane A, muse-88 | 1A, 2B | 0.75d | pending |
 | 4A | [Weak-spot weighting](phase-04a-weak-spot-weighting.md) | Lane A, muse-88 | 0, 1A | 1d | pending |
 | 1B | [Length ladder generators](phase-01b-length-ladder-generators.md) | Lane B, muse-min (R81) | 0, D1 | 1.5d | done (#88) |
-| 2B | [Order/match steps + length scenes](phase-02b-order-match-steps-and-length-scenes.md) | Lane B, muse-min (R81, after 1B) | 0 | 1.25d | assigned |
+| 2B | [Order/match steps + length scenes](phase-02b-order-match-steps-and-length-scenes.md) | Lane B, muse-min (R81, after 1B) | 0 | 1.25d | done (#89) |
 | 3B | [Length in the workshop](phase-03b-length-in-workshop.md) | Lane B, muse-min | 1B, 2B | 0.5d | pending |
 | 5B | [Quick diagnostic](phase-05b-quick-diagnostic.md) | Lane B, muse-min | 1A, 1B, 4A | 1d | pending |
 | 6B | [Parent progress view (optional)](phase-06b-parent-progress-view.md) | Lane B, muse-min | 4A, D5 | 0.5d | pending |
