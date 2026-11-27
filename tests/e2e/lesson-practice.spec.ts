@@ -159,11 +159,15 @@ async function playLessonRun(
 }
 
 // Hotfix P0 (22/11): the profile id is pinned (crypto.randomUUID stubbed) so a fresh
-// B2 run is deterministic — its mental-round item is "700 + 300" = 1000 (verified
-// offline with lessonSeed + planLessonRun; the profile id is the only seed input a
-// fresh run has). Without the pin, the B2 seed varies per run and the 4-digit answer
-// only shows up by luck (that is how it slipped past #51's green CI and only failed
-// on #52's tablet-landscape shard).
+// run is deterministic (the profile id is the only seed input a fresh run has).
+// Without the pin, the seed varies per run and a 4-digit answer only shows up by
+// luck (that is how it slipped past #51's green CI and only failed on #52's
+// tablet-landscape shard). The pin's old B2 claim ("700 + 300" = 1000 in run 1)
+// died when skills were added: the 12-skill B2 chain has no >= 1000 number step
+// in 20 replays (verified offline 27/11 with lessonSeed + planLessonRun +
+// skillPlan; the first one lands in run 24). The 4-digit-answer tests therefore
+// live on B54, whose four skills all play in run 1 and whose add-4digit answers
+// are always >= 2000 by construction.
 const PINNED_PROFILE_UUID = '00000000-0000-4000-8000-000000000005';
 
 /** Crypto.prototype with the pinned-UUID override state (see pinProfileUuid). */
@@ -458,28 +462,26 @@ test('run B7: two runs cover all 12 skills, stars show after the second, coins i
   await expect(page.locator('#dialog')).not.toHaveAttribute('open', '');
 });
 
-test('B2 four-digit answer: a replay contains a 1000 answer and typing it completes the step', async ({
+test('B54 four-digit answer: run 1 has a 4-digit answer and typing it completes the step', async ({
   page,
 }, info) => {
   const touch = isTouch(info);
-  // Six replays on tablets need more than the 12-min describe budget (see the
-  // run-B2 coverage test), so the budget is 20 minutes like that test.
   test.setTimeout(SLOW_TEST_MS * 5);
   await pinProfileUuid(page);
   await boot(page);
   await unpinProfileUuid(page);
   await openPicker(page, touch);
-  await pickLesson(page, 2, touch);
+  await openTopic(page, 10, touch);
+  await pickLesson(page, 54, touch);
   await expect(page.locator('#dialog-content')).toContainText(
-    'Bài 2 · Cộng, trừ trong phạm vi 1 000 · Câu 1/6',
+    'Bài 54 · Phép cộng trong phạm vi 10 000 · Câu 1/6',
   );
-  // The pinned profile's run 1 has no >= 1000 answer (the 12-skill shuffle
-  // plays column, find-error, mental-round at 200, number-line, chain,
-  // bug-choice); the 1000 answer (mental-round, round hundreds) lands in
-  // run 6 (verified offline with lessonSeed + planLessonRun + skillPlan).
-  // One run cannot earn the star with 12 skills, so no star assertion here —
-  // the run-B2 coverage test owns that. The run assert is ≤ so a planner
-  // change that surfaces the 1000 answer earlier does not break it (R105).
+  // B54 has only four skills, so run 1 plays all of them — and add-4digit
+  // always answers >= 2000 by construction (add-sub-10000-wp can top 1000
+  // too). Verified offline with lessonSeed + planLessonRun + skillPlan: run 1
+  // is [find-error, 10000-wp, missing-digit, add-4digit] in both box regimes.
+  // The replay loop below is a safety net, not luck: the premise holds by
+  // construction, and the run assert is ≤ (R105).
   let sawThousand = false;
   let runs = 0;
   for (let r = 0; r < 6 && !sawThousand; r++) {
@@ -492,47 +494,46 @@ test('B2 four-digit answer: a replay contains a 1000 answer and typing it comple
       if (touch) await replay.tap();
       else await replay.click();
       await expect(page.locator('#dialog-content')).toContainText(
-        'Bài 2 · Cộng, trừ trong phạm vi 1 000 · Câu 1/6',
+        'Bài 54 · Phép cộng trong phạm vi 10 000 · Câu 1/6',
       );
     }
   }
-  expect(sawThousand, 'a B2 run contains a 4-digit answer step').toBe(true);
-  expect(runs, 'pinned profile finds the 1000 answer by run 6').toBeLessThanOrEqual(6);
+  expect(sawThousand, 'a B54 run contains a 4-digit answer step').toBe(true);
+  expect(runs, 'pinned profile finds the 4-digit answer in run 1').toBeLessThanOrEqual(1);
   const content = page.locator('#dialog-content');
-  await expect(content).toContainText('Xong bài 2!');
+  await expect(content).toContainText('Xong bài 54!');
   await waitDialogSettled(page);
   await page.locator('#close-dialog').click();
   await expect(page.locator('#dialog')).not.toHaveAttribute('open', '');
 });
 
-test('B2 pad fits six digits: typing 100000 shows all six, keys stay ≥ 44 px, no overflow', async ({
+test('B54 pad fits six digits: typing 100000 shows all six, keys stay ≥ 44 px, no overflow', async ({
   page,
 }, info) => {
   const touch = isTouch(info);
-  // Six replays on tablets need more than the 12-min describe budget (see the
-  // run-B2 coverage test), so the budget is 20 minutes like that test.
   test.setTimeout(SLOW_TEST_MS * 5);
   await pinProfileUuid(page);
   await boot(page);
   await unpinProfileUuid(page);
   await openPicker(page, touch);
-  await pickLesson(page, 2, touch);
-  // Play until the item whose number step answers 1000, then check the pad there.
-  // The pinned profile's run 1 has no >= 1000 number step; the 1000 answer
-  // (mental-round) lands in run 6 (verified offline with lessonSeed +
-  // planLessonRun + skillPlan) — replay until it appears.
+  await openTopic(page, 10, touch);
+  await pickLesson(page, 54, touch);
+  // Run 1 plays all four B54 skills, so a 4-digit number step is in run 1
+  // (add-4digit always answers >= 2000; verified offline). Check the pad on
+  // that step: type six digits without submitting, then clear and answer it
+  // with its own four-digit answer. The replay loop is a safety net only.
   let runs = 0;
   for (;;) {
     const state = await page.evaluate(() => window.__lesson?.state() ?? null);
     if (!state) throw new Error('lesson hook missing');
     if (state.index >= state.total) {
       runs++;
-      if (runs >= 6) throw new Error('1000-answer item not found in B2 run');
+      if (runs >= 6) throw new Error('4-digit-answer item not found in B54 run');
       const replay = page.locator('#lesson-replay');
       if (touch) await replay.tap();
       else await replay.click();
       await expect(page.locator('#dialog-content')).toContainText(
-        'Bài 2 · Cộng, trừ trong phạm vi 1 000 · Câu 1/6',
+        'Bài 54 · Phép cộng trong phạm vi 10 000 · Câu 1/6',
       );
       continue;
     }
@@ -544,6 +545,9 @@ test('B2 pad fits six digits: typing 100000 shows all six, keys stay ≥ 44 px, 
       });
       const bigIndex = steps?.findIndex((s) => s.kind === 'number' && s.answer >= 1000) ?? -1;
       if (bigIndex >= 0) {
+        const bigStep = steps?.[bigIndex];
+        if (!bigStep || bigStep.kind !== 'number')
+          throw new Error('4-digit step vanished between reads');
         const panel = page.locator('#dialog-content');
         const row = panel.locator('.daily-steps .kit-step').nth(bigIndex);
         const pad = row.locator('.kit-pad');
@@ -573,14 +577,15 @@ test('B2 pad fits six digits: typing 100000 shows all six, keys stay ≥ 44 px, 
           expect(keyBox.width, `pad key ${i} width`).toBeGreaterThanOrEqual(44);
           expect(keyBox.height, `pad key ${i} height`).toBeGreaterThanOrEqual(44);
         }
-        // Clear the six digits, then answer the step correctly.
+        // Clear the six digits, then answer the step correctly with its own
+        // four-digit answer.
         if (touch) {
           for (let i = 0; i < 6; i++) await pad.locator('.kit-pad__key', { hasText: '⌫' }).tap();
         } else {
           for (let i = 0; i < 6; i++) await page.keyboard.press('Backspace');
         }
         await expect(pad.locator('.kit-pad__display')).toHaveText('');
-        await typeNumber(page, pad, 1000, touch);
+        await typeNumber(page, pad, bigStep.answer, touch);
         await expect(row).toHaveClass(/kit-step--done/);
         return;
       }
