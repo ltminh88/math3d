@@ -84,9 +84,15 @@ export function pickDailyItems({
   islandUnlocked = false,
 }: PlanDailyInput): FactKey[] {
   const rng = mulberry32(seed);
-  // Shuffled first so the stable sorts below break ties deterministically by seed.
   // English Island (Phase 6): a locked island contributes no English items at all.
-  const pool = shuffle(rng, learnedPool(stats)).filter((k) => islandUnlocked || !isEnglishKey(k));
+  // Filtered BEFORE the shuffle (R114): a locked island with English stats must
+  // plan the same deck as the same profile without them — filtering after the
+  // shuffle consumed the rng differently and drifted 158/2000 decks from main.
+  // Shuffled so the stable sorts below break ties deterministically by seed.
+  const pool = shuffle(
+    rng,
+    learnedPool(stats).filter((k) => islandUnlocked || !isEnglishKey(k)),
+  );
   const due = pool
     .filter((k) => {
       const s = statOf(stats, k);

@@ -175,6 +175,18 @@ describe('English in daily practice (Phase 6)', () => {
     ]);
   });
 
+  it('locked island: the deck equals the math-only deck (R114)', () => {
+    // The English filter runs before the shuffle, so English stats on a locked
+    // island cannot change the rng or the deck (was 158/2000 off main).
+    const stats = statsOf({ ...enDue, ...mathDue });
+    const mathOnly = statsOf({ ...mathDue });
+    for (const seed of [7, 11, 23, 42]) {
+      expect(planDailySet({ stats, today: TODAY, seed, islandUnlocked: false })).toEqual(
+        planDailySet({ stats: mathOnly, today: TODAY, seed, islandUnlocked: false }),
+      );
+    }
+  });
+
   it('is deterministic for (seed, today, stats, islandUnlocked)', () => {
     const stats = statsOf({ ...enDue, ...mathDue });
     const input = { stats, today: TODAY, seed: 11, islandUnlocked: true };
