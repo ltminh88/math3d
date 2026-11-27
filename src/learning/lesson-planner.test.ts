@@ -3,7 +3,7 @@
 // not by calling the helpers under test:
 //   B25 = div-rem-floor, div-rem-ceil, choose-all-correct, tf-explain (catalog lines 36-37, 49-50)
 //   B3  = unknown-add-sub + unknown-add-sub-wp (R8); B1 has the six number skills (phase 07); B2 has
-//         the six arithmetic skills (phase 09); B7 reviews twelve geometry/measurement
+//         the eleven arithmetic skills (phase 09 + boost 1A); B7 reviews twelve geometry/measurement
 //         skills (phase 21 + boost 1B); B14 = the six fraction skills (phase 12); B23/B26/B36/B37
 //         have the mul/div arithmetic skills (phase 10)
 //   B5  = tables [3]: 9 mul facts (3x2..3x10) + 9 div facts (6/3..30/3), plus
@@ -168,7 +168,7 @@ describe('planLessonRun', () => {
       expect(run).toHaveLength(6);
       expect(run.every((k) => /^(sk:tally-|sk:table-|sk:chance-)/.test(k))).toBe(true);
     }
-    // B2 plans its six arithmetic skills now that phase 09 landed them.
+    // B2 plans its eleven arithmetic skills (phase 09 + boost 1A).
     const b2 = planLessonRun(2, {}, mulberry32(4));
     expect(b2).toHaveLength(6);
     expect(new Set(b2).size).toBe(6);

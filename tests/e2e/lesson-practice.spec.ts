@@ -320,7 +320,7 @@ test('VLM entry: the Milo dialog opens the picker by tap', async ({ page }, info
   await expect(page.locator('#dialog')).not.toHaveAttribute('open', '');
 });
 
-test('run B2: answer all 6, stars before/after show, coins in store, picker stars update', async ({
+test('run B2: two runs cover all 11 skills, stars show after the second, coins in store, picker stars update', async ({
   page,
 }, info) => {
   const touch = isTouch(info);
@@ -330,22 +330,31 @@ test('run B2: answer all 6, stars before/after show, coins in store, picker star
   await expect(page.locator('#dialog-content')).toContainText(
     'Bài 2 · Cộng, trừ trong phạm vi 1 000 · Câu 1/6',
   );
-  expect(await playLessonRun(page, touch)).toBe(6);
+  const played: (string | undefined)[] = [];
+  // B2 has eleven skills since boost 1A (six legacy + five new formats),
+  // so one 6-item run cannot earn the first star: it needs every skill
+  // attempted. Run 1 plays six; run 2 plays the other five (longest unseen
+  // first) plus one repeat, then the star lands.
+  expect(await playLessonRun(page, touch, (id) => played.push(id))).toBe(6);
   const content = page.locator('#dialog-content');
+  await expect(content).toContainText('Xong bài 2!');
+  await expect(content).toContainText('☆☆☆ → ☆☆☆');
+  await expect(content).toContainText('+30 xu');
+  const replay = page.locator('#lesson-replay');
+  if (touch) await replay.tap();
+  else await replay.click();
+  await expect(page.locator('#dialog-content')).toContainText(
+    'Bài 2 · Cộng, trừ trong phạm vi 1 000 · Câu 1/6',
+  );
+  expect(await playLessonRun(page, touch, (id) => played.push(id))).toBe(6);
   await expect(content).toContainText('Xong bài 2!');
   await expect(content).toContainText('☆☆☆ → ★☆☆');
   await expect(content).toContainText('+30 xu');
-  await expect(coins(page)).toHaveText('30');
+  await expect(coins(page)).toHaveText('60');
   const snap = await page.evaluate(() => window.__game?.snapshot());
-  for (const id of [
-    'add-sub-mental-round',
-    'add-sub-1000',
-    'add-sub-1000-wp',
-    'add-sub-1000-chain',
-    'add-sub-find-error',
-    'add-missing-digit',
-  ])
-    expect(snap?.factStats[`sk:${id}`]?.attempts ?? 0).toBeGreaterThanOrEqual(1);
+  for (const key of skillsOfLesson(2))
+    expect(snap?.factStats[key]?.attempts ?? 0, key).toBeGreaterThanOrEqual(1);
+  expect(new Set(played).size, 'both runs together play all 11 skills').toBe(11);
   // Back to the picker: B2 now shows 1 star.
   const back = page.locator('#lesson-back');
   if (touch) await back.tap();

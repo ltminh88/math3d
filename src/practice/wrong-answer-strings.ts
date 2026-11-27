@@ -275,6 +275,24 @@ export const twa = defineStrings('wrongAnswer', {
       'Bạn tính số mà quên đơn vị rồi. Hai số khác đơn vị thì phải đổi về cùng một đơn vị trước nhé.',
     lenFallback:
       'Bạn thử lại nhé: nhìn thang đo 1 m = 10 dm = 100 cm = 1 000 mm rồi đổi từng bậc một.',
+    // Nhóm 12 — các lỗi cộng/trừ (add-sub-bug-choice, add-sub-compare-estimate,
+    // add-sub-number-line, add-sub-find-error)
+    bugForgotCarry:
+      'Bạn cộng từng hàng mà quên nhớ 1 sang hàng bên trái. Mình đặt tính rồi cộng từng hàng từ phải sang trái nhé.',
+    bugCarryNotAdded:
+      'Bạn nhớ 1 rồi nhưng chưa cộng nó vào hàng tiếp theo. Mình cộng thêm số nhớ vào hàng đó nhé.',
+    bugSmallerFromLarger:
+      'Bạn trừ số bé cho số lớn ở từng hàng. Khi số trên bé hơn số dưới thì mình mượn 1 ở hàng bên trái nhé.',
+    bugBorrowNoDecrement:
+      'Bạn mượn 1 rồi nhưng quên bớt 1 ở số cho mượn. Mình bớt 1 ở hàng cho mượn rồi tính lại nhé.',
+    bugZeroBorrowSkip:
+      'Bạn gặp số 0 thì dừng mượn. Số 0 mượn 1 thành 9 rồi mượn tiếp sang hàng bên trái nhé.',
+    bugZeroMinusNZero:
+      'Bạn thấy 0 trừ một số thì viết 0. Mình mượn 1 cho số 0 rồi tính lại nhé.',
+    bugMisalignedColumns:
+      'Bạn đặt các chữ số chưa thẳng hàng. Mình viết số dưới sao cho hàng đơn vị thẳng hàng đơn vị nhé.',
+    bugSecondRegroupDropped:
+      'Bạn nhớ lần đầu rồi nhưng quên nhớ lần thứ hai. Mình tính từng hàng, có nhớ thì cộng vào hàng tiếp theo nhé.',
   },
   en: {
     unknownWrongInverseAdd:
@@ -548,6 +566,24 @@ export const twa = defineStrings('wrongAnswer', {
       'You worked with the numbers and forgot the units. When the units differ, convert them to the same unit first.',
     lenFallback:
       'Try again: look at the ladder 1 m = 10 dm = 100 cm = 1 000 mm and convert one step at a time.',
+    // Group 12 — the add/sub bugs (add-sub-bug-choice, add-sub-compare-estimate,
+    // add-sub-number-line, add-sub-find-error)
+    bugForgotCarry:
+      'You added column by column but forgot to carry 1 to the next column. Set it out again and add column by column from right to left.',
+    bugCarryNotAdded:
+      'You carried 1 but did not add it to the next column. Add the carried 1 to that column.',
+    bugSmallerFromLarger:
+      'You subtracted the smaller digit from the larger one in each column. When the top digit is smaller, borrow 1 from the column on the left.',
+    bugBorrowNoDecrement:
+      'You borrowed 1 but forgot to take 1 away from the digit you borrowed from. Take 1 away there and work it out again.',
+    bugZeroBorrowSkip:
+      'You stopped borrowing when you met a 0. A 0 that borrows 1 becomes 9 — borrow on to the next column.',
+    bugZeroMinusNZero:
+      'You saw 0 minus a number and wrote 0. Borrow 1 for the 0 and work it out again.',
+    bugMisalignedColumns:
+      'Your digits are not lined up. Write the lower number so the units line up under the units.',
+    bugSecondRegroupDropped:
+      'You remembered the first carry but forgot the second one. Work column by column and carry every regroup into the next column.',
   },
 });
 

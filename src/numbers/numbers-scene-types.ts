@@ -32,6 +32,9 @@ export type NumberScene =
       readonly marks: readonly number[];
       /** Indices into `marks` drawn as '?'. */
       readonly missing: readonly number[];
+      /** Optional jumps the renderer draws as arcs (Phase 1A): each jump starts at
+          `from` and moves by `by`. Absent for the plain ±1 sequence scenes. */
+      readonly jumps?: readonly { readonly from: number; readonly by: number }[];
     };
 
 /** A numbers scene is a PracticeScene: `kind` names the renderer that draws it. */

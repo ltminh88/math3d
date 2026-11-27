@@ -33,6 +33,27 @@ function renderNumberLine(scene: NumberLineScene): SVGElement {
       class: 'ds-point',
     }),
   );
+  // Jump arcs (Phase 1A): each jump arcs above the line from its start mark to
+  // its landing mark, labelled with the signed jump. Marks 100 apart, so the
+  // arc midpoint sits 50 from either mark's letter (y=34) — no collision.
+  const xOf = (value: number): number | undefined => {
+    const i = scene.marks.indexOf(value);
+    return i === -1 ? undefined : X0 + i * STEP_X;
+  };
+  for (const jump of scene.jumps ?? []) {
+    const x1 = xOf(jump.from);
+    const x2 = xOf(jump.from + jump.by);
+    if (x1 === undefined || x2 === undefined) continue;
+    const midX = (x1 + x2) / 2;
+    svg.append(
+      svgEl('path', {
+        d: `M ${x1},${LINE_Y} Q ${midX},${LINE_Y - 34} ${x2},${LINE_Y}`,
+        class: 'ds-line',
+        fill: 'none',
+      }),
+    );
+    svg.append(dsLabel(midX, LINE_Y - 30, jump.by >= 0 ? `+${jump.by}` : `${jump.by}`));
+  }
   let missingSeen = 0;
   scene.marks.forEach((mark, i) => {
     const x = X0 + i * STEP_X;

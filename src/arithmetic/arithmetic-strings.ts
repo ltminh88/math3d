@@ -5,6 +5,7 @@ import { defineStrings } from '../i18n/i18n';
 import { formatDigitRuns, formatNumber } from '../numbers/numbers-format';
 import { renderPrompt as renderReasoningPrompt } from '../reasoning/reasoning-strings';
 import type { PromptRef } from '../reasoning/reasoning-types';
+import { addSubFormatStrings } from './add-sub-format-strings';
 
 const vi = {
   addCalc: 'Tính: {a} + {b}.',
@@ -187,7 +188,10 @@ const en = {
   item_riceKg: 'kg of rice',
 };
 
-const ns = defineStrings('arithmetic', { vi, en });
+const ns = defineStrings('arithmetic', {
+  vi: { ...vi, ...addSubFormatStrings.vi },
+  en: { ...en, ...addSubFormatStrings.en },
+});
 
 type Key = Parameters<typeof ns>[0];
 

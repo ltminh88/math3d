@@ -51,4 +51,10 @@ export const ARITHMETIC_ENTRIES: readonly SkillEntry[] = Object.freeze([
   entry('div-5d-1d-remainder', 'arithmetic', [t2(71)]),
   entry('mul-div-large-wp', 'arithmetic', [t2(56), t2(57), t2(70), t2(71)]),
   entry('mul-chain-operators', 'arithmetic', [t2(56), t2(57), t2(70), t2(71)]),
+  // Boost Phase 1A: the five new add/sub formats, B2 (book 1, lesson 2).
+  entry('add-sub-bug-choice', 'arithmetic', [t1(2)]),
+  entry('add-sub-true-false', 'arithmetic', [t1(2)]),
+  entry('add-sub-compare-estimate', 'arithmetic', [t1(2)]),
+  entry('add-sub-number-line', 'arithmetic', [t1(2)]),
+  entry('add-sub-bar-model-wp', 'arithmetic', [t1(2)]),
 ]);

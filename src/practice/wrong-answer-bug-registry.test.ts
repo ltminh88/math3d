@@ -7,7 +7,9 @@ import type { ReasoningStep } from '../reasoning/reasoning-types';
 import type { PracticeItem } from './practice-scene';
 import { explainWrongAnswer, registerBugExplainer } from './wrong-answer-explanation';
 
-const choice = (misconception: 'carry-not-added' | 'unit-direction'): ReasoningStep => ({
+const choice = (
+  misconception: 'carry-not-added' | 'unit-direction' | 'wrong-sign',
+): ReasoningStep => ({
   kind: 'choice',
   prompt: { key: 'addPick' },
   options: [
@@ -32,7 +34,9 @@ describe('bug explainer registry', () => {
       skillId: 'add-sub-1000',
       tier: 2,
       story: { key: 'addCalc', params: { a: 47, b: 28 } },
-      steps: [choice('carry-not-added')],
+      // 'wrong-sign' has no explainer (Phase 1A registered the add/sub bugs,
+      // so 'carry-not-added' no longer works as the unregistered example).
+      steps: [choice('wrong-sign')],
       work: [],
     };
     // A choice step on add-sub-1000 has no number diagnosis: carry's fallback.

@@ -44,12 +44,18 @@ export function sweepArithmeticItem(
   const where = `${skillId} t${tier} #${seed}`;
   expect(item.skillId).toBe(skillId);
   expect(item.tier).toBe(tier);
-  expect(item.scene, where).toBeUndefined();
+  // add-sub-number-line is the one arithmetic item with a scene (its number-line
+  // picture); every other arithmetic item is scene-free.
+  if (item.scene !== undefined) {
+    expect(skillId, where).toBe('add-sub-number-line');
+    expect(item.scene.kind, where).toBe('number-line');
+  }
   expect(item.steps.length, where).toBeGreaterThanOrEqual(1);
   // div-2d-1d-wp T3 is the one three-step form (full boxes → leftover → boxes
-  // needed); every other arithmetic item has at most two steps.
+  // needed); add-sub-bar-model-wp is the other (bar → operation → number pad);
+  // every other arithmetic item has at most two steps.
   expect(item.steps.length, where).toBeLessThanOrEqual(
-    skillId === 'div-2d-1d-wp' && tier === 3 ? 3 : 2,
+    (skillId === 'div-2d-1d-wp' && tier === 3) || skillId === 'add-sub-bar-model-wp' ? 3 : 2,
   );
   const cap = rangeCapOfSkill(skillId, tier);
   for (const n of allNumbers(item)) {
