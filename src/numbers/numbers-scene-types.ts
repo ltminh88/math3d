@@ -24,7 +24,11 @@ export type NumberScene =
     }
   | {
       readonly kind: 'number-line';
-      /** The first mark; the step between marks is 1 or -1. */
+      /**
+       * The first mark for a ±1 sequence; with `jumps` present it is the jump
+       * origin instead (not necessarily marks[0]), and `step` is the jump
+       * direction (+1 right, −1 left) rather than the gap between marks.
+       */
       readonly start: number;
       readonly step: 1 | -1;
       /** Every mark of the line (the missing ones carry their true value; the renderer

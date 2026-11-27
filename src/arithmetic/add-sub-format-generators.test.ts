@@ -226,6 +226,34 @@ describe('add-sub-compare-estimate', () => {
 });
 
 describe('add-sub-number-line', () => {
+  it('the marks always increase left to right, even for subtraction (R103.1)', () => {
+    for (const tier of [1, 2, 3] as const) {
+      for (let seed = 0; seed < 40; seed++) {
+        const item = generate('add-sub-number-line', tier, seed);
+        const scene = item.scene as Extract<NumberScene, { kind: 'number-line' }> | undefined;
+        expect(scene?.kind).toBe('number-line');
+        if (scene?.kind !== 'number-line') continue;
+        const marks = scene.marks;
+        for (let i = 1; i < marks.length; i++) {
+          expect(marks[i] as number, `t${tier} #${seed}: ${marks}`).toBeGreaterThan(
+            marks[i - 1] as number,
+          );
+        }
+        // The jumps still run in jump order (right-to-left for subtraction).
+        const jumps = scene.jumps ?? [];
+        expect(jumps.length).toBeGreaterThan(0);
+        const p = params(item);
+        const start = p.start as number;
+        expect(jumps[0]?.from).toBe(start);
+        for (let i = 1; i < jumps.length; i++) {
+          expect(jumps[i]?.from).toBe(
+            (jumps[i - 1]?.from ?? 0) + (jumps[i - 1]?.by ?? 0),
+          );
+        }
+      }
+    }
+  });
+
   it('the scene lands on the right answer and the options match the bugs', () => {
     for (const tier of [1, 2, 3] as const) {
       for (let seed = 0; seed < 40; seed++) {
@@ -241,9 +269,11 @@ describe('add-sub-number-line', () => {
         expect(scene?.kind).toBe('number-line');
         if (scene?.kind !== 'number-line') continue;
         const marks = scene.marks;
-        expect(marks[0]).toBe(start);
-        expect(marks[marks.length - 1]).toBe(correct);
-        expect(scene.missing).toEqual([marks.length - 1]);
+        // Marks increase left to right (R103.1): the first is the smaller of
+        // start/correct, the last the larger; '?' sits on the landing.
+        expect(marks[0]).toBe(Math.min(start, correct));
+        expect(marks[marks.length - 1]).toBe(Math.max(start, correct));
+        expect(scene.missing).toEqual([marks.indexOf(correct)]);
         expect(scene.jumps?.length).toBe(jumps.length);
         for (let i = 0; i < jumps.length; i++) {
           expect(scene.jumps?.[i]?.by).toBe(jumps[i]);

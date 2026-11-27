@@ -36,6 +36,17 @@ function renderNumberLine(scene: NumberLineScene): SVGElement {
   // Jump arcs (Phase 1A): each jump arcs above the line from its start mark to
   // its landing mark, labelled with the signed jump. Marks 100 apart, so the
   // arc midpoint sits 50 from either mark's letter (y=34) — no collision.
+  // The arc's height grows with the jump's size (R103.1): a real number line
+  // is to scale, but these landings are hundreds apart, so the arcs only rank
+  // the jumps — the hundred-step arc is visibly longer than the unit-step one.
+  // The arrowhead sits at the landing end and points in the jump's direction
+  // (left for subtraction).
+  const arcHeight = (by: number): number => {
+    const mag = Math.abs(by);
+    if (mag >= 100) return 48;
+    if (mag >= 10) return 34;
+    return 22;
+  };
   const xOf = (value: number): number | undefined => {
     const i = scene.marks.indexOf(value);
     return i === -1 ? undefined : X0 + i * STEP_X;
@@ -45,14 +56,25 @@ function renderNumberLine(scene: NumberLineScene): SVGElement {
     const x2 = xOf(jump.from + jump.by);
     if (x1 === undefined || x2 === undefined) continue;
     const midX = (x1 + x2) / 2;
+    const h = arcHeight(jump.by);
     svg.append(
       svgEl('path', {
-        d: `M ${x1},${LINE_Y} Q ${midX},${LINE_Y - 34} ${x2},${LINE_Y}`,
+        d: `M ${x1},${LINE_Y} Q ${midX},${LINE_Y - h} ${x2},${LINE_Y}`,
         class: 'ds-line',
         fill: 'none',
       }),
     );
-    svg.append(dsLabel(midX, LINE_Y - 30, jump.by >= 0 ? `+${jump.by}` : `${jump.by}`));
+    // Arrowhead at the landing end, pointing in the jump's direction.
+    const dir = jump.by >= 0 ? -1 : 1;
+    svg.append(
+      svgEl('polygon', {
+        points: `${x2},${LINE_Y} ${x2 + dir * 10},${LINE_Y - 5} ${x2 + dir * 10},${LINE_Y + 5}`,
+        class: 'ds-point',
+      }),
+    );
+    svg.append(
+      dsLabel(midX, LINE_Y - h / 2 - 8, jump.by >= 0 ? `+${jump.by}` : `${jump.by}`),
+    );
   }
   let missingSeen = 0;
   scene.marks.forEach((mark, i) => {

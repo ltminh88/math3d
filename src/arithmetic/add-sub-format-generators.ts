@@ -153,7 +153,10 @@ export const numberLine: ReasoningGenerator = (rng, tier) => {
     landing += by;
   }
   const correct = landing;
-  const marks = [a, ...jumps.map((j) => j.from + j.by)];
+  // The marks always read left to right: the landings sorted ascending, so a
+  // subtraction line still increases to the right (R103.1) — the jumps run
+  // right-to-left instead, and the renderer points their arrows left.
+  const marks = [a, ...jumps.map((j) => j.from + j.by)].sort((x, y) => x - y);
   const bugs = bugsFor(a, b, op).filter((f) => f.value <= CAP);
   const candidates = bugs.map((f) => ({ value: f.value, misconception: f.bug }));
   const jumpsText = jumps.map((j) => (j.by >= 0 ? `+${j.by}` : `${j.by}`)).join(', ');
@@ -162,7 +165,7 @@ export const numberLine: ReasoningGenerator = (rng, tier) => {
     start: a,
     step: isAdd ? 1 : -1,
     marks,
-    missing: [marks.length - 1],
+    missing: [marks.indexOf(correct)],
     jumps,
   };
   return arithmeticItem(
