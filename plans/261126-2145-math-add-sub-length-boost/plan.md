@@ -21,7 +21,7 @@ the AGENTS.md gates; UI PRs carry `parity-change`; `tap()` only, targets ≥ 44 
 | # | Phase | Owner | Depends | Effort | Status |
 |---|---|---|---|---|---|
 | 0 | [Shared contracts](phase-00-shared-contracts.md) | muse-min (R77, moved: muse-88 quota) | — | 0.5d | done (#87) |
-| 1A | [Add/sub bug catalogue + new formats](phase-01a-add-sub-bug-catalogue-and-formats.md) | Lane A, muse-88 (R82, after audio) | 0 | 1.5d | in progress |
+| 1A | [Add/sub bug catalogue + new formats](phase-01a-add-sub-bug-catalogue-and-formats.md) | Lane A, muse-88 (R82, after audio) | 0 | 1.5d | done (#93) |
 | 2A | [Column-calc scene, step by step](phase-02a-column-calc-scene.md) | Lane A, muse-88 | 1A | 1.25d | pending |
 | 3A | [Add/sub in play](phase-03a-add-sub-in-play.md) | Lane A, muse-88 | 1A, 2B | 0.75d | pending |
 | 4A | [Weak-spot weighting](phase-04a-weak-spot-weighting.md) | Lane A, muse-88 | 0, 1A | 1d | pending |
