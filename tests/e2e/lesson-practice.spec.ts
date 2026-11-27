@@ -344,7 +344,7 @@ test('VLM entry: the Milo dialog opens the picker by tap', async ({ page }, info
   await expect(page.locator('#dialog')).not.toHaveAttribute('open', '');
 });
 
-test('run B2: replays cover all 11 skills, stars show once covered, coins in store, picker stars update', async ({
+test('run B2: replays cover all 12 skills, stars show once covered, coins in store, picker stars update', async ({
   page,
 }, info) => {
   const touch = isTouch(info);
@@ -355,10 +355,12 @@ test('run B2: replays cover all 11 skills, stars show once covered, coins in sto
   // mid-run-4, so the budget is 20 minutes.
   test.setTimeout(SLOW_TEST_MS * 5);
   // The pinned profile makes the replay sequence deterministic: B2 is a
-  // 'skills' lesson (not 'mix'), so each run shuffles the 11 skills and plays
+  // 'skills' lesson (not 'mix'), so each run shuffles the 12 skills and plays
   // 6 — a replay does NOT prefer the unseen ones. The seed chain (profile +
-  // total attempts) covers all 11 after 5 replays (find-error last); the
-  // assert is ≤ so a planner change that covers faster does not break it
+  // total attempts) covers all 12 after 4 replays (verified offline with
+  // lessonSeed + planLessonRun; the slow regime — answers over 8 s, so the
+  // Leitner box never advances mid-run — is what the pinned chain assumes).
+  // The assert is ≤ so a planner change that covers faster does not break it
   // (R105) — the loop's own cap of 8 is the hard bound.
   await pinProfileUuid(page);
   await boot(page);
@@ -369,15 +371,15 @@ test('run B2: replays cover all 11 skills, stars show once covered, coins in sto
     'Bài 2 · Cộng, trừ trong phạm vi 1 000 · Câu 1/6',
   );
   const played: (string | undefined)[] = [];
-  // B2 has eleven skills since boost 1A (six legacy + five new formats),
-  // so one 6-item run cannot earn the first star: it needs every skill
-  // attempted. Replay until all 11 have been played, then the star lands.
+  // B2 has twelve skills since boost 2A (six legacy + five 1A formats +
+  // column-calc), so one 6-item run cannot earn the first star: it needs every
+  // skill attempted. Replay until all 12 have been played, then the star lands.
   let runs = 0;
   for (;;) {
     expect(await playLessonRun(page, touch, (id) => played.push(id))).toBe(6);
     runs++;
-    if (new Set(played).size >= 11) break;
-    if (runs >= 8) throw new Error('B2 did not cover all 11 skills in 8 runs');
+    if (new Set(played).size >= 12) break;
+    if (runs >= 8) throw new Error('B2 did not cover all 12 skills in 8 runs');
     const replay = page.locator('#lesson-replay');
     if (touch) await replay.tap();
     else await replay.click();
@@ -385,16 +387,16 @@ test('run B2: replays cover all 11 skills, stars show once covered, coins in sto
       'Bài 2 · Cộng, trừ trong phạm vi 1 000 · Câu 1/6',
     );
   }
-  expect(runs, 'pinned profile covers B2 in at most 5 replays').toBeLessThanOrEqual(5);
+  expect(runs, 'pinned profile covers B2 in at most 4 replays').toBeLessThanOrEqual(4);
   const content = page.locator('#dialog-content');
   await expect(content).toContainText('Xong bài 2!');
   await expect(content).toContainText('☆☆☆ → ★☆☆');
   await expect(content).toContainText('+30 xu');
-  await expect(coins(page)).toHaveText('150');
+  await expect(coins(page)).toHaveText('120');
   const snap = await page.evaluate(() => window.__game?.snapshot());
   for (const key of skillsOfLesson(2))
     expect(snap?.factStats[key]?.attempts ?? 0, key).toBeGreaterThanOrEqual(1);
-  expect(new Set(played).size, 'all runs together play all 11 skills').toBe(11);
+  expect(new Set(played).size, 'all runs together play all 12 skills').toBe(12);
   // Back to the picker: B2 now shows 1 star.
   const back = page.locator('#lesson-back');
   if (touch) await back.tap();
@@ -460,6 +462,9 @@ test('B2 four-digit answer: a replay contains a 1000 answer and typing it comple
   page,
 }, info) => {
   const touch = isTouch(info);
+  // Six replays on tablets need more than the 12-min describe budget (see the
+  // run-B2 coverage test), so the budget is 20 minutes like that test.
+  test.setTimeout(SLOW_TEST_MS * 5);
   await pinProfileUuid(page);
   await boot(page);
   await unpinProfileUuid(page);
@@ -468,15 +473,16 @@ test('B2 four-digit answer: a replay contains a 1000 answer and typing it comple
   await expect(page.locator('#dialog-content')).toContainText(
     'Bài 2 · Cộng, trừ trong phạm vi 1 000 · Câu 1/6',
   );
-  // The pinned profile's run 1 has no >= 1000 answer (the 11-skill shuffle
-  // plays wp, compare-estimate, bar-model, chain, number-line, missing-digit);
-  // the 1000 answer (mental-round, round hundreds) lands in run 2. One run
-  // cannot earn the star with 11 skills, so no star assertion here — the
-  // run-B2 coverage test owns that. The run assert is ≤ so a planner change
-  // that surfaces the 1000 answer earlier does not break it (R105).
+  // The pinned profile's run 1 has no >= 1000 answer (the 12-skill shuffle
+  // plays column, find-error, mental-round at 200, number-line, chain,
+  // bug-choice); the 1000 answer (mental-round, round hundreds) lands in
+  // run 6 (verified offline with lessonSeed + planLessonRun + skillPlan).
+  // One run cannot earn the star with 12 skills, so no star assertion here —
+  // the run-B2 coverage test owns that. The run assert is ≤ so a planner
+  // change that surfaces the 1000 answer earlier does not break it (R105).
   let sawThousand = false;
   let runs = 0;
-  for (let r = 0; r < 4 && !sawThousand; r++) {
+  for (let r = 0; r < 6 && !sawThousand; r++) {
     const { items, sawThousand: saw } = await playLessonRunTracked(page, touch);
     expect(items).toBe(6);
     sawThousand = saw;
@@ -491,7 +497,7 @@ test('B2 four-digit answer: a replay contains a 1000 answer and typing it comple
     }
   }
   expect(sawThousand, 'a B2 run contains a 4-digit answer step').toBe(true);
-  expect(runs, 'pinned profile finds the 1000 answer by run 2').toBeLessThanOrEqual(2);
+  expect(runs, 'pinned profile finds the 1000 answer by run 6').toBeLessThanOrEqual(6);
   const content = page.locator('#dialog-content');
   await expect(content).toContainText('Xong bài 2!');
   await waitDialogSettled(page);
@@ -503,6 +509,9 @@ test('B2 pad fits six digits: typing 100000 shows all six, keys stay ≥ 44 px, 
   page,
 }, info) => {
   const touch = isTouch(info);
+  // Six replays on tablets need more than the 12-min describe budget (see the
+  // run-B2 coverage test), so the budget is 20 minutes like that test.
+  test.setTimeout(SLOW_TEST_MS * 5);
   await pinProfileUuid(page);
   await boot(page);
   await unpinProfileUuid(page);
@@ -510,14 +519,15 @@ test('B2 pad fits six digits: typing 100000 shows all six, keys stay ≥ 44 px, 
   await pickLesson(page, 2, touch);
   // Play until the item whose number step answers 1000, then check the pad there.
   // The pinned profile's run 1 has no >= 1000 number step; the 1000 answer
-  // (mental-round) lands in run 2 — replay until it appears.
+  // (mental-round) lands in run 6 (verified offline with lessonSeed +
+  // planLessonRun + skillPlan) — replay until it appears.
   let runs = 0;
   for (;;) {
     const state = await page.evaluate(() => window.__lesson?.state() ?? null);
     if (!state) throw new Error('lesson hook missing');
     if (state.index >= state.total) {
       runs++;
-      if (runs >= 3) throw new Error('1000-answer item not found in B2 run');
+      if (runs >= 6) throw new Error('1000-answer item not found in B2 run');
       const replay = page.locator('#lesson-replay');
       if (touch) await replay.tap();
       else await replay.click();
