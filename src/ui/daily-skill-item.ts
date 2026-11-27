@@ -45,9 +45,14 @@ export function skillPlan(skillId: string, box: number, rng: Rng): ReasoningRoun
 }
 
 /** Body HTML for the item: an already-counted note, the badge, the scene picture host, and the step-card host. */
-export function skillItemHtml(index: number, total: number, alreadyCounted: boolean): string {
+export function skillItemHtml(
+  index: number,
+  total: number,
+  alreadyCounted: boolean,
+  badge = `🧠 ${trr('badge')}`,
+): string {
   const note = alreadyCounted ? `<p class="daily-note">${td('alreadyDone')}</p>` : '';
-  return `${note}<div class="dialog-eyebrow">${td('itemOf', { n: index + 1, total }).toUpperCase()}</div><p class="daily-badge">🧠 ${trr('badge')}</p><div class="daily-scene"></div><div class="daily-steps"></div><div class="daily-hint-area" hidden></div><p class="feedback" role="status"></p><div class="daily-footer"><button type="button" class="secondary daily-hint">💡 ${trr('hint')}</button><button type="button" class="text-button daily-leave">${td('leave')}</button></div><button type="button" class="primary wide daily-next" hidden></button>`;
+  return `${note}<div class="dialog-eyebrow">${td('itemOf', { n: index + 1, total }).toUpperCase()}</div><p class="daily-badge">${badge}</p><div class="daily-scene"></div><div class="daily-steps"></div><div class="daily-hint-area" hidden></div><p class="feedback" role="status"></p><div class="daily-footer"><button type="button" class="secondary daily-hint">💡 ${trr('hint')}</button><button type="button" class="text-button daily-leave">${td('leave')}</button></div><button type="button" class="primary wide daily-next" hidden></button>`;
 }
 
 /** Mounts the step card and wires hint / next / leave inside the open dialog. */

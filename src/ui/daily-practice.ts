@@ -65,7 +65,15 @@ export function openDailyPractice(): void {
     return;
   }
   const seed = dailySeed(today, snapshot.profile.id);
-  const keys = planDailySet({ stats: renderableStats(snapshot.factStats), today, seed });
+  // English Island (Phase 6): the island opens when the bridge quest is done
+  // (gameState.progress.questComplete); until then the planner drops every
+  // English key, and afterwards it caps them at 2 per day.
+  const keys = planDailySet({
+    stats: renderableStats(snapshot.factStats),
+    today,
+    seed,
+    islandUnlocked: gameState.progress.questComplete,
+  });
   if (keys.length === 0) {
     openDialog(td('title'), `<p class="dialog-copy">${td('locked')}</p>`, 'daily');
     return;
