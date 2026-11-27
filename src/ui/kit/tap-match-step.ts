@@ -72,14 +72,33 @@ export function createTapMatchStep(
   };
 
   const renderPairs = () => {
-    // Paired tiles share a tint and a pair number (data-pair), so the child
-    // can see which left goes with which right (R90.4).
+    // Paired tiles share a tint (data-pair) and a pair number, so the child
+    // can see which left goes with which right (R90.4). The number rides in
+    // an aria-hidden span: a ::after badge would leak into the button's
+    // accessible name ('1 m 1') and break exact-name lookups.
+    const pairNo = (b: HTMLButtonElement, n: number | null) => {
+      const existing = b.querySelector('.kit-match__pair-no');
+      if (n === null) {
+        existing?.remove();
+        return;
+      }
+      if (existing) {
+        existing.textContent = String(n);
+        return;
+      }
+      const span = doc.createElement('span');
+      span.className = 'kit-match__pair-no';
+      span.setAttribute('aria-hidden', 'true');
+      span.textContent = String(n);
+      b.append(span);
+    };
     for (const [i, b] of leftButtons.entries()) {
       const paired = pairs[i] !== null;
       b.classList.toggle('paired', paired);
       b.setAttribute('aria-pressed', String(paired));
       if (paired) b.dataset.pair = String(i + 1);
       else delete b.dataset.pair;
+      pairNo(b, paired ? i + 1 : null);
     }
     for (const [j, b] of rightButtons.entries()) {
       const leftIndex = pairs.indexOf(j);
@@ -88,6 +107,7 @@ export function createTapMatchStep(
       b.setAttribute('aria-pressed', String(paired));
       if (paired) b.dataset.pair = String(leftIndex + 1);
       else delete b.dataset.pair;
+      pairNo(b, paired ? leftIndex + 1 : null);
     }
   };
 

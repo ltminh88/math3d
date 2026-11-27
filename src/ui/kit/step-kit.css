@@ -149,10 +149,10 @@
 }
 
 /* Paired tiles share a tint and a pair number, so the child can see which
- * left goes with which right (boost 2B, R90.4). */
-.kit-match__left.paired::after,
-.kit-match__right.paired::after {
-  content: attr(data-pair);
+ * left goes with which right (boost 2B, R90.4). The number is a real span
+ * with aria-hidden, not a ::after badge: generated content would leak into
+ * the button's accessible name. */
+.kit-match__pair-no {
   display: inline-block;
   margin-left: 8px;
   min-width: 22px;
