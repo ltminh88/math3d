@@ -133,6 +133,9 @@ const ORACLE: Record<string, (i: PracticeItem) => void> = {
       const missing = missingValue(expr);
       expect(Number.isInteger(missing)).toBe(true);
       expect(last(i)).toBe(missing);
+      // R132: a □ item asks for the missing value, never the result on screen
+      // (askResult would invite typing the number already shown, e.g. 60).
+      expect(['askMissingDigit', 'askMissingNumber']).toContain(stepAt(i, 0).prompt.key);
       if (stepAt(i, 0).prompt.key === 'askMissingDigit') expect(missing).toBeLessThan(10);
       return;
     }

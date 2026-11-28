@@ -1,8 +1,10 @@
 // Shared forms for the mental ×/÷ skills (phase 7): a missing-number item and a
-// true/false verdict item. Both reuse existing prompt keys only — arithmetic-strings
-// is shared with Lane A (1A), so no new key until 1A merges.
+// true/false verdict item.
 // - missing-digit: the blank is one digit ("Chữ số còn thiếu là mấy?").
-// - missing-number: the blank is a round ten/hundred, asked as "Kết quả là bao nhiêu?".
+// - missing-number: the blank is a round ten/hundred, asked with its own key
+//   `askMissingNumber` ("Số còn thiếu là bao nhiêu?") — NOT `askResult`,
+//   because the result is already on screen (R132: "□ × 3 = 60" with
+//   "Kết quả là bao nhiêu?" invites the child to type 60).
 // - verdict: the find-error shape ("{name} tính … = …", Đúng/Sai + fix when wrong).
 import type { Rng } from '../learning/seeded-rng';
 import type { SkillTier } from '../learning/skill-tiers';
@@ -30,7 +32,7 @@ export function missingNumberItem(
   value: number,
 ): ReasoningItem {
   return arithmeticItem(skillId, tier, ref('mentalCalc', { expr }), [
-    numberStep(ref('askResult'), value),
+    numberStep(ref('askMissingNumber'), value),
   ]);
 }
 
