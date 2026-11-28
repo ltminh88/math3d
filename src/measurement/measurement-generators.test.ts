@@ -7,6 +7,7 @@ import { skillsOfFamily } from '../learning/skill-catalog';
 import type { SkillTier } from '../learning/skill-tiers';
 import { MEASUREMENT_SKILLS, measurementItemForSkill } from './measurement-item-for-skill';
 import { area, UNIT } from './measurement-test-oracles';
+import { OBJECTS } from './length-everyday-objects';
 
 const p = (i: GeoItem, k: string) => Number(i.story.params?.[k]);
 const scene = <K extends GeoItem['scene']['kind']>(i: GeoItem, kind: K) => {
@@ -39,8 +40,23 @@ const ORACLE: Record<string, (i: GeoItem) => void> = {
     const len = scene(i, 'ruler').toMm - scene(i, 'ruler').fromMm;
     expect(values(i)).toEqual([Math.floor(len / 10), len % 10]);
   },
-  cmToMm: (i) => expect(last(i)).toBe(10 * p(i, 'n')),
-  mmToCm: (i) => expect((last(i) as number) * 10).toBe(p(i, 'm')),
+  // R129: the T1 object must fit the number — its OBJECTS cm range contains n.
+  cmToMm: (i) => {
+    expect(last(i)).toBe(10 * p(i, 'n'));
+    const obj = OBJECTS.find((o) => o.item === i.story.params?.item);
+    expect(obj, `OBJECTS entry for ${String(i.story.params?.item)}`).toBeDefined();
+    expect(obj?.unit).toBe('cm');
+    expect(p(i, 'n')).toBeGreaterThanOrEqual(obj?.lo ?? 0);
+    expect(p(i, 'n')).toBeLessThanOrEqual(obj?.hi ?? 0);
+  },
+  mmToCm: (i) => {
+    expect((last(i) as number) * 10).toBe(p(i, 'm'));
+    const obj = OBJECTS.find((o) => o.item === i.story.params?.item);
+    expect(obj, `OBJECTS entry for ${String(i.story.params?.item)}`).toBeDefined();
+    expect(obj?.unit).toBe('cm');
+    expect(p(i, 'm') / 10).toBeGreaterThanOrEqual(obj?.lo ?? 0);
+    expect(p(i, 'm') / 10).toBeLessThanOrEqual(obj?.hi ?? 0);
+  },
   compareCmMm: (i) => {
     const [a, b] = [10 * p(i, 'a'), p(i, 'b')];
     const want = a === b ? 'sameLength' : a > b ? i.story.params?.x : i.story.params?.y;
