@@ -124,18 +124,25 @@ async function enterGate(gate: LevelGate): Promise<EnterOutcome> {
  * first-completion bonus: a stage 2+ run records only its own `stageStars` slot (merged by
  * max, so earned stars survive) and `firstCompletionBonus` pays only while `completedAt`
  * is still 0.
+ *
+ * The gate is NOT checked here, by design: the map panel and the English home enter levels
+ * the child has not unlocked in the world yet (the island in English mode has no bridge to
+ * cross). The gate check lives in `useGate`, for taps on the gate itself.
+ * Returns whether the run actually started, so the caller can put its own page back when
+ * the entry failed.
  */
-export async function enterLevelFromMap(levelId: string, stage?: number): Promise<void> {
+export async function enterLevelFromMap(levelId: string, stage?: number): Promise<EnterOutcome> {
   const gate = LEVEL_GATES.find((g) => g.levelId === levelId);
   const definition = levelDefinition(levelId);
   if (!gate || !definition || !host || !connectedStore()) {
     showToast(tl('loadFailed'));
-    return;
+    return 'failed';
   }
   if (stage !== undefined) requestStage(levelId, stage);
   const outcome = await enterGate(gate);
   // A run that never started must not leave a stale stage armed for a later entry.
   if (outcome !== 'entered') clearRequestedStage();
+  return outcome;
 }
 
 function lockedToast(gate: LevelGate): string {

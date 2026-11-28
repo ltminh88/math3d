@@ -4,6 +4,14 @@
   padding: 19px 22px;
   font-size: 18px;
 }
+/* The remembered mode's button is outlined, so the child sees last time's choice. */
+.play-button.selected {
+  outline: 3px solid var(--gold);
+  outline-offset: 2px;
+}
+.play-button + .play-button {
+  margin-top: 10px;
+}
 .play-button svg {
   box-sizing: content-box;
   padding: 5px;

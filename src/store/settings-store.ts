@@ -1,6 +1,9 @@
 /** Device settings in localStorage with an in-memory fallback (private mode, blocked storage, node). */
 export type QualityTier = 'auto' | 'low' | 'medium' | 'high';
 
+/** Which welcome button the child picked last: the 3D world, or the English home. */
+export type PlayMode = 'game' | 'english';
+
 export interface Settings {
   lang: 'vi' | 'en';
   sound: boolean;
@@ -12,6 +15,8 @@ export interface Settings {
   music: boolean;
   /** The quest card is collapsed (legacy key `aigame3d_quest_collapsed`). */
   questCollapsed: boolean;
+  /** The welcome mode the child picked last; the welcome pre-selects it. */
+  playMode: PlayMode;
 }
 
 export const DEFAULT_SETTINGS: Readonly<Settings> = {
@@ -23,6 +28,7 @@ export const DEFAULT_SETTINGS: Readonly<Settings> = {
   qualityTier: 'auto',
   music: false,
   questCollapsed: false,
+  playMode: 'game',
 };
 
 export const SETTINGS_STORAGE_KEY = 'math3d.settings';
@@ -56,6 +62,7 @@ export function sanitizeSettings(raw: unknown): Settings {
     qualityTier: QUALITY.find((q) => q === r.qualityTier) ?? d.qualityTier,
     music: bool(r.music, d.music),
     questCollapsed: bool(r.questCollapsed, d.questCollapsed),
+    playMode: r.playMode === 'game' || r.playMode === 'english' ? r.playMode : d.playMode,
   };
 }
 
