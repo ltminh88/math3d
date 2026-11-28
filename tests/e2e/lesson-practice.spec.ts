@@ -406,7 +406,13 @@ test('run B2: replays cover all 13 skills, stars show once covered, coins in sto
   await expect(content).toContainText('Xong bài 2!');
   await expect(content).toContainText('☆☆☆ → ★☆☆');
   await expect(content).toContainText('+30 xu');
-  await expect(coins(page)).toHaveText('120');
+  // Coins follow the run count, they are not a fixed 120: one all-correct
+  // 6-item run pays 6 × 5 = 30 xu, and the pinned chain covers all 13 skills
+  // in 3 replays (verified offline with lessonSeed + planLessonRun — the
+  // 120 was left over from the 12-skill chain's 4 replays; the 13th skill
+  // changed the shuffle chain). A planner change that covers faster still
+  // passes, a lost award still fails (R105 pattern: derived, not loosened).
+  await expect(coins(page)).toHaveText(String(runs * 30));
   const snap = await page.evaluate(() => window.__game?.snapshot());
   for (const key of skillsOfLesson(2))
     expect(snap?.factStats[key]?.attempts ?? 0, key).toBeGreaterThanOrEqual(1);
