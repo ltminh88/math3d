@@ -95,4 +95,23 @@ describe('settings store', () => {
     const s = createSettingsStore(null);
     expect(s.update({ volume: 5 }).volume).toBe(DEFAULT_SETTINGS.volume);
   });
+
+  it('defaults playMode to game for an old blob and rejects bad values', () => {
+    expect(createSettingsStore(memory('{}')).get().playMode).toBe('game');
+    const s = createSettingsStore(memory(JSON.stringify({ playMode: 'arcade' })));
+    expect(s.get().playMode).toBe('game');
+    expect(
+      createSettingsStore(memory(JSON.stringify({ playMode: 'english' }))).get().playMode,
+    ).toBe('english');
+    expect(DEFAULT_SETTINGS.playMode).toBe('game');
+  });
+
+  it('persists the picked playMode', () => {
+    const storage = memory();
+    createSettingsStore(storage).update({ playMode: 'english' });
+    expect(createSettingsStore(storage).get().playMode).toBe('english');
+    expect(JSON.parse(storage.data.get(SETTINGS_STORAGE_KEY) ?? '{}')).toMatchObject({
+      playMode: 'english',
+    });
+  });
 });

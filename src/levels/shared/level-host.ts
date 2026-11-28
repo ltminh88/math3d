@@ -6,6 +6,7 @@ import type { Camera, Scene, Texture } from 'three';
 import { SceneDisposer } from '../../core/scene-disposer';
 import { isShared } from '../../core/shared-asset-cache';
 import { isStaleChunkError } from '../../core/stale-build-reload';
+import { getLevelExitTarget, runLevelExitTarget } from './level-exit-target';
 import type { LevelContext, LevelDefinition, LevelResult, LevelSession } from './level-types';
 
 /** Largest simulated level step, same as the world's (a hitch never jumps the simulation). */
@@ -89,8 +90,9 @@ export class LevelHost {
     } catch (error) {
       console.error(`Level "${definition.id}" could not open its run`, error);
       active.restoreRenderer();
-      ports.world.resume();
+      this.resumeWorld();
       this.busy = false;
+      runLevelExitTarget();
       return 'failed';
     }
     try {
@@ -140,6 +142,15 @@ export class LevelHost {
     active.frame = this.ports.requestFrame(frame);
   }
 
+  /**
+   * Restarts the world loop after a run — unless the exit target is the English home,
+   * where the world stays suspended and inactive behind the home (resume() would start
+   * the loop rendering the village again, even though the world was never activated).
+   */
+  private resumeWorld(): void {
+    if (getLevelExitTarget() !== 'english-home') this.ports.world.resume();
+  }
+
   private finish(active: ActiveRun, disposer: SceneDisposer, run: LevelRun, result: LevelResult) {
     if (active.ended) return;
     active.ended = true;
@@ -156,8 +167,9 @@ export class LevelHost {
     try {
       run.close(result);
     } finally {
-      this.ports.world.resume();
+      this.resumeWorld();
       this.busy = false;
+      runLevelExitTarget();
     }
   }
 }

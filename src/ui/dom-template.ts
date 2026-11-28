@@ -26,6 +26,7 @@ export const gameShellHtml = (): string => `
       <div class="choose-label">Chọn người bạn đồng hành</div>
       <div class="avatar-options" role="group" aria-label="Chọn nhân vật"><button id="boy" class="avatar-option" aria-pressed="true"><span>👦</span>Nhà thám hiểm</button><button id="girl" class="avatar-option" aria-pressed="false"><span>👧</span>Nhà khám phá</button></div>
       <button id="play" class="primary play-button">Bắt đầu phiêu lưu ${icon('arrow')}</button>
+      <button id="play-english" class="primary play-button">Tiếng Anh lớp 1 ${icon('book')}</button>
       <button id="learn-welcome" class="text-button">${icon('book')} Khám phá bảng cửu chương</button>
       <button id="import-save-code" class="text-button">${icon('save')} ${ts('importButton')}</button>
       <div class="welcome-notes"><span>✦ Học qua những chuyến đi</span><span>Không giới hạn thời gian</span></div>

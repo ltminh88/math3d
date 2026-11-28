@@ -1,0 +1,90 @@
+/* English home (two-modes Phase 2): the glass card over the idle world, same tokens as the
+   welcome panel. The stage cards are a grid: 2 columns on phones, 4 on wide screens. */
+.english-home {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  z-index: 3;
+  width: min(640px, calc(100vw - 2 * var(--gutter)));
+  max-height: calc(100dvh - 2 * var(--gutter));
+  overflow: auto;
+  padding: 28px 30px 24px;
+  border-radius: 30px;
+  background: #fffcf094;
+  border: 1px solid var(--glass-border);
+  backdrop-filter: var(--blur);
+  -webkit-backdrop-filter: var(--blur);
+  box-shadow: var(--shadow-lift);
+}
+.english-home:focus {
+  outline: none;
+}
+.english-home-title {
+  margin: 0 0 8px;
+  font-family: var(--font-display);
+  font-size: clamp(30px, 3.4vw, 44px);
+  font-weight: 800;
+  line-height: 1.05;
+  letter-spacing: -0.5px;
+}
+.english-home-sub {
+  margin: 0 0 18px;
+  font-size: 15px;
+  line-height: 1.5;
+  color: var(--muted);
+}
+.english-home-cards {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 10px;
+  margin-bottom: 18px;
+}
+@media (min-width: 700px) {
+  .english-home-cards {
+    grid-template-columns: repeat(4, 1fr);
+  }
+}
+.english-home-card {
+  min-height: 88px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 2px;
+  padding: 12px 8px;
+  border: 2px solid transparent;
+  border-radius: 16px;
+  background: #ffffff8c;
+  font-size: 14px;
+  font-weight: 800;
+  color: var(--ink);
+  cursor: pointer;
+}
+.english-home-card strong {
+  font-family: var(--font-display);
+  font-size: 17px;
+}
+.english-home-card-stage {
+  font-size: 11px;
+  font-weight: 900;
+  letter-spacing: 1.5px;
+  color: var(--muted-2);
+}
+.english-home-card-stars {
+  font-size: 15px;
+  letter-spacing: 2px;
+  color: var(--gold-deep);
+}
+.english-home-card.next {
+  border-color: var(--ink-soft);
+  background: var(--paper);
+  box-shadow: 0 4px #32644d22;
+}
+.english-home-card:disabled {
+  opacity: 0.55;
+  cursor: default;
+}
+.english-home-menu {
+  margin: 0 auto;
+}

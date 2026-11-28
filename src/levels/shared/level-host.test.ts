@@ -8,6 +8,7 @@ import {
   Texture,
 } from 'three';
 import { afterEach, describe, expect, it, vi } from 'vitest';
+import { setLevelExitTarget } from './level-exit-target';
 import { LevelHost, type LevelHostPorts } from './level-host';
 import type { LevelContext, LevelDefinition, LevelModule, LevelResult } from './level-types';
 
@@ -99,7 +100,10 @@ const disposedCount = (geometries: BufferGeometry[]) => {
   return () => count;
 };
 
-afterEach(() => vi.restoreAllMocks());
+afterEach(() => {
+  vi.restoreAllMocks();
+  setLevelExitTarget('world');
+});
 
 describe('level host', () => {
   it('suspends the world and renders the level scene from its own loop', async () => {
@@ -283,5 +287,77 @@ describe('level host', () => {
     for (const t of [background, environment]) t.addEventListener('dispose', () => disposed++);
     f.exit({ completed: false });
     expect(disposed).toBe(2);
+  });
+
+  it('in English mode an exit never resumes the world and shows the home again', async () => {
+    const f = fakePorts();
+    const showHome = vi.fn();
+    setLevelExitTarget('english-home', showHome);
+    const host = new LevelHost(f.ports);
+    const log = { geometries: [], updates: [] as number[] };
+    await host.enter(definition(async () => testLevel(log)));
+    f.exit({ completed: true });
+    expect(f.events).not.toContain('resume');
+    expect(f.closed).toEqual([{ completed: true }]);
+    expect(showHome).toHaveBeenCalledTimes(1);
+    expect(host.running).toBe(false);
+  });
+
+  it('in English mode a start failure never resumes the world and shows the home again', async () => {
+    vi.spyOn(console, 'error').mockImplementation(() => {});
+    const f = fakePorts();
+    const showHome = vi.fn();
+    setLevelExitTarget('english-home', showHome);
+    const host = new LevelHost(f.ports);
+    const broken: LevelModule = {
+      start: () => {
+        throw new Error('scene build failed');
+      },
+    };
+    expect(await host.enter(definition(async () => broken))).toBe('failed');
+    expect(f.events).not.toContain('resume');
+    expect(showHome).toHaveBeenCalledTimes(1);
+    expect(host.running).toBe(false);
+  });
+
+  it('in English mode a run that cannot open never resumes the world and shows the home again', async () => {
+    vi.spyOn(console, 'error').mockImplementation(() => {});
+    const f = fakePorts();
+    const showHome = vi.fn();
+    setLevelExitTarget('english-home', showHome);
+    const host = new LevelHost({
+      ...f.ports,
+      openRun: () => {
+        throw new Error('store not connected');
+      },
+    });
+    const log = { geometries: [], updates: [] };
+    expect(await host.enter(definition(async () => testLevel(log)))).toBe('failed');
+    expect(f.events).toEqual(['suspend', 'renderer:save', 'renderer:restore']);
+    expect(showHome).toHaveBeenCalledTimes(1);
+    expect(host.running).toBe(false);
+  });
+
+  it('a loop crash in English mode never resumes the world and shows the home again', async () => {
+    vi.spyOn(console, 'error').mockImplementation(() => {});
+    const f = fakePorts();
+    const showHome = vi.fn();
+    setLevelExitTarget('english-home', showHome);
+    const host = new LevelHost(f.ports);
+    const crashing: LevelModule = {
+      start: () => ({
+        scene: new Scene(),
+        camera: new PerspectiveCamera(),
+        update: () => {
+          throw new Error('frame failed');
+        },
+      }),
+    };
+    await host.enter(definition(async () => crashing));
+    f.tick(0);
+    expect(f.closed).toEqual([{ completed: false }]);
+    expect(f.events).not.toContain('resume');
+    expect(showHome).toHaveBeenCalledTimes(1);
+    expect(host.running).toBe(false);
   });
 });
