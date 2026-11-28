@@ -5,9 +5,9 @@ import { sweepItem } from '../geometry/geometry-test-sweep';
 import { mulberry32 } from '../learning/seeded-rng';
 import { skillsOfFamily } from '../learning/skill-catalog';
 import type { SkillTier } from '../learning/skill-tiers';
+import { OBJECTS } from './length-everyday-objects';
 import { MEASUREMENT_SKILLS, measurementItemForSkill } from './measurement-item-for-skill';
 import { area, UNIT } from './measurement-test-oracles';
-import { OBJECTS } from './length-everyday-objects';
 
 const p = (i: GeoItem, k: string) => Number(i.story.params?.[k]);
 const scene = <K extends GeoItem['scene']['kind']>(i: GeoItem, kind: K) => {

@@ -6,8 +6,8 @@ import { geoItem, qtyChoiceStep, scene } from '../geometry/geometry-distractors'
 import { pick, type Rng, randInt } from '../learning/seeded-rng';
 import { numberStep, ref } from '../reasoning/reasoning-distractors';
 import type { ReasoningStep } from '../reasoning/reasoning-types';
-import { LONG_NOUNS, nounLabel, pickOptions, twoNouns } from './measurement-distractors';
 import { OBJECTS } from './length-everyday-objects';
+import { LONG_NOUNS, nounLabel, pickOptions, twoNouns } from './measurement-distractors';
 import { RULER_MAX_CM } from './measurement-ranges';
 
 const MAX_MM = RULER_MAX_CM * 10;
