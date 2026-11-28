@@ -99,6 +99,7 @@ describe('M3D3 save code', () => {
       bugs: ['forgot-carry', 'unit-direction'],
       recent: 0b101101,
       recentCount: 6,
+      seen: [123, 456],
     });
     const { records } = importOfDecodedSaveCode(
       decodeSaveCode(encodeSaveCodeV3(withBugs, audio)),

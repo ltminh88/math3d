@@ -135,6 +135,22 @@ describe('stage stars in the store', () => {
     store.close();
   });
 
+  it('seen survives a reload through the local merge', async () => {
+    const name = freshName();
+    const store = await openGameStore({ dbName: name, newId: ids() });
+    const pid = store.getSnapshot().profile.id;
+    await store.commitSession(
+      session(pid, 'b1', {
+        facts: { 'mul:2x3': { a: 1, c: 1, ms: 1000, box: 2, seenAt: 2000 } },
+      }),
+      { 'mul:2x3': { streak: 0, fluent: false, errs: [], seen: [11, 22] } },
+    );
+    store.close();
+    const reopened = await openGameStore({ dbName: name, newId: ids() });
+    expect(reopened.getSnapshot().factStats['mul:2x3']?.seen).toEqual([11, 22]);
+    reopened.close();
+  });
+
   it('rejects stage stars outside 0–3 or longer than the cap', async () => {
     const name = freshName();
     const store = await openGameStore({ dbName: name, newId: ids() });
