@@ -21,6 +21,8 @@ export interface FactStat {
   recent?: number;
   /** How many first tries `recent` actually records (R133): `attempts` also counts retries and seeded/imported attempts the mask never saw, so it must not be the denominator for `recent`. Device-only, never in a save code. */
   recentCount?: number;
+  /** Last 24 fingerprints of shown items, newest last. Device-only, never in a save code. */
+  seen?: number[];
 }
 
 /** Device-only fields the server never receives. */
@@ -31,6 +33,7 @@ export interface FactLocalState {
   bugs?: Misconception[];
   recent?: number;
   recentCount?: number;
+  seen?: number[];
 }
 
 export interface DeltaFact {

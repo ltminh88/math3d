@@ -3,52 +3,15 @@
 // question": the story (key + params), every step's prompt (key + params) and its
 // correct answer, and — for geometry/measurement — the whole scene. Wrong options
 // are NOT part of a signature. Used by the `pool-counter.ts` CLI and its test.
-import type { GeoItem } from '../../src/geometry/geo-scene-types';
 import { divFactsForTables, mulFactsForTables } from '../../src/learning/curriculum-tables';
 import { mulberry32, pick, type Rng } from '../../src/learning/seeded-rng';
 import type { SkillTier } from '../../src/learning/skill-tiers';
 import { towerFactPool } from '../../src/levels/tower/tower-round-flow';
+import { itemSignature } from '../../src/practice/item-fingerprint';
 import { itemForSkill } from '../../src/practice/item-for-skill';
-import type { PromptRef, ReasoningItem, ReasoningStep } from '../../src/reasoning/reasoning-types';
+import type { ReasoningItem } from '../../src/reasoning/reasoning-types';
 
-const refSig = (ref: PromptRef): string => {
-  const params = ref.params
-    ? Object.entries(ref.params)
-        .sort(([a], [b]) => (a < b ? -1 : 1))
-        .map(([k, v]) => `${k}=${v}`)
-        .join(',')
-    : '';
-  return `${ref.key}(${params})`;
-};
-
-const stepSig = (step: ReasoningStep): string => {
-  if (step.kind === 'number') return `n:${refSig(step.prompt)}=${step.answer}`;
-  if (step.kind === 'verdict')
-    return `v:${refSig(step.prompt)}|${refSig(step.statement)}=${step.answer}${
-      step.fix ? `|fix=${step.fix.answer}` : ''
-    }`;
-  if (step.kind === 'set-clock') return `c:${refSig(step.prompt)}=${step.h}:${step.m}`;
-  if (step.kind === 'order')
-    return `o:${refSig(step.prompt)}|${step.tiles.map(refSig).join('+')}=${step.answer.join(',')}`;
-  if (step.kind === 'match')
-    return `m:${refSig(step.prompt)}|${step.left.map(refSig).join('+')}|${step.right
-      .map((o) => refSig(o.label))
-      .join('+')}=${step.pairs.join(',')}`;
-  const correct = step.options
-    .filter((o) => o.correct)
-    .map((o) => refSig(o.label))
-    .sort();
-  return `${step.kind}:${refSig(step.prompt)}|${step.options.length}|${correct.join('+')}`;
-};
-
-/** The visible prompt of one generated item, as a string. */
-export function itemSignature(item: ReasoningItem): string {
-  const base = `${item.skillId}|t${item.tier}|${refSig(item.story)}|${item.steps
-    .map(stepSig)
-    .join(';')}`;
-  const scene = (item as GeoItem).scene;
-  return scene ? `${base}|${JSON.stringify(scene)}` : base;
-}
+export { itemSignature };
 
 /** Draws one item for a skill through the shared dispatcher (all nine families). */
 export function drawSkillItem(skillId: string, tier: SkillTier, rng: Rng): ReasoningItem {

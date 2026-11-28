@@ -1,5 +1,8 @@
 import { describe, expect, it } from 'vitest';
+import { itemFingerprint } from '../practice/item-fingerprint';
+import { itemForSkill } from '../practice/item-for-skill';
 import { newFactStat } from './leitner-box';
+import { mulberry32 } from './seeded-rng';
 import { createSessionRecorder, type QuestionOutcome } from './session-recorder';
 
 const make = (stats = {}) => {
@@ -105,6 +108,61 @@ describe('session recorder', () => {
     const { delta, local } = r.finish();
     expect(delta.facts['sk:add-sub-1000']).toMatchObject({ a: 1, c: 1, box: 3 });
     expect(local['sk:add-sub-1000']?.bugs).toEqual(['forgot-carry']);
+  });
+
+  it('records the shown item fingerprint into seen for every outcome', () => {
+    const itemA = itemForSkill('mul-tens-mental', mulberry32(1), 1);
+    const itemB = itemForSkill('mul-tens-mental', mulberry32(2), 1);
+    const fpA = itemFingerprint(itemA);
+    const fpB = itemFingerprint(itemB);
+    // Right.
+    const r = make();
+    r.recordQuestion({ ...clean('mul:2x3'), item: itemA });
+    expect(r.finish().local['mul:2x3']?.seen).toEqual([fpA]);
+    // Wrong: attempts still counted, seen still recorded.
+    const r2 = make();
+    r2.recordQuestion({
+      factKey: 'mul:2x3',
+      ms: 6000,
+      correct: false,
+      firstTry: false,
+      usedHint: false,
+      wrongAnswers: [5],
+      item: itemA,
+    });
+    const done2 = r2.finish();
+    expect(done2.delta.facts['mul:2x3']).toMatchObject({ a: 1, c: 0 });
+    expect(done2.local['mul:2x3']?.seen).toEqual([fpA]);
+    // Two different items in one session accumulate newest-last.
+    const r3 = make();
+    r3.recordQuestion({ ...clean('mul:2x3'), item: itemA });
+    r3.recordQuestion({ ...clean('mul:2x3'), item: itemB });
+    expect(r3.finish().local['mul:2x3']?.seen).toEqual([fpA, fpB]);
+  });
+
+  it('a choice bug still adds seen but no attempt and no box move (R79)', () => {
+    const itemA = itemForSkill('mul-tens-mental', mulberry32(1), 1);
+    const r = make({ 'sk:add-sub-1000': { ...newFactStat(), box: 3, attempts: 4 } });
+    r.recordQuestion({
+      factKey: 'sk:add-sub-1000',
+      ms: 6000,
+      correct: true,
+      firstTry: false,
+      usedHint: false,
+      wrongAnswers: [],
+      bugs: ['forgot-carry'],
+      item: itemA,
+    });
+    const { delta, local } = r.finish();
+    expect(delta.facts['sk:add-sub-1000']).toMatchObject({ a: 1, c: 1, box: 3 });
+    expect(local['sk:add-sub-1000']?.bugs).toEqual(['forgot-carry']);
+    expect(local['sk:add-sub-1000']?.seen).toEqual([itemFingerprint(itemA)]);
+  });
+
+  it('an outcome without an item leaves seen untouched', () => {
+    const r = make();
+    r.recordQuestion(clean('mul:2x3'));
+    expect(r.finish().local['mul:2x3']?.seen).toBeUndefined();
   });
 
   it('shifts recent once per question in local state', () => {

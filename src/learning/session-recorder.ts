@@ -1,7 +1,9 @@
-import type { Misconception } from '../reasoning/reasoning-types';
+import { itemFingerprint } from '../practice/item-fingerprint';
+import type { Misconception, ReasoningItem } from '../reasoning/reasoning-types';
 import type { FactKey } from './fact-key';
 import type { DeltaFact, FactLocalState, FactStat, SessionDelta } from './learning-types';
 import { applyAttempt, LEITNER, newFactStat } from './leitner-box';
+import { rememberSeen } from './recent-items';
 import { questionReward, starsFor } from './scoring';
 
 /** One wrong pick inside a question, in the order given. A number wrong carries
@@ -28,6 +30,9 @@ export interface QuestionOutcome {
   /** The question's bugs (boost Phase 0, R79): they go only into the bug bank
    * — they never add an attempt or move the box. */
   bugs?: readonly Misconception[];
+  /** The item as shown (anti-repeat Phase 2): its fingerprint is recorded into
+   * `seen` — recording seen is not an attempt, so it touches nothing else. */
+  item?: ReasoningItem;
 }
 
 export interface SessionResult {
@@ -110,6 +115,9 @@ export function createSessionRecorder(opts: RecorderOptions): SessionRecorder {
         // seeded/imported attempts the mask never saw.
         recentCount: Math.min((stat.recentCount ?? 0) + 1, LEITNER.recentKept),
       };
+      // Recording "seen" is not an attempt: it runs after the attempt/bug
+      // logic for every outcome and touches nothing else (R79 unchanged).
+      if (o.item !== undefined) stat = rememberSeen(stat, itemFingerprint(o.item));
 
       entry.box = stat.box;
       entry.seenAt = at;
@@ -156,6 +164,7 @@ export function createSessionRecorder(opts: RecorderOptions): SessionRecorder {
           bugs: s.bugs,
           recent: s.recent,
           recentCount: s.recentCount,
+          seen: s.seen,
         };
       return { delta, local };
     },
