@@ -26,7 +26,12 @@ export interface GardenRoundHooks {
   onLevelDone(earned: { xp: number; coins: number }, stars: number): void;
 }
 
-const GUIDE_KEYS = { pattern: 'guidePattern', balance: 'guideBalance', bag: 'guideBag' } as const;
+const GUIDE_KEYS = {
+  pattern: 'guidePattern',
+  balance: 'guideBalance',
+  bag: 'guideBag',
+  addsub: 'guideAddSub',
+} as const;
 
 export class GardenRoundController {
   private card: StepCard | undefined;
@@ -153,9 +158,10 @@ export class GardenRoundController {
       this.refreshPots();
     } else if (kind === 'bag') {
       this.views.bags.sprout(stepIndex);
-    } else if (stepIndex === this.flow.steps.length - 1) {
+    } else if (kind === 'balance' && stepIndex === this.flow.steps.length - 1) {
       this.views.balance.level();
     }
+    // 'addsub' rounds have no 3D reply: the step card carries them.
   }
 
   hint(): void {

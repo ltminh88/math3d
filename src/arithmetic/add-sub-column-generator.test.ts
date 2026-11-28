@@ -9,6 +9,7 @@ import type { PracticeItem } from '../practice/practice-scene';
 import type { ReasoningStep } from '../reasoning/reasoning-types';
 import { ADD_SUB_COLUMN_GENERATORS, buildColumnSteps, columnsOf } from './add-sub-column-generator';
 import { findError } from './add-sub-error-generators';
+import { renderArithmeticPrompt } from './arithmetic-strings';
 import {
   oracleAddCarries,
   oracleBorrowAcrossZero,
@@ -217,6 +218,31 @@ describe('column item steps', () => {
         }
       }
     }
+  });
+
+  it('digit prompts ask for the digit to write, never "=?", in either operation (R123)', () => {
+    // The R123 nit: "Hàng đơn vị: 5 + 7 = ?" asks for 2 while the value is
+    // 12 — the rendered prompt must ask for the digit to write instead.
+    for (const tier of [1, 2, 3] as const) {
+      for (let seed = 0; seed < 40; seed++) {
+        const item = generate(tier, seed);
+        for (const step of item.steps) {
+          if (step.kind !== 'number') continue;
+          const rendered = renderArithmeticPrompt(step.prompt);
+          expect(rendered).toContain('Viết chữ số nào?');
+          expect(rendered).not.toContain('=?');
+        }
+      }
+    }
+    // Both operations, fixed examples: 385 + 247 and 403 − 158.
+    const add = buildColumnSteps(385, 247, '+');
+    expect(renderArithmeticPrompt(numStep(add[0]).prompt)).toBe(
+      'Hàng đơn vị: 5 + 7. Viết chữ số nào?',
+    );
+    const sub = buildColumnSteps(403, 158, '−');
+    expect(renderArithmeticPrompt(numStep(sub[1]).prompt)).toBe(
+      'Hàng đơn vị: 13 − 8. Viết chữ số nào?',
+    );
   });
 
   it('carry questions are choices, never verdicts, with the yes-option first', () => {

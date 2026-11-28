@@ -24,6 +24,11 @@ const FIXED_RANGES: Record<string, number> = {
   'add-sub-compare-estimate': RANGE_1000,
   'add-sub-number-line': RANGE_1000,
   'add-sub-bar-model-wp': RANGE_1000,
+  // Boost Phase 3A: the match format practises to 1 000; the bug-choice
+  // variants practise at the numberfort stage ranges.
+  'add-sub-match': RANGE_1000,
+  'add-sub-10000-bug-choice': RANGE_10000,
+  'add-sub-100000-bug-choice': RANGE_100000,
   'add-4digit': RANGE_10000,
   'sub-4digit': RANGE_10000,
   'add-sub-10000-wp': RANGE_10000,

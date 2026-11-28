@@ -44,6 +44,18 @@ const STAGE2_SKILLS = [
   'number-to-roman',
   'roman-sequence',
 ];
+const STAGE3_SKILLS = [
+  'add-4digit',
+  'sub-4digit',
+  'add-sub-10000-wp',
+  'mul-4d-1d',
+  'mul-thousands-mental',
+  'div-4d-1d',
+  'div-4d-1d-remainder',
+  'div-thousands-mental',
+  // Boost Phase 3A: one bug-choice round per stage-3 run, at the 10 000 range.
+  'add-sub-10000-bug-choice',
+];
 
 type NumberfortState = NonNullable<ReturnType<NonNullable<Window['__numberfort']>['state']>>;
 type Expected = NonNullable<NumberfortState['expected']>;
@@ -99,6 +111,34 @@ async function startWithStages(page: Page, stageStars: number[]): Promise<void> 
     }),
   );
   await page.evaluate((stars) => window.__game?.seedStageProgress('numberfort', stars), stageStars);
+}
+
+/** A profile with stages 1 and 2 done (and attempts for the stage-3 pool), ready for stage 3. */
+async function startWithStage3(page: Page): Promise<void> {
+  await page.goto('/');
+  await waitForStoreBoot(page);
+  await page.waitForFunction(() => '__game' in window);
+  await page.locator('#play').click();
+  await expect(page.locator('body')).toHaveClass(/playing/);
+  await page.evaluate(
+    (done) => window.__game?.seedProgress({ bridgeComplete: true, completedLevels: done }),
+    BEFORE_NUMBERFORT,
+  );
+  // Attempts for the stage-3 pool: the 10 000 arithmetic skills, so the stage-3 plan
+  // plays them (the bug-choice id itself starts unattempted and is spliced in last).
+  await page.evaluate(() =>
+    window.__game?.seedFactStats({
+      'sk:add-4digit': { attempts: 2, box: 2 },
+      'sk:sub-4digit': { attempts: 2, box: 1 },
+      'sk:add-sub-10000-wp': { attempts: 1, box: 1 },
+      'sk:mul-4d-1d': { attempts: 2, box: 2 },
+      'sk:mul-thousands-mental': { attempts: 1, box: 1 },
+      'sk:div-4d-1d': { attempts: 2, box: 1 },
+      'sk:div-4d-1d-remainder': { attempts: 1, box: 1 },
+      'sk:div-thousands-mental': { attempts: 2, box: 2 },
+    }),
+  );
+  await page.evaluate((stars) => window.__game?.seedStageProgress('numberfort', stars), [2, 2]);
 }
 
 async function enterNumberfortStage(page: Page, tap: boolean): Promise<void> {
@@ -352,5 +392,62 @@ test('stage 2 plays rounding and Roman rounds and ends with the stage celebratio
   // A stage-2 run never overwrites stage 1's stars (the level's `stars` stay 2).
   expect(numberfort?.stars).toBe(2);
   await expect(page.locator('#gate-numberfort-label small')).toHaveText(/Chặng 3\/5/);
+  expect(errors).toEqual([]);
+});
+
+test('stage 3 plays one 10000 bug-choice round and ends with the stage celebration', async ({
+  page,
+}, info) => {
+  const tap = !!info.project.use.hasTouch;
+  const errors: string[] = [];
+  page.on('pageerror', (e) => errors.push(String(e)));
+  await startWithStage3(page);
+  await expect(page.locator('#gate-numberfort-label small')).toHaveText(
+    'Đã hoàn thành ★★☆ · Chặng 3/5',
+  );
+  await enterNumberfortStage(page, tap);
+  expect(await page.evaluate(() => window.__game?.levelRunning())).toBe(true);
+
+  const skills = (await page.evaluate(() => window.__numberfort?.skills())) ?? [];
+  expect(skills).toHaveLength(ROUNDS);
+  // Stage 3 drills the 10 000 arithmetic skills, with exactly one bug-choice round.
+  for (const id of skills) expect(STAGE3_SKILLS).toContain(id);
+  expect(skills.filter((id) => id === 'add-sub-10000-bug-choice')).toHaveLength(1);
+
+  for (let i = 0; i < ROUNDS; i++) {
+    await playRoundCorrect(page, tap);
+    await expect(page.locator('.numberfort-next')).toBeFocused();
+    if (tap) await page.locator('.numberfort-next').tap();
+    else await page.keyboard.press('Enter');
+  }
+  const done = page.locator('.numberfort-done');
+  await expect(done).toBeVisible();
+  await expect(done.locator('.numberfort-stage-line')).toHaveText(/Chặng 3\/5 · \d sao/);
+  // Later stages pay no first-clear bonus.
+  await expect(done.locator('.numberfort-bonus')).toHaveCount(0);
+  const maxCalls = Number(await page.locator('.level-layer').getAttribute('data-max-draw-calls'));
+  expect(maxCalls).toBeGreaterThan(0);
+  expect(maxCalls).toBeLessThanOrEqual(DRAW_CALL_BUDGET);
+
+  const back = page.locator('.numberfort-back');
+  if (tap) await back.tap();
+  else {
+    await expect(back).toBeFocused();
+    await page.keyboard.press('Enter');
+  }
+  await expect.poll(() => page.evaluate(() => window.__game?.levelRunning())).toBe(false);
+  // The commit runs in the background after the level closes: poll the store until it lands.
+  await expect
+    .poll(() =>
+      page.evaluate(() => window.__game?.snapshot()?.levelProgress.numberfort?.stageStars),
+    )
+    .toEqual([2, 2, expect.any(Number)]);
+  const numberfort = await page.evaluate(() => window.__game?.snapshot()?.levelProgress.numberfort);
+  expect(numberfort?.stageStars?.[0]).toBe(2);
+  expect(numberfort?.stageStars?.[1]).toBe(2);
+  expect(numberfort?.stageStars?.[2]).toBeGreaterThanOrEqual(1);
+  // A stage-3 run never overwrites the earlier stars (the level's `stars` stay 2).
+  expect(numberfort?.stars).toBe(2);
+  await expect(page.locator('#gate-numberfort-label small')).toHaveText(/Chặng 4\/5/);
   expect(errors).toEqual([]);
 });

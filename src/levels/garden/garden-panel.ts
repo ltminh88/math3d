@@ -17,7 +17,12 @@ function el<K extends keyof HTMLElementTagNameMap>(tag: K, className = '', text 
   return node;
 }
 
-const KIND_KEYS = { pattern: 'kindPattern', balance: 'kindBalance', bag: 'kindBag' } as const;
+const KIND_KEYS = {
+  pattern: 'kindPattern',
+  balance: 'kindBalance',
+  bag: 'kindBag',
+  addsub: 'kindAddSub',
+} as const;
 
 export class GardenPanel {
   readonly guide = el('div', 'garden-guide glass');

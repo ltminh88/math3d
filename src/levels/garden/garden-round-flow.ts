@@ -8,8 +8,9 @@ import {
   isStepAnswerCorrect,
   playableSteps,
   type StepAnswer,
+  wrongAnswerBug,
 } from '../../reasoning/reasoning-step-answers';
-import type { ReasoningStep } from '../../reasoning/reasoning-types';
+import type { Misconception, ReasoningStep } from '../../reasoning/reasoning-types';
 import { StepMissBudget } from '../shared/step-miss-budget';
 import type { GardenRound } from './garden-round-plan';
 
@@ -33,6 +34,10 @@ export class GardenRoundFlow {
   roundComplete = false;
   private readonly budget = new StepMissBudget();
   private wrongAnswers: number[] = [];
+  /** The question's bugs, in the order first picked (boost Phase 0, R79):
+   * a wrong choice that stands for a bug fills only the bug bank — it adds
+   * no attempt and moves no box. The shared flow collects them the same way. */
+  private readonly questionBugs = new Set<Misconception>();
   private startedAt: number;
 
   constructor(
@@ -69,8 +74,21 @@ export class GardenRoundFlow {
     const step = this.step;
     if (!round || !step) return { verdict: 'ignored' };
     if (isStepAnswerCorrect(step, answer)) return this.advance(round, 'correct');
-    const value = wrongValue(step, answer);
-    if (value !== undefined) this.wrongAnswers.push(value);
+    if (round.kind === 'addsub') {
+      // The shared flow's rule (R79): a wrong pick that stands for a bug
+      // fills only the bug bank — it adds no attempt and moves no box; a
+      // wrong number is a wrong answer. Garden-native rounds keep their
+      // existing behaviour (a wrong pick's number is a wrong answer).
+      if (typeof answer === 'number') {
+        this.wrongAnswers.push(answer);
+      } else {
+        const bug = wrongAnswerBug(step, answer);
+        if (bug !== undefined) this.questionBugs.add(bug);
+      }
+    } else {
+      const value = wrongValue(step, answer);
+      if (value !== undefined) this.wrongAnswers.push(value);
+    }
     if (!this.budget.miss()) return { verdict: 'wrong' };
     return this.advance(round, 'revealed');
   }
@@ -101,6 +119,7 @@ export class GardenRoundFlow {
     this.budget.reset();
     this.roundComplete = false;
     this.wrongAnswers = [];
+    this.questionBugs.clear();
     this.startedAt = this.now();
   }
 
@@ -114,6 +133,7 @@ export class GardenRoundFlow {
       firstTry: result.firstTry,
       usedHint: result.usedHint,
       wrongAnswers: [...this.wrongAnswers],
+      bugs: [...this.questionBugs],
     };
   }
 }

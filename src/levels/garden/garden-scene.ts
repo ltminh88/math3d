@@ -7,6 +7,9 @@ import { LEVEL_COMPLETE_BONUS } from '../shared/level-run-result';
 import type { LevelContext, LevelModule, LevelSession } from '../shared/level-types';
 import { attachLevelZoom } from '../shared/level-zoom';
 import '../shared/level-zoom.css';
+import { renderPromptFor } from '../../practice/family-prompt-registry';
+import { familyOfSkill } from '../../practice/item-for-skill';
+import { withGardenAddSubRound } from './garden-add-sub-slots';
 import { GardenBalanceView } from './garden-balance-view';
 import { GardenCamera } from './garden-camera';
 import { showGardenCelebration } from './garden-celebration';
@@ -14,10 +17,10 @@ import { buildGardenDiorama } from './garden-diorama-builder';
 import { listenGardenKeys } from './garden-input';
 import { GardenPanel } from './garden-panel';
 import { GardenPatternRowView } from './garden-pattern-row-view';
-import { gardenPromptRenderer } from './garden-prompt-render';
+import { gardenPromptRenderer, type PromptRenderer } from './garden-prompt-render';
 import { GardenRoundController, type GardenViews } from './garden-round-controller';
 import { GardenRoundFlow } from './garden-round-flow';
-import { planGardenRun } from './garden-round-plan';
+import { GARDEN_SKILLS, planGardenRun } from './garden-round-plan';
 import { GardenSeedBagView } from './garden-seed-bag-view';
 import { gardenStrings } from './garden-strings';
 import { installGardenTestHook } from './garden-test-hook';
@@ -28,7 +31,6 @@ const TRACK_DRAW_CALLS = import.meta.env.MODE === 'test';
 
 function start(ctx: LevelContext): LevelSession {
   const gs = gardenStrings(ctx.defineStrings);
-  const render = gardenPromptRenderer(gs);
   const scene = new Scene();
   scene.name = 'garden';
   const { sun } = buildGardenDiorama(scene, ctx.stage);
@@ -52,8 +54,23 @@ function start(ctx: LevelContext): LevelSession {
     zoomOutLabel: gs('zoomOut'),
   });
   ctx.ui.dataset.zoomFactor = '1';
-  const plan = planGardenRun(ctx.learning, ctx.definition, ctx.stage);
+  const plan = withGardenAddSubRound(
+    planGardenRun(ctx.learning, ctx.definition, ctx.stage),
+    ctx.learning.stats(),
+    ctx.learning.rng,
+    ctx.stage,
+  );
   const flow = new GardenRoundFlow(plan, () => performance.now());
+  // The garden renderer only knows the garden skills' stories; the add/sub
+  // round renders through its own family's renderer (the market pattern).
+  const gardenRender = gardenPromptRenderer(gs);
+  const render: PromptRenderer = (prompt) => {
+    const skillId = flow.round?.skillId;
+    if (skillId && !GARDEN_SKILLS.includes(skillId)) {
+      return renderPromptFor(familyOfSkill(skillId))(prompt);
+    }
+    return gardenRender(prompt);
+  };
   const controller: { current?: GardenRoundController } = {};
   const panel = new GardenPanel(ctx.ui, gs, {
     onHint: () => controller.current?.hint(),

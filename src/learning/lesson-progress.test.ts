@@ -124,7 +124,7 @@ describe('lessonStars', () => {
     expect(lessonStars(74, statsOf(keys, 4))).toBe(3);
   });
 
-  it('B2: 0-3 by hand (phase 09 arithmetic skills + boost 1A + 2A formats)', () => {
+  it('B2: 0-3 by hand (phase 09 arithmetic skills + boost 1A + 2A + 3A formats)', () => {
     const keys = [
       'sk:add-sub-mental-round',
       'sk:add-sub-1000',
@@ -138,6 +138,7 @@ describe('lessonStars', () => {
       'sk:add-sub-number-line',
       'sk:add-sub-bar-model-wp',
       'sk:add-sub-column',
+      'sk:add-sub-match',
     ] as const;
     expect(lessonStars(2, {})).toBe(0);
     expect(lessonStars(2, statsOf(keys, 2))).toBe(1); // all attempted, none >= 3
@@ -145,12 +146,13 @@ describe('lessonStars', () => {
     expect(lessonStars(2, statsOf(keys, 4))).toBe(3);
   });
 
-  it('B54: 0-3 by hand (phase 09 4-digit skills)', () => {
+  it('B54: 0-3 by hand (phase 09 4-digit skills + boost 3A bug-choice)', () => {
     const keys = [
       'sk:add-4digit',
       'sk:add-sub-10000-wp',
       'sk:add-sub-find-error',
       'sk:add-missing-digit',
+      'sk:add-sub-10000-bug-choice',
     ] as const;
     expect(lessonStars(54, {})).toBe(0);
     expect(lessonStars(54, statsOf(keys, 2))).toBe(1); // all attempted, none >= 3
@@ -183,7 +185,7 @@ describe('nextLesson', () => {
   });
 
   it('moves on once B3 is at 3 stars', () => {
-    // B1's six number skills and B2's twelve arithmetic skills are at box 4 too, so B1
+    // B1's six number skills and B2's thirteen arithmetic skills are at box 4 too, so B1
     // and B2 are done; B3 at 3 stars (box 4) moves the pointer to B4.
     const stats = statsOf(
       [
@@ -205,6 +207,7 @@ describe('nextLesson', () => {
         'sk:add-sub-number-line',
         'sk:add-sub-bar-model-wp',
         'sk:add-sub-column',
+        'sk:add-sub-match',
         'sk:unknown-add-sub',
         'sk:unknown-add-sub-wp',
       ] as const,

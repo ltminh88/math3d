@@ -18,6 +18,8 @@ import { countAddCarries, countSubBorrows } from './carry-count';
 
 const SKILLS = [
   'add-sub-bug-choice',
+  'add-sub-10000-bug-choice',
+  'add-sub-100000-bug-choice',
   'add-sub-true-false',
   'add-sub-compare-estimate',
   'add-sub-number-line',
@@ -149,6 +151,48 @@ describe('add-sub-bug-choice', () => {
       }
     }
     expect(bugTagged / total).toBeGreaterThan(0.5);
+  });
+});
+
+describe('add-sub bug-choice at range (Phase 3A)', () => {
+  it.each([
+    ['add-sub-10000-bug-choice', 10000],
+    ['add-sub-100000-bug-choice', 100000],
+  ] as const)('%s keeps operands and options within %s', (skillId, cap) => {
+    for (const tier of [1, 2, 3] as const) {
+      for (let seed = 0; seed < 40; seed++) {
+        const item = generate(skillId, tier, seed);
+        const p = params(item);
+        const isAdd = item.story.key === 'addCalc';
+        const op = isAdd ? '+' : '−';
+        const a = p.a as number;
+        const b = p.b as number;
+        const correct = isAdd ? a + b : a - b;
+        expect(ladderMatchesTier(a, b, op, tier)).toBe(true);
+        expect(correct).toBeLessThanOrEqual(cap);
+        const step = choiceStep(item);
+        expect(step.options.length).toBe(4);
+        for (const v of step.options.map(numOf)) expect(v).toBeLessThanOrEqual(cap);
+        expect(numOf(step.options.filter((o) => o.correct)[0] as ChoiceOption)).toBe(correct);
+        for (const o of step.options) {
+          if (o.misconception && o.misconception !== 'near-miss') {
+            expect(numOf(o)).toBe(bugValue(o.misconception as never, a, b, op));
+          }
+        }
+      }
+    }
+  });
+
+  it('actually practises at the big range (not the 1 000 range in disguise)', () => {
+    // Over 40 seeds at least one pair has an operand above 1 000.
+    for (const skillId of ['add-sub-10000-bug-choice', 'add-sub-100000-bug-choice'] as const) {
+      let big = 0;
+      for (let seed = 0; seed < 40; seed++) {
+        const p = params(generate(skillId, 1, seed));
+        if ((p.a as number) > 1000 || (p.b as number) > 1000) big++;
+      }
+      expect(big).toBeGreaterThan(0);
+    }
   });
 });
 

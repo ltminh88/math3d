@@ -12,12 +12,15 @@ import type { ReasoningItem, ReasoningStep } from '../../reasoning/reasoning-typ
 import type { LevelDefinition, LevelLearning } from '../shared/level-types';
 import { withFirstOpStep } from './garden-expression-steps';
 
-export type GardenKind = 'pattern' | 'balance' | 'bag';
+export type GardenKind = 'pattern' | 'balance' | 'bag' | 'addsub';
 
 const SKILLS_BY_KIND: Readonly<Record<GardenKind, readonly string[]>> = {
   pattern: ['pattern-add', 'pattern-sub', 'pattern-skip-count'],
   balance: ['unknown-add-sub', 'unknown-mul-div'],
   bag: ['expr-order', 'expr-brackets', 'expr-from-story'],
+  // 'addsub' has no garden skills: its rounds come from the arithmetic
+  // family (garden-add-sub-slots), never from this pool.
+  addsub: [],
 };
 const KINDS: readonly GardenKind[] = ['pattern', 'balance', 'bag'];
 

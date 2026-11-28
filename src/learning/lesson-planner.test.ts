@@ -3,7 +3,7 @@
 // not by calling the helpers under test:
 //   B25 = div-rem-floor, div-rem-ceil, choose-all-correct, tf-explain (catalog lines 36-37, 49-50)
 //   B3  = unknown-add-sub + unknown-add-sub-wp (R8); B1 has the six number skills (phase 07); B2 has
-//         the twelve arithmetic skills (phase 09 + boost 1A + 2A); B7 reviews twelve geometry/measurement
+//         the thirteen arithmetic skills (phase 09 + boost 1A + 2A + 3A); B7 reviews twelve geometry/measurement
 //         skills (phase 21 + boost 1B); B14 = the six fraction skills (phase 12); B23/B26/B36/B37
 //         have the mul/div arithmetic skills (phase 10)
 //   B5  = tables [3]: 9 mul facts (3x2..3x10) + 9 div facts (6/3..30/3), plus
@@ -168,17 +168,20 @@ describe('planLessonRun', () => {
       expect(run).toHaveLength(6);
       expect(run.every((k) => /^(sk:tally-|sk:table-|sk:chance-)/.test(k))).toBe(true);
     }
-    // B2 plans its twelve arithmetic skills (phase 09 + boost 1A + 2A).
+    // B2 plans its thirteen arithmetic skills (phase 09 + boost 1A + 2A + 3A).
     const b2 = planLessonRun(2, {}, mulberry32(4));
     expect(b2).toHaveLength(6);
     expect(new Set(b2).size).toBe(6);
     expect(b2.every((k) => /^(sk:add-|sk:sub-)/.test(k))).toBe(true);
-    // B54/B55/B63/B64 plan their four arithmetic skills each: six items, four distinct.
+    // B54/B55/B63/B64 plan their arithmetic skills each: six items; B54 and
+    // B63 have five distinct now that boost 3A added the bug-choice range
+    // variants, B55 and B64 still four.
     const B54_SKILLS = [
       'sk:add-4digit',
       'sk:add-sub-10000-wp',
       'sk:add-sub-find-error',
       'sk:add-missing-digit',
+      'sk:add-sub-10000-bug-choice',
     ] as const;
     const B55_SKILLS = [
       'sk:sub-4digit',
@@ -191,6 +194,7 @@ describe('planLessonRun', () => {
       'sk:add-sub-100000-wp',
       'sk:add-sub-find-error',
       'sk:add-missing-digit',
+      'sk:add-sub-100000-bug-choice',
     ] as const;
     const B64_SKILLS = [
       'sk:sub-5digit',
@@ -198,24 +202,25 @@ describe('planLessonRun', () => {
       'sk:add-sub-find-error',
       'sk:add-missing-digit',
     ] as const;
-    for (const [n, skills] of [
-      [54, B54_SKILLS],
-      [55, B55_SKILLS],
-      [63, B63_SKILLS],
-      [64, B64_SKILLS],
+    for (const [n, skills, size] of [
+      [54, B54_SKILLS, 5],
+      [55, B55_SKILLS, 4],
+      [63, B63_SKILLS, 5],
+      [64, B64_SKILLS, 4],
     ] as const) {
       const run = planLessonRun(n, {}, mulberry32(4));
       expect(run).toHaveLength(6);
-      expect(new Set(run).size).toBe(4);
+      expect(new Set(run).size).toBe(size);
       for (const key of run) expect(skills).toContain(key);
     }
     // B58/B65/B77 mix the 4-digit and 5-digit lessons: six items; B58 has six
-    // distinct skills now that phase 11 landed B56/B57, B65 has five, B77 six
+    // distinct skills now that phase 11 landed B56/B57, B65 has six now that
+    // boost 3A added the 100 000 bug-choice range to B63, B77 six
     // (eight skills in its pool). B58's run now mixes mul/div skills in with the
     // add/sub ones; B65/B77 stay add/sub only.
     for (const [n, distinct, pattern] of [
       [58, 6, /^(sk:add-|sk:sub-|sk:mul-|sk:div-)/],
-      [65, 5, /^(sk:add-|sk:sub-)/],
+      [65, 6, /^(sk:add-|sk:sub-)/],
       [77, 6, /^(sk:add-|sk:sub-)/],
     ] as const) {
       const run = planLessonRun(n, {}, mulberry32(4));

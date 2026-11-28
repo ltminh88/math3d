@@ -32,9 +32,13 @@ export const addSubFormatStrings = {
     // question (subtraction only, asked BEFORE the digit) names its column
     // and shows the raw column instead.
     columnCalc: 'Đặt tính rồi tính: {a} {op} {b}.',
-    columnDigitOnes: 'Hàng đơn vị: {text} = ?',
-    columnDigitTens: 'Hàng chục: {text} = ?',
-    columnDigitHundreds: 'Hàng trăm: {text} = ?',
+    columnDigitOnes: 'Hàng đơn vị: {text}. Viết chữ số nào?',
+    columnDigitTens: 'Hàng chục: {text}. Viết chữ số nào?',
+    columnDigitHundreds: 'Hàng trăm: {text}. Viết chữ số nào?',
+    // Boost Phase 3A match: four calculations matched to their results; one
+    // result is also the bug value of another pair in the set (the decoy).
+    matchAddSub: 'Nối mỗi phép tính với kết quả của nó.',
+    matchAddSubPrompt: 'Chạm một phép tính, rồi chạm kết quả của nó.',
     askCarry: 'Có nhớ 1 không?',
     askBorrowOnes: 'Hàng đơn vị: {text}. Có phải vay 1 không?',
     askBorrowTens: 'Hàng chục: {text}. Có phải vay 1 không?',
@@ -66,9 +70,13 @@ export const addSubFormatStrings = {
     askUnknownPart: 'How many are in the unknown part?',
     // Boost Phase 2A column-calc: one digit step per column, units first.
     columnCalc: 'Work it out in columns: {a} {op} {b}.',
-    columnDigitOnes: 'Ones: {text} = ?',
-    columnDigitTens: 'Tens: {text} = ?',
-    columnDigitHundreds: 'Hundreds: {text} = ?',
+    columnDigitOnes: 'Ones: {text}. Which digit do you write?',
+    columnDigitTens: 'Tens: {text}. Which digit do you write?',
+    columnDigitHundreds: 'Hundreds: {text}. Which digit do you write?',
+    // Boost Phase 3A match: four calculations matched to their results; one
+    // result is also the bug value of another pair in the set (the decoy).
+    matchAddSub: 'Match each calculation with its result.',
+    matchAddSubPrompt: 'Tap a calculation, then tap its result.',
     askCarry: 'Do you carry 1?',
     askBorrowOnes: 'Ones: {text}. Do you borrow 1?',
     askBorrowTens: 'Tens: {text}. Do you borrow 1?',
