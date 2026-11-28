@@ -111,6 +111,105 @@ describe('planDailySet', () => {
   });
 });
 
+describe('focus mix (Phase 4A)', () => {
+  // Weak focus skills (no `recent`: the seeded-stat fallback reads correct/attempts).
+  const weakFocus = (id: string, correct: number, box: number): [FactKey, FactStat] => [
+    `sk:${id}` as FactKey,
+    { ...newFactStat(), attempts: 10, correct, box, lastSeenAt: dayMs(2026, 10, 20) },
+  ];
+  const focusStats = (): Record<FactKey, FactStat> => ({
+    ...Object.fromEntries([
+      weakFocus('add-sub-1000', 2, 1), // score 0.8
+      weakFocus('meas-len-convert', 5, 2), // score 0.5
+      weakFocus('add-sub-column', 8, 1), // score 0.2
+      weakFocus('meas-ruler-read', 9, 3), // score 0.1
+    ]),
+    'mul:3x4': stat(1, [2026, 10, 19]),
+    'mul:3x5': stat(2, [2026, 10, 18]),
+    'mul:3x6': stat(1, [2026, 10, 18]),
+    'mul:4x6': stat(4, [2026, 10, 10]),
+    'mul:3x7': stat(3, [2026, 10, 21]),
+    'mul:4x5': stat(4, [2026, 10, 21]),
+    'mul:4x4': stat(5, [2026, 10, 1]),
+  });
+
+  it('a seeded weak profile gets 6 focus items, weakest first', () => {
+    const picked = pickDailyItems({ stats: focusStats(), today: TODAY, seed: 7 });
+    expect(picked).toEqual([
+      'sk:add-sub-1000',
+      'sk:meas-len-convert',
+      'sk:add-sub-column',
+      'sk:meas-ruler-read',
+      'sk:add-sub-1000',
+      'sk:meas-len-convert',
+      'mul:3x6',
+      'mul:3x4',
+      'mul:3x5',
+      'mul:4x4',
+    ]);
+    expect(picked.filter((k) => k.startsWith('sk:'))).toHaveLength(6);
+  });
+
+  it('the interleaved set keeps 6 focus items', () => {
+    const set = planDailySet({ stats: focusStats(), today: TODAY, seed: 7 });
+    expect(set).toHaveLength(DAILY_LENGTH);
+    expect(set.filter((k) => k.startsWith('sk:'))).toHaveLength(6);
+  });
+
+  it('is deterministic for (seed, today, stats)', () => {
+    const input = { stats: focusStats(), today: TODAY, seed: 11 };
+    expect(pickDailyItems(input)).toEqual(pickDailyItems(input));
+  });
+
+  it('fewer than 3 focus skills: exactly today’s set (regression guard)', () => {
+    // Same pool as the first test plus two focus skills — hand-traced through
+    // the old 6-due/3-weak/1-mastered rule (no ties in (box, lastSeenAt)).
+    const stats = statsOf({
+      'mul:3x4': stat(1, [2026, 10, 19]),
+      'mul:3x5': stat(2, [2026, 10, 18]),
+      'mul:3x6': stat(1, [2026, 10, 18]),
+      'mul:4x6': stat(4, [2026, 10, 10]),
+      'mul:3x7': stat(3, [2026, 10, 21]),
+      'mul:4x5': stat(4, [2026, 10, 21]),
+      'mul:4x4': stat(5, [2026, 10, 1]),
+      'sk:add-sub-1000': stat(1, [2026, 10, 20]),
+      'sk:meas-len-convert': stat(2, [2026, 10, 19]),
+    });
+    expect(pickDailyItems({ stats, today: TODAY, seed: 7 })).toEqual([
+      'mul:3x6',
+      'mul:3x4',
+      'sk:add-sub-1000',
+      'mul:3x5',
+      'sk:meas-len-convert',
+      'mul:4x6',
+      'mul:3x7',
+      'mul:4x5',
+      'mul:4x4',
+    ]);
+  });
+
+  it('no focus attempts: exactly today’s set', () => {
+    const stats = statsOf({
+      'mul:3x4': stat(1, [2026, 10, 20]),
+      'mul:3x5': stat(2, [2026, 10, 19]),
+      'mul:3x6': stat(1, [2026, 10, 19]),
+      'mul:4x6': stat(4, [2026, 10, 10]),
+      'mul:3x7': stat(3, [2026, 10, 21]),
+      'mul:4x5': stat(4, [2026, 10, 21]),
+      'mul:4x4': stat(5, [2026, 10, 1]),
+    });
+    expect(pickDailyItems({ stats, today: TODAY, seed: 7 })).toEqual([
+      'mul:3x6',
+      'mul:3x4',
+      'mul:3x5',
+      'mul:4x6',
+      'mul:3x7',
+      'mul:4x5',
+      'mul:4x4',
+    ]);
+  });
+});
+
 describe('dailyUnlocked', () => {
   it('opens after field stage 1 (stars >= 1), not before', () => {
     expect(dailyUnlocked({})).toBe(false);

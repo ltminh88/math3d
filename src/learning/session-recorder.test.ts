@@ -119,6 +119,36 @@ describe('session recorder', () => {
     expect(r.finish().local['mul:2x3']?.recent).toBe(0b10);
   });
 
+  it('counts the recorded tries in recentCount (R133)', () => {
+    const r = make();
+    r.recordQuestion(clean('mul:2x3'));
+    r.recordQuestion({
+      ...clean('mul:2x3'),
+      correct: true,
+      firstTry: false,
+      wrongAnswers: [5],
+    });
+    expect(r.finish().local['mul:2x3']?.recentCount).toBe(2);
+  });
+
+  it('a seeded stat counts only its live questions in recentCount (R133)', () => {
+    // Walkthrough seed: 3/3, no `recent`. One live correct question must not
+    // let `attempts` (4) become the denominator for a 1-bit mask.
+    const r = make({ 'sk:add-sub-1000': { ...newFactStat(), box: 4, attempts: 3, correct: 3 } });
+    r.recordQuestion(clean('sk:add-sub-1000'));
+    const local = r.finish().local['sk:add-sub-1000'];
+    expect(local?.recent).toBe(0b1);
+    expect(local?.recentCount).toBe(1);
+  });
+
+  it('recentCount caps at 10 like the mask', () => {
+    const r = make();
+    for (let i = 0; i < 12; i++) r.recordQuestion(clean('mul:2x3'));
+    const local = r.finish().local['mul:2x3'];
+    expect(local?.recent).toBe(0b1111111111);
+    expect(local?.recentCount).toBe(10);
+  });
+
   it('a later question in the same session can drop the fact one more box', () => {
     const r = make({ 'mul:6x7': { ...newFactStat(), box: 3, attempts: 9 } });
     const miss: QuestionOutcome = {

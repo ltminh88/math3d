@@ -14,7 +14,7 @@ import { divFactsForTables, mulFactsForTables } from './curriculum-tables';
 import type { FactKey } from './fact-key';
 import { ALL_LESSONS, skillsOfLesson } from './kntt-lesson-index';
 import type { FactStat } from './learning-types';
-import { lessonStars, nextLesson, topicProgress } from './lesson-progress';
+import { focusReviewLesson, lessonStars, nextLesson, topicProgress } from './lesson-progress';
 
 const stat = (box: number, attempts = 1): FactStat => ({
   attempts,
@@ -292,5 +292,87 @@ describe('topicProgress', () => {
 
   it('an unknown topic is empty', () => {
     expect(topicProgress(99, {})).toEqual({ completed: 0, total: 0 });
+  });
+});
+
+describe('focusReviewLesson (Phase 4A)', () => {
+  // B2's thirteen arithmetic skills; B54 adds add-4digit, add-sub-10000-wp and
+  // add-sub-10000-bug-choice (find-error / missing-digit are shared with B2).
+  const B2: readonly FactKey[] = [
+    'sk:add-sub-mental-round',
+    'sk:add-sub-1000',
+    'sk:add-sub-1000-wp',
+    'sk:add-sub-1000-chain',
+    'sk:add-sub-find-error',
+    'sk:add-missing-digit',
+    'sk:add-sub-bug-choice',
+    'sk:add-sub-true-false',
+    'sk:add-sub-compare-estimate',
+    'sk:add-sub-number-line',
+    'sk:add-sub-bar-model-wp',
+    'sk:add-sub-column',
+    'sk:add-sub-match',
+  ];
+  const B54_EXTRA: readonly FactKey[] = [
+    'sk:add-4digit',
+    'sk:add-sub-10000-wp',
+    'sk:add-sub-10000-bug-choice',
+  ];
+  const rstat = (box: number, session: number, attempts = 10, correct = 10): FactStat => ({
+    ...stat(box, attempts),
+    correct,
+    lastSeenSession: session,
+  });
+  const doneStats = (session: number): Record<FactKey, FactStat> =>
+    Object.fromEntries([...B2, ...B54_EXTRA].map((k) => [k, rstat(4, session)]));
+
+  it('a weak focus skill reviews its done lesson (run 6 of 3)', () => {
+    const stats = doneStats(5); // next run 6: 6 % 3 === 0, review offered
+    stats['sk:add-sub-1000'] = rstat(4, 5, 10, 2); // weakScore 0.8
+    expect(focusReviewLesson(stats)).toBe(2);
+  });
+
+  it('nextLesson jumps to the review while B1 is unfinished', () => {
+    const stats = doneStats(5);
+    stats['sk:add-sub-1000'] = rstat(4, 5, 10, 2);
+    expect(nextLesson(stats)).toBe(2);
+  });
+
+  it('the 1-in-3 cap: run 5 offers no review', () => {
+    const stats = doneStats(4); // next run 5: 5 % 3 !== 0
+    stats['sk:add-sub-1000'] = rstat(4, 4, 10, 2);
+    expect(focusReviewLesson(stats)).toBeUndefined();
+    expect(nextLesson(stats)).toBe(1); // B1 unfinished, progress moves on
+  });
+
+  it('the weakest skill leads; a weaker skill in an unfinished lesson is skipped', () => {
+    // B2 done, B54 done: the weaker skill (add-sub-1000, 0.8) wins over add-4digit (0.6).
+    const stats = doneStats(5);
+    stats['sk:add-sub-1000'] = rstat(4, 5, 10, 2);
+    stats['sk:add-4digit'] = rstat(4, 5, 10, 4);
+    expect(focusReviewLesson(stats)).toBe(2);
+    // B2 unfinished (one skill at box 2): fall through to B54.
+    const stats2 = doneStats(5);
+    stats2['sk:add-sub-1000-wp'] = rstat(2, 5);
+    stats2['sk:add-sub-1000'] = rstat(4, 5, 10, 2);
+    stats2['sk:add-4digit'] = rstat(4, 5, 10, 4);
+    expect(focusReviewLesson(stats2)).toBe(54);
+  });
+
+  it('no weak focus skill: no review', () => {
+    expect(focusReviewLesson(doneStats(5))).toBeUndefined();
+  });
+
+  it('a weak skill whose lesson is not done: no review', () => {
+    const stats = doneStats(5);
+    stats['sk:add-sub-1000-wp'] = rstat(2, 5);
+    stats['sk:add-sub-1000'] = rstat(4, 5, 10, 2);
+    expect(focusReviewLesson(stats)).toBeUndefined();
+  });
+
+  it('a weak non-focus skill does not trigger a review', () => {
+    const stats = doneStats(5);
+    stats['sk:mul-2d-1d'] = rstat(1, 5, 10, 1);
+    expect(focusReviewLesson(stats)).toBeUndefined();
   });
 });

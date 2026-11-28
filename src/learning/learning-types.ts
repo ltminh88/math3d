@@ -19,6 +19,8 @@ export interface FactStat {
   bugs?: Misconception[];
   /** Bitmask of the last 10 first tries, bit 0 = most recent (1 = correct). Device-only, never in a save code. */
   recent?: number;
+  /** How many first tries `recent` actually records (R133): `attempts` also counts retries and seeded/imported attempts the mask never saw, so it must not be the denominator for `recent`. Device-only, never in a save code. */
+  recentCount?: number;
 }
 
 /** Device-only fields the server never receives. */
@@ -28,6 +30,7 @@ export interface FactLocalState {
   errs: number[];
   bugs?: Misconception[];
   recent?: number;
+  recentCount?: number;
 }
 
 export interface DeltaFact {
