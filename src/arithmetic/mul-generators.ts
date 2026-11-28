@@ -8,6 +8,7 @@ import type { ReasoningGenerator } from '../reasoning/reasoning-types';
 import { arithmeticItem, numberStep, ref } from './arithmetic-distractors';
 import { RANGE_99, RANGE_999, RANGE_10000, RANGE_100000 } from './arithmetic-ranges';
 import { countMulCarries } from './carry-count';
+import { mentalVerdictItem, missingDigitItem, missingNumberItem } from './mul-div-missing-factor';
 
 /** Fallbacks when rejection sampling misses (never in practice): one valid pair per tier. */
 const MUL_FALLBACK: Record<number, Record<SkillTier, [number, number]>> = {
@@ -57,10 +58,19 @@ const plainMul =
     ]);
   };
 
-/** Round tens × a digit (product ≤ 99): T1 small tens and digit, T2 the rest, T3 a
- *  two-step chain of round tens. */
+/** Round tens × a digit (product ≤ 99): T1 tens 1–5 × digit 2–5, T2 the wider
+ *  range, T1–T2 a missing-number form (R117), T3 a two-step chain or a Đúng/Sai verdict. */
 export const mulTensMental: ReasoningGenerator = (rng, tier) => {
   if (tier === 3) {
+    if (rng() < 0.5) {
+      for (let t = 0; t < 500; t++) {
+        const tens = randInt(rng, 1, 9);
+        const d = randInt(rng, 2, 9);
+        if (tens * d > 9) continue;
+        return mentalVerdictItem('mul-tens-mental', tier, true, tens * 10, d, rng, RANGE_99);
+      }
+      return mentalVerdictItem('mul-tens-mental', tier, true, 30, 2, rng);
+    }
     for (let t = 0; t < 500; t++) {
       const a = randInt(rng, 1, 9) * 10;
       const b = randInt(rng, 2, 9);
@@ -82,12 +92,15 @@ export const mulTensMental: ReasoningGenerator = (rng, tier) => {
     ]);
   }
   for (let t = 0; t < 500; t++) {
-    const tens = randInt(rng, 1, 9);
-    const d = randInt(rng, 2, 9);
+    const tens = tier === 1 ? randInt(rng, 1, 5) : randInt(rng, 1, 9);
+    const d = tier === 1 ? randInt(rng, 2, 5) : randInt(rng, 2, 9);
     if (tens * d > 9) continue;
-    if (tier === 1 && (tens > 3 || d > 3)) continue;
-    if (tier === 2 && tens <= 3 && d <= 3) continue;
     const a = tens * 10;
+    const form = pick(rng, ['plain', 'digit', 'tens'] as const);
+    if (form === 'digit')
+      return missingDigitItem('mul-tens-mental', tier, `${a} × □ = ${a * d}`, d);
+    if (form === 'tens')
+      return missingNumberItem('mul-tens-mental', tier, `□ × ${d} = ${a * d}`, a);
     return arithmeticItem('mul-tens-mental', tier, ref('mentalCalc', { expr: `${a} × ${d}` }), [
       numberStep(ref('askResult'), a * d),
     ]);
@@ -100,10 +113,19 @@ export const mulTensMental: ReasoningGenerator = (rng, tier) => {
   );
 };
 
-/** Round hundreds × a digit (product ≤ 999): T1 a small product, T2 the rest, T3 a
- *  two-step chain of round hundreds. */
+/** Round hundreds × a digit (product ≤ 999): T1 hundreds 1–4 × digit 2–4, T2 the
+ *  wider range, T1–T2 a missing-number form (R117), T3 a two-step chain or a Đúng/Sai verdict. */
 export const mulHundredsMental: ReasoningGenerator = (rng, tier) => {
   if (tier === 3) {
+    if (rng() < 0.5) {
+      for (let t = 0; t < 500; t++) {
+        const h = randInt(rng, 1, 9);
+        const d = randInt(rng, 2, 9);
+        if (h * d > 9) continue;
+        return mentalVerdictItem('mul-hundreds-mental', tier, true, h * 100, d, rng);
+      }
+      return mentalVerdictItem('mul-hundreds-mental', tier, true, 200, 3, rng);
+    }
     for (let t = 0; t < 500; t++) {
       const a = randInt(rng, 1, 9) * 100;
       const b = randInt(rng, 2, 9);
@@ -128,12 +150,15 @@ export const mulHundredsMental: ReasoningGenerator = (rng, tier) => {
     );
   }
   for (let t = 0; t < 500; t++) {
-    const h = randInt(rng, 1, 9);
-    const d = randInt(rng, 2, 9);
+    const h = tier === 1 ? randInt(rng, 1, 4) : randInt(rng, 1, 9);
+    const d = tier === 1 ? randInt(rng, 2, 4) : randInt(rng, 2, 9);
     if (h * d > 9) continue;
-    if (tier === 1 && h * d > 5) continue;
-    if (tier === 2 && h * d < 6) continue;
     const a = h * 100;
+    const form = pick(rng, ['plain', 'digit', 'hundreds'] as const);
+    if (form === 'digit')
+      return missingDigitItem('mul-hundreds-mental', tier, `${a} × □ = ${a * d}`, d);
+    if (form === 'hundreds')
+      return missingNumberItem('mul-hundreds-mental', tier, `□ × ${d} = ${a * d}`, a);
     return arithmeticItem('mul-hundreds-mental', tier, ref('mentalCalc', { expr: `${a} × ${d}` }), [
       numberStep(ref('askResult'), a * d),
     ]);
@@ -146,8 +171,20 @@ export const mulHundredsMental: ReasoningGenerator = (rng, tier) => {
   );
 };
 
+/** 2-digit × 1-digit (product ≤ 99): the missing-number form at every tier
+ *  (R117) — the pair still follows the tier's carry rule (T1 no carry). */
+const mul2d1d: ReasoningGenerator = (rng, tier) => {
+  const [a, b] = pickMulPair(rng, RANGE_99, tier);
+  const form = pick(rng, ['plain', 'digit', 'a'] as const);
+  if (form === 'digit') return missingDigitItem('mul-2d-1d', tier, `${a} × □ = ${a * b}`, b);
+  if (form === 'a') return missingNumberItem('mul-2d-1d', tier, `□ × ${b} = ${a * b}`, a);
+  return arithmeticItem('mul-2d-1d', tier, ref('mulCalc', { a, b }), [
+    numberStep(ref('askProduct'), a * b),
+  ]);
+};
+
 export const MUL_GENERATORS: Record<string, ReasoningGenerator> = {
-  'mul-2d-1d': plainMul('mul-2d-1d', RANGE_99),
+  'mul-2d-1d': mul2d1d,
   'mul-tens-mental': mulTensMental,
   'mul-3d-1d': plainMul('mul-3d-1d', RANGE_999),
   'mul-hundreds-mental': mulHundredsMental,

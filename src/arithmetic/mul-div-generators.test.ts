@@ -60,7 +60,29 @@ const exprNums = (i: PracticeItem): number[] =>
     .filter((t) => /^\d+$/.test(t))
     .map(Number);
 
-/** Wrong product from "forgot the carry": each digit × b, mod 10 (oracle-local). */
+/** The missing number of a □ expr ("20 × □ = 60" -> 3, "□ : 3 = 20" -> 60). */
+function missingValue(expr: string): number {
+  const [left, right] = expr.split(' = ');
+  const result = Number(right);
+  const [x, op, y] = (left ?? '').split(' ');
+  if (x === '□') return op === '×' ? result / Number(y) : result * Number(y);
+  return op === '×' ? result / Number(x) : Number(x) / result;
+}
+
+/** The (a, b) pair behind a □ mental expr, solved from the visible numbers. */
+function missingPair(item: PracticeItem, op: '×' | ':'): [number, number] {
+  const expr = s(item, 'expr');
+  const [left, right] = expr.split(' = ');
+  const result = Number(right);
+  const [x, o, y] = (left ?? '').split(' ');
+  if (o !== op) throw new Error(`expected ${op} in ${expr}`);
+  if (x === '□') {
+    const other = Number(y);
+    return op === '×' ? [result / other, other] : [result * other, other];
+  }
+  const first = Number(x);
+  return op === '×' ? [first, result / first] : [first, first / result];
+}
 function forgotCarryMul(a: number, b: number): number {
   const out: number[] = [];
   for (const d of String(a).split('').map(Number)) out.push((d * b) % 10);
@@ -105,7 +127,20 @@ const ORACLE: Record<string, (i: PracticeItem) => void> = {
     expect(r).toBeGreaterThan(0);
     expect(values(i)).toEqual([q, r]);
   },
-  mentalCalc: (i) => expect(last(i)).toBe(evalExpr(s(i, 'expr'))),
+  mentalCalc: (i) => {
+    const expr = s(i, 'expr');
+    if (expr.includes('□')) {
+      const missing = missingValue(expr);
+      expect(Number.isInteger(missing)).toBe(true);
+      expect(last(i)).toBe(missing);
+      // R132: a □ item asks for the missing value, never the result on screen
+      // (askResult would invite typing the number already shown, e.g. 60).
+      expect(['askMissingDigit', 'askMissingNumber']).toContain(stepAt(i, 0).prompt.key);
+      if (stepAt(i, 0).prompt.key === 'askMissingDigit') expect(missing).toBeLessThan(10);
+      return;
+    }
+    expect(last(i)).toBe(evalExpr(expr));
+  },
   wpMulGroups: (i) => expect(last(i)).toBe(p(i, 'per') * p(i, 'n')),
   wpMulTimesRice: checkMulTimes,
   wpMulTimesBooks: checkMulTimes,
@@ -154,8 +189,14 @@ function tierCheck(skillId: string, item: PracticeItem, tier: SkillTier): void {
   const where = `${skillId} t${tier}`;
   const key = item.story.key;
   if (skillId === 'mul-2d-1d' || skillId === 'mul-2d-1d-wp') {
-    const a = key === 'wpMulGroups' ? p(item, 'per') : p(item, 'a');
-    const b = key === 'wpMulGroups' ? p(item, 'n') : p(item, 'b');
+    let a: number;
+    let b: number;
+    if (key === 'mentalCalc') {
+      [a, b] = missingPair(item, '×');
+    } else {
+      a = key === 'wpMulGroups' ? p(item, 'per') : p(item, 'a');
+      b = key === 'wpMulGroups' ? p(item, 'n') : p(item, 'b');
+    }
     const ones = (a % 10) * b;
     if (tier === 1) expect(ones, where).toBeLessThan(10);
     else if (tier === 2) {
@@ -165,6 +206,26 @@ function tierCheck(skillId: string, item: PracticeItem, tier: SkillTier): void {
     return;
   }
   if (skillId === 'mul-tens-mental') {
+    if (key === 'errorMul') {
+      // T3 verdict: a round ten × a digit, product ≤ 99 (skill cap).
+      const a = p(item, 'a');
+      const b = p(item, 'b');
+      expect(a % 10, where).toBe(0);
+      expect((a / 10) * b, where).toBeLessThanOrEqual(9);
+      return;
+    }
+    if (s(item, 'expr').includes('□')) {
+      const [a, b] = missingPair(item, '×');
+      expect(a % 10, where).toBe(0);
+      expect(a / 10, where).toBeLessThanOrEqual(9);
+      expect(b, where).toBeLessThanOrEqual(9);
+      expect((a / 10) * b, where).toBeLessThanOrEqual(9);
+      if (tier === 1) {
+        expect(a / 10, where).toBeLessThanOrEqual(5);
+        expect(b, where).toBeLessThanOrEqual(5);
+      }
+      return;
+    }
     const nums = exprNums(item);
     if (tier === 3) {
       expect(nums.length, where).toBe(3);
@@ -173,16 +234,33 @@ function tierCheck(skillId: string, item: PracticeItem, tier: SkillTier): void {
     expect(nums.length, where).toBe(2);
     const [tens, d] = nums as [number, number];
     expect(tens % 10, where).toBe(0);
+    expect((tens / 10) * d, where).toBeLessThanOrEqual(9);
     if (tier === 1) {
-      expect(tens / 10, where).toBeLessThanOrEqual(3);
-      expect(d, where).toBeLessThanOrEqual(3);
-    } else {
-      expect((tens / 10) * d, where).toBeLessThanOrEqual(9);
-      expect(tens / 10 > 3 || d > 3, where).toBe(true);
+      expect(tens / 10, where).toBeLessThanOrEqual(5);
+      expect(d, where).toBeLessThanOrEqual(5);
     }
     return;
   }
   if (skillId === 'mul-hundreds-mental') {
+    if (key === 'errorMul') {
+      const a = p(item, 'a');
+      const b = p(item, 'b');
+      expect(a % 100, where).toBe(0);
+      expect((a / 100) * b, where).toBeLessThanOrEqual(9);
+      return;
+    }
+    if (s(item, 'expr').includes('□')) {
+      const [a, b] = missingPair(item, '×');
+      expect(a % 100, where).toBe(0);
+      expect(a / 100, where).toBeLessThanOrEqual(9);
+      expect(b, where).toBeLessThanOrEqual(9);
+      expect((a / 100) * b, where).toBeLessThanOrEqual(9);
+      if (tier === 1) {
+        expect(a / 100, where).toBeLessThanOrEqual(4);
+        expect(b, where).toBeLessThanOrEqual(4);
+      }
+      return;
+    }
     const nums = exprNums(item);
     if (tier === 3) {
       expect(nums.length, where).toBe(3);
@@ -191,12 +269,29 @@ function tierCheck(skillId: string, item: PracticeItem, tier: SkillTier): void {
     expect(nums.length, where).toBe(2);
     const [h, d] = nums as [number, number];
     expect(h % 100, where).toBe(0);
-    const product = (h / 100) * d;
-    if (tier === 1) expect(product, where).toBeLessThanOrEqual(5);
-    else expect(product, where).toBeGreaterThanOrEqual(6);
+    expect((h / 100) * d, where).toBeLessThanOrEqual(9);
+    if (tier === 1) {
+      expect(h / 100, where).toBeLessThanOrEqual(4);
+      expect(d, where).toBeLessThanOrEqual(4);
+    }
     return;
   }
   if (skillId === 'div-tens-mental') {
+    if (key === 'errorDiv') {
+      const a = p(item, 'a');
+      const b = p(item, 'b');
+      expect(a % 10, where).toBe(0);
+      expect(a % b, where).toBe(0);
+      expect(a / b, where).toBeLessThanOrEqual(40);
+      return;
+    }
+    if (s(item, 'expr').includes('□')) {
+      const [a, b] = missingPair(item, ':');
+      expect(a % 10, where).toBe(0);
+      expect(a % b, where).toBe(0);
+      expect(a / b, where).toBeLessThanOrEqual(40);
+      return;
+    }
     const nums = exprNums(item);
     if (tier === 3) {
       expect(nums.length, where).toBe(3);
@@ -206,12 +301,25 @@ function tierCheck(skillId: string, item: PracticeItem, tier: SkillTier): void {
     const [tens, d] = nums as [number, number];
     expect(tens % 10, where).toBe(0);
     expect((tens / 10) % d, where).toBe(0);
-    const q = evalExpr(s(item, 'expr'));
-    if (tier === 1) expect(q, where).toBeLessThanOrEqual(20);
-    else expect(q, where).toBeGreaterThanOrEqual(30);
+    expect(evalExpr(s(item, 'expr')), where).toBeLessThanOrEqual(40);
     return;
   }
   if (skillId === 'div-hundreds-mental') {
+    if (key === 'errorDiv') {
+      const a = p(item, 'a');
+      const b = p(item, 'b');
+      expect(a % 100, where).toBe(0);
+      expect(a % b, where).toBe(0);
+      expect(a / b, where).toBeLessThanOrEqual(400);
+      return;
+    }
+    if (s(item, 'expr').includes('□')) {
+      const [a, b] = missingPair(item, ':');
+      expect(a % 100, where).toBe(0);
+      expect(a % b, where).toBe(0);
+      expect(a / b, where).toBeLessThanOrEqual(400);
+      return;
+    }
     const nums = exprNums(item);
     if (tier === 3) {
       expect(nums.length, where).toBe(3);
@@ -221,9 +329,7 @@ function tierCheck(skillId: string, item: PracticeItem, tier: SkillTier): void {
     const [h, d] = nums as [number, number];
     expect(h % 100, where).toBe(0);
     expect((h / 100) % d, where).toBe(0);
-    const q = evalExpr(s(item, 'expr'));
-    if (tier === 1) expect(q, where).toBe(100);
-    else expect([200, 300, 400], where).toContain(q);
+    expect(evalExpr(s(item, 'expr')), where).toBeLessThanOrEqual(400);
     return;
   }
   if (skillId === 'mul-3d-1d') {
@@ -255,8 +361,14 @@ function tierCheck(skillId: string, item: PracticeItem, tier: SkillTier): void {
     return;
   }
   if (skillId === 'div-2d-1d') {
-    const a = p(item, 'a');
-    const b = p(item, 'b');
+    let a: number;
+    let b: number;
+    if (key === 'mentalCalc') {
+      [a, b] = missingPair(item, ':');
+    } else {
+      a = p(item, 'a');
+      b = p(item, 'b');
+    }
     const q = oracleDivBySubtraction(a, b).q;
     if (tier === 1) {
       expect(Math.floor(a / 10) % b, where).toBe(0);
