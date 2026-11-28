@@ -1,11 +1,15 @@
 // Daily planner (phase 11): the day's set from what the child has learned so far.
-// Pool = attempted facts/skills only — never an untaught fact, never a repeat within one day,
-// and fewer items when the pool is under 10 (no top-up). Due uses calendar days
+// Pool = attempted facts/skills only — never an untaught fact, and fewer items
+// when the pool is under 10 (no top-up). Below the focus threshold a skill key
+// never repeats within one day; on a focus day (Phase 4A) a focus skill may
+// appear twice (a re-rolled skill is a new question). Due uses calendar days
 // (daily-intervals.ts), not sessions: a box-1 fact seen yesterday is due today.
 import { FLUENCY_ORDER } from './curriculum-tables';
+import { FOCUS_MIN_POOL, planFocusDay } from './daily-focus-slots';
 import { dailyIntervalDays, dayNumber } from './daily-intervals';
 import type { FactKey } from './fact-key';
 import { parseKey } from './fact-key';
+import { isFocusSkillKey } from './focus-skills';
 import type { FactStat } from './learning-types';
 import { mulberry32, shuffle } from './seeded-rng';
 import { interleaveFacts } from './session-planner';
@@ -73,9 +77,14 @@ const weakFirst = (a: FactStat, b: FactStat): number =>
 const oldestFirst = (a: FactStat, b: FactStat): number => a.lastSeenAt - b.lastSeenAt;
 
 /**
- * The day's picks in priority order (before interleaving): 6 due/weak first (lowest box,
- * then oldest), 3 weakest not-due, 1 mastered check. Spill follows the same priority when a
- * bucket is short, mirroring planSession; the pool is never topped up with untaught facts.
+ * The day's picks in priority order (before interleaving). With at least
+ * FOCUS_MIN_POOL focus skills in the pool (boost, Phase 4A) the day is 6 focus
+ * (weakest first, ≤ 2 per skill, add/sub interleaved with length) + 3 due review
+ * + 1 mastered; below that the day is exactly today's set — 6 due/weak first
+ * (lowest box, then oldest), 3 weakest not-due, 1 mastered check. Spill follows
+ * the same priority when a bucket is short, mirroring planSession; the pool is
+ * never topped up with untaught facts. The focus branch takes no rng before the
+ * decision, so a below-threshold pool plans byte-identically to before.
  */
 export function pickDailyItems({
   stats,
@@ -105,16 +114,22 @@ export function pickDailyItems({
   const notDue = pool
     .filter((k) => !due.includes(k) && !mastered.includes(k))
     .sort((a, b) => weakFirst(statOf(stats, a) as FactStat, statOf(stats, b) as FactStat));
-  const picked: FactKey[] = [
-    ...due.slice(0, DAILY_DUE_COUNT),
-    ...notDue.slice(0, DAILY_WEAK_COUNT),
-    ...mastered.slice(0, DAILY_MASTERED_COUNT),
-  ];
-  const spill = [
-    ...due.slice(DAILY_DUE_COUNT),
-    ...notDue.slice(DAILY_WEAK_COUNT),
-    ...mastered.slice(DAILY_MASTERED_COUNT),
-  ];
+  let picked: FactKey[];
+  let spill: FactKey[];
+  if (pool.filter(isFocusSkillKey).length >= FOCUS_MIN_POOL) {
+    ({ picked, spill } = planFocusDay({ pool, due, notDue, mastered, stats, rng }));
+  } else {
+    picked = [
+      ...due.slice(0, DAILY_DUE_COUNT),
+      ...notDue.slice(0, DAILY_WEAK_COUNT),
+      ...mastered.slice(0, DAILY_MASTERED_COUNT),
+    ];
+    spill = [
+      ...due.slice(DAILY_DUE_COUNT),
+      ...notDue.slice(DAILY_WEAK_COUNT),
+      ...mastered.slice(DAILY_MASTERED_COUNT),
+    ];
+  }
   for (const k of spill) {
     if (picked.length >= DAILY_LENGTH) break;
     if (!picked.includes(k)) picked.push(k);
