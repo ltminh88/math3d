@@ -23,7 +23,7 @@ the AGENTS.md gates; UI PRs carry `parity-change`; `tap()` only, targets ≥ 44 
 | 0 | [Shared contracts](phase-00-shared-contracts.md) | muse-min (R77, moved: muse-88 quota) | — | 0.5d | done (#87) |
 | 1A | [Add/sub bug catalogue + new formats](phase-01a-add-sub-bug-catalogue-and-formats.md) | Lane A, muse-88 (R82, after audio) | 0 | 1.5d | done (#93) |
 | 2A | [Column-calc scene, step by step](phase-02a-column-calc-scene.md) | Lane A, muse-88 (PR #96) | 1A | 1.25d | done (#96) |
-| 3A | [Add/sub in play](phase-03a-add-sub-in-play.md) | Lane A, muse-88 | 1A, 2B | 0.75d | pending |
+| 3A | [Add/sub in play](phase-03a-add-sub-in-play.md) | Lane A, muse-88 (PR #98) | 1A, 2B | 0.75d | done (#98) |
 | 4A | [Weak-spot weighting](phase-04a-weak-spot-weighting.md) | Lane A, muse-88 | 0, 1A | 1d | pending |
 | 1B | [Length ladder generators](phase-01b-length-ladder-generators.md) | Lane B, muse-min (R81) | 0, D1 | 1.5d | done (#88) |
 | 2B | [Order/match steps + length scenes](phase-02b-order-match-steps-and-length-scenes.md) | Lane B, muse-min (R81, after 1B) | 0 | 1.25d | done (#89) |
