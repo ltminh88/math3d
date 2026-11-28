@@ -6,24 +6,10 @@ import type { SkillTier } from '../learning/skill-tiers';
 import { pickName, pickNames, pickNoun } from '../reasoning/reasoning-distractors';
 import type { ReasoningGenerator } from '../reasoning/reasoning-types';
 import { pickAddPair, pickSubPair } from './add-sub-generators';
+import { BIG_CONTEXTS } from './add-sub-story-contexts';
 import { arithmeticItem, numberStep, ref } from './arithmetic-distractors';
 import { RANGE_1000, RANGE_10000, RANGE_100000 } from './arithmetic-ranges';
 import { countAddCarries, countSubBorrows } from './carry-count';
-
-/** A big-number context (le, 22/11): counts ≥ 1000 belong to a warehouse, a library
- *  or a school — never to one child's marbles or sweets. `give` / `giveTwoStep` are
- *  the story keys for giving some away: a warehouse ships out, a library lends, a
- *  school hands out to its students. */
-const BIG_CONTEXTS = [
-  { name: 'Kho', item: 'i:riceKg', give: 'wpSubGiveOut', giveTwoStep: 'wpTwoStepLeftOut' },
-  { name: 'Thư viện', item: 'i:book', give: 'wpSubGiveLend', giveTwoStep: 'wpTwoStepLeftLend' },
-  {
-    name: 'Trường',
-    item: 'i:book',
-    give: 'wpSubGiveHandout',
-    giveTwoStep: 'wpTwoStepLeftHandout',
-  },
-] as const;
 
 /** A sub pair with a ≠ b (the compare frame needs two different counts). */
 function pickSubPairNoEqual(rng: Rng, maxSum: number, tier: SkillTier): [number, number] {
@@ -32,11 +18,61 @@ function pickSubPairNoEqual(rng: Rng, maxSum: number, tier: SkillTier): [number,
   return [a, b];
 }
 
-/** One step: has a, buys b more / gives b away / has more than a friend. */
+/** One step: has a, buys b more / gives b away / has more than a friend, plus
+ *  the Phase 8 frames — missing addend (has a, wants c), start unknown (bought
+ *  b more / gave b away, now has c), and compare-less (who has fewer, by how
+ *  many). The story never prints the answer: the missing addend and the start
+ *  amount stay hidden, so the child must work backwards. */
 function oneStep(rng: Rng, tier: SkillTier, maxSum: number, skillId: string) {
-  const frame = pick(rng, ['add', 'sub', 'compare'] as const);
-  // Numbers first: the context follows the numbers — any number ≥ 1000 (operands
-  // or result) takes a big-number context; small numbers keep the personal nouns.
+  const frame = pick(rng, [
+    'add',
+    'sub',
+    'compare',
+    'compareLess',
+    'missingAddend',
+    'startUnknown',
+  ] as const);
+  // Numbers first: the context follows the numbers — any number ≥ 1000 (operands,
+  // result or the answer itself) takes a big-number context; small numbers keep
+  // the personal nouns.
+  if (frame === 'missingAddend') {
+    const [a, b] = pickAddPair(rng, maxSum, tier);
+    const c = a + b;
+    const big = a >= 1000 || b >= 1000 || c >= 1000;
+    const ctx = big ? pick(rng, BIG_CONTEXTS) : null;
+    const name = ctx?.name ?? pickName(rng);
+    const item = ctx?.item ?? pickNoun(rng);
+    return arithmeticItem(skillId, tier, ref('wpMissingAddend', { name, item, a, c }), [
+      numberStep(ref('askNeedMore', { name, item }), b),
+    ]);
+  }
+  if (frame === 'startUnknown') {
+    if (rng() < 0.5) {
+      const [a, b] = pickAddPair(rng, maxSum, tier);
+      const c = a + b;
+      const big = a >= 1000 || b >= 1000 || c >= 1000;
+      const ctx = big ? pick(rng, BIG_CONTEXTS) : null;
+      const name = ctx?.name ?? pickName(rng);
+      const item = ctx?.item ?? pickNoun(rng);
+      return arithmeticItem(skillId, tier, ref('wpStartUnknownAdd', { name, item, b, c }), [
+        numberStep(ref('askStart', { name, item }), a),
+      ]);
+    }
+    const [a, b] = pickSubPairNoEqual(rng, maxSum, tier);
+    const c = a - b;
+    // The answer (a = c + b) can reach ≥ 1000 while b and c stay small, so it
+    // counts for the context too — a big answer needs a big-number story.
+    const big = a >= 1000 || b >= 1000 || c >= 1000;
+    const ctx = big ? pick(rng, BIG_CONTEXTS) : null;
+    const name = ctx?.name ?? pickName(rng);
+    const item = ctx?.item ?? pickNoun(rng);
+    return arithmeticItem(
+      skillId,
+      tier,
+      ref(ctx?.giveStart ?? 'wpStartUnknownSub', { name, item, b, c }),
+      [numberStep(ref('askStart', { name, item }), a)],
+    );
+  }
   const [a, b] =
     frame === 'add' ? pickAddPair(rng, maxSum, tier) : pickSubPairNoEqual(rng, maxSum, tier);
   const result = frame === 'add' ? a + b : a - b;
@@ -54,9 +90,13 @@ function oneStep(rng: Rng, tier: SkillTier, maxSum: number, skillId: string) {
       numberStep(ref('askLeft', { name, item }), a - b),
     ]);
   }
+  // Compare and compare-less share the story; only the ask differs — "how many
+  // more does A have" vs "how many fewer does B have". The answer is the same
+  // difference (a > b by construction, so it is never negative).
   const [name1, name2] = ctx ? [`${name} A`, `${name} B`] : pickNames(rng);
+  const ask = frame === 'compareLess' ? 'askFewer' : 'askMore';
   return arithmeticItem(skillId, tier, ref('wpCompare', { name: name1, name2, item, a, b }), [
-    numberStep(ref('askMore', { name: name1, name2, item }), a - b),
+    numberStep(ref(ask, { name: name1, name2, item }), a - b),
   ]);
 }
 

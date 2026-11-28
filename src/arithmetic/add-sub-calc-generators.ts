@@ -32,6 +32,15 @@ export const mentalRound: ReasoningGenerator = (rng, tier) => {
     const a = aT * 10;
     const b = bT * 10;
     const answer = op === '+' ? a + b : a - b;
+    if (rng() < 0.5) {
+      // Missing number (Phase 8): one addend / the subtrahend is hidden, the
+      // total is given — the child finds it by working backwards.
+      const missing = op === '+' ? b : answer;
+      const expr = op === '+' ? `${a} + ? = ${answer}` : `${a} − ? = ${b}`;
+      return arithmeticItem('add-sub-mental-round', tier, ref('mentalMissing', { expr }), [
+        numberStep(ref('askMissingNumber'), missing),
+      ]);
+    }
     return arithmeticItem(
       'add-sub-mental-round',
       tier,
@@ -46,6 +55,19 @@ export const mentalRound: ReasoningGenerator = (rng, tier) => {
     const b = randInt(rng, 1, 19) * 50;
     const first = op1 === '+' ? a + b : a - b;
     if (first < 0 || first > RANGE_1000) continue;
+    if (rng() < 0.5) {
+      // Missing number (Phase 8): the last term is hidden, the final total is
+      // given — the child finds it from the first two terms and the total.
+      const missing = randInt(rng, 1, 19) * 50;
+      const total = op2 === '+' ? first + missing : first - missing;
+      if (total < 0 || total > RANGE_1000) continue;
+      return arithmeticItem(
+        'add-sub-mental-round',
+        tier,
+        ref('mentalMissing', { expr: `${a} ${op1} ${b} ${op2} ? = ${total}` }),
+        [numberStep(ref('askMissingNumber'), missing)],
+      );
+    }
     const c = randInt(rng, 1, 19) * 50;
     const final = op2 === '+' ? first + c : first - c;
     if (final < 0 || final > RANGE_1000) continue;
