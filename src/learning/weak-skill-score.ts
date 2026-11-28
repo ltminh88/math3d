@@ -25,20 +25,22 @@ const popcount = (n: number): number => {
  * `attempts`, which also counts retries and seeded/imported attempts the mask
  * never saw. The old denominator read a seeded 3/3 skill as 1/4 = 0.25 after a
  * single live correct question (score 0.75), so the focus review hijacked
- * "Học tiếp" in the walkthrough (R133). Records written before `recentCount`
- * existed keep the old denominator: their attempts all came through the
- * recorder, so it is exact for them.
+ * "Học tiếp" in the walkthrough (R133).
+ * A record WITHOUT `recentCount` must not trust the mask at all (R134): the
+ * `recent` field only exists since Phase 0 (26/11), but the child has played
+ * since October, so a pre-Phase-0 record's mask covers only its last few tries
+ * while `attempts` counts them all — the old fallback read 2/10 = 0.2 for a
+ * 38/40 skill (score 0.8). Such records use the overall correct/attempts
+ * ratio instead, exactly like a stat with no `recent`. From the first question
+ * after this build, the recorder sets `recentCount` and the mask is used again.
  * Without `recent` (e.g. a seeded stat) the overall correct/attempts ratio is
  * used; an unattempted skill reads as fully accurate.
  */
 export function recentAccuracy(
   stat: Pick<FactStat, 'attempts' | 'correct' | 'recent' | 'recentCount'>,
 ): number {
-  if (stat.recent !== undefined) {
-    const n = Math.min(
-      Math.max(stat.recentCount ?? Math.min(Math.max(stat.attempts, 1), RECENT_KEPT), 1),
-      RECENT_KEPT,
-    );
+  if (stat.recent !== undefined && stat.recentCount !== undefined) {
+    const n = Math.min(Math.max(stat.recentCount, 1), RECENT_KEPT);
     return Math.min(popcount(stat.recent), n) / n;
   }
   return stat.attempts > 0 ? stat.correct / stat.attempts : 1;
