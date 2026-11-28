@@ -26,6 +26,7 @@ Dòng đầu mỗi comment:
 | `HANDOFF` | bàn giao việc (hạn mức ≥ 99% hoặc đổi người) |
 | `BLOCKED` | kẹt, cần reviewer quyết |
 | `WAITING` | Muse đang chờ anh chủ dự án trả lời trong tab (câu hỏi, nút chọn, xin duyệt); dòng 2 chép nguyên câu hỏi và các lựa chọn |
+| `PRE` | Muse báo TRƯỚC khi chạy lệnh hay bị hệ thống hỏi duyệt (rule 12); dòng 2 ghi lệnh sắp chạy |
 | `PING` | reviewer nhắc một tin chưa được ACK (không phải việc mới) |
 | `STOP` | reviewer yêu cầu dừng vòng lặp |
 
@@ -68,6 +69,13 @@ Hạn mức: 41%
     - **Mỗi Muse giữ 1 chỗ CI:** không mở PR thứ hai khi PR đầu chưa xong CI và chưa merge. Việc mới cứ commit; push nhánh thường không chạy CI (CI chỉ chạy cho PR và main), nên từ 90% hạn mức vẫn push nhánh WIP được, chỉ chưa mở PR.
     - Chỉ làm phase reviewer đã giao trong `TASK` hoặc phase kế tiếp trong lane của mình trên plan; không lấy phase của Muse kia.
     - Vẫn kiểm CI + hộp thư theo rule 1 và 5: giữa các đoạn code, mỗi ~10 phút ghé một lần.
+12. **Báo trước lệnh hay bị hỏi duyệt (`PRE`).** Hộp xin duyệt của hệ thống làm em dừng hẳn, không gửi được `WAITING`. Nên TRƯỚC khi chạy các lệnh dưới đây, gửi một tin `PRE` ngắn (lệnh gì, để làm gì), rồi mới chạy:
+    - tạo worktree / nhánh mới (`git worktree add`, `git switch -c`)
+    - tải từ mạng (mô hình, file, gói mới), `npm install` gói mới
+    - xoá thư mục / file ngoài worktree của em
+    - deploy preview
+    - lần đầu chạy một công cụ / lệnh lạ, hoặc lệnh đã từng bị hỏi duyệt
+    Chạy xong thì làm tiếp như thường (không cần báo lại riêng). Reviewer thấy `PRE` mà 10 phút không có tin/commit tiếp theo → báo anh chủ dự án mở tab bấm duyệt.
 
 ## Bảo mật (repo PUBLIC)
 

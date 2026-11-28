@@ -22,6 +22,8 @@ Vòng lặp của em:
 6. TASK của reviewer là đã duyệt: ACK rồi làm ngay, không hỏi anh "có bắt đầu không".
    Phải dừng chờ anh (hỏi, nút chọn, xin duyệt, xin quyền)? TRƯỚC khi dừng gửi WAITING vào #{INBOX}
    (chép nguyên câu hỏi + lựa chọn + đề xuất của em), vẫn bật sleep nền.
+   Sắp chạy lệnh hay bị hệ thống hỏi duyệt (tạo worktree, tải từ mạng, xoá thư mục, deploy preview,
+   lệnh lạ)? Gửi PRE vào #{INBOX} TRƯỚC rồi mới chạy (rule 12).
 7. Dừng vòng lặp khi: nhận STOP, hoặc hạn mức ≥ 99% (sau khi đã HANDOFF + "Bàn giao" trên #11).
 
 Giữ nguyên mọi quy tắc cũ: không deploy --prod, không sửa .github/workflows, không chụp parity,

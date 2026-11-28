@@ -17,7 +17,8 @@ Start in the reviewer Claude Code session (repo root) with:
 5. **Daily summary** at the first tick after 21:00 (once per day) via `telegram-relay.py send`.
 6. **Re-ping**: a TASK with no ACK after 2 ticks → one `PING` (own id, not a new TASK); still nothing → Telegram `send` to the user
    ("muse-x chưa nhận R.., có thể đang chờ anh trong tab").
-   **Silence check**: a Muse with an ACKed TASK but no REPORT/PR/WAITING for > 45 min → `PING` asking
+   **PRE check**: a Muse `PRE` with no later inbox post or branch commit after 10 min → right away `telegram-relay.py send` "muse-x đang kẹt ở hộp duyệt lệnh <X>, anh mở tab bấm duyệt" (also at night).
+   **Silence check**: a Muse with an active task and no inbox post, no branch commit and no CI of its own running for > 20 min → right away Telegram the user a paste-ready "continue + sleep" text (also at night; it blocks a lane). Before that, a Muse with an ACKed TASK but no REPORT/PR/WAITING for > 45 min → `PING` asking
    "đang làm tới đâu, có đang chờ anh không?"; no answer by the next tick → Telegram `send` to the user
    to look at that Muse tab (it is probably stuck on a question in its chat).
    **Safety-flag timeout (most common stall)**: the Muses' safety check often flags reviewer inbox
