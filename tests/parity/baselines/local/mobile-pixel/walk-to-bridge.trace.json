@@ -3,7 +3,12 @@
   [
    "set",
    "math3d.settings",
-   "{\"lang\":\"vi\",\"sound\":true,\"volume\":0.8,\"readAloud\":true,\"reducedMotion\":false,\"qualityTier\":\"auto\",\"music\":false,\"questCollapsed\":true}"
+   "{\"lang\":\"vi\",\"sound\":true,\"volume\":0.8,\"readAloud\":true,\"reducedMotion\":false,\"qualityTier\":\"auto\",\"music\":false,\"questCollapsed\":true,\"playMode\":\"game\"}"
+  ],
+  [
+   "set",
+   "math3d.settings",
+   "{\"lang\":\"vi\",\"sound\":true,\"volume\":0.8,\"readAloud\":true,\"reducedMotion\":false,\"qualityTier\":\"auto\",\"music\":false,\"questCollapsed\":true,\"playMode\":\"game\"}"
   ]
  ],
  "audio": [
