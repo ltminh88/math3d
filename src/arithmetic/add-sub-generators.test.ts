@@ -51,6 +51,29 @@ const stepAt = (i: PracticeItem, idx: number): ReasoningStep => {
 
 const applyOp = (a: number, op: string, b: number): number => (op === '+' ? a + b : a - b);
 
+/** Parse a missing-number expr ("a op b [op ?] = d"): the known part's value,
+ *  the missing number, and the carries of the two-stage computation that finds
+ *  it (first the known part, then d − first / first − d). */
+function mentalMissingParts(expr: string): { first: number; missing: number; carries: number } {
+  const [lhs, rhs] = expr.split(' = ');
+  const d = Number(rhs);
+  const tokens = (lhs ?? '').split(' ');
+  const q = tokens.indexOf('?');
+  if (q < 2) throw new Error(`mentalMissing: cannot parse ${expr}`);
+  const opBefore = tokens[q - 1] as string;
+  const known = tokens.slice(0, q - 1);
+  let first = Number(known[0]);
+  let carries = 0;
+  for (let k = 1; k < known.length; k += 2) {
+    const n = Number(known[k + 1]);
+    carries += known[k] === '+' ? oracleAddCarries(first, n) : oracleSubBorrows(first, n);
+    first = applyOp(first, known[k] as string, n);
+  }
+  const missing = opBefore === '+' ? d - first : first - d;
+  carries += opBefore === '+' ? oracleSubBorrows(d, first) : oracleSubBorrows(first, d);
+  return { first, missing, carries };
+}
+
 /** Independent answers per story key, from the story params. */
 const ORACLE: Record<string, (i: PracticeItem) => void> = {
   addCalc: (i) => expect(last(i)).toBe(p(i, 'a') + p(i, 'b')),
@@ -71,11 +94,12 @@ const ORACLE: Record<string, (i: PracticeItem) => void> = {
     expect(values(i)).toEqual([p(i, 'a') + p(i, 'b'), p(i, 'a') + p(i, 'b') - p(i, 'c')]);
     expect(i.work).toEqual([p(i, 'a') + p(i, 'b')]);
   },
-  // Big-number "give away" variants (warehouse / library / school): same maths as
-  // wpSubGive / wpTwoStepLeft, only the wording changes.
+  // Big-number "give away" variants: same maths as wpSubGive / wpTwoStepLeft,
+  // only the wording changes (hand out at school, sell at home / at the market).
   wpSubGiveOut: (i) => expect(last(i)).toBe(p(i, 'a') - p(i, 'b')),
   wpSubGiveLend: (i) => expect(last(i)).toBe(p(i, 'a') - p(i, 'b')),
   wpSubGiveHandout: (i) => expect(last(i)).toBe(p(i, 'a') - p(i, 'b')),
+  wpSubGiveSell: (i) => expect(last(i)).toBe(p(i, 'a') - p(i, 'b')),
   wpTwoStepLeftOut: (i) => {
     expect(values(i)).toEqual([p(i, 'a') + p(i, 'b'), p(i, 'a') + p(i, 'b') - p(i, 'c')]);
     expect(i.work).toEqual([p(i, 'a') + p(i, 'b')]);
@@ -88,6 +112,18 @@ const ORACLE: Record<string, (i: PracticeItem) => void> = {
     expect(values(i)).toEqual([p(i, 'a') + p(i, 'b'), p(i, 'a') + p(i, 'b') - p(i, 'c')]);
     expect(i.work).toEqual([p(i, 'a') + p(i, 'b')]);
   },
+  wpTwoStepLeftSell: (i) => {
+    expect(values(i)).toEqual([p(i, 'a') + p(i, 'b'), p(i, 'a') + p(i, 'b') - p(i, 'c')]);
+    expect(i.work).toEqual([p(i, 'a') + p(i, 'b')]);
+  },
+  // Phase 8 frames: the story hides the answer — the missing addend (c − a),
+  // the start amount (c − b after buying more, c + b after giving away).
+  wpMissingAddend: (i) => expect(last(i)).toBe(p(i, 'c') - p(i, 'a')),
+  wpStartUnknownAdd: (i) => expect(last(i)).toBe(p(i, 'c') - p(i, 'b')),
+  wpStartUnknownSub: (i) => expect(last(i)).toBe(p(i, 'c') + p(i, 'b')),
+  wpStartUnknownSubHandout: (i) => expect(last(i)).toBe(p(i, 'c') + p(i, 'b')),
+  wpStartUnknownSubSell: (i) => expect(last(i)).toBe(p(i, 'c') + p(i, 'b')),
+  mentalMissing: (i) => expect(last(i)).toBe(mentalMissingParts(s(i, 'expr')).missing),
   wpCompare: (i) => {
     expect(p(i, 'a')).toBeGreaterThan(p(i, 'b'));
     expect(last(i)).toBe(p(i, 'a') - p(i, 'b'));
@@ -128,13 +164,34 @@ function carriesOf(i: PracticeItem): number {
     return (
       oracleAddCarries(p(i, 'a'), p(i, 'b')) + oracleSubBorrows(p(i, 'a') + p(i, 'b'), p(i, 'c'))
     );
-  if (key === 'wpTwoStepLeftOut' || key === 'wpTwoStepLeftLend' || key === 'wpTwoStepLeftHandout')
+  if (
+    key === 'wpTwoStepLeftOut' ||
+    key === 'wpTwoStepLeftLend' ||
+    key === 'wpTwoStepLeftHandout' ||
+    key === 'wpTwoStepLeftSell'
+  )
     return (
       oracleAddCarries(p(i, 'a'), p(i, 'b')) + oracleSubBorrows(p(i, 'a') + p(i, 'b'), p(i, 'c'))
     );
   if (key === 'wpSubGive' || key === 'wpCompare') return oracleSubBorrows(p(i, 'a'), p(i, 'b'));
-  if (key === 'wpSubGiveOut' || key === 'wpSubGiveLend' || key === 'wpSubGiveHandout')
+  if (
+    key === 'wpSubGiveOut' ||
+    key === 'wpSubGiveLend' ||
+    key === 'wpSubGiveHandout' ||
+    key === 'wpSubGiveSell'
+  )
     return oracleSubBorrows(p(i, 'a'), p(i, 'b'));
+  // Phase 8 frames: the carries of the hidden operation — a + b for the missing
+  // addend and the start-unknown add, a − b for the start-unknown sub.
+  if (key === 'wpMissingAddend') return oracleAddCarries(p(i, 'a'), p(i, 'c') - p(i, 'a'));
+  if (key === 'wpStartUnknownAdd') return oracleAddCarries(p(i, 'c') - p(i, 'b'), p(i, 'b'));
+  if (
+    key === 'wpStartUnknownSub' ||
+    key === 'wpStartUnknownSubHandout' ||
+    key === 'wpStartUnknownSubSell'
+  )
+    return oracleSubBorrows(p(i, 'c') + p(i, 'b'), p(i, 'b'));
+  if (key === 'mentalMissing') return mentalMissingParts(s(i, 'expr')).carries;
   if (key === 'chainCalc') {
     const first = applyOp(p(i, 'a'), s(i, 'op1'), p(i, 'b'));
     const c1 =
@@ -295,11 +352,12 @@ describe('arithmetic generators', () => {
   });
 });
 
-/** Big-number word-problem contexts (le, 22/11, review of #51): a word problem with
- *  any number ≥ 1000 belongs to a warehouse, a library or a school — never to one
- *  child's marbles, sweets or fish. Small numbers keep the personal nouns. */
+/** Big-number word-problem contexts (le, 22/11, review of #51; R137 narrows add/sub
+ *  to school / home / market): a word problem with any number ≥ 1000 belongs to
+ *  one of those places — never to one child's marbles, sweets or fish. Small
+ *  numbers keep the personal nouns. */
 const WP_SKILLS = ['add-sub-1000-wp', 'add-sub-10000-wp', 'add-sub-100000-wp'] as const;
-const BIG_MARKERS = ['Kho', 'Thư viện', 'Trường'];
+const BIG_MARKERS = ['Trường', 'Nhà', 'Chợ'];
 const PERSONAL_NOUNS = ['viên bi', 'cái kẹo', 'bông hoa', 'quả táo', 'con cá'];
 
 /** The numbers in a rendered story (SGK grouping spaces stripped first). */
