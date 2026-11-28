@@ -33,15 +33,21 @@ const popcount = (n: number): number => {
  * 38/40 skill (score 0.8). Such records use the overall correct/attempts
  * ratio instead, exactly like a stat with no `recent`. From the first question
  * after this build, the recorder sets `recentCount` and the mask is used again.
+ * Two more guards (R135): (1) the mask still holds stale bits from before
+ * `recentCount` existed (the recorder shifts but never clears them), so only
+ * the `n` lowest bits — the `n` most recent tries, bit 0 = most recent — are
+ * counted, never `min(popcount, n)`; (2) a sample of 1–2 tries is too small —
+ * one wrong answer would read as weakScore 1.0 / 0.5 — so below 3 recorded
+ * tries the overall correct/attempts ratio is used, and the mask only from 3.
  * Without `recent` (e.g. a seeded stat) the overall correct/attempts ratio is
  * used; an unattempted skill reads as fully accurate.
  */
 export function recentAccuracy(
   stat: Pick<FactStat, 'attempts' | 'correct' | 'recent' | 'recentCount'>,
 ): number {
-  if (stat.recent !== undefined && stat.recentCount !== undefined) {
-    const n = Math.min(Math.max(stat.recentCount, 1), RECENT_KEPT);
-    return Math.min(popcount(stat.recent), n) / n;
+  if (stat.recent !== undefined && stat.recentCount !== undefined && stat.recentCount >= 3) {
+    const n = Math.min(stat.recentCount, RECENT_KEPT);
+    return popcount(stat.recent & ((1 << n) - 1)) / n;
   }
   return stat.attempts > 0 ? stat.correct / stat.attempts : 1;
 }

@@ -105,6 +105,44 @@ describe('missing recentCount (R134)', () => {
   });
 });
 
+describe('stale mask bits and tiny samples (R135)', () => {
+  it('one new wrong answer does not read 1.0 (legacy mask 0b11 -> 0b110)', () => {
+    // The mask still holds 2 correct bits from before `recentCount` existed;
+    // the first question after the build is wrong, so the mask is 0b110 and
+    // recentCount = 1. The old min(popcount, 1) / 1 read 1.0; the new code
+    // uses correct/attempts below 3 recorded tries.
+    const legacy = { attempts: 40, correct: 38, recent: 0b110, recentCount: 1 };
+    expect(recentAccuracy(stat(legacy))).toBeCloseTo(0.95);
+    expect(weakScore(stat(legacy))).toBeCloseTo(0.05);
+  });
+
+  it('recentCount 1 uses correct/attempts, not the mask', () => {
+    // One wrong answer on a weak overall record: 1/5, not 0/1 from the mask.
+    expect(
+      recentAccuracy(stat({ attempts: 5, correct: 1, recent: 0b0, recentCount: 1 })),
+    ).toBeCloseTo(0.2);
+    // And one wrong answer on a strong overall record does not make it weak.
+    expect(
+      recentAccuracy(stat({ attempts: 40, correct: 39, recent: 0b0, recentCount: 1 })),
+    ).toBeCloseTo(39 / 40);
+  });
+
+  it('recentCount 2 still uses correct/attempts', () => {
+    expect(
+      recentAccuracy(stat({ attempts: 10, correct: 9, recent: 0b11, recentCount: 2 })),
+    ).toBeCloseTo(0.9);
+  });
+
+  it('from 3 recorded tries the mask counts only the n lowest bits', () => {
+    // Legacy mask 0b11, then 3 new questions: wrong, correct, correct.
+    // Mask is 0b11011; the 3 lowest bits (0b011) are the 3 newest tries.
+    // The old min(popcount, 3) / 3 read 1.0 (4 correct bits in the mask).
+    expect(
+      recentAccuracy(stat({ attempts: 43, correct: 40, recent: 0b11011, recentCount: 3 })),
+    ).toBeCloseTo(2 / 3);
+  });
+});
+
 describe('labelledBugs', () => {
   it('a bug is labelled only at ≥ 2 of the last 5', () => {
     expect(labelledBugs(stat({ bugs: ['forgot-carry'] }))).toEqual([]);
