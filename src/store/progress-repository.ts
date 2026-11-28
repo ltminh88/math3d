@@ -158,6 +158,7 @@ export async function applyDelta(
       errs: local?.errs ?? prev.errs,
       bugs: local?.bugs ?? prev.bugs,
       recent: local?.recent ?? prev.recent,
+      recentCount: local?.recentCount ?? prev.recentCount,
     });
   }
 

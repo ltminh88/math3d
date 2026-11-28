@@ -105,6 +105,10 @@ export function createSessionRecorder(opts: RecorderOptions): SessionRecorder {
       stat = {
         ...stat,
         recent: (((stat.recent ?? 0) << 1) | (o.correct && o.firstTry ? 1 : 0)) & mask,
+        // One recorded try per question, capped like the mask: the count is the
+        // denominator for `recent` (R133) — `attempts` also counts retries and
+        // seeded/imported attempts the mask never saw.
+        recentCount: Math.min((stat.recentCount ?? 0) + 1, LEITNER.recentKept),
       };
 
       entry.box = stat.box;
@@ -151,6 +155,7 @@ export function createSessionRecorder(opts: RecorderOptions): SessionRecorder {
           errs: s.errs,
           bugs: s.bugs,
           recent: s.recent,
+          recentCount: s.recentCount,
         };
       return { delta, local };
     },

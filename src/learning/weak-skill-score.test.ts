@@ -42,6 +42,40 @@ describe('recentAccuracy', () => {
   });
 });
 
+describe('recentCount (R133)', () => {
+  it('a seeded skill stays strong after one live correct question', () => {
+    // Walkthrough seed: 3/3, no `recent`. One live correct question sets a
+    // 1-bit mask; the old denominator (attempts = 4) read 1/4 = 0.25, score
+    // 0.75, and the focus review hijacked "Học tiếp" (B30 -> B7).
+    const seededThenPlayed = { attempts: 4, correct: 4, recent: 0b1, recentCount: 1 };
+    expect(recentAccuracy(stat(seededThenPlayed))).toBe(1);
+    expect(weakScore(stat(seededThenPlayed))).toBe(0);
+  });
+
+  it('retries no longer drag accuracy down', () => {
+    // 3 questions: one wrong-then-right (2 attempts), two clean. True
+    // first-try accuracy is 2/3; the old denominator (attempts = 4) read 1/2.
+    expect(
+      recentAccuracy(stat({ attempts: 4, correct: 3, recent: 0b011, recentCount: 3 })),
+    ).toBeCloseTo(2 / 3);
+  });
+
+  it('a full mask still caps at 10', () => {
+    expect(
+      recentAccuracy(stat({ attempts: 14, correct: 12, recent: 0b1111111111, recentCount: 10 })),
+    ).toBe(1);
+    expect(
+      recentAccuracy(stat({ attempts: 14, correct: 7, recent: 0b1010101010, recentCount: 10 })),
+    ).toBe(0.5);
+  });
+
+  it('a genuinely weak recent still scores weak', () => {
+    expect(
+      weakScore(stat({ attempts: 6, correct: 3, recent: 0b010101, recentCount: 6 })),
+    ).toBeCloseTo(0.5);
+  });
+});
+
 describe('labelledBugs', () => {
   it('a bug is labelled only at ≥ 2 of the last 5', () => {
     expect(labelledBugs(stat({ bugs: ['forgot-carry'] }))).toEqual([]);

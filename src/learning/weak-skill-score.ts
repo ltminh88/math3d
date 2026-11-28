@@ -20,15 +20,25 @@ const popcount = (n: number): number => {
 };
 
 /**
- * Accuracy of the last first tries. `recent` shifts once per question, so the
- * recorded tries are min(attempts, 10) — attempts counts retries too, so a skill
- * with retries reads slightly weaker than it is, a safe direction for a
- * practice-more signal. Without `recent` (e.g. a seeded stat) the overall
- * correct/attempts ratio is used; an unattempted skill reads as fully accurate.
+ * Accuracy of the last first tries. The denominator is how many tries `recent`
+ * actually records (`recentCount`, one per question, capped at 10) — NOT
+ * `attempts`, which also counts retries and seeded/imported attempts the mask
+ * never saw. The old denominator read a seeded 3/3 skill as 1/4 = 0.25 after a
+ * single live correct question (score 0.75), so the focus review hijacked
+ * "Học tiếp" in the walkthrough (R133). Records written before `recentCount`
+ * existed keep the old denominator: their attempts all came through the
+ * recorder, so it is exact for them.
+ * Without `recent` (e.g. a seeded stat) the overall correct/attempts ratio is
+ * used; an unattempted skill reads as fully accurate.
  */
-export function recentAccuracy(stat: Pick<FactStat, 'attempts' | 'correct' | 'recent'>): number {
+export function recentAccuracy(
+  stat: Pick<FactStat, 'attempts' | 'correct' | 'recent' | 'recentCount'>,
+): number {
   if (stat.recent !== undefined) {
-    const n = Math.min(Math.max(stat.attempts, 1), RECENT_KEPT);
+    const n = Math.min(
+      Math.max(stat.recentCount ?? Math.min(Math.max(stat.attempts, 1), RECENT_KEPT), 1),
+      RECENT_KEPT,
+    );
     return Math.min(popcount(stat.recent), n) / n;
   }
   return stat.attempts > 0 ? stat.correct / stat.attempts : 1;
@@ -46,7 +56,7 @@ export function labelledBugs(stat: Pick<FactStat, 'bugs'>): Misconception[] {
 
 /** Weak score of one skill stat: 0 (strong) to 1.4 (inaccurate with two labelled bugs). */
 export function weakScore(
-  stat: Pick<FactStat, 'attempts' | 'correct' | 'recent' | 'bugs'>,
+  stat: Pick<FactStat, 'attempts' | 'correct' | 'recent' | 'recentCount' | 'bugs'>,
 ): number {
   return 1 - recentAccuracy(stat) + BUG_WEIGHT * labelledBugs(stat).length;
 }
