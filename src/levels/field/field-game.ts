@@ -94,7 +94,11 @@ export function createFieldGame({ ctx, view, hud, labels, diorama, planting }: F
       phase = 'planting';
       const title = tf('buildPrompt', { rows: round.rows, cols: round.cols });
       hud.setPrompt(title, tipWithKeys(tf('buildTip'), 'keysTip'));
-      hud.speak(i === 0 ? tf('intro') : title);
+      // Round 0 speaks the story intro — but a fresh profile's first round is a build
+      // round, and the number pad only mounts once the plot is full (R149/R150: the
+      // child waited for the pad, not knowing to plant first). So the first build
+      // round's speech says the planting step AND that the pad comes after it.
+      hud.speak(i === 0 ? tf('introBuild', { rows: round.rows, cols: round.cols }) : title);
       hud.setTools({ rotate: false, hint: false });
       planting.enable();
       return;

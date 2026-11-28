@@ -6,6 +6,8 @@ export const tf = defineStrings('field', {
   vi: {
     title: 'Cánh Đồng Phép Tính',
     intro: 'Cơn bão đêm qua quật đổ cả cánh đồng rồi! Mình cùng trồng lại từng luống nhé.',
+    introBuild:
+      'Cơn bão đêm qua quật đổ cả cánh đồng rồi! Chạm vào từng ô đất để trồng lại {rows} hàng, mỗi hàng {cols} cây nhé — trồng xong bảng số mới hiện ra.',
     round: 'Luống {n}/{total}',
     buildPrompt: 'Trồng {rows} hàng, mỗi hàng {cols} cây',
     buildTip: 'Chạm vào từng ô đất, chạm cọc gỗ để trồng cả hàng, hoặc kéo giỏ cây qua các ô.',
@@ -59,6 +61,8 @@ export const tf = defineStrings('field', {
   en: {
     title: 'Math Meadow',
     intro: 'Last night’s storm flattened the whole field! Let’s replant it patch by patch.',
+    introBuild:
+      'Last night’s storm flattened the whole field! Tap each patch of soil to replant {rows} rows of {cols} — the number pad appears once the plot is full.',
     round: 'Patch {n}/{total}',
     buildPrompt: 'Plant {rows} rows of {cols}',
     buildTip: 'Tap soil cells, tap a wooden stake to plant a whole row, or drag the basket.',
