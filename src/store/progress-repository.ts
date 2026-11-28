@@ -3,6 +3,7 @@ import type { FactKey } from '../learning/fact-key';
 import type { FactLocalState, FactStat, SessionDelta } from '../learning/learning-types';
 import { newFactStat } from '../learning/leitner-box';
 import type { GameDb } from './idb-database';
+import { mergeFactStat } from './progress-local-merge';
 import type { NumberStoneDb } from './save-migrations';
 import { migrateLevelProgress } from './save-migrations';
 import {
@@ -143,23 +144,7 @@ export async function applyDelta(
   const facts = tx.objectStore('factStats');
   for (const [key, f] of Object.entries(delta.facts)) {
     const prev = (await facts.get([profileId, key])) ?? { ...newFactStat(), profileId, key };
-    const local = ctx.local?.[key];
-    const newest = f.seenAt >= prev.lastSeenAt;
-    await facts.put({
-      ...prev,
-      attempts: prev.attempts + f.a,
-      correct: prev.correct + f.c,
-      totalMs: prev.totalMs + f.ms,
-      box: newest ? f.box : prev.box,
-      lastSeenAt: Math.max(prev.lastSeenAt, f.seenAt),
-      lastSeenSession: newest ? ctx.sessionNo : prev.lastSeenSession,
-      streak: local?.streak ?? prev.streak,
-      fluent: local?.fluent ?? prev.fluent,
-      errs: local?.errs ?? prev.errs,
-      bugs: local?.bugs ?? prev.bugs,
-      recent: local?.recent ?? prev.recent,
-      recentCount: local?.recentCount ?? prev.recentCount,
-    });
+    await facts.put(mergeFactStat(prev, f, ctx.local?.[key], ctx.sessionNo));
   }
 
   const levels = tx.objectStore('levelProgress');
