@@ -107,11 +107,28 @@ export const GENERIC_NOUNS = [
   'i:book',
   'i:apple',
   'i:fish',
+  'i:orange',
+  'i:ball',
+  'i:notebook',
+  'i:pencil',
+  'i:cake',
+  'i:banana',
+  'i:mango',
+  'i:chicken',
+  'i:eraser',
+  'i:crayon',
 ] as const;
 const NAMES = [
   ['Mai', 'Nam'],
   ['An', 'Bình'],
   ['Lan', 'Hùng'],
+  ['Linh', 'Minh'],
+  ['Hoa', 'Tuấn'],
+  ['Thu', 'Đức'],
+  ['Ngọc', 'Khang'],
+  ['Hà', 'Long'],
+  ['Trang', 'Phong'],
+  ['Vy', 'Quân'],
 ] as const;
 
 export const pickNoun = (rng: Rng): string => pick(rng, GENERIC_NOUNS);

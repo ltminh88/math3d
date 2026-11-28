@@ -6,13 +6,11 @@ import { geoItem, qtyChoiceStep, scene } from '../geometry/geometry-distractors'
 import { pick, type Rng, randInt } from '../learning/seeded-rng';
 import { numberStep, ref } from '../reasoning/reasoning-distractors';
 import type { ReasoningStep } from '../reasoning/reasoning-types';
+import { OBJECTS } from './length-everyday-objects';
 import { LONG_NOUNS, nounLabel, pickOptions, twoNouns } from './measurement-distractors';
 import { RULER_MAX_CM } from './measurement-ranges';
 
 const MAX_MM = RULER_MAX_CM * 10;
-
-/** Small objects that fit the T1 mm-convert range (1–10 cm). */
-const MM_T1_NOUNS = ['i:pencil', 'i:eraser', 'i:leaf', 'i:crayon'] as const;
 
 const ruler = (fromMm: number, toMm: number, showMmLabels = false) =>
   scene(
@@ -94,8 +92,13 @@ export const measMmConvert: GeoGenerator = (rng, tier) => {
   if (tier === 1) {
     // R112: four small nouns so each T1 question feels different (the 20
     // conversion pairs themselves are curriculum-bound — see plan.md T2).
-    const item = pick(rng, MM_T1_NOUNS);
+    // R129: the noun must fit the number — pick from OBJECTS the cm objects
+    // whose range contains n, so no "pencil 2 cm" (every n in 1–10 has at
+    // least one: 1 → button, 10 → leaf/crayon/cup/candle). The T1 number
+    // range itself is unchanged.
     const n = randInt(rng, 1, RULER_MAX_CM);
+    const candidates = OBJECTS.filter((o) => o.unit === 'cm' && o.lo <= n && n <= o.hi);
+    const item = pick(rng, candidates).item;
     const s = ruler(0, n * 10);
     if (rng() < 0.5)
       return geoItem(

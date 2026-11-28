@@ -394,7 +394,23 @@ describe('arithmetic mul/div generators', () => {
  *  warehouse, a library or a school — never to one child's marbles or sweets. Small
  *  counts (≤ 99) keep the personal nouns. */
 const BIG_MARKERS = ['Kho', 'Thư viện', 'Trường'];
-const PERSONAL_NOUNS = ['viên bi', 'cái kẹo', 'bông hoa', 'quả táo', 'con cá'];
+const PERSONAL_NOUNS = [
+  'viên bi',
+  'cái kẹo',
+  'bông hoa',
+  'quả táo',
+  'con cá',
+  'quả cam',
+  'quả bóng',
+  'quyển vở',
+  'cây bút chì',
+  'cái bánh',
+  'quả chuối',
+  'quả xoài',
+  'con gà',
+  'cục tẩy',
+  'bút sáp',
+];
 const ALL_NOUNS = [...PERSONAL_NOUNS, 'quyển sách'];
 
 /** The numbers in a rendered story (SGK grouping spaces stripped first). */

@@ -58,6 +58,9 @@ Lane B (muse-min, after English 6): 1 → 6 → 5 → 7 → 2 → 3. Lane A (mus
   of curriculum-bound skills (money notes, roman, fraction-read, clock hour/half) with a reason.
   Added 2026-11-27 (R112): `meas-mm-convert` T1 — số ≤100, 1–10 cm ↔ 10–100 mm, không thập
   phân → tối đa 20 cặp; 4 danh từ T1 chỉ làm câu hỏi cảm giác khác nhau, không tăng số cặp.
+  R129 (2026-11-28): danh từ chọn theo n từ OBJECTS (vật cm có lo ≤ n ≤ hi, vd 2 cm →
+  cúc áo/tem) để không ra "bút chì dài 2 cm"; giữ nguyên dải số T1, vẫn 20 cặp, distinct
+  đo được 60 (mỗi chiều 30 = 20 cặp × vật vừa khoảng, trung bình 1,5 vật/n).
   Added 2026-11-27 (R113): `meas-len-convert-far` — D1: số nguyên ≤ 1000, không thập phân →
   tối đa 42 cặp ([m,cm] 20, [dm,mm] 20, [m,mm] 2); 4 danh từ chỉ làm câu hỏi cảm giác
   khác nhau, không tăng số cặp. Không nới D1.
