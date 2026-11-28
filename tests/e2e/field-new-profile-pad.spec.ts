@@ -27,12 +27,14 @@ async function enterFieldFresh(page: Page): Promise<void> {
   await expect(page.locator('.field-speech')).toContainText('VLM');
 }
 
+async function tapCell(page: Page, id: string): Promise<void> {
+  const point = await page.evaluate((target) => window.__field?.point(target), id);
+  if (!point) throw new Error(`no screen point for ${id}`);
+  await page.touchscreen.tap(point.x, point.y);
+}
+
 async function plantByTouch(page: Page): Promise<void> {
-  const tapId = async (id: string) => {
-    const point = await page.evaluate((target) => window.__field?.point(target), id);
-    if (!point) throw new Error(`no screen point for ${id}`);
-    await page.touchscreen.tap(point.x, point.y);
-  };
+  const tapId = async (id: string) => tapCell(page, id);
   await tapId('cell:0:0');
   for (let guard = 0; guard < 12; guard++) {
     const rows = await page.evaluate(() => window.__field?.openRows() ?? []);
@@ -129,6 +131,8 @@ test('fresh profile: field stage 1 shows the number pad after planting, and it t
 
   const first = await fieldState(page);
   expect(first).toMatchObject({ index: 0, phase: 'planting', type: 'build' });
+  // R151: on entering a build round the empty soil cells carry the planting hint.
+  expect(first?.plantHint).toBe(true);
   // By design the pad mounts only once the plot is full.
   await expect(page.locator('.field-pad')).toHaveCount(0);
   // R149/R150: the child must be able to SEE the planting instruction at round start —
@@ -150,6 +154,11 @@ test('fresh profile: field stage 1 shows the number pad after planting, and it t
     expect((box?.y ?? 0) + (box?.height ?? 0)).toBeLessThanOrEqual(viewport.height);
   }
 
+  await tapCell(page, 'cell:0:0');
+  // R151: the hint is gone after the first touch — planting has started.
+  await expect
+    .poll(() => fieldState(page).then((s) => s?.plantHint), { timeout: 5_000 })
+    .toBe(false);
   await plantByTouch(page);
   await page.waitForFunction(() => window.__field?.state().phase === 'answer');
 
@@ -172,5 +181,18 @@ test('fresh profile: field stage 1 shows the number pad after planting, and it t
   await pad.getByRole('button', { name: 'Xong' }).tap();
   await page.waitForFunction(() => window.__field?.state().phase === 'solved');
   await expect(page.locator('.field-panel .feedback.success')).toBeVisible();
+  // R151 applies to EVERY build round, not just round 0: if round 1 is also a build
+  // round (a square fact in stage 1 builds), its hint must behave the same way.
+  await page.locator('.field-next').tap();
+  await page.waitForFunction(() => window.__field?.state().index === 1);
+  const second = await fieldState(page);
+  if (second?.type === 'build') {
+    expect(second).toMatchObject({ phase: 'planting' });
+    expect(second.plantHint).toBe(true);
+    await tapCell(page, 'cell:0:0');
+    await expect
+      .poll(() => fieldState(page).then((s) => s?.plantHint), { timeout: 5_000 })
+      .toBe(false);
+  }
   expect(errors).toEqual([]);
 });

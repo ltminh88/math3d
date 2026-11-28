@@ -37,6 +37,7 @@ export function createFieldGame({ ctx, view, hud, labels, diorama, planting }: F
   const tally = createRunTally();
   let index = 0;
   let phase: FieldPhase = 'planting';
+  let plantHint = false;
   let state = flow.startRound(rounds[0] as flow.FieldRound);
   let grid = model.createGrid(1, 1);
   let focus: model.GridCell | null = null;
@@ -63,6 +64,11 @@ export function createFieldGame({ ctx, view, hud, labels, diorama, planting }: F
     focus = cell;
     view.setFocus(cell);
   };
+  /** The planting hint (R151) lives in the view; the game owns when it is on. */
+  const setPlantHint = (on: boolean) => {
+    plantHint = on;
+    view.setPlantHint(on);
+  };
   const clearFocus = () => setFocus(null);
   const dropWidget = () => {
     widget?.destroy();
@@ -85,6 +91,7 @@ export function createFieldGame({ ctx, view, hud, labels, diorama, planting }: F
     dropWidget();
     clearFocus();
     view.setRowHighlight(false);
+    setPlantHint(false); // non-build rounds never carry the hint; build turns it on below
     hud.resetRound(i, run.total);
     const [a, b] = round.type === 'recall' ? round.shownOrder : [round.rows, round.cols];
     showGrid(model.createGrid(a, b, round.type !== 'build'));
@@ -101,6 +108,8 @@ export function createFieldGame({ ctx, view, hud, labels, diorama, planting }: F
       hud.speak(i === 0 ? tf('introBuild', { rows: round.rows, cols: round.cols }) : title);
       hud.setTools({ rotate: false, hint: false });
       planting.enable();
+      // R151: empty soil cells pulse until the first planting, on every build round.
+      setPlantHint(true);
       return;
     }
     const prompt = round.type === 'equations' ? 'equationsPrompt' : 'recallPrompt';
@@ -113,6 +122,7 @@ export function createFieldGame({ ctx, view, hud, labels, diorama, planting }: F
     hud.setFeedback('', '');
     planting.disable();
     clearFocus();
+    setPlantHint(false); // the plot is full; the hint has nothing left to point at
     const round = state.round;
     hud.setTools({ rotate: true, hint: true });
     if (round.type !== 'equations') equationLabel(' = ?');
@@ -195,13 +205,23 @@ export function createFieldGame({ ctx, view, hud, labels, diorama, planting }: F
     showGrid(next);
     audio.jump();
     const count = model.plantedCount(grid);
+    // R151: the hint stops once planting has started — one planted cell (or row) ends it.
+    if (plantHint) setPlantHint(false);
     hud.setFeedback(tf('planted', { count, total: grid.rows * grid.cols }), '');
     if (model.isFull(grid)) askAnswer();
   }
 
   return {
     /** Live round state (keyboard layer, test hook). */
-    status: () => ({ phase, index, round: state.round, grid, focus, hintRung: state.hint.rung }),
+    status: () => ({
+      phase,
+      index,
+      round: state.round,
+      grid,
+      focus,
+      hintRung: state.hint.rung,
+      plantHint,
+    }),
     start: () => beginRound(0),
     plantCell: (row: number, col: number) => plant(model.plantCell(grid, row, col)),
     plantRow: (row: number) => plant(model.plantRow(grid, row)),

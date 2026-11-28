@@ -34,6 +34,8 @@ export interface GridView {
   show(grid: PlantingGrid): void;
   setFocus(cell: GridCell | null): void;
   setRowHighlight(on: boolean): void;
+  /** Empty soil cells pulse gently until the first planting (R151); no-op when off. */
+  setPlantHint(on: boolean): void;
   /** Quarter turn of the plot; resolves when done (the caller then shows the rotated model). */
   rotate(): Promise<void>;
   /** Ends a running turn at once (plot back to rest) and resolves its promise. */
@@ -66,6 +68,9 @@ export function createGridView(mat: MaterialCache, reducedMotion: boolean): Grid
   let grid: PlantingGrid = { rows: 1, cols: 1, planted: [false] };
   let focus: GridCell | null = null;
   let highlight = false;
+  let plantHint = false;
+  /** Clock for the planting-hint pulse; only advances while the hint is on. */
+  let pulseT = 0;
   const growth = new Float32Array(MAX_CELLS);
   let turn: { t: number; resolve: () => void } | null = null;
 
@@ -86,8 +91,21 @@ export function createGridView(mat: MaterialCache, reducedMotion: boolean): Grid
       }
       const focused = focus?.row === row && focus.col === col;
       const planted = isPlanted(grid, row, col);
-      const soil = highlight ? (row % 2 ? C.rowB : C.rowA) : planted ? C.soilDark : C.soil;
-      const s = focused ? 1.2 : 1;
+      // Priority: focused > planted > hint > row-highlight. The hint colours every
+      // still-empty mound bright yellow and breathes its scale 1 → 1.1; with reduced
+      // motion the colour stays but the scale never moves (R151).
+      const hinted = plantHint && !planted;
+      const soil = planted
+        ? C.soilDark
+        : hinted
+          ? C.plantHint
+          : highlight
+            ? row % 2
+              ? C.rowB
+              : C.rowA
+            : C.soil;
+      const pulse = hinted && !reducedMotion ? 1 + 0.05 * (1 + Math.sin(pulseT * 4)) : 1;
+      const s = focused ? 1.2 : pulse;
       setInstance(
         mounds,
         i,
@@ -128,6 +146,10 @@ export function createGridView(mat: MaterialCache, reducedMotion: boolean): Grid
     },
     setRowHighlight(on) {
       highlight = on;
+      layout();
+    },
+    setPlantHint(on) {
+      plantHint = on;
       layout();
     },
     rotate() {
@@ -179,6 +201,10 @@ export function createGridView(mat: MaterialCache, reducedMotion: boolean): Grid
         grew = true;
       }
       if (grew) layout();
+      if (plantHint && !reducedMotion) {
+        pulseT += dt;
+        layout();
+      }
       if (!turn) return;
       turn.t = Math.min(1, turn.t + dt / ROTATE_SECONDS);
       plot.rotation.y = -(Math.PI / 2) * EASE.easeInOutQuad(turn.t);

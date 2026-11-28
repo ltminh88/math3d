@@ -41,6 +41,7 @@ function setup(facts: string[], firstCompletion = true, stage = 1) {
     show: noop,
     setFocus: noop,
     setRowHighlight: noop,
+    setPlantHint: noop,
     worldOf: () => null,
     rotate: () =>
       new Promise<void>((resolve) => {
@@ -135,6 +136,27 @@ describe('field game rounds', () => {
     const planting = hud.tips.at(-1);
     expect(planting?.rotate).toBe(false);
     expect(planting?.tip).not.toMatch(/\bR\b/);
+  });
+
+  it('R151: the planting hint is on at the start of a build round', () => {
+    const { game } = setup(['mul:3x6']);
+    expect(game.status().round.type).toBe('build');
+    expect(game.status().phase).toBe('planting');
+    expect(game.status().plantHint).toBe(true);
+  });
+
+  it('R151: the planting hint turns off after the first planting', () => {
+    const { game } = setup(['mul:3x6']);
+    expect(game.status().plantHint).toBe(true);
+    game.plantCell(0, 0);
+    expect(game.status().plantHint).toBe(false);
+    expect(game.status().phase).toBe('planting');
+  });
+
+  it('R151: the planting hint turns off when a whole row is planted at once', () => {
+    const { game } = setup(['mul:3x6']);
+    game.plantRow(0);
+    expect(game.status().plantHint).toBe(false);
   });
 
   it('the pad is cleared when the answer is revealed after three misses (m-2)', () => {

@@ -17,6 +17,8 @@ export interface FieldTestHook {
     answer: number;
     correctOptions: string[];
     hintRung: number;
+    /** R151: whether the empty soil cells are currently pulsing with the planting hint. */
+    plantHint: boolean;
   };
   /** Client (CSS px) point of `cell:r:c`, `row:r` or `basket`; null when not shown. */
   point(id: string): { x: number; y: number } | null;
@@ -51,6 +53,7 @@ export function installFieldTestHook(
         .round.options.filter((o) => o.correct)
         .map((o) => o.id),
       hintRung: game.status().hintRung,
+      plantHint: game.status().plantHint,
     }),
     point(id) {
       const at = id === 'basket' ? view.basket.getWorldPosition(new Vector3()) : view.worldOf(id);
