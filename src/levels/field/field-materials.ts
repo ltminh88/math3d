@@ -22,6 +22,8 @@ export const FIELD_COLORS = {
   straw: 0xd9c48a,
   sprout: 0x6aa95c,
   focus: 0xffd064,
+  /** Empty soil cells while the planting hint is on (R151): bright yellow, pulsing. */
+  plantHint: 0xffd064,
   rowA: 0xf2bd55,
   rowB: 0x74b9a7,
 } as const;
