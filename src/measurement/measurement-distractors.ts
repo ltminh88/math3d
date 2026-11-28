@@ -5,7 +5,18 @@ import { ref } from '../reasoning/reasoning-distractors';
 import type { ChoiceOption, Misconception, PromptRef } from '../reasoning/reasoning-types';
 import { WEIGHTS } from './measurement-ranges';
 
-export const LONG_NOUNS = ['i:pencil', 'i:eraser', 'i:ribbon', 'i:leaf', 'i:crayon'] as const;
+export const LONG_NOUNS = [
+  'i:pencil',
+  'i:eraser',
+  'i:ribbon',
+  'i:leaf',
+  'i:crayon',
+  'i:key',
+  'i:stamp',
+  'i:button',
+  'i:paperclip',
+  'i:coin',
+] as const;
 export const MASS_NOUNS = ['i:candyBag', 'i:sugarBag', 'i:orange', 'i:cake'] as const;
 
 /** Two different nouns from `nouns`. */

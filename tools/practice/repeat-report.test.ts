@@ -212,6 +212,24 @@ describe('repeat meter guard', () => {
   it('meas-temperature tier 1 has 48 distinct prompts (report params)', () => {
     expect(countSkill('meas-temperature', 1, POOL_OPTS).distinct).toBe(48);
   });
+
+  it('phase 06: widened length pools clear their bars', () => {
+    // Phase 6 widens the pools that can grow; the meter is the guard.
+    // (meas-mm-convert T1 and meas-len-convert-far are curriculum-bound —
+    // ceilings 20 and 42 pairs, allow-listed per R112/R113; their bars below
+    // assert the pairs ceilings as floors, and the 4 story nouns lift the
+    // measured distinct counts above them: 20×4=80, 42×4=168.)
+    for (const tier of [1, 2, 3] as const) {
+      expect(
+        countSkill('meas-len-choose-unit', tier, POOL_OPTS).distinct,
+        `choose-unit t${tier}`,
+      ).toBeGreaterThanOrEqual(100);
+    }
+    expect(countSkill('meas-len-convert-far', 1, POOL_OPTS).distinct).toBeGreaterThanOrEqual(40);
+    expect(countSkill('meas-len-convert-far', 2, POOL_OPTS).distinct).toBeGreaterThanOrEqual(42);
+    expect(countSkill('meas-len-convert-far', 3, POOL_OPTS).distinct).toBeGreaterThanOrEqual(42);
+    expect(countSkill('meas-ruler-read', 1, POOL_OPTS).distinct).toBeGreaterThanOrEqual(60);
+  });
 });
 
 describe('repeat baseline report', () => {

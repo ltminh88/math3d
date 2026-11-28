@@ -29,7 +29,18 @@ function mixedWithBug(bug: Misconception, m: Mixed, to: LengthUnit): number {
   );
 }
 
-const LEN_OBJECTS = ['i:rope', 'i:ribbon', 'i:cloth', 'i:road'] as const;
+const LEN_OBJECTS = [
+  'i:rope',
+  'i:ribbon',
+  'i:cloth',
+  'i:road',
+  'i:fence',
+  'i:wire',
+  'i:track',
+  'i:gardenbed',
+  'i:curtain',
+  'i:hose',
+] as const;
 
 /** meas-len-add-sub: word problems that add or subtract lengths. */
 export const measLenAddSub = (rng: Rng, tier: SkillTier, _ladder: number): LengthItem => {

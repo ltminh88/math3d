@@ -20,6 +20,9 @@ const FAR: readonly (readonly [LengthUnit, LengthUnit])[] = [
   ['dm', 'mm'],
 ];
 
+/** Long things measured in far conversions (any far range fits all four). */
+const CONVERT_FAR_NOUNS = ['i:rope', 'i:ribbon', 'i:cloth', 'i:fence'] as const;
+
 /** One rung of a chain: the value in that unit, or '?' for the blank. */
 function chainString(values: readonly (number | null)[], units: readonly LengthUnit[]): string {
   return values
@@ -110,7 +113,10 @@ export const measLenConvertFar = (rng: Rng, tier: SkillTier, ladder: number): Le
     ? randInt(rng, 1, Math.floor(LENGTH_LADDER_MAX / factor))
     : randInt(rng, 1, Math.floor(LENGTH_LADDER_MAX / factor)) * factor;
   const answer = convertLength(n, from, to) as number;
-  const story = ref('lenConvert', { n, from, to });
+  // R113: four long nouns so each question feels different (the 42 conversion
+  // pairs themselves are curriculum-bound — see plan.md T2).
+  const item = pick(rng, CONVERT_FAR_NOUNS);
+  const story = ref('lenConvertFar', { item, n, from, to });
   const scene = ladderScene(from, to);
   if (tier === 1)
     return lengthItem(

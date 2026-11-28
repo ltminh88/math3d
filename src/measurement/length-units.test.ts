@@ -21,6 +21,10 @@ describe('length units', () => {
     expect(convertLength(1, 'm', 'mm')).toBe(1000);
     expect(convertLength(4, 'dm', 'cm')).toBe(40);
     expect(convertLength(25, 'cm', 'mm')).toBe(250);
+    // 1 dm = 10 cm = 100 mm (R112: never "fix" the [dm,mm] factor to 10).
+    expect(convertLength(1, 'dm', 'mm')).toBe(100);
+    expect(convertLength(1, 'dm', 'cm')).toBe(10);
+    expect(convertLength(10, 'cm', 'mm')).toBe(100);
   });
 
   it('converts up by ÷10 per rung, null when not whole', () => {
