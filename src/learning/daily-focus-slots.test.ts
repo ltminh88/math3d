@@ -3,9 +3,7 @@
 // cases below use accuracy without `recent` (seeded-stat fallback) so the
 // scores are plain correct/attempts.
 import { describe, expect, it } from 'vitest';
-import {
-  planFocusDay,
-} from './daily-focus-slots';
+import { planFocusDay } from './daily-focus-slots';
 import type { FactKey } from './fact-key';
 import type { FactStat } from './learning-types';
 import { newFactStat } from './leitner-box';
@@ -13,10 +11,7 @@ import { mulberry32 } from './seeded-rng';
 
 const dayMs = (y: number, m: number, d: number): number => new Date(y, m, d).getTime();
 
-const stat = (
-  box: number,
-  partial: Partial<FactStat> = {},
-): FactStat => ({
+const stat = (box: number, partial: Partial<FactStat> = {}): FactStat => ({
   ...newFactStat(),
   attempts: 10,
   correct: 10,

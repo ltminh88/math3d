@@ -318,12 +318,11 @@ describe('focusReviewLesson (Phase 4A)', () => {
     'sk:add-sub-10000-wp',
     'sk:add-sub-10000-bug-choice',
   ];
-  const rstat = (
-    box: number,
-    session: number,
-    attempts = 10,
-    correct = 10,
-  ): FactStat => ({ ...stat(box, attempts), correct, lastSeenSession: session });
+  const rstat = (box: number, session: number, attempts = 10, correct = 10): FactStat => ({
+    ...stat(box, attempts),
+    correct,
+    lastSeenSession: session,
+  });
   const doneStats = (session: number): Record<FactKey, FactStat> =>
     Object.fromEntries([...B2, ...B54_EXTRA].map((k) => [k, rstat(4, session)]));
 

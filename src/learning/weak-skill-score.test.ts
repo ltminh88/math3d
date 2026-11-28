@@ -45,9 +45,9 @@ describe('recentAccuracy', () => {
 describe('labelledBugs', () => {
   it('a bug is labelled only at ≥ 2 of the last 5', () => {
     expect(labelledBugs(stat({ bugs: ['forgot-carry'] }))).toEqual([]);
-    expect(
-      labelledBugs(stat({ bugs: ['forgot-carry', 'near-miss', 'forgot-carry'] })),
-    ).toEqual(['forgot-carry']);
+    expect(labelledBugs(stat({ bugs: ['forgot-carry', 'near-miss', 'forgot-carry'] }))).toEqual([
+      'forgot-carry',
+    ]);
   });
 
   it('returns distinct labelled bugs in first-appearance order', () => {
@@ -83,9 +83,7 @@ describe('weakScore', () => {
 
   it('each labelled bug adds 0.2', () => {
     expect(
-      weakScore(
-        stat({ attempts: 4, recent: 0b1111, bugs: ['forgot-carry', 'forgot-carry'] }),
-      ),
+      weakScore(stat({ attempts: 4, recent: 0b1111, bugs: ['forgot-carry', 'forgot-carry'] })),
     ).toBeCloseTo(0.2);
     expect(
       weakScore(
