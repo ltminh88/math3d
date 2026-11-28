@@ -82,7 +82,8 @@ function isEnglishItem(v: unknown, skillIds: readonly string[]): v is EnglishIte
         v.choices.length >= 2 &&
         v.choices.every(isNonEmptyString) &&
         typeof v.answer === 'string' &&
-        v.choices.includes(v.answer)
+        v.choices.includes(v.answer) &&
+        (v.picture === undefined || v.picture === null || typeof v.picture === 'string')
       );
     default:
       return false;

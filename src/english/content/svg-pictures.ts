@@ -1,8 +1,9 @@
 // SVG pictures (Phase 2A, self-drawn): for bank words with no good emoji.
 // Same data-URI encoding as the synthetic pack fixture: `<`/`>` as %3C/%3E,
-// `#` as %23, single quotes inside. Each picture is a 64×64 SVG.
+// `#` as %23, single quotes inside. Each picture is drawn on a 64×64
+// viewBox (R148: no fixed width/height, so it scales up sharp).
 const svg = (inner: string): string =>
-  `data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='64' height='64'%3E${inner}%3C/svg%3E`;
+  `data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E${inner}%3C/svg%3E`;
 
 /** A patchwork quilt: four coloured squares (word `quilt`). */
 export const SVG_QUILT = svg(

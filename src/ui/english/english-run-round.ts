@@ -74,7 +74,9 @@ export async function playEnglishRound(ctx: EnglishRoundContext): Promise<Englis
   });
   shell.feedback.textContent = '';
   shell.nextButton.hidden = true;
-  shell.hintButton.disabled = true;
+  // R143: the hint is usable before the first miss — a button disabled
+  // until the first mistake is why "Gợi ý" looked dead when tapped.
+  shell.hintButton.disabled = false;
 
   let widget: EnglishWidget | null = null;
   const hooks: EnglishWidgetHooks = {
@@ -121,8 +123,12 @@ export async function playEnglishRound(ctx: EnglishRoundContext): Promise<Englis
       item,
       hintRung: rung,
     });
-    if (rung === 1) shell.say(tei('hintEncourage'));
-    else if (rung === 2) {
+    if (rung === 1) {
+      // R143: on a word-order item the first hint must do something visible,
+      // not just a line of encouragement — it places the first word.
+      if (item.kind === 'order-words') widget.helpOnce();
+      shell.say(tei('hintEncourage'));
+    } else if (rung === 2) {
       widget.helpOnce();
       shell.say(tei('hintNarrowed'));
     }

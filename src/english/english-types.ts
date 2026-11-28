@@ -134,6 +134,12 @@ export interface LetterPickItem {
   readonly prompt: string;
   readonly choices: readonly string[];
   readonly answer: string;
+  /**
+   * R146: the word's picture, shown instead of the word until the answer is
+   * known. Own items carry the bank picture; pack items carry their own (the
+   * widget falls back to the bank lookup, then to a generic picture).
+   */
+  readonly picture?: string | null;
 }
 
 export type EnglishItem =

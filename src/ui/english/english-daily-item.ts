@@ -161,15 +161,20 @@ export function mountEnglishDailyItem(opts: {
     if (!widget || nextButton.hidden === false) return;
     const rung = budget.takeHint(2);
     setEnglishRunLive({ round: 1, total: 1, done: false, skillId, item, hintRung: rung });
-    if (rung === 1) say(tei('hintEncourage'));
-    else if (rung === 2) {
+    if (rung === 1) {
+      // R143: as on the island — the first hint on a word-order item places
+      // the first word, so it is visible, not just a line of encouragement.
+      if (item.kind === 'order-words') widget.helpOnce();
+      say(tei('hintEncourage'));
+    } else if (rung === 2) {
       widget.helpOnce();
       say(tei('hintNarrowed'));
     }
     hintButton.disabled = budget.hint.rung >= 2;
     gameState.audio.hint();
   };
-  hintButton.disabled = true;
+  // R143: usable before the first miss (a disabled hint looks dead).
+  hintButton.disabled = false;
   hintButton.addEventListener('click', hint);
   nextButton.addEventListener('click', () => cb.onNext());
   leaveButton.addEventListener('click', () => cb.onLeave());

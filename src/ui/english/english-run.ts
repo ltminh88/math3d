@@ -7,6 +7,10 @@
 // resolves after round 8; the level shell owns the ending screen. 3B:
 // "🔊 Nghe" speaks the item, "Phụ huynh" unlocks the book pack, `signal`
 // aborts mid-run. Round: `english-run-round.ts`; shell: `english-run-widgets.ts`; speech: `english-run-speech.ts`.
+// R143: the widget CSS lives here (not only in the daily adapter) — the
+// island run never loaded it, so the bank/slots rendered unstyled and the
+// sentence tiles stacked one per row.
+import './english-widgets.css';
 import { createItemPlanner, type PlannedRound } from '../../english/engine/item-planner';
 import type { EnglishBook } from '../../english/english-books';
 import type { EnglishItem, EnglishPack } from '../../english/english-types';

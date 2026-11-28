@@ -118,10 +118,21 @@ export function mountWordTileOrder(
     },
     helpOnce() {
       if (done) return;
-      for (const tile of tiles) bank.appendChild(tile);
-      const first = tiles.find((t) => t.textContent === item.words[0]) as HTMLButtonElement;
-      const empty = [...slots.children].find((s) => s.childElementCount === 0);
-      if (empty) empty.appendChild(first);
+      // R143: each hint places the next word that is not in its own slot yet
+      // (rung 1 → the first word, rung 2 → the second). A tile sitting in
+      // the wrong slot goes back to the bank first, so the hint never shows
+      // a word in the wrong place and never moves a word already right.
+      const nextIndex = item.words.findIndex((word, i) => {
+        const tile = slots.children[i]?.querySelector('.english-tile');
+        return (tile?.textContent ?? '') !== word;
+      });
+      if (nextIndex === -1) return;
+      const word = item.words[nextIndex] as string;
+      const tile = tiles.find((t) => t.textContent === word) as HTMLButtonElement;
+      const slot = slots.children[nextIndex] as HTMLElement;
+      const occupant = slot.querySelector('.english-tile');
+      if (occupant) bank.appendChild(occupant);
+      slot.appendChild(tile);
       refreshCheck();
     },
     showGloss() {

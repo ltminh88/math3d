@@ -44,8 +44,20 @@ async function answerRight(page: Page, tap: boolean): Promise<void> {
     await tapOrClick(page.locator('.english-choice-grid .english-choice').nth(expected.index), tap);
   } else if (expected.kind === 'match-pairs') {
     for (const pair of expected.pairs) {
-      await tapOrClick(page.getByRole('button', { name: pair.word, exact: true }), tap);
-      await tapOrClick(page.getByRole('button', { name: pair.picture, exact: true }), tap);
+      await tapOrClick(
+        page
+          .locator('.english-pair-column')
+          .nth(0)
+          .getByRole('button', { name: pair.word, exact: true }),
+        tap,
+      );
+      await tapOrClick(
+        page
+          .locator('.english-pair-column')
+          .nth(1)
+          .getByRole('button', { name: pair.word, exact: true }),
+        tap,
+      );
     }
   } else {
     for (const word of expected.words) {
@@ -71,8 +83,20 @@ async function answerWrongOnce(page: Page, tap: boolean): Promise<void> {
   } else if (expected.kind === 'match-pairs') {
     const [first, second] = expected.pairs;
     if (!first || !second) throw new Error('match-pairs needs 2 pairs');
-    await tapOrClick(page.getByRole('button', { name: first.word, exact: true }), tap);
-    await tapOrClick(page.getByRole('button', { name: second.picture, exact: true }), tap);
+    await tapOrClick(
+      page
+        .locator('.english-pair-column')
+        .nth(0)
+        .getByRole('button', { name: first.word, exact: true }),
+      tap,
+    );
+    await tapOrClick(
+      page
+        .locator('.english-pair-column')
+        .nth(1)
+        .getByRole('button', { name: second.word, exact: true }),
+      tap,
+    );
   } else {
     const reversed = [...expected.words].reverse();
     for (const word of reversed) {

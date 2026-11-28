@@ -5,11 +5,11 @@ import { expectedOf } from '../../english/engine/answer-check';
 import type { ListenPickPictureItem } from '../../english/english-types';
 import { tei } from './english-strings';
 import {
-  choiceButton,
   type EnglishWidget,
   type EnglishWidgetHooks,
   type EnglishWidgetOptions,
   englishWordEl,
+  pictureChoiceButton,
   renderGloss,
   widgetRoot,
 } from './english-widget-layout';
@@ -34,8 +34,11 @@ export function mountPictureChoiceGrid(
   const answerIndex = expected.kind === 'listen-pick-picture' ? expected.index : -1;
   let done = false;
   const buttons = item.choices.map((choice, index) => {
-    const button = choiceButton(
+    // R147: the picture renders through the shared helper — a data-URI
+    // picture becomes a real <img>, never button text.
+    const button = pictureChoiceButton(
       choice.picture,
+      choice.word,
       index,
       () => {
         if (done) return;

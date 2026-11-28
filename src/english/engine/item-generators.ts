@@ -121,6 +121,8 @@ function letterPick(
     prompt: word.word,
     choices: letterChoices(answer, tier, blockLetters(skillId), rng),
     answer,
+    // R146: the widget shows this picture instead of the word.
+    picture: word.picture ?? null,
   };
 }
 

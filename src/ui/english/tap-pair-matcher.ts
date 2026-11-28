@@ -8,6 +8,7 @@ import {
   type EnglishWidget,
   type EnglishWidgetHooks,
   type EnglishWidgetOptions,
+  pictureChoiceButton,
   renderGloss,
   widgetRoot,
 } from './english-widget-layout';
@@ -112,11 +113,16 @@ export function mountTapPairMatcher(
     wordButtons.set(pair.word, button);
   }
   for (const pair of shuffled(item.pairs)) {
-    const button = createUiButton(
-      { label: pair.picture, variant: 'secondary', onClick: () => select('picture', pair.picture) },
+    // R147: the picture renders through the shared helper — a data-URI
+    // picture becomes a real <img>, never button text.
+    const button = pictureChoiceButton(
+      pair.picture,
+      pair.word,
+      undefined,
+      () => select('picture', pair.picture),
       doc,
     );
-    button.classList.add('english-choice', 'english-picture-choice');
+    button.classList.add('english-picture-choice');
     picturesCol.appendChild(button);
     pictureButtons.set(pair.picture, button);
   }
