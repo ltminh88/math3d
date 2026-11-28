@@ -6,6 +6,7 @@
 import type { EnglishAttempt } from '../../english/engine/answer-check';
 import type { EnglishItem } from '../../english/english-types';
 import { createUiButton } from '../kit/ui-button';
+import { pictureEl } from './english-picture';
 import { tei } from './english-strings';
 
 export interface EnglishWidgetHooks {
@@ -79,6 +80,27 @@ export function choiceButton(
     button.lang = 'en';
     button.translate = false;
   }
+  return button;
+}
+
+/**
+ * A choice button whose face is a picture (R147): an image picture renders as
+ * a real <img>, an emoji as text. The accessible label is always the word —
+ * never the data-URI string. `index` is the e2e choice index, when the
+ * button sits in a choice grid (pair columns pass none).
+ */
+export function pictureChoiceButton(
+  picture: string,
+  label: string,
+  index: number | undefined,
+  onClick: () => void,
+  doc: Document,
+): HTMLButtonElement {
+  const button = createUiButton({ label, variant: 'secondary', onClick, ariaLabel: label }, doc);
+  button.textContent = '';
+  button.appendChild(pictureEl(picture, doc));
+  button.classList.add('english-choice');
+  if (index !== undefined) button.dataset.choiceIndex = String(index);
   return button;
 }
 

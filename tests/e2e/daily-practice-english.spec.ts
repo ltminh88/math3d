@@ -64,8 +64,20 @@ async function answerEnglishRight(page: Page, tap: boolean): Promise<void> {
     await tapOrClick(page.locator('.english-choice-grid .english-choice').nth(expected.index), tap);
   } else if (expected.kind === 'match-pairs') {
     for (const pair of expected.pairs) {
-      await tapOrClick(page.getByRole('button', { name: pair.word, exact: true }), tap);
-      await tapOrClick(page.getByRole('button', { name: pair.picture, exact: true }), tap);
+      await tapOrClick(
+        page
+          .locator('.english-pair-column')
+          .nth(0)
+          .getByRole('button', { name: pair.word, exact: true }),
+        tap,
+      );
+      await tapOrClick(
+        page
+          .locator('.english-pair-column')
+          .nth(1)
+          .getByRole('button', { name: pair.word, exact: true }),
+        tap,
+      );
     }
   } else {
     for (const word of expected.words) {

@@ -88,8 +88,29 @@
   font-size: 20px;
 }
 
+/* R148: answer pictures are big on iPad (72–88 px) and stay sharp. The
+   scoped selectors beat the grid/pair `.kit-button` font-size above (same
+   specificity, later in the file). Square cells centre the picture. */
 .english-picture-choice {
-  font-size: 40px;
+  font-size: clamp(56px, 12vw, 88px);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.english-choice-grid .english-picture-choice {
+  font-size: clamp(56px, 12vw, 88px);
+  aspect-ratio: 1;
+}
+
+.english-pair-column .english-picture-choice {
+  font-size: clamp(56px, 12vw, 88px);
+}
+
+/* R147/R148: a self-drawn picture renders at the emoji's size (~80 px). */
+.english-picture-choice img {
+  width: clamp(56px, 12vw, 80px);
+  height: auto;
 }
 
 .english-choice.correct {
@@ -135,6 +156,7 @@
 
 .english-slots {
   display: flex;
+  flex-wrap: wrap;
   gap: 8px;
   min-height: 64px;
   padding: 8px;
@@ -143,13 +165,17 @@
 }
 
 .english-slot {
-  flex: 1;
+  /* R143: slots sit in a row and wrap only when truly out of space — never
+     one full-width row per word. */
+  flex: 1 1 72px;
+  min-width: 72px;
   display: flex;
   min-height: 56px;
 }
 
 .english-slot .english-tile {
   flex: 1;
+  width: auto;
 }
 
 .english-bank {
@@ -160,7 +186,20 @@
 }
 
 .english-bank .english-tile {
+  /* R143: a bank tile never stretches to a full row on its own. */
+  flex: 0 0 auto;
   min-width: 72px;
+}
+
+/* R146: the first-letter prompt shows the word's picture (never its text)
+   until the answer is known. */
+.english-prompt--picture img {
+  width: clamp(56px, 12vw, 80px);
+  height: auto;
+}
+
+.english-prompt--picture .english-picture-emoji {
+  font-size: clamp(56px, 12vw, 80px);
 }
 
 .english-check {

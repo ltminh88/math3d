@@ -63,8 +63,20 @@ async function answerRight(page: Page, tap: boolean): Promise<void> {
     await tapOrClick(page.locator('.english-choice-grid .english-choice').nth(expected.index), tap);
   } else if (expected.kind === 'match-pairs') {
     for (const pair of expected.pairs) {
-      await tapOrClick(page.getByRole('button', { name: pair.word, exact: true }), tap);
-      await tapOrClick(page.getByRole('button', { name: pair.picture, exact: true }), tap);
+      await tapOrClick(
+        page
+          .locator('.english-pair-column')
+          .nth(0)
+          .getByRole('button', { name: pair.word, exact: true }),
+        tap,
+      );
+      await tapOrClick(
+        page
+          .locator('.english-pair-column')
+          .nth(1)
+          .getByRole('button', { name: pair.word, exact: true }),
+        tap,
+      );
     }
   } else {
     for (const word of expected.words) {
@@ -78,6 +90,22 @@ async function answerRight(page: Page, tap: boolean): Promise<void> {
 async function nextRound(page: Page, tap: boolean): Promise<void> {
   await tapOrClick(page.locator('.english-next'), tap);
   await expect(page.locator('.english-next')).toBeHidden();
+}
+
+/**
+ * Round 2 is a pack item: it shows the pack word — as text, or (letter-pick,
+ * R146) as the pack's own picture instead of the word. The synthetic pack's
+ * picture is the orange circle (`#f59e0b`), not the generic fallback.
+ */
+async function expectPackWord(page: Page): Promise<void> {
+  const state = await islandState(page);
+  if (state?.kind === 'letter-pick') {
+    await expect(page.locator('.english-prompt img')).toHaveCount(1);
+    const src = await page.locator('.english-prompt img').first().getAttribute('src');
+    expect(src).toContain('f59e0b');
+  } else {
+    await expect(page.locator('.english-widget')).toContainText('zib');
+  }
 }
 
 /** Fake speechSynthesis that records every spoken text on `window.__spoken`. */
@@ -205,7 +233,7 @@ test('no request before a passphrase; unlock joins pack items from the next roun
   expect(requests).toBe(2);
   await answerRight(page, tap);
   await nextRound(page, tap);
-  await expect(page.locator('.english-widget')).toContainText('zib');
+  await expectPackWord(page);
 });
 
 test('401 clears the stored passphrase but keeps the pack', async ({ page }, testInfo) => {
@@ -263,7 +291,7 @@ test('reload offline keeps the pack', async ({ page }, testInfo) => {
   await startIsland(page);
   await answerRight(page, tap);
   await nextRound(page, tap);
-  await expect(page.locator('.english-widget')).toContainText('zib');
+  await expectPackWord(page);
   expect(requests).toBe(1);
 });
 
@@ -273,13 +301,15 @@ test('Nghe speaks the shown word through a clip or speechSynthesis', async ({ pa
   await recordClipPlays(page);
   await boot(page);
   await startIsland(page);
-  // Find a listen/letter round (its word is on screen as the prompt).
+  // Find a listen-pick-picture round: its word is on screen as the prompt
+  // (a letter-pick round shows a picture instead, R146 — the word is not
+  // in the DOM to compare the spoken text against).
   for (let round = 1; round <= 8; round++) {
     const state = await islandState(page);
-    if (state?.kind === 'listen-pick-picture' || state?.kind === 'letter-pick') break;
+    if (state?.kind === 'listen-pick-picture') break;
     await answerRight(page, tap);
     await nextRound(page, tap);
-    if (round === 8) throw new Error('no listen/letter round in 8 rounds');
+    if (round === 8) throw new Error('no listen-pick-picture round in 8 rounds');
   }
   const prompt = (await page.locator('.english-prompt').textContent())?.trim() ?? '';
   expect(prompt.length).toBeGreaterThan(0);

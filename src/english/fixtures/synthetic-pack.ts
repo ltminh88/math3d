@@ -34,6 +34,8 @@ export const SYNTHETIC_PACK: EnglishPack = {
       prompt: 'zib',
       choices: ['z', 'w', 't'],
       answer: 'z',
+      // R146: the widget shows this picture instead of the word.
+      picture: SYNTHETIC_IMAGES.zib,
     },
     {
       kind: 'match-pairs',
