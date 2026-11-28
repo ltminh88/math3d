@@ -76,6 +76,7 @@ Hạn mức: 41%
     - deploy preview
     - lần đầu chạy một công cụ / lệnh lạ, hoặc lệnh đã từng bị hỏi duyệt
     Chạy xong thì làm tiếp như thường (không cần báo lại riêng). Reviewer thấy `PRE` mà 10 phút không có tin/commit tiếp theo → báo anh chủ dự án mở tab bấm duyệt.
+13. **Dọn nhánh đã gộp (anh chủ dự án duyệt 28/11):** sau khi reviewer gộp PR và em đã kiểm head PR là ancestor của `origin/main`, em được xoá worktree, nhánh local VÀ nhánh remote của chính PR đó. Không xoá nhánh của Muse kia, không xoá nhánh chưa gộp, không xoá `main`.
 
 ## Bảo mật (repo PUBLIC)
 
